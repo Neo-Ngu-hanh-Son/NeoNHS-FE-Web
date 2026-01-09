@@ -1,6 +1,6 @@
-import { AntdProvider } from '@/app/providers/AntdProvider'
+import { AntdProvider } from '@/config/providers/AntdProvider'
 import { RouterProvider } from 'react-router-dom'
-import { router } from '@/app/router'
+import { router } from '@/routes'
 
 export function App() {
   return (

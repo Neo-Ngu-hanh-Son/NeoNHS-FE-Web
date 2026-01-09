@@ -117,41 +117,86 @@ Preview bản build production trước khi deploy.
 
 ```
 NeoNHS_FE_Web/
-├── public/                    # Static assets
-│   └── img-src/              # Images
-│       └── auth/             # Authentication images
+├── public/                        # Static assets
+│   └── img-src/                  # Images
+│       └── auth/                 # Authentication images
 │
-├── src/                       # Source code
-│   ├── app/                  # Application core
-│   │   ├── App.tsx           # Root component
-│   │   ├── router.tsx        # Route definitions
-│   │   └── providers/        # Context providers
+├── src/                           # Source code
+│   ├── app/                      # Application core
+│   │   └── App.tsx               # Root component
+│   │
+│   ├── assets/                   # Static assets (images, fonts, etc.)
+│   │   └── images/               # Image files
+│   │
+│   ├── components/               # Reusable components
+│   │   ├── common/               # Common/shared components
+│   │   │   ├── Button.tsx        # Button component
+│   │   │   └── index.ts          # Barrel export
+│   │   └── index.ts              # Barrel export
+│   │
+│   ├── config/                   # Configuration files
+│   │   └── providers/            # Context providers
 │   │       └── AntdProvider.tsx  # Ant Design config
 │   │
-│   ├── layouts/              # Layout components
-│   │   ├── AppLayout.tsx     # Main app layout
-│   │   └── BlankLayout.tsx   # Blank layout (auth, etc.)
+│   ├── constants/                # Application constants
+│   │   └── index.ts              # Global constants (routes, API endpoints, etc.)
 │   │
-│   ├── pages/                # Page components
-│   │   ├── HomePage.tsx      # Home page
-│   │   ├── NotFoundPage.tsx  # 404 page
-│   │   └── AuthPage/         # Authentication pages
-│   │       ├── Login.tsx     # Login page
-│   │       └── Login.css     # Login styles
+│   ├── hooks/                    # Custom React hooks
+│   │   └── useAuth.ts            # Authentication hook
 │   │
-│   ├── styles/               # Global styles
-│   │   └── globals.css       # Tailwind + custom styles
+│   ├── layouts/                  # Layout components
+│   │   ├── AppLayout.tsx         # Main app layout
+│   │   └── BlankLayout.tsx       # Blank layout (auth, etc.)
 │   │
-│   └── main.tsx              # Application entry point
+│   ├── pages/                    # Page components
+│   │   ├── HomePage.tsx          # Home page
+│   │   ├── NotFoundPage.tsx      # 404 page
+│   │   └── AuthPage/             # Authentication pages
+│   │       ├── Login.tsx         # Login page
+│   │       └── Login.css         # Login styles
+│   │
+│   ├── routes/                   # Route definitions
+│   │   └── index.tsx             # Main router configuration
+│   │
+│   ├── services/                 # Business logic & API calls
+│   │   └── api/                  # API services
+│   │       ├── apiClient.ts      # API client configuration
+│   │       └── authService.ts    # Authentication API
+│   │
+│   ├── types/                    # TypeScript type definitions
+│   │   └── index.ts              # Global types & interfaces
+│   │
+│   ├── utils/                    # Utility functions
+│   │   └── helpers.ts            # Helper functions
+│   │
+│   ├── styles/                   # Global styles
+│   │   └── globals.css           # Tailwind + custom styles
+│   │
+│   └── main.tsx                  # Application entry point
 │
-├── index.html                # HTML template
-├── package.json              # Dependencies & scripts
-├── tsconfig.json             # TypeScript configuration
-├── vite.config.ts            # Vite configuration
-├── tailwind.config.js        # Tailwind CSS configuration
-├── postcss.config.js         # PostCSS configuration
-└── README.md                 # This file
+├── index.html                    # HTML template
+├── package.json                  # Dependencies & scripts
+├── tsconfig.json                 # TypeScript configuration
+├── vite.config.ts                # Vite configuration
+├── tailwind.config.js            # Tailwind CSS configuration
+├── postcss.config.js             # PostCSS configuration
+└── README.md                     # This file
 ```
+
+### 📂 Giải Thích Cấu Trúc
+
+- **`assets/`** - Chứa các tài nguyên tĩnh như images, fonts, icons
+- **`components/`** - Các React components có thể tái sử dụng
+  - **`common/`** - Components dùng chung trong toàn dự án
+- **`config/`** - Cấu hình ứng dụng và providers
+- **`constants/`** - Các hằng số, enums, API endpoints
+- **`hooks/`** - Custom React hooks
+- **`layouts/`** - Layout components (header, footer, sidebar)
+- **`pages/`** - Page components (tương ứng với routes)
+- **`routes/`** - Định nghĩa routes và navigation
+- **`services/`** - Business logic, API calls, data fetching
+- **`types/`** - TypeScript types và interfaces
+- **`utils/`** - Các hàm tiện ích (formatters, validators, helpers)
 
 ---
 
@@ -171,16 +216,31 @@ import { Component } from '@/components/Component'
 
 ### Ant Design Theme
 
-Cấu hình theme tại `src/app/providers/AntdProvider.tsx`
+Cấu hình theme tại [src/config/providers/AntdProvider.tsx](src/config/providers/AntdProvider.tsx)
 
 ### Tailwind CSS
 
-Cấu hình Tailwind tại `tailwind.config.js`
+Cấu hình Tailwind tại [tailwind.config.js](tailwind.config.js)
 
 ### CSS Reset
 
-- Ant Design reset được import tại `src/main.tsx`: `antd/dist/reset.css`
-- Tailwind directives được import tại `src/styles/globals.css`
+- Ant Design reset được import tại [src/main.tsx](src/main.tsx): `antd/dist/reset.css`
+- Tailwind directives được import tại [src/styles/globals.css](src/styles/globals.css)
+
+### Import Best Practices
+
+```typescript
+// ✅ Sử dụng barrel exports
+import { Button } from '@/components/common';
+
+// ✅ Sử dụng alias @/ 
+import { authService } from '@/services/api/authService';
+import { useAuth } from '@/hooks/useAuth';
+import { ROUTES } from '@/constants';
+
+// ✅ Import types
+import type { User, ApiResponse } from '@/types';
+```
 
 ---
 
