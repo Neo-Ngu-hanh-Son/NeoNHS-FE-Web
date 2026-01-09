@@ -25,7 +25,7 @@
 
 ## 🎯 Giới Thiệu
 
-**NeoNHS** là một hệ thống quản lý y tế hiện đại, được xây dựng với các công nghệ web tiên tiến nhất. Dự án này là phần frontend của hệ thống NeoNHS, cung cấp giao diện người dùng thân thiện và hiệu suất cao.
+**NeoNHS** là một cổng thông tin du lịch dành cho khu du lịch sinh thái Ngũ Hành Sơn tại Đà Nẵng - Việt Nam. Dự án này là phần frontend của hệ thống NeoNHS, cung cấp giao diện người dùng thân thiện và hiệu suất cao.
 
 ## ✨ Tính Năng
 
