@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 import { Card, Tabs, Avatar, Space, Typography, Skeleton } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { TabsProps } from "antd";
-import { NotFoundPage } from "@/pages/NotFoundPage";
-import { HomePage } from "@/pages/HomePage";
-import { BlankLayout } from "@/layouts/BlankLayout";
-import { AppLayout } from "@/layouts/AppLayout";
 import authService from "@/services/api/authService";
 import type { User } from "@/types";
 

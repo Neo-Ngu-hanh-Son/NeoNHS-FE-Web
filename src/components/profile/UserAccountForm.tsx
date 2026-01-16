@@ -40,7 +40,7 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
     }
   };
 
-  const beforeUpload = async (file: RcFile) => {
+  const beforeUpload = async (_file: RcFile) => {
     // Prevent auto upload; we'll upload manually to backend
     return false;
   };

@@ -4,10 +4,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import { authService, LoginCredentials } from '@/services/api/authService';
+import { authService, type LoginCredentials } from '@/services/api/authService';
+import type { User } from '@/types';
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
