@@ -1,3 +1,20 @@
+# Helper files
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Production
+dist
+build
+dist-ssr
+
+# Local Env Files
+.env
+.env.local
+.env.*.local
+*.local
+
 # Logs
 logs
 *.log
@@ -7,14 +24,17 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Testing
+coverage
+*.lcov
+.nyc_output
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
 .idea
 .DS_Store
 *.suo
@@ -22,6 +42,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-*.env
-.env.local
-.env.*.local
+*.tsbuildinfo
+
+# OS Generated
+Thumbs.db
+ehthumbs.db
+Desktop.ini
