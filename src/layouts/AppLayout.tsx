@@ -1,37 +1,44 @@
-import { Layout, Menu, Typography } from 'antd'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-
-const { Header, Content, Footer } = Layout
+import { cn } from '@/lib/utils'
 
 export function AppLayout() {
   const { pathname } = useLocation()
-  const selectedKey = pathname === '/login' ? 'login' : 'home'
 
   return (
-    <Layout className="min-h-screen">
-      <Header className="flex items-center justify-between !bg-white border-b border-slate-200">
-        <Link to="/">
-          <Typography.Text className="font-semibold">CCTE FE</Typography.Text>
+    <div className="flex min-h-screen flex-col">
+      <header className="flex h-14 items-center justify-between border-b border-slate-200 bg-white px-6">
+        <Link to="/" className="font-semibold text-foreground">
+          CCTE FE
         </Link>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[selectedKey]}
-          items={[
-            { key: 'home', label: <Link to="/">Home</Link> },
-            { key: 'login', label: <Link to="/login">Login</Link> },
-          ]}
-        />
-      </Header>
+        <nav className="flex items-center gap-6">
+          <Link
+            to="/"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              pathname === "/" ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            Home
+          </Link>
+          <Link
+            to="/login"
+            className={cn(
+              "text-sm font-medium transition-colors hover:text-primary",
+              pathname === "/login" ? "text-primary" : "text-muted-foreground"
+            )}
+          >
+            Login
+          </Link>
+        </nav>
+      </header>
 
-      <Content className="w-full p-0">
+      <main className="flex-1">
         <Outlet />
-      </Content>
+      </main>
 
-      <Footer className="text-center text-slate-500">
+      <footer className="border-t border-slate-200 bg-white py-4 text-center text-sm text-muted-foreground">
         CCTE FE © {new Date().getFullYear()}
-      </Footer>
-    </Layout>
+      </footer>
+    </div>
   )
 }
-
-
