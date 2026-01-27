@@ -176,17 +176,16 @@ export function LoginForm({
         <FieldSeparator>Or continue with</FieldSeparator>
 
         <Field>
-          {/* Thay thế nút tự chế bằng GoogleLogin Component chuẩn */}
           <div className="flex justify-center w-full">
              <GoogleLogin
                 onSuccess={handleGoogleSuccess}
                 onError={handleGoogleError}
-                theme="outline"     // Giao diện viền giống nút cũ của bạn
-                size="large"        // Kích thước lớn
-                shape="rectangular" // Hình chữ nhật
-                width="100%"        // Cố gắng full width (tùy parent container)
-                text="signin_with"  // Text hiển thị
-                useOneTap           // Hiển thị popup góc phải nếu đã login
+                theme="outline"     
+                size="large"        
+                shape="rectangular" 
+                width="100%"        
+                text="signin_with"  
+                useOneTap           
              />
           </div>
           
