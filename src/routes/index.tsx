@@ -4,6 +4,7 @@ import { BlankLayout } from '@/layouts/BlankLayout'
 import { HomePage } from '@/pages/HomePage'
 import Login from '@/pages/AuthPage/Login'
 import Forgot from '@/pages/AuthPage/Forgot'
+import Register from '@/pages/AuthPage/Register'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export const router = createBrowserRouter([
@@ -12,6 +13,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/login', element: <Login /> },
       { path: '/forgot-password', element: <Forgot /> },
+      { path: '/register', element: <Register /> },
     ],
   },
   {
