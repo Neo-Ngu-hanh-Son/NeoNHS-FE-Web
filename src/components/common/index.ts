@@ -3,5 +3,5 @@
  * Export tất cả common components từ một file
  */
 
-export { default as Button } from './Button';
+export { Button, buttonVariants } from './Button';
 // Add more common components here

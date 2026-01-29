@@ -6,7 +6,9 @@
 // Sử dụng với axios
 // import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// Use relative URL in development to leverage Vite proxy and avoid CORS
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // Ví dụ với fetch
 export const apiClient = {
