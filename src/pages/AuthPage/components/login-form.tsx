@@ -1,18 +1,17 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { EyeOutlined, EyeInvisibleOutlined, LoadingOutlined } from "@ant-design/icons"
+import { 
+  EyeOutlined, 
+  EyeInvisibleOutlined, 
+  LoadingOutlined,
+  UserOutlined,
+  LockOutlined,
+  MailOutlined
+} from "@ant-design/icons"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { authService, LoginCredentials } from "@/services/api/authService"
-// Thay đổi import: Dùng GoogleLogin component thay vì useGoogleLogin hook
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google"
 
 
@@ -23,7 +22,6 @@ export function LoginForm({
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  // Không cần state isGoogleLoading thủ công nữa vì Google Button tự handle UI
   const [error, setError] = useState<string | null>(null)
   
   const [formData, setFormData] = useState<LoginCredentials>({
@@ -37,7 +35,6 @@ export function LoginForm({
     setError(null)
   }
 
-  // --- XỬ LÝ LOGIN THƯỜNG ---
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
@@ -55,11 +52,9 @@ export function LoginForm({
     }
   }
   
-  // --- XỬ LÝ LOGIN GOOGLE ---
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setError(null);
     
-    // credentialResponse.credential CHÍNH LÀ ID TOKEN
     const idToken = credentialResponse.credential;
 
     if (!idToken) {
@@ -67,21 +62,14 @@ export function LoginForm({
         return;
     }
 
-    // (Optional) Log thử xem token có gì bên trong
-    // const decoded = jwtDecode(idToken);
-    // console.log("User Google Info:", decoded);
-
-    setIsLoading(true); // Tận dụng state loading chung để chặn user thao tác
+    setIsLoading(true); 
 
     try {
-      // Gửi idToken xuống backend Spring Boot
       const response = await authService.loginGoogle({ 
         idToken: idToken 
       });
-      // console.log("idToken from login-form", idToken);
-      // console.log("response from login-form", response);
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
+      sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem("user", JSON.stringify(response.user));
       navigate("/");
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
@@ -97,106 +85,137 @@ export function LoginForm({
   };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login</h1>
-          <h1 className="text-2xl font-bold text-primary">Ngu Hanh Son Tourism</h1>
-          <p className="text-muted-foreground text-balance">
-            Start your journey now
-          </p>
+    <div className={cn("w-full max-w-md mx-auto", className)}>
+      {/* Header */}
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
+          <UserOutlined className="text-2xl text-white" />
         </div>
-        
-        {error && (
-          <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md text-center font-medium border border-destructive/20">
-            {error}
-          </div>
-        )}
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+        <p className="text-gray-500">
+          Sign in to explore <span className="text-emerald-600 font-semibold">Ngu Hanh Son</span>
+        </p>
+      </div>
 
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input
-            id="email"
-            type="email"
-            placeholder="name@example.com"
-            required
-            value={formData.email}
-            onChange={handleInputChange}
-            disabled={isLoading}
-          />
-        </Field>
-
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+      {/* Error Alert */}
+      {error && (
+        <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+          <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+            <span className="text-red-600 text-xs font-bold">!</span>
           </div>
-          <div className="relative">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleSubmit} {...props}>
+        <div className="space-y-5">
+          {/* Email Field */}
+          <div className="space-y-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <MailOutlined className="text-gray-400" />
+              Email Address
+            </label>
             <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
+              id="email"
+              type="email"
+              placeholder="Enter your email"
               required
-              placeholder="Enter your password"
-              className="pr-10"
-              value={formData.password}
+              value={formData.email}
               onChange={handleInputChange}
               disabled={isLoading}
+              className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-              disabled={isLoading}
-            >
-              {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-            </button>
           </div>
-          <div className="flex items-end">
-            <Link
-              to="/forgot-password"
-              className="ml-auto text-sm text-primary underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-        </Field>
 
-        <Field>
-          <Button type="submit" disabled={isLoading} className="w-full">
+          {/* Password Field */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <LockOutlined className="text-gray-400" />
+                Password
+              </label>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                disabled={isLoading}
+              >
+                {showPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Login Button */}
+          <Button 
+            type="submit" 
+            disabled={isLoading} 
+            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300"
+          >
             {isLoading ? (
-              <>
-                <LoadingOutlined className="mr-2 animate-spin" />
-                Logging in...
-              </>
+              <span className="flex items-center gap-2">
+                <LoadingOutlined className="animate-spin" />
+                Signing in...
+              </span>
             ) : (
-              "Login"
+              "Sign In"
             )}
           </Button>
-        </Field>
+        </div>
 
-        <FieldSeparator>Or continue with</FieldSeparator>
-
-        <Field>
-          <div className="flex justify-center w-full">
-             <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                theme="outline"     
-                size="large"        
-                shape="rectangular" 
-                width="100%"        
-                text="signin_with"  
-                useOneTap           
-             />
+        {/* Divider */}
+        <div className="relative my-8">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200"></div>
           </div>
-          
-          <FieldDescription className="text-center mt-4">
-            Don&apos;t have an account?{" "}
-            <Link to="/register" className="font-semibold text-primary underline underline-offset-4 hover:text-primary/80">
-              Sign up
-            </Link>
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
-    </form>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white text-gray-500">or continue with</span>
+          </div>
+        </div>
+
+        {/* Google Login */}
+        <div className="flex justify-center w-full">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+            theme="outline"     
+            size="large"        
+            shape="pill" 
+            width="100%"        
+            text="signin_with"  
+            useOneTap           
+          />
+        </div>
+
+        {/* Sign Up Link */}
+        <p className="mt-8 text-center text-gray-600">
+          Don&apos;t have an account?{" "}
+          <Link 
+            to="/register" 
+            className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+          >
+            Create account
+          </Link>
+        </p>
+      </form>
+    </div>
   )
 }
