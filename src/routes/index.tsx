@@ -5,6 +5,8 @@ import { HomePage } from '@/pages/HomePage'
 import Login from '@/pages/AuthPage/Login'
 import Forgot from '@/pages/AuthPage/Forgot'
 import Register from '@/pages/AuthPage/Register'
+import VerifyOTP from '@/pages/AuthPage/VerifyOTP'
+import NewPassword from '@/pages/AuthPage/NewPassword'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export const router = createBrowserRouter([
@@ -14,6 +16,8 @@ export const router = createBrowserRouter([
       { path: '/login', element: <Login /> },
       { path: '/forgot-password', element: <Forgot /> },
       { path: '/register', element: <Register /> },
+      { path: '/verify-otp', element: <VerifyOTP /> },
+      { path: '/new-password', element: <NewPassword /> },
     ],
   },
   {
