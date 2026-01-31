@@ -43,6 +43,16 @@ export const authService = {
   getCurrentUser: async () => {
     return await apiClient.get('/auth/me');
   },
-};
 
-export default authService;
+  forgotPassword: async (email: string) => {
+    return await apiClient.post('/auth/forgot-password', { email });
+  },
+
+  verifyOTP: async (email: string, otp: string) => {
+    return await apiClient.post('/auth/verify', { email, otp });
+  },
+
+  resetPassword: async (email: string, newPassword: string, confirmPassword: string) => {
+    return await apiClient.post('/auth/reset-password', { email, newPassword, confirmPassword });
+  },
+}
