@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  UserOutlined, 
-  PhoneOutlined, 
-  MailOutlined, 
+import {
+  UserOutlined,
+  PhoneOutlined,
+  MailOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
   EyeOutlined,
@@ -54,7 +54,7 @@ export function RegisterForm({
   const passwordsMatch = password === confirmPassword && confirmPassword.length > 0
 
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
+    <div className={cn("w-full max-w-2xl mx-auto", className)}>
       {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
@@ -69,178 +69,190 @@ export function RegisterForm({
       {/* Form */}
       <form {...props}>
         <div className="space-y-4">
-          {/* Full Name */}
-          <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <UserOutlined className="text-gray-400" />
-              Full Name
-            </label>
-            <Input 
-              id="name" 
-              type="text" 
-              placeholder="Enter your full name"
-              required 
-              className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
-            />
-          </div>
-
-          {/* Phone Number */}
-          <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <PhoneOutlined className="text-gray-400" />
-              Phone Number
-            </label>
-            <Input 
-              id="phone" 
-              type="tel" 
-              placeholder="Enter your phone number"
-              required 
-              className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <MailOutlined className="text-gray-400" />
-              Email Address
-            </label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="Enter your email"
-              required 
-              className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
-            />
-          </div>
-
-          {/* Validation Code */}
-          <div className="space-y-2">
-            <label htmlFor="validation-code" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <SafetyCertificateOutlined className="text-gray-400" />
-              Verification Code
-            </label>
-            <div className="flex gap-3">
-              <Input 
-                id="validation-code" 
-                type="text" 
-                placeholder="Enter 6-digit code" 
-                required 
-                className="flex-1 h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+          {/* Row 1: Full Name & Phone Number */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Full Name */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <UserOutlined className="text-gray-400" />
+                Full Name
+              </label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your full name"
+                required
+                className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
               />
-              <Button 
-                type="button" 
-                variant="outline" 
-                className={cn(
-                  "h-12 px-5 rounded-xl font-medium transition-all min-w-[120px]",
-                  isCounting 
-                    ? "border-gray-200 text-gray-400 cursor-not-allowed" 
-                    : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300"
-                )}
-                onClick={handleSendCode}
-                disabled={isCounting}
-              >
-                {isCounting ? (
-                  <span className="flex items-center gap-1">
-                    <span className="text-lg font-semibold">{countDown}</span>
-                    <span className="text-xs">sec</span>
-                  </span>
-                ) : (
-                  "Send Code"
-                )}
-              </Button>
+            </div>
+
+            {/* Phone Number */}
+            <div className="space-y-2">
+              <label htmlFor="phone" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <PhoneOutlined className="text-gray-400" />
+                Phone Number
+              </label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="Enter your phone number"
+                required
+                className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+              />
             </div>
           </div>
 
-          {/* Password */}
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <LockOutlined className="text-gray-400" />
-              Password
-            </label>
-            <div className="relative">
-              <Input 
-                id="password" 
-                type={showPassword ? "text" : "password"}
-                placeholder="Create a password"
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+          {/* Row 2: Email & Verification Code */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Email */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <MailOutlined className="text-gray-400" />
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
-              >
-                {showPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
-              </button>
             </div>
-            {/* Password Requirements */}
-            {password.length > 0 && (
-              <div className="mt-2 p-3 rounded-lg bg-gray-50 space-y-1.5">
-                <PasswordCheck passed={passwordChecks.length} text="At least 8 characters" />
-                <PasswordCheck passed={passwordChecks.hasLetter} text="Contains a letter" />
-                <PasswordCheck passed={passwordChecks.hasNumber} text="Contains a number" />
+
+            {/* Validation Code */}
+            <div className="space-y-2">
+              <label htmlFor="validation-code" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <SafetyCertificateOutlined className="text-gray-400" />
+                Verification Code
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  id="validation-code"
+                  type="text"
+                  placeholder="6-digit code"
+                  required
+                  className="flex-1 h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "h-12 px-4 rounded-xl font-medium transition-all min-w-[100px]",
+                    isCounting
+                      ? "border-gray-200 text-gray-400 cursor-not-allowed"
+                      : "border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300"
+                  )}
+                  onClick={handleSendCode}
+                  disabled={isCounting}
+                >
+                  {isCounting ? (
+                    <span className="flex items-center gap-1">
+                      <span className="text-lg font-semibold">{countDown}</span>
+                      <span className="text-xs">s</span>
+                    </span>
+                  ) : (
+                    "Send"
+                  )}
+                </Button>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Confirm Password */}
-          <div className="space-y-2">
-            <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <LockOutlined className="text-gray-400" />
-              Confirm Password
-            </label>
-            <div className="relative">
-              <Input 
-                id="confirm-password" 
-                type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm your password"
-                required 
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className={cn(
-                  "h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all",
-                  confirmPassword.length > 0 && !passwordsMatch && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
-                )}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
-              >
-                {showConfirmPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
-              </button>
+          {/* Row 3: Password & Confirm Password */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Password */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <LockOutlined className="text-gray-400" />
+                Password
+              </label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Create a password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                >
+                  {showPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
+                </button>
+              </div>
             </div>
-            {confirmPassword.length > 0 && !passwordsMatch && (
-              <p className="text-sm text-red-500 flex items-center gap-1.5">
-                <CloseCircleFilled className="text-xs" />
-                Passwords do not match
-              </p>
-            )}
-            {passwordsMatch && (
-              <p className="text-sm text-emerald-600 flex items-center gap-1.5">
-                <CheckCircleFilled className="text-xs" />
-                Passwords match
-              </p>
-            )}
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <LockOutlined className="text-gray-400" />
+                Confirm Password
+              </label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm your password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={cn(
+                    "h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all",
+                    confirmPassword.length > 0 && !passwordsMatch && "border-red-300 focus:border-red-500 focus:ring-red-500/20"
+                  )}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
+                </button>
+              </div>
+              {confirmPassword.length > 0 && !passwordsMatch && (
+                <p className="text-sm text-red-500 flex items-center gap-1.5">
+                  <CloseCircleFilled className="text-xs" />
+                  Passwords do not match
+                </p>
+              )}
+              {passwordsMatch && (
+                <p className="text-sm text-emerald-600 flex items-center gap-1.5">
+                  <CheckCircleFilled className="text-xs" />
+                  Passwords match
+                </p>
+              )}
+            </div>
           </div>
+
+          {/* Password Requirements - Full Width */}
+          {password.length > 0 && (
+            <div className="p-3 rounded-lg bg-gray-50 flex flex-wrap gap-x-6 gap-y-1.5">
+              <PasswordCheck passed={passwordChecks.length} text="At least 8 characters" />
+              <PasswordCheck passed={passwordChecks.hasLetter} text="Contains a letter" />
+              <PasswordCheck passed={passwordChecks.hasNumber} text="Contains a number" />
+            </div>
+          )}
 
           {/* Submit Button */}
-          <Button 
-            type="submit" 
-            className="w-full h-12 mt-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300"
-          >
-            Create Account
-          </Button>
+            <div className="flex justify-center">
+            <Button
+              type="submit"
+              className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
+            >
+              Create Account
+            </Button>
+            </div>
         </div>
 
         {/* Login Link */}
         <p className="mt-8 text-center text-gray-600">
           Already have an account?{" "}
-          <Link 
-            to="/login" 
+          <Link
+            to="/login"
             className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             Sign in

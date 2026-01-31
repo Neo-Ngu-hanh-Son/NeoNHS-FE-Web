@@ -1,16 +1,19 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { 
-  EyeOutlined, 
-  EyeInvisibleOutlined, 
+import {
+  EyeOutlined,
+  EyeInvisibleOutlined,
   LoadingOutlined,
   UserOutlined,
   LockOutlined,
-  MailOutlined
+  MailOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined
 } from "@ant-design/icons"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { notification } from "antd"
 import { authService, LoginCredentials } from "@/services/api/authService"
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google"
 
@@ -20,10 +23,11 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"form">) {
   const navigate = useNavigate()
+  const [api, contextHolder] = notification.useNotification()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  
+
   const [formData, setFormData] = useState<LoginCredentials>({
     email: "",
     password: "",
@@ -44,49 +48,106 @@ export function LoginForm({
       const response = await authService.login(formData)
       localStorage.setItem("token", response.token)
       localStorage.setItem("user", JSON.stringify(response.user))
-      navigate("/")
+      
+      api.success({
+        message: 'Login Successful!',
+        description: 'Welcome back! Redirecting to homepage...',
+        icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
+        placement: 'topRight',
+        duration: 3,
+      })
+      
+      setTimeout(() => {
+        navigate("/")
+      }, 3000)
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed. Please check your credentials.")
+      const errorMessage = err.response?.data?.message || "Login failed. Please check your credentials."
+      setError(errorMessage)
+      
+      api.error({
+        message: 'Login Failed',
+        description: errorMessage,
+        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
+        placement: 'topRight',
+        duration: 3,
+      })
     } finally {
       setIsLoading(false)
     }
   }
-  
+
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setError(null);
-    
+
     const idToken = credentialResponse.credential;
 
     if (!idToken) {
-        setError("Cannot retrieve Google ID Token.");
-        return;
+      const errorMessage = "Cannot retrieve Google ID Token.";
+      setError(errorMessage);
+      api.error({
+        message: 'Google Login Failed',
+        description: errorMessage,
+        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
+        placement: 'topRight',
+        duration: 3,
+      });
+      return;
     }
 
-    setIsLoading(true); 
+    setIsLoading(true);
 
     try {
-      const response = await authService.loginGoogle({ 
-        idToken: idToken 
+      const response = await authService.loginGoogle({
+        idToken: idToken
       });
       sessionStorage.setItem("token", response.token);
       sessionStorage.setItem("user", JSON.stringify(response.user));
-      navigate("/");
+      
+      api.success({
+        message: 'Google Login Successful!',
+        description: 'Welcome! Redirecting to homepage...',
+        icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
+        placement: 'topRight',
+        duration: 3,
+      });
+      
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
-      setError(err.response?.data?.message || "Google login failed on server.");
+      const errorMessage = err.response?.data?.message || "Google login failed on server.";
+      setError(errorMessage);
+      api.error({
+        message: 'Google Login Failed',
+        description: errorMessage,
+        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
+        placement: 'topRight',
+        duration: 3,
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
-  
+
   const handleGoogleError = () => {
-      setError("Google Login failed connection.");
+    const errorMessage = "Google Login failed connection.";
+    setError(errorMessage);
+    api.error({
+      message: 'Google Login Failed',
+      description: errorMessage,
+      icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
+      placement: 'topRight',
+      duration: 3,
+    });
   };
 
   return (
-    <div className={cn("w-full max-w-md mx-auto", className)}>
-      {/* Header */}
+    <>
+      {contextHolder}
+      <div className={cn("w-full max-w-md mx-auto", className)}>
+        {/* Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
           <UserOutlined className="text-2xl text-white" />
@@ -165,10 +226,11 @@ export function LoginForm({
           </div>
 
           {/* Login Button */}
-          <Button 
-            type="submit" 
-            disabled={isLoading} 
-            className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300"
+          <div className="flex justify-center">
+          <Button
+            type="submit"
+            disabled={isLoading}
+              className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
@@ -179,6 +241,7 @@ export function LoginForm({
               "Sign In"
             )}
           </Button>
+          </div>
         </div>
 
         {/* Divider */}
@@ -196,26 +259,29 @@ export function LoginForm({
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={handleGoogleError}
-            theme="outline"     
-            size="large"        
-            shape="pill" 
-            width="100%"        
-            text="signin_with"  
-            useOneTap           
+            theme="outline"
+            size="large"
+            shape="pill"
+            width="100%"
+            text="signin_with"
+            useOneTap
           />
         </div>
 
         {/* Sign Up Link */}
         <p className="mt-8 text-center text-gray-600">
           Don&apos;t have an account?{" "}
-          <Link 
-            to="/register" 
+          <Link
+            to="/register"
             className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
           >
             Create account
           </Link>
         </p>
       </form>
-    </div>
+      </div>
+    </>
   )
 }
+
+
