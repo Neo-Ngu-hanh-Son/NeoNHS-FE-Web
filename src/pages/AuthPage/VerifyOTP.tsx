@@ -1,9 +1,8 @@
+import { CheckOTPForm } from "./components/check-otp-form"
 import { AppstoreOutlined } from "@ant-design/icons"
-
-import { RegisterForm } from "./components/register-form"
 import loginImage from "@/assets/images/login-img.jpg"
 
-export default function SignupPage() {
+export default function VerifyOTP() {
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -16,8 +15,8 @@ export default function SignupPage() {
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-1xl">
-            <RegisterForm />
+          <div className="w-full max-w-sm">
+            <CheckOTPForm />
           </div>
         </div>
       </div>

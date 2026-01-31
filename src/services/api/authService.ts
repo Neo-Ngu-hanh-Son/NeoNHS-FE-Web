@@ -55,4 +55,13 @@ export const authService = {
   resetPassword: async (email: string, newPassword: string, confirmPassword: string) => {
     return await apiClient.post('/auth/reset-password', { email, newPassword, confirmPassword });
   },
+
+  // Registration OTP methods
+  verifyRegistrationOTP: async (email: string, otp: string) => {
+    return await apiClient.post('/auth/verify', { email, otp });
+  },
+
+  resendRegistrationOTP: async (email: string) => {
+    return await apiClient.post('/auth/resend-verify-email', { email });
+  },
 }

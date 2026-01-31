@@ -14,7 +14,18 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 export const apiClient = {
   get: async (endpoint: string) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`);
-    if (!response.ok) throw new Error('API request failed');
+    if (!response.ok) {
+      const text = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = { message: text };
+      }
+      const error: any = new Error(errorData.message || text || 'API request failed');
+      error.response = { data: errorData, status: response.status };
+      throw error;
+    }
     return response.json();
   },
 
@@ -26,7 +37,18 @@ export const apiClient = {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('API request failed');
+    if (!response.ok) {
+      const text = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = { message: text };
+      }
+      const error: any = new Error(errorData.message || text || 'API request failed');
+      error.response = { data: errorData, status: response.status };
+      throw error;
+    }
     return response.json();
   },
 
@@ -38,7 +60,18 @@ export const apiClient = {
       },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('API request failed');
+    if (!response.ok) {
+      const text = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = { message: text };
+      }
+      const error: any = new Error(errorData.message || text || 'API request failed');
+      error.response = { data: errorData, status: response.status };
+      throw error;
+    }
     return response.json();
   },
 
@@ -46,7 +79,18 @@ export const apiClient = {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'DELETE',
     });
-    if (!response.ok) throw new Error('API request failed');
+    if (!response.ok) {
+      const text = await response.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(text);
+      } catch {
+        errorData = { message: text };
+      }
+      const error: any = new Error(errorData.message || text || 'API request failed');
+      error.response = { data: errorData, status: response.status };
+      throw error;
+    }
     return response.json();
   },
 };
