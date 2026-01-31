@@ -15,35 +15,77 @@ import {
 } from "@/components/ui/input-otp"
 import { MailOutlined, ArrowLeftOutlined } from "@ant-design/icons"
 import { useState } from "react"
+import { authService } from "@/services/api/authService"
 import { Link } from "react-router-dom"
 
-export function ForgotForm({ className, ...props }: React.ComponentProps<"div">) {
-  const [step, setStep] = useState<"email" | "otp">("email")
-  const [email, setEmail] = useState("")
+import { NewPasswordForm } from "./new-password-form"
 
-  const handleSendOTP = (e: React.FormEvent) => {
+export function ForgotForm({ className, ...props }: React.ComponentProps<"div">) {
+  const [step, setStep] = useState<"email" | "otp" | "new-password">("email")
+  const [email, setEmail] = useState("")
+  const [otp, setOtp] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError("")
     if (email) {
-      // TODO: Call API to send OTP
-      console.log("Sending OTP to:", email)
-      setStep("otp")
+      setLoading(true)
+      try {
+        await authService.forgotPassword(email)
+        setStep("otp")
+      } catch (err: any) {
+        setError(err?.message || "Failed to send OTP")
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
-  const handleVerifyOTP = (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Call API to verify OTP
-    console.log("Verifying OTP")
+    setError("")
+    setLoading(true)
+    try {
+      await authService.verifyOTP(email, otp)
+      setStep("new-password")
+    } catch (err: any) {
+      setError(err?.message || "Invalid OTP")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleResendOTP = () => {
-    // TODO: Call API to resend OTP
-    console.log("Resending OTP to:", email)
+  const handleResendOTP = async () => {
+    setError("")
+    setLoading(true)
+    try {
+      await authService.forgotPassword(email)
+    } catch (err: any) {
+      setError(err?.message || "Failed to resend OTP")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSetNewPassword = async (password: string, confirmPassword?: string) => {
+    setError("")
+    setLoading(true)
+    try {
+      await authService.resetPassword(email, password, confirmPassword || password)
+      // Optionally, redirect to login or show success message
+      setStep("email")
+    } catch (err: any) {
+      setError(err?.message || "Failed to reset password")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      {step === "email" ? (
+      {step === "email" && (
         <form onSubmit={handleSendOTP}>
           <FieldGroup>
             <div className="flex flex-col items-center gap-1 text-center">
@@ -67,9 +109,10 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
                 />
               </div>
             </Field>
-            <Button type="submit" className="w-full">
-              Send OTP
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Sending..." : "Send OTP"}
             </Button>
+            {error && <FieldDescription className="text-red-500 text-center">{error}</FieldDescription>}
             <FieldDescription className="text-center">
               Remember your password?{" "}
               <Link to="/login" className="underline underline-offset-4">
@@ -78,7 +121,8 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
             </FieldDescription>
           </FieldGroup>
         </form>
-      ) : (
+      )}
+      {step === "otp" && (
         <form onSubmit={handleVerifyOTP}>
           <FieldGroup>
             <div className="flex flex-col items-center gap-1 text-center">
@@ -98,6 +142,8 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
                 inputMode="numeric"
                 pattern="[0-9]*"
                 containerClassName="justify-center"
+                value={otp}
+                onChange={setOtp}
               >
                 <InputOTPGroup className="gap-2 *:data-[slot=input-otp-slot]:rounded-md *:data-[slot=input-otp-slot]:border">
                   <InputOTPSlot index={0} />
@@ -115,15 +161,17 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
                 Enter the 6-digit code sent to your email.
               </FieldDescription>
             </Field>
-            <Button type="submit" className="w-full">
-              Verify
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Verifying..." : "Verify"}
             </Button>
+            {error && <FieldDescription className="text-red-500 text-center">{error}</FieldDescription>}
             <FieldDescription className="text-center">
               Didn&apos;t receive the code?{" "}
               <button
                 type="button"
                 onClick={handleResendOTP}
                 className="underline underline-offset-4 hover:text-foreground"
+                disabled={loading}
               >
                 Resend
               </button>
@@ -132,12 +180,16 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
               type="button"
               onClick={() => setStep("email")}
               className="flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+              disabled={loading}
             >
               <ArrowLeftOutlined />
               Change email
             </button>
           </FieldGroup>
         </form>
+      )}
+      {step === "new-password" && (
+        <NewPasswordForm onSubmit={handleSetNewPassword} loading={loading} error={error} />
       )}
     </div>
   )
