@@ -29,7 +29,7 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
       try {
         await authService.forgotPassword(email)
         api.success({
-          message: 'OTP Sent!',
+          title: 'OTP Sent!',
           description: 'A verification code has been sent to your email.',
           icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
           placement: 'topRight',
@@ -50,7 +50,7 @@ export function ForgotForm({ className, ...props }: React.ComponentProps<"div">)
         setError(errorMessage)
 
         api.error({
-          message: 'Failed to Send OTP',
+          title: 'Failed to Send OTP',
           description: errorMessage,
           icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
           placement: 'topRight',

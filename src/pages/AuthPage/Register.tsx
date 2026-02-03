@@ -3,7 +3,19 @@ import { AppstoreOutlined } from "@ant-design/icons"
 import { RegisterForm } from "./components/register-form"
 import loginImage from "@/assets/images/login-img.jpg"
 
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
+
 export default function SignupPage() {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">

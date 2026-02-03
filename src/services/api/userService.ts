@@ -13,7 +13,7 @@ export const userService = {
    */
   async getProfile(): Promise<User> {
     // apiClient.get returns parsed JSON
-    const res = await apiClient.get('/user/profile');
+    const res = await apiClient.get('/users/profile');
     // Normalize response: it may be either { data } or direct object
     const data = (res?.data ?? res) as User;
     return data;
@@ -23,7 +23,7 @@ export const userService = {
    * Update current user's profile
    */
   async updateProfile(data: Partial<User>): Promise<User> {
-    const res = await apiClient.put('/user/profile', data);
+    const res = await apiClient.put(`/users/update-profile/${data.id}`, data);
     const updated = (res?.data ?? res) as User;
     return updated;
   },
@@ -36,7 +36,7 @@ export const userService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/user/avatar`, {
+    const response = await fetch(`${API_BASE_URL}/users/avatar`, {
       method: 'POST',
       body: formData,
     });

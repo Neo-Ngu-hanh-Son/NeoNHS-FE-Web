@@ -1,21 +1,53 @@
 import { FunctionComponent, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { MenuOutlined, CloseOutlined, UserOutlined, LogoutOutlined, ProfileOutlined } from '@ant-design/icons';
+import { Dropdown, Avatar } from 'antd';
+import type { MenuProps } from 'antd';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header: FunctionComponent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'profile',
+      label: 'Profile',
+      icon: <ProfileOutlined />,
+      onClick: () => navigate('/account'),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      label: 'Logout',
+      icon: <LogoutOutlined />,
+      onClick: handleLogout,
+      danger: true,
+    },
+  ];
 
   const navLinks = [
     { label: 'Landing Page', href: '/' },
-    { label: 'About Us', href: '/about' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: 'About Us', href: '/about-us' },
+    { label: 'Contact Us', href: '/contact-us' },
   ];
 
   const isActiveLink = (href: string) => {
     return location.pathname === href;
   };
+
+  console.log('Header render - user:', user);
+  console.log('Header render - isAuthenticated:', isAuthenticated);
 
   return (
     <header className="w-full bg-white text-gray-900 font-[Poppins] sticky top-0 z-50">
@@ -49,21 +81,40 @@ const Header: FunctionComponent = () => {
               ))}
             </ul>
 
-            {/* Auth Buttons */}
+            {/* Auth Buttons / User Avatar */}
             <div className="flex items-center gap-3">
-              <Link to="/login">
-                <Button
-                  variant="ghost"
-                  className="text-gray-900 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
+              {isAuthenticated ? (
+                <Dropdown
+                  menu={{ items: userMenuItems }}
+                  placement="bottomRight"
+                  trigger={['click']}
                 >
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
-                  Register
-                </Button>
-              </Link>
+                  <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <Avatar
+                      size={40}
+                      src={user?.avatarUrl}
+                      icon={!user?.avatarUrl && <UserOutlined />}
+                      className="bg-emerald-500"
+                    />
+                  </div>
+                </Dropdown>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button
+                      variant="ghost"
+                      className="text-gray-900 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/register">
+                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
 
@@ -102,21 +153,59 @@ const Header: FunctionComponent = () => {
               ))}
             </ul>
 
-            {/* Mobile Auth Buttons */}
+            {/* Mobile Auth Buttons / User Menu */}
             <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-gray-800">
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button
-                  variant="ghost"
-                  className="w-full text-gray-300 hover:text-emerald-400 hover:bg-gray-800 transition-colors duration-300"
-                >
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
-                  Register
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-3 px-2 py-2">
+                    <Avatar
+                      size={36}
+                      src={user?.avatarUrl}
+                      icon={!user?.avatarUrl && <UserOutlined />}
+                      className="bg-emerald-500"
+                    />
+                    <span className="text-gray-900 font-medium">
+                      {user?.fullname || 'User'}
+                    </span>
+                  </div>
+                  <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start text-gray-700 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
+                    >
+                      <ProfileOutlined className="mr-2" />
+                      Profile
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors duration-300"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    <LogoutOutlined className="mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button
+                      variant="ghost"
+                      className="w-full text-gray-300 hover:text-emerald-400 hover:bg-gray-800 transition-colors duration-300"
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         )}
