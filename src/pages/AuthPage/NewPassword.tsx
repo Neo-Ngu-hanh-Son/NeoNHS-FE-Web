@@ -2,14 +2,22 @@ import { NewPasswordForm } from "./components/new-password-form"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { authService } from "@/services/api/authService"
+import { useAuth } from "@/hooks/useAuth"
 import { notification } from "antd"
 import { CheckCircleOutlined, CloseCircleOutlined, AppstoreOutlined } from "@ant-design/icons"
 import loginImage from "@/assets/images/login-img.jpg"
 
 export default function NewPassword() {
+  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const state = location.state as { email: string; otp: string } | null
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

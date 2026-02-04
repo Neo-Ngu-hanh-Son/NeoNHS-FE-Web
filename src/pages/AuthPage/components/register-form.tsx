@@ -49,7 +49,7 @@ export function RegisterForm({
     // Validate password requirements
     if (!allChecksPassed) {
       api.error({
-        message: 'Invalid Password',
+        title: 'Invalid Password',
         description: "Password does not meet requirements.",
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
@@ -61,7 +61,7 @@ export function RegisterForm({
     // Validate password match
     if (!passwordsMatch) {
       api.error({
-        message: 'Password Mismatch',
+        title: 'Password Mismatch',
         description: "Passwords do not match.",
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
@@ -75,7 +75,7 @@ export function RegisterForm({
       // Register and send OTP
       await authService.register({ fullname, phone, email, password })
       api.success({
-        message: 'Registration Submitted!',
+        title: 'Registration Submitted!',
         description: 'A verification code has been sent to your email.',
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
@@ -95,7 +95,7 @@ export function RegisterForm({
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || "Registration failed. Please try again."
       api.error({
-        message: 'Registration Failed',
+        title: 'Registration Failed',
         description: errorMessage,
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',

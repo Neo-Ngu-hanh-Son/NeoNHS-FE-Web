@@ -10,13 +10,24 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface UserInfo {
+  id: string;
+  email: string;
+  fullname: string;
+  role?: string;
+  avatarUrl?: string;
+}
+
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
+  status: number;
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+    tokenType: string;
+    userInfo: UserInfo;
   };
+  timestamp: string;
 }
 
 export const authService = {

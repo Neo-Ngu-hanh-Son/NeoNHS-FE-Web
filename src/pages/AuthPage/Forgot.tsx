@@ -1,10 +1,20 @@
 import { AppstoreOutlined } from "@ant-design/icons"
-import { Link } from "react-router-dom"
+import { useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
 
 import { ForgotForm } from "./components/forgot-form"
 import loginImage from "@/assets/images/login-img.jpg"
 
 export default function ForgotPage() {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
