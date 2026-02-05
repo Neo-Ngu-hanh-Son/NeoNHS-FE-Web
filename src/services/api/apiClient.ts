@@ -1,54 +1,72 @@
 /**
  * API Client Configuration
- * Cấu hình axios hoặc fetch cho việc gọi API
+ * Cấu hình axios cho việc gọi API
  */
 
-// Sử dụng với axios
-// import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 // Use relative URL in development to leverage Vite proxy and avoid CORS
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Or use environment variable
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
-// Ví dụ với fetch
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  timeout: 10000, // 10 seconds timeout
+});
+
+// Request Interceptor: Attach Token
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response Interceptor: Handle Errors & Data
+axiosInstance.interceptors.response.use(
+  (response: AxiosResponse) => {
+    // Return the data directly to matching the previous fetch behavior (response.json())
+    return response.data;
+  },
+  (error: AxiosError) => {
+    let errorMessage = 'API request failed';
+    let errorData: any = {};
+
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      errorData = error.response.data;
+      errorMessage = (errorData as any).message || error.message;
+    } else if (error.request) {
+      // The request was made but no response was received
+      errorMessage = 'No response from server';
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      errorMessage = error.message;
+    }
+
+    const customError: any = new Error(errorMessage);
+    customError.response = error.response;
+    customError.status = error.response?.status;
+
+    return Promise.reject(customError);
+  }
+);
+
 export const apiClient = {
-  get: async (endpoint: string) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
-
-  post: async (endpoint: string, data: any) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
-
-  put: async (endpoint: string, data: any) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
-
-  delete: async (endpoint: string) => {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'DELETE',
-    });
-    if (!response.ok) throw new Error('API request failed');
-    return response.json();
-  },
+  get: <T = any>(endpoint: string) => axiosInstance.get<T, T>(endpoint),
+  post: <T = any>(endpoint: string, data: any) => axiosInstance.post<T, T>(endpoint, data),
+  put: <T = any>(endpoint: string, data: any) => axiosInstance.put<T, T>(endpoint, data),
+  delete: <T = any>(endpoint: string) => axiosInstance.delete<T, T>(endpoint),
 };
 
 export default apiClient;

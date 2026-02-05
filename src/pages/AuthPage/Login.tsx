@@ -3,12 +3,24 @@ import { AppstoreOutlined } from "@ant-design/icons"
 import { LoginForm } from "./components/login-form"
 import loginImage from "@/assets/images/login-img.jpg"
 
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
+
 export default function LoginPage() {
+  const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/')
+    }
+  }, [isAuthenticated, navigate])
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
+          <a href="/" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <AppstoreOutlined className="text-sm" />
             </div>

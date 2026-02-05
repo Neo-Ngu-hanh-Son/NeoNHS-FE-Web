@@ -1,13 +1,12 @@
+import { CheckOTPForm } from "./components/check-otp-form"
 import { AppstoreOutlined } from "@ant-design/icons"
-
-import { RegisterForm } from "./components/register-form"
 import loginImage from "@/assets/images/login-img.jpg"
 
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
-export default function SignupPage() {
+export default function VerifyOTP() {
   const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
 
@@ -28,8 +27,8 @@ export default function SignupPage() {
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-1xl">
-            <RegisterForm />
+          <div className="w-full max-w-sm">
+            <CheckOTPForm />
           </div>
         </div>
       </div>

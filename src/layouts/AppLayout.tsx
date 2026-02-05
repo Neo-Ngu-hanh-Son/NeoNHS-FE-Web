@@ -1,10 +1,9 @@
-import { Link, Outlet, useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import { Outlet, useLocation } from 'react-router-dom'
 import Footer from '@/components/headfoot/footer'
-import Header from '@/components/headfoot/header' 
+import Header from '@/components/headfoot/header'
 
 export function AppLayout() {
-  const { pathname } = useLocation()
+  useLocation()
 
   return (
     <div className="flex min-h-screen flex-col">

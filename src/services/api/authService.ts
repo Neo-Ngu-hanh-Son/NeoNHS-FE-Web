@@ -10,13 +10,24 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface UserInfo {
+  id: string;
+  email: string;
+  fullname: string;
+  role?: string;
+  avatarUrl?: string;
+}
+
 export interface LoginResponse {
-  token: string;
-  user: {
-    id: string;
-    email: string;
-    name: string;
+  status: number;
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+    tokenType: string;
+    userInfo: UserInfo;
   };
+  timestamp: string;
 }
 
 export const authService = {
@@ -43,6 +54,25 @@ export const authService = {
   getCurrentUser: async () => {
     return await apiClient.get('/auth/me');
   },
-};
 
-export default authService;
+  forgotPassword: async (email: string) => {
+    return await apiClient.post('/auth/forgot-password', { email });
+  },
+
+  verifyOTP: async (email: string, otp: string) => {
+    return await apiClient.post('/auth/verify', { email, otp });
+  },
+
+  resetPassword: async (email: string, newPassword: string, confirmPassword: string) => {
+    return await apiClient.post('/auth/reset-password', { email, newPassword, confirmPassword });
+  },
+
+  // Registration OTP methods
+  verifyRegistrationOTP: async (email: string, otp: string) => {
+    return await apiClient.post('/auth/verify', { email, otp });
+  },
+
+  resendRegistrationOTP: async (email: string) => {
+    return await apiClient.post('/auth/resend-verify-email', { email });
+  },
+}

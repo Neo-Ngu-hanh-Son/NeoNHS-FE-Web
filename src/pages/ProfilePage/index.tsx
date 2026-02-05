@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Card, Tabs, Avatar, Space, Typography, Skeleton } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import type { TabsProps } from "antd";
-import authService from "@/services/api/authService";
+import { authService } from "@/services/api/authService";
 import type { User } from "@/types";
 
 const { Title, Text } = Typography;
