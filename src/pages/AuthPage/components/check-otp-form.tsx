@@ -75,7 +75,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
     e.preventDefault()
     if (otp.length !== 6) {
       api.error({
-        message: 'Invalid OTP',
+        title: 'Invalid OTP',
         description: "Please enter a 6-digit verification code.",
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
@@ -90,7 +90,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
         // Verify OTP for forgot password flow
         await authService.verifyOTP(email, otp)
         api.success({
-          message: 'OTP Verified!',
+          title: 'OTP Verified!',
           description: 'Your OTP has been successfully verified.',
           icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
           placement: 'topRight',
@@ -102,7 +102,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
         // For register flow - verify and complete registration
         await authService.verifyRegistrationOTP(email, otp)
         api.success({
-          message: 'Registration Successful!',
+          title: 'Registration Successful!',
           description: 'Your account has been created. Redirecting to login...',
           icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
           placement: 'topRight',
@@ -114,7 +114,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
       }
     } catch (err: any) {
       api.error({
-        message: 'Failed to Verify OTP',
+        title: 'Failed to Verify OTP',
         description: err.response?.data?.message || "Invalid OTP, please try again.",
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
@@ -136,7 +136,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
       setCountDown(60)
       setIsCounting(true)
       api.success({
-        message: 'OTP Resent!',
+        title: 'OTP Resent!',
         description: 'A new verification code has been sent to your email.',
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
@@ -144,7 +144,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
       })
     } catch (err: any) {
       api.error({
-        message: 'Failed to Resend OTP',
+        title: 'Failed to Resend OTP',
         description: err.response?.data?.message || "Failed to resend OTP, please try again.",
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
