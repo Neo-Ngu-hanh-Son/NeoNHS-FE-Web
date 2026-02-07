@@ -9,7 +9,7 @@ export default function AdminTicketsPage() {
     ];
 
     return (
-        <div className="p-8">
+        <div className="max-w-7xl mx-auto">
             <Card title={<Title level={4}>Ticket Management</Title>}>
                 <Table columns={columns} dataSource={[]} locale={{ emptyText: 'No tickets found yet.' }} />
             </Card>

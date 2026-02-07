@@ -421,7 +421,7 @@ export function AdminDestinationsPage() {
     ];
 
     return (
-        <div className="p-8">
+        <div className="max-w-7xl mx-auto">
             <style>
                 {`
                     .preview-marker-hue {

@@ -6,7 +6,7 @@ import {
     MenuUnfoldOutlined
 } from '@ant-design/icons';
 
-export function AdminLayout() {
+export function VendorLayout() {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,40 +17,39 @@ export function AdminLayout() {
     };
 
     const navItems = [
-        { label: 'Dashboard', path: '/admin/dashboard', icon: 'dashboard' },
-        { label: 'Destination', path: '/admin/destinations', icon: 'map' },
-        { label: 'Users', path: '/admin/users', icon: 'group' },
-        { label: 'Vendors', path: '/admin/vendors', icon: 'storefront' },
-        { label: 'Tickets', path: '/admin/tickets', icon: 'confirmation_number' },
-        { label: 'Vouchers', path: '/admin/vouchers', icon: 'loyalty' },
-        { label: 'Reports', path: '/admin/reports', icon: 'analytics' },
-        { label: 'Events', path: '/admin/events', icon: 'event' },
+        { label: 'Dashboard', path: '/vendor/dashboard', icon: 'dashboard' },
+        { label: 'Profile', path: '/vendor/profile', icon: 'person' },
+        { label: 'Workshop Templates', path: '/vendor/workshop-templates', icon: 'architecture' },
+        { label: 'Workshop Sessions', path: '/vendor/workshop-sessions', icon: 'event_repeat' },
+        { label: 'Workshop Calendar', path: '/vendor/workshop-calendar', icon: 'calendar_month' },
+        { label: 'Ticket Verification', path: '/vendor/ticket-verification', icon: 'qr_code_scanner' },
+        { label: 'Vouchers', path: '/vendor/vouchers', icon: 'loyalty' },
     ];
 
     // Helper to get breadcrumb from path
     const getPageTitle = () => {
         const path = window.location.pathname;
         const item = navItems.find(i => i.path === path);
-        return item ? item.label : 'System';
+        return item ? item.label : 'Vendor Portal';
     };
 
     return (
         <div className="flex h-screen overflow-hidden font-display">
             {/* Sidebar */}
             <aside
-                className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
+                className={`bg-[#0f2e1b] flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
                     }`}
             >
                 <div className={`flex flex-col gap-8 ${isCollapsed ? 'items-center px-2' : 'px-6'}`}>
                     {/* Brand */}
                     <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-                        <div className="size-10 rounded-lg bg-accent-gold flex items-center justify-center text-sidebar-bg shrink-0">
-                            <span className="material-symbols-outlined font-bold">travel_explore</span>
+                        <div className="size-10 rounded-lg bg-accent-gold flex items-center justify-center text-[#0f2e1b] shrink-0">
+                            <span className="material-symbols-outlined font-bold">storefront</span>
                         </div>
                         {!isCollapsed && (
                             <div className="flex flex-col">
-                                <h1 className="text-white text-base font-bold leading-tight">Tourism Admin</h1>
-                                <p className="text-white/60 text-xs font-normal">System Management</p>
+                                <h1 className="text-white text-base font-bold leading-tight">Vendor Center</h1>
+                                <p className="text-white/60 text-xs font-normal">Business Management</p>
                             </div>
                         )}
                     </div>
@@ -79,12 +78,13 @@ export function AdminLayout() {
 
                 <div className={`flex flex-col gap-2 border-t border-white/10 pt-6 ${isCollapsed ? 'items-center px-2' : 'px-6'}`}>
                     <div
+                        onClick={() => navigate('/')}
                         className={`flex items-center gap-3 p-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white cursor-pointer transition-all ${isCollapsed ? 'justify-center' : ''
                             }`}
-                        title={isCollapsed ? 'Settings' : ''}
+                        title={isCollapsed ? 'Back to Home' : ''}
                     >
-                        <span className="material-symbols-outlined shrink-0">settings</span>
-                        {!isCollapsed && <p className="text-sm font-medium">Settings</p>}
+                        <span className="material-symbols-outlined shrink-0">home</span>
+                        {!isCollapsed && <p className="text-sm font-medium">Back to Home</p>}
                     </div>
                     <div
                         onClick={handleLogout}
@@ -111,11 +111,11 @@ export function AdminLayout() {
                         </button>
                         <div className="flex flex-col">
                             <div className="flex items-center gap-2 text-sm text-[#588d70]">
-                                <span>System</span>
+                                <span>Vendor</span>
                                 <span>/</span>
                                 <span className="text-primary font-medium">{getPageTitle()}</span>
                             </div>
-                            <h2 className="text-xl font-bold mt-1">{getPageTitle()} Overview</h2>
+                            <h2 className="text-xl font-bold mt-1">{getPageTitle()} Area</h2>
                         </div>
                     </div>
 
@@ -125,7 +125,7 @@ export function AdminLayout() {
                             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#588d70]">search</span>
                             <input
                                 className="pl-10 pr-4 py-2 bg-background-light dark:bg-white/5 border border-[#d3e4da] dark:border-white/10 rounded-lg text-sm w-64 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all"
-                                placeholder="Search data..."
+                                placeholder="Search..."
                                 type="text"
                             />
                         </div>
@@ -138,15 +138,15 @@ export function AdminLayout() {
                             <div className="h-8 w-px bg-[#d3e4da] mx-2"></div>
                             <div className="flex items-center gap-3">
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{user?.fullname || 'Admin'}</p>
-                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">System Admin</p>
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{user?.fullname || 'Vendor'}</p>
+                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">Business Owner</p>
                                 </div>
                                 <div
                                     className="size-10 rounded-full bg-primary/10 bg-center bg-cover border-2 border-primary/20"
                                     style={{
                                         backgroundImage: user?.avatarUrl
                                             ? `url(${user.avatarUrl})`
-                                            : `url("https://lh3.googleusercontent.com/aida-public/AB6AXuADGFml9SUZm46Hz--HyVemu0zyCnCXClRTBn_X5EfDBwH5zFADVS5MmxAsg4UI3cOSE3ul_r2WFpWcHYb9IHBJMfR527_AU3VBRpfxefjb4PnmN30EQLWtdbNuR2-juuwn9uCiuiNey0jc9m6Ldlr9sPi5LxUX1pLH_Ig9wvSmMCew0EH0M1W-oYkWpblNFH4Bv9d5XGltiVFHrbARxFSUFs2XmZPStYmT8J94v4AYhKyH4gEa_WAsQ95x7td4OXBNdI23v3v_Ch43")`,
+                                            : `url("https://ui-avatars.com/api/?name=${user?.fullname || 'V'}&background=random")`,
                                     }}
                                 ></div>
                             </div>
@@ -154,7 +154,7 @@ export function AdminLayout() {
                     </div>
                 </header>
 
-                {/* Content area with standardized padding */}
+                {/* Content */}
                 <div className="flex-1 overflow-y-auto p-8">
                     <Outlet />
                 </div>

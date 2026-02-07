@@ -94,7 +94,7 @@ export function AdminUsersPage() {
     ];
 
     return (
-        <div className="p-8">
+        <div className="max-w-7xl mx-auto">
             <DashboardCard>
                 {/* Filters */}
                 <div className="mb-6 flex flex-wrap gap-4">
