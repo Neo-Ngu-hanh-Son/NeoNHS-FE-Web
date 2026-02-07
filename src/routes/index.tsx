@@ -9,8 +9,15 @@ import Register from '@/pages/AuthPage/Register'
 import VerifyOTP from '@/pages/AuthPage/VerifyOTP'
 import NewPassword from '@/pages/AuthPage/NewPassword'
 import { NotFoundPage } from '@/pages/NotFoundPage'
-import ProfilePage from '@/pages/ProfilePage'
+import { ProfilePage } from '@/pages/ProfilePage'
+import UserProfilePage from '@/pages/ProfilePage/UserProfilePage'
+import VendorProfilePage from '@/pages/ProfilePage/VendorProfilePage'
 import { AboutUs } from '@/pages/AboutUs'
+// Dashboard Pages
+import UserDashboardPage from '@/pages/Dashboard/UserDashboardPage'
+import VendorDashboardPage from '@/pages/Dashboard/VendorDashboardPage'
+import AdminDashboardPage from '@/pages/Dashboard/AdminDashboardPage'
+import AdminUsersPage from '@/pages/Dashboard/AdminUsersPage'
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +38,22 @@ export const router = createBrowserRouter([
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/about-us", element: <AboutUs /> },
+
+          // Profile Routes - Auto-redirect based on role
           { path: "/account", element: <ProfilePage /> },
+          { path: "/account/user", element: <UserProfilePage /> },
+          { path: "/account/vendor", element: <VendorProfilePage /> },
+
+          // User/Tourist Dashboard
+          { path: "/user/dashboard", element: <UserDashboardPage /> },
+
+          // Vendor Dashboard
+          { path: "/vendor/dashboard", element: <VendorDashboardPage /> },
+
+          // Admin Dashboard
+          { path: "/admin/dashboard", element: <AdminDashboardPage /> },
+          { path: "/admin/users", element: <AdminUsersPage /> },
+
           { path: "*", element: <NotFoundPage /> },
         ],
       },

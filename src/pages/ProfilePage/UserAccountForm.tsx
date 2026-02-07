@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Form, Input, Button, Upload, message, Row, Col, Card, Avatar, Space } from 'antd';
 import { UploadOutlined, UserOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
@@ -14,34 +14,49 @@ type Props = {
 
 export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
   const [form] = Form.useForm();
+  const [previewUrl, setPreviewUrl] = useState<string | undefined>();
 
   useEffect(() => {
     if (initialUser) {
       form.setFieldsValue({
-        name: initialUser.name,
+        name: initialUser.fullname,
         email: initialUser.email,
-        avatar: initialUser.avatar,
+        avatar: initialUser.avatarUrl,
       });
+      setPreviewUrl(initialUser.avatarUrl);
     }
   }, [initialUser, form]);
 
   const onFinish = async (values: any) => {
     try {
+      console.log('=== FORM SUBMIT ===');
+      console.log('Form values:', values);
+      console.log('Initial user:', initialUser);
+
+      // Merge form values with initial user data to ensure all fields are sent
       const payload: Partial<User> = {
-        name: values.name,
+        ...initialUser, // Include all original user data
+        fullname: values.name,
         email: values.email,
-        avatar: values.avatar,
+        avatarUrl: values.avatar, // Use the Cloudinary URL from form
       };
+
+      console.log('Merged payload:', payload);
+
+      // Call update API with the avatar URL (already uploaded to Cloudinary)
       const updated = await userService.updateProfile(payload);
       message.success('Profile updated successfully.');
       onSaved?.(updated);
     } catch (err: any) {
-      message.error(err?.message ?? 'Failed to update profile.');
+      console.error('=== FORM SUBMIT ERROR ===');
+      console.error('Error:', err);
+      console.error('Error response:', err?.response);
+      console.error('Error response data:', err?.response?.data);
+      message.error(err?.response?.data?.message || err?.message || 'Failed to update profile.');
     }
   };
 
   const beforeUpload = async (_file: RcFile) => {
-    // Prevent auto upload; we'll upload manually to backend
     return false;
   };
 
@@ -50,11 +65,30 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
     if (!fileObj) return;
 
     try {
-      const avatarUrl = await userService.uploadAvatar(fileObj);
-      form.setFieldsValue({ avatar: avatarUrl });
-      message.success('Avatar updated successfully.');
+      // Validate file first
+      const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
+      const validationError = validateImageFile(fileObj);
+      if (validationError) {
+        message.error(validationError);
+        return;
+      }
+
+      // Upload to Cloudinary immediately to get URL
+      message.loading({ content: 'Uploading avatar...', key: 'avatar-upload' });
+      const uploadedUrl = await uploadImageToCloudinary(fileObj);
+
+      if (!uploadedUrl) {
+        message.error({ content: 'Failed to upload avatar', key: 'avatar-upload' });
+        return;
+      }
+
+      // Store the URL for later use when form is submitted
+      setPreviewUrl(uploadedUrl);
+      form.setFieldsValue({ avatar: uploadedUrl });
+
+      message.success({ content: 'Avatar uploaded! Click "Save changes" to update your profile.', key: 'avatar-upload' });
     } catch (err: any) {
-      message.error(err?.message ?? 'Failed to upload avatar.');
+      message.error({ content: err?.message ?? 'Failed to upload avatar', key: 'avatar-upload' });
     }
   };
 
@@ -73,9 +107,9 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
       layout="vertical"
       onFinish={onFinish}
       initialValues={{
-        name: initialUser?.name,
+        name: initialUser?.fullname,
         email: initialUser?.email,
-        avatar: initialUser?.avatar,
+        avatar: initialUser?.avatarUrl,
       }}
       disabled={loading}
     >
@@ -84,7 +118,7 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
           <Avatar
             size={64}
             icon={<UserOutlined />}
-            src={form.getFieldValue('avatar') || initialUser?.avatar}
+            src={previewUrl || initialUser?.avatarUrl}
           />
           <Upload {...uploadProps}>
             <Button icon={<UploadOutlined />}>Upload new avatar</Button>

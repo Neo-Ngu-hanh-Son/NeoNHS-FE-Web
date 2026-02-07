@@ -5,53 +5,49 @@ import type { User } from '@/types';
  * User Service
  * Handles user profile retrieval, updates, and avatar uploads.
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export const userService = {
   /**
    * Get current user's profile
    */
   async getProfile(): Promise<User> {
-    // apiClient.get returns parsed JSON
-    const res = await apiClient.get('/users/profile');
-    // Normalize response: it may be either { data } or direct object
-    const data = (res?.data ?? res) as User;
-    return data;
+    try {
+      const res = await apiClient.get('/users/profile');
+      console.log('getProfile raw response:', res);
+
+      const data = (res?.data ?? res) as User;
+      console.log('getProfile normalized data:', data);
+      return data;
+    } catch (error) {
+      console.error('getProfile error:', error);
+      throw error;
+    }
   },
 
   /**
    * Update current user's profile
+   * @param data - Profile data to update (including avatarUrl if changed)
    */
   async updateProfile(data: Partial<User>): Promise<User> {
-    const res = await apiClient.put(`/users/update-profile/${data.id}`, data);
-    const updated = (res?.data ?? res) as User;
-    return updated;
-  },
+    try {
+      const userId = data.id;
 
-  /**
-   * Upload avatar and return the new URL
-   * Uses direct fetch with FormData because apiClient is configured for JSON bodies.
-   */
-  async uploadAvatar(file: File): Promise<string> {
-    const formData = new FormData();
-    formData.append('file', file);
+      const payload = {
+        fullname: data.fullname,
+        email: data.email,
+        phoneNumber: data.phoneNumber,
+        avatarUrl: data.avatarUrl,
+      };
 
-    const response = await fetch(`${API_BASE_URL}/users/avatar`, {
-      method: 'POST',
-      body: formData,
-    });
+      Object.keys(payload).forEach(key =>
+        (payload as any)[key] === undefined && delete (payload as any)[key]
+      );
 
-    if (!response.ok) {
-      const text = await response.text().catch(() => '');
-      throw new Error(text || 'Avatar upload failed');
+      const res = await apiClient.put(`/users/update-profile/${userId}`, payload);
+      return (res?.data ?? res) as User;
+    } catch (error) {
+      throw error;
     }
-
-    const resJson = await response.json();
-    const url: string = resJson?.avatarUrl ?? resJson?.data?.avatarUrl;
-    if (!url) {
-      throw new Error('Avatar URL not returned from server');
-    }
-    return url;
   },
 };
 

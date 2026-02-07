@@ -14,6 +14,7 @@ interface AuthContextType {
   login: (credentials: LoginCredentials) => Promise<any>;
   loginGoogle: (data: { idToken: string }) => Promise<any>;
   logout: () => Promise<void>;
+  updateUser: (userData: User) => void;
   isAuthenticated: boolean;
 }
 
@@ -35,7 +36,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
-    
+    console.log('checkAuth - token exists:', !!token);
+
     // If no token, just set loading to false and return
     if (!token) {
       setLoading(false);
@@ -43,12 +45,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
+      console.log('checkAuth - fetching current user...');
       const currentUser = await authService.getCurrentUser();
+      console.log('checkAuth - currentUser received:', currentUser);
       setUser(currentUser);
-       console.log("Current User", currentUser);
+      console.log("Current User", currentUser);
     } catch (err: any) {
+      console.error('checkAuth - error:', err);
+      console.error('checkAuth - error response:', err?.response);
+      console.error('checkAuth - error status:', err?.response?.status);
       // If unauthorized (401), clear the invalid token
       if (err?.response?.status === 401 || err?.message === 'Unauthorized') {
+        console.log('checkAuth - clearing invalid token');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -57,14 +65,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
- 
-
   const login = async (credentials: LoginCredentials) => {
     try {
       setLoading(true);
       setError(null);
       const response = await authService.login(credentials);
-      // API returns: { data: { accessToken, tokenType, userInfo } }
       const { accessToken, userInfo } = response.data;
       localStorage.setItem('token', accessToken);
       setUser(userInfo);
@@ -109,6 +114,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const updateUser = (userData: User) => {
+    setUser(userData);
+  };
+
   const value: AuthContextType = {
     user,
     loading,
@@ -116,6 +125,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     login,
     loginGoogle,
     logout,
+    updateUser,
     isAuthenticated: !!user,
   };
 
