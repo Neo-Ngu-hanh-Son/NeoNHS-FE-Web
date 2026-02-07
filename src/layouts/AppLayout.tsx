@@ -9,6 +9,7 @@ export function AppLayout() {
     <div className="flex min-h-screen flex-col">
       <Header />
 
+      {/* Auto-redirect Admins to dashboard if they land on public pages */}
       <main className="flex-1">
         <Outlet />
       </main>

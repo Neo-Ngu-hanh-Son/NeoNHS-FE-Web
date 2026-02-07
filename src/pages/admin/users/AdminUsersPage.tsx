@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { DashboardCard } from '@/components/dashboard/DashboardCard';
 import { EmptyState } from '@/components/dashboard/EmptyState';
 import { TeamOutlined, SearchOutlined, FilterOutlined } from '@ant-design/icons';
@@ -95,13 +94,7 @@ export function AdminUsersPage() {
     ];
 
     return (
-        <DashboardLayout>
-            {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Users Management</h1>
-                <p className="text-gray-600">Manage all platform users</p>
-            </div>
-
+        <div className="p-8">
             <DashboardCard>
                 {/* Filters */}
                 <div className="mb-6 flex flex-wrap gap-4">
@@ -144,7 +137,7 @@ export function AdminUsersPage() {
                     />
                 )}
             </DashboardCard>
-        </DashboardLayout>
+        </div>
     );
 }
 
