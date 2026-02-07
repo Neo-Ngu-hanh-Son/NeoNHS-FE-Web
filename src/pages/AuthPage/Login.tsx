@@ -8,19 +8,29 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function LoginPage() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (isAuthenticated) {
-      // Use replace: true to prevent back-navigation issues
-      // and only navigate if we are currently on the login page
+    if (isAuthenticated && user) {
+
       const currentPath = window.location.pathname;
       if (currentPath === '/login') {
-        navigate('/', { replace: true });
+        const timer = setTimeout(() => {
+          const role = user.role?.toUpperCase();
+          if (role === 'ADMIN') {
+            navigate('/admin/dashboard', { replace: true });
+          } else if (role === 'VENDOR') {
+            navigate('/vendor/dashboard', { replace: true });
+          } else {
+            navigate('/', { replace: true });
+          }
+        }, 1500);
+
+        return () => clearTimeout(timer);
       }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
