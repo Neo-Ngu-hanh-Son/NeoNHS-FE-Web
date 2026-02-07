@@ -4,6 +4,7 @@
  */
 
 import apiClient from './apiClient';
+import type { UserRole } from '@/types';
 
 export interface LoginCredentials {
   email: string;
@@ -14,8 +15,12 @@ export interface UserInfo {
   id: string;
   email: string;
   fullname: string;
-  role?: string;
+  role: UserRole;
   avatarUrl?: string;
+  phoneNumber?: string;
+  isActive: boolean;
+  isVerified: boolean;
+  isBanned: boolean;
 }
 
 export interface LoginResponse {
@@ -51,8 +56,14 @@ export const authService = {
     return await apiClient.post('/auth/refresh', {});
   },
 
-  getCurrentUser: async () => {
-    return await apiClient.get('/auth/me');
+  getCurrentUser: async (): Promise<UserInfo> => {
+    const response = await apiClient.get('/auth/me');
+    // Handle different response structures
+    // Backend might return: { data: {...} } or { status, success, message, data: {...}, timestamp }
+    if (response?.data) {
+      return response.data as UserInfo;
+    }
+    return response as UserInfo;
   },
 
   forgotPassword: async (email: string) => {
