@@ -49,19 +49,24 @@ export function LoginForm({
 
     try {
       // Use context login instead of direct service call
-      await login(formData)
+      const response = await login(formData)
+      const user = response.data.userInfo;
 
       api.success({
         title: 'Login Successful!',
-        description: 'Welcome back! Redirecting to homepage...',
+        description: 'Welcome back! Redirecting...',
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
         duration: 3,
       })
 
       setTimeout(() => {
-        navigate("/")
-      }, 3000)
+        if (user.role === 'ADMIN') {
+          navigate("/admin/dashboard")
+        } else {
+          navigate("/")
+        }
+      }, 1500)
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials."
       setError(errorMessage)
@@ -100,19 +105,24 @@ export function LoginForm({
 
     try {
       // Use context loginGoogle
-      await loginGoogle({ idToken });
+      const response = await loginGoogle({ idToken });
+      const user = response.data.userInfo;
 
       api.success({
         message: 'Google Login Successful!',
-        description: 'Welcome! Redirecting to homepage...',
+        description: 'Welcome! Redirecting...',
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
         duration: 3,
       });
 
       setTimeout(() => {
-        navigate("/");
-      }, 3000);
+        if (user.role === 'ADMIN') {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      }, 1500);
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
       const errorMessage = err.response?.data?.message || err.message || "Google login failed on server.";

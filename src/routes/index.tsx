@@ -13,11 +13,17 @@ import { ProfilePage } from '@/pages/ProfilePage'
 import UserProfilePage from '@/pages/ProfilePage/UserProfilePage'
 import VendorProfilePage from '@/pages/ProfilePage/VendorProfilePage'
 import { AboutUs } from '@/pages/AboutUs'
+import { AdminLayout } from '@/layouts/admin/AdminLayout'
 // Dashboard Pages
-import UserDashboardPage from '@/pages/Dashboard/UserDashboardPage'
-import VendorDashboardPage from '@/pages/Dashboard/VendorDashboardPage'
-import AdminDashboardPage from '@/pages/Dashboard/AdminDashboardPage'
-import AdminUsersPage from '@/pages/Dashboard/AdminUsersPage'
+import VendorDashboardPage from '@/pages/vendor/dashboard/VendorDashboardPage'
+import AdminDashboardPage from '@/pages/admin/dashboard/AdminDashboardPage'
+import AdminUsersPage from '@/pages/admin/users/AdminUsersPage'
+import AdminDestinationsPage from '@/pages/admin/destinations/AdminDestinationsPage'
+import AdminVendorsPage from '@/pages/admin/vendors/AdminVendorsPage'
+import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage'
+import AdminVouchersPage from '@/pages/admin/vouchers/AdminVouchersPage'
+import AdminReportsPage from '@/pages/admin/reports/AdminReportsPage'
+import AdminEventsPage from '@/pages/admin/events/AdminEventsPage'
 
 export const router = createBrowserRouter([
   {
@@ -44,17 +50,24 @@ export const router = createBrowserRouter([
           { path: "/account/user", element: <UserProfilePage /> },
           { path: "/account/vendor", element: <VendorProfilePage /> },
 
-          // User/Tourist Dashboard
-          { path: "/user/dashboard", element: <UserDashboardPage /> },
-
           // Vendor Dashboard
           { path: "/vendor/dashboard", element: <VendorDashboardPage /> },
 
-          // Admin Dashboard
-          { path: "/admin/dashboard", element: <AdminDashboardPage /> },
-          { path: "/admin/users", element: <AdminUsersPage /> },
-
           { path: "*", element: <NotFoundPage /> },
+        ],
+      },
+      {
+        path: "/admin",
+        element: <AdminLayout />,
+        children: [
+          { path: "dashboard", element: <AdminDashboardPage /> },
+          { path: "destinations", element: <AdminDestinationsPage /> },
+          { path: "users", element: <AdminUsersPage /> },
+          { path: "vendors", element: <AdminVendorsPage /> },
+          { path: "tickets", element: <AdminTicketsPage /> },
+          { path: "vouchers", element: <AdminVouchersPage /> },
+          { path: "reports", element: <AdminReportsPage /> },
+          { path: "events", element: <AdminEventsPage /> },
         ],
       },
     ],
