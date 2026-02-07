@@ -1,6 +1,5 @@
 import apiClient from './apiClient';
-import type { VendorProfile, User } from '@/types';
-import { uploadImageToCloudinary, validateImageFile } from '@/utils/cloudinary';
+import type { VendorProfile } from '@/types';
 
 /**
  * Vendor Service
