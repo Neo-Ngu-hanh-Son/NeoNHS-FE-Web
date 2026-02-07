@@ -14,6 +14,7 @@ import UserProfilePage from '@/pages/ProfilePage/UserProfilePage'
 import VendorProfilePage from '@/pages/ProfilePage/VendorProfilePage'
 import { AboutUs } from '@/pages/AboutUs'
 import { AdminLayout } from '@/layouts/admin/AdminLayout'
+import { VendorLayout } from '@/layouts/vendor/VendorLayout'
 // Dashboard Pages
 import VendorDashboardPage from '@/pages/vendor/dashboard/VendorDashboardPage'
 import AdminDashboardPage from '@/pages/admin/dashboard/AdminDashboardPage'
@@ -24,6 +25,13 @@ import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage'
 import AdminVouchersPage from '@/pages/admin/vouchers/AdminVouchersPage'
 import AdminReportsPage from '@/pages/admin/reports/AdminReportsPage'
 import AdminEventsPage from '@/pages/admin/events/AdminEventsPage'
+
+// Vendor specific pages
+import WorkshopTemplatesPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage'
+import WorkshopSessionsPage from '@/pages/vendor/WorkshopSessions/WorkshopSessionsPage'
+import WorkshopCalendarPage from '@/pages/vendor/WorkshopCalendar/CalendarPage.tsx'
+import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPage'
+import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage'
 
 export const router = createBrowserRouter([
   {
@@ -48,12 +56,21 @@ export const router = createBrowserRouter([
           // Profile Routes - Auto-redirect based on role
           { path: "/account", element: <ProfilePage /> },
           { path: "/account/user", element: <UserProfilePage /> },
-          { path: "/account/vendor", element: <VendorProfilePage /> },
-
-          // Vendor Dashboard
-          { path: "/vendor/dashboard", element: <VendorDashboardPage /> },
 
           { path: "*", element: <NotFoundPage /> },
+        ],
+      },
+      {
+        path: "/vendor",
+        element: <VendorLayout />,
+        children: [
+          { path: "dashboard", element: <VendorDashboardPage /> },
+          { path: "profile", element: <VendorProfilePage /> },
+          { path: "workshop-templates", element: <WorkshopTemplatesPage /> },
+          { path: "workshop-sessions", element: <WorkshopSessionsPage /> },
+          { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
+          { path: "ticket-verification", element: <TicketVerificationPage /> },
+          { path: "vouchers", element: <VouchersPage /> },
         ],
       },
       {

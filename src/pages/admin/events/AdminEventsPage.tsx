@@ -9,7 +9,7 @@ export default function AdminEventsPage() {
     ];
 
     return (
-        <div className="p-8">
+        <div className="max-w-7xl mx-auto">
             <Card title={<Title level={4}>Event Management</Title>}>
                 <Table columns={columns} dataSource={[]} locale={{ emptyText: 'No events found yet.' }} />
             </Card>

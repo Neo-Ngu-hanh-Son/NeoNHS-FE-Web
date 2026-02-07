@@ -13,7 +13,7 @@ export default function AdminVendorsPage() {
     ];
 
     return (
-        <div className="p-8">
+        <div className="max-w-7xl mx-auto">
             <Card title={<Title level={4}>Vendor Management</Title>}>
                 <Table columns={columns} dataSource={[]} locale={{ emptyText: 'No vendors found yet.' }} />
             </Card>

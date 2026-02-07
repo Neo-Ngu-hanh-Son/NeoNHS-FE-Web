@@ -17,7 +17,7 @@ export const ProfilePage = () => {
     if (!loading && user) {
       // Redirect based on role
       if (user.role === UserRole.VENDOR) {
-        navigate('/account/vendor', { replace: true });
+        navigate('/vendor/profile', { replace: true });
       } else {
         // TOURIST or ADMIN go to user profile
         navigate('/account/user', { replace: true });
