@@ -1,83 +1,79 @@
-import { message } from 'antd';
-import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { useState } from 'react';
 import { UserInfoCard } from '@/components/profile/UserInfoCard';
 import { UserEditForm } from '@/components/profile/UserEditForm';
-import { userService } from '@/services/api/userService';
+import { ChangePasswordForm } from '@/components/profile/ChangePasswordForm';
 import type { User } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
 export function UserProfilePage() {
     const { user, updateUser } = useAuth();
+    const [activeTab, setActiveTab] = useState('profile');
 
     const handleProfileSaved = (updatedUser: User) => {
         updateUser(updatedUser);
     };
 
-    const handleAvatarUpload = async (file: File) => {
-        if (!user) return;
+    if (!user) return null;
 
-        try {
-            // Upload to Cloudinary first
-            const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
-
-            // Validate file
-            const validationError = validateImageFile(file);
-            if (validationError) {
-                throw new Error(validationError);
-            }
-
-            // Upload to Cloudinary
-            const avatarUrl = await uploadImageToCloudinary(file);
-            if (!avatarUrl) {
-                throw new Error('Failed to upload avatar to Cloudinary');
-            }
-
-            // Update profile with the new avatar URL
-            const updated = await userService.updateProfile({
-                ...user,
-                avatarUrl
-            });
-            updateUser(updated);
-            message.success('Avatar updated successfully!');
-        } catch (error: any) {
-            message.error(error?.message || 'Failed to upload avatar');
-            throw error; // Re-throw to let ProfileAvatar component handle loading state
-        }
-    };
-
-    if (!user) {
-        return (
-            <DashboardLayout>
-                <div className="flex items-center justify-center h-64">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                </div>
-            </DashboardLayout>
-        );
-    }
+    const navItems = [
+        { id: 'profile', label: 'Profile Information', icon: 'person' },
+        { id: 'security', label: 'Security & Password', icon: 'security' },
+        { id: 'preferences', label: 'Preferences', icon: 'settings' },
+        { id: 'history', label: 'Booking History', icon: 'history' },
+    ];
 
     return (
-        <DashboardLayout>
-            {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">My Profile</h1>
-                <p className="text-gray-600">Manage your personal information and preferences</p>
-            </div>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+            <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {/* Profile Header */}
-            <div className="mb-6">
-                <ProfileHeader
-                    user={user}
-                    onAvatarUpload={handleAvatarUpload}
-                />
-            </div>
+                    {/* Left Column: Profile Aside (4 cols) */}
+                    <aside className="lg:col-span-4 space-y-6">
+                        <nav className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-2">
+                            {navItems.map((item) => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setActiveTab(item.id)}
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${activeTab === item.id
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                                        }`}
+                                >
+                                    <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                                    {item.label}
+                                </button>
+                            ))}
+                        </nav>
+                    </aside>
 
-            {/* Profile Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <UserInfoCard user={user} />
-                <UserEditForm user={user} onSaved={handleProfileSaved} />
+                    {/* Right Column: Main Content (8 cols) */}
+                    <main className="lg:col-span-8 space-y-8">
+                        <div className="min-h-[400px]">
+                            {activeTab === 'profile' && (
+                                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                    <UserEditForm user={user} onSaved={handleProfileSaved} />
+                                    <UserInfoCard user={user} />
+                                </div>
+                            )}
+
+                            {activeTab === 'security' && (
+                                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                    <ChangePasswordForm />
+                                </div>
+                            )}
+
+                            {(activeTab === 'preferences' || activeTab === 'history') && (
+                                <div className="bg-white dark:bg-slate-900 rounded-xl p-12 border border-slate-200 dark:border-slate-800 text-center animate-in zoom-in-95 duration-300 shadow-sm">
+                                    <span className="material-symbols-outlined text-slate-400 text-5xl mb-4">construction</span>
+                                    <h3 className="text-slate-900 dark:text-white font-bold text-lg">Under Construction</h3>
+                                    <p className="text-slate-500 text-sm">This section is being redesigned to provide you with a better experience.</p>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
             </div>
-        </DashboardLayout>
+        </div>
     );
 }
 

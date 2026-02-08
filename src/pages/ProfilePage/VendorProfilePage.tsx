@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { message } from 'antd';
-import { ProfileHeader } from '@/components/profile/ProfileHeader';
-import { VendorInfoCard } from '@/components/profile/VendorInfoCard';
 import { VendorEditForm } from '@/components/profile/VendorEditForm';
+import { ChangePasswordForm } from '@/components/profile/ChangePasswordForm';
 import type { User, VendorProfile } from '@/types';
 import VendorService from '@/services/api/vendorService';
 import { useAuth } from '@/hooks/useAuth';
@@ -11,6 +10,7 @@ export default function VendorProfilePage() {
     const { user, updateUser } = useAuth();
     const [vendor, setVendor] = useState<VendorProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('business');
 
     useEffect(() => {
         if (user) {
@@ -34,34 +34,6 @@ export default function VendorProfilePage() {
         updateUser(updatedVendor as unknown as User);
     };
 
-    const handleAvatarUpload = async (file: File) => {
-        if (!user || !vendor) return;
-
-        try {
-            const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
-            const validationError = validateImageFile(file);
-            if (validationError) {
-                throw new Error(validationError);
-            }
-
-            const avatarUrl = await uploadImageToCloudinary(file);
-            if (!avatarUrl) {
-                throw new Error('Failed to upload avatar to Cloudinary');
-            }
-
-            const updated = await VendorService.updateVendorProfile({
-                ...vendor,
-                avatarUrl
-            });
-            setVendor(updated);
-            updateUser(updated as unknown as User);
-            message.success('Avatar updated successfully!');
-        } catch (error: any) {
-            message.error(error?.message || 'Failed to upload avatar');
-            throw error;
-        }
-    };
-
     if (loading || !user) {
         return (
             <div className="flex items-center justify-center h-64">
@@ -70,41 +42,48 @@ export default function VendorProfilePage() {
         );
     }
 
-    if (!vendor) {
-        return (
-            <div className="text-center py-8">
-                <p className="text-gray-600">Failed to load vendor data. Please try again.</p>
-            </div>
-        );
-    }
+    if (!vendor) return null;
 
     return (
         <div className="max-w-7xl mx-auto">
-            {/* Page Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Vendor Profile</h1>
-                <p className="text-[#588d70]">Manage your official business documents and shop information</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8">
-                {/* Profile Header section */}
-                <div className="bg-white dark:bg-zinc-900 p-1 rounded-2xl shadow-sm border border-[#d3e4da] dark:border-white/10">
-                    <ProfileHeader
-                        user={user}
-                        onAvatarUpload={handleAvatarUpload}
-                    />
+            {/* Vendor Page Content */}
+            <div className="space-y-8">
+                {/* Content Tabs */}
+                <div className="border-b border-slate-200 dark:border-slate-800 flex items-center gap-8 px-2">
+                    <button
+                        onClick={() => setActiveTab('business')}
+                        className={`pb-4 px-2 text-sm font-bold transition-all relative ${activeTab === 'business'
+                            ? 'text-primary'
+                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Business Profile
+                        {activeTab === 'business' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('security')}
+                        className={`pb-4 px-2 text-sm font-bold transition-all relative ${activeTab === 'security'
+                            ? 'text-primary'
+                            : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'
+                            }`}
+                    >
+                        Security Settings
+                        {activeTab === 'security' && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                        )}
+                    </button>
                 </div>
 
-                {/* Vendor Info & Edit section */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-1">
-                        <VendorInfoCard vendor={vendor} />
-                    </div>
-                    <div className="lg:col-span-2">
-                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-[#d3e4da] dark:border-white/10 shadow-sm transition-all h-full">
-                            <VendorEditForm vendor={vendor} onSaved={handleVendorSaved} />
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                    {activeTab === 'business' ? (
+                        <VendorEditForm vendor={vendor} onSaved={handleVendorSaved} />
+                    ) : (
+                        <div className="max-w-4xl">
+                            <ChangePasswordForm />
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
