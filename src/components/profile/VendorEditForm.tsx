@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Divider } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { VendorProfile } from '@/types';
-import { motion } from 'framer-motion';
 import VendorService from '@/services/api/vendorService';
 import { MapPicker } from '@/components/common/MapPicker';
+import { ProfileAvatar } from './ProfileAvatar';
 
 const { TextArea } = Input;
 
@@ -15,6 +15,7 @@ interface VendorEditFormProps {
 export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [uploading, setUploading] = useState(false);
     const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>(
         vendor.latitude && vendor.longitude
             ? { lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude) }
@@ -37,6 +38,29 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
         setLocation(newLocation);
     };
 
+    const handleAvatarUpload = async (file: File) => {
+        setUploading(true);
+        try {
+            const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
+            const validationError = validateImageFile(file);
+            if (validationError) throw new Error(validationError);
+
+            const avatarUrl = await uploadImageToCloudinary(file);
+            if (!avatarUrl) throw new Error('Upload failed');
+
+            const updated = await VendorService.updateVendorProfile({
+                ...vendor,
+                avatarUrl
+            });
+            message.success('Avatar updated successfully!');
+            onSaved?.(updated);
+        } catch (error: any) {
+            message.error(error?.message || 'Failed to upload avatar');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmit = async (values: any) => {
         setLoading(true);
         try {
@@ -47,162 +71,182 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
                 longitude: location?.lng.toString(),
             };
 
-            const updated = await VendorService.updateVendorProfile(payload);
-            message.success({ content: 'Business information updated successfully!', key: 'vendor-update' });
-            onSaved?.(updated);
+            const response = await VendorService.updateVendorProfile(payload);
+
+            // Merge current state with updates to ensure UI consistency
+            const updatedVendor = {
+                ...vendor,
+                ...values,
+                latitude: payload.latitude,
+                longitude: payload.longitude,
+                ...(response?.id ? response : {})
+            };
+
+            message.success('Business information updated successfully!');
+            onSaved?.(updatedVendor);
         } catch (error: any) {
-            message.error({ content: error?.message || 'Failed to update business information', key: 'vendor-update' });
+            message.error(error?.message || 'Failed to update business information');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 hover:shadow-2xl transition-shadow duration-300"
+        <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleSubmit}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
         >
-            <div className="flex items-center gap-2 mb-6">
-                <div className="w-1 h-6 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"></div>
-                <h2 className="text-xl font-bold text-gray-900">Edit Business Information</h2>
+            {/* Left Column: Business Info */}
+            <div className="lg:col-span-8 space-y-6">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 pb-8 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-6">
+                            <ProfileAvatar
+                                src={vendor.avatarUrl}
+                                alt={vendor.businessName}
+                                size="lg"
+                                onUpload={handleAvatarUpload}
+                                loading={uploading}
+                            />
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Business Profile</h2>
+                                <p className="text-sm text-slate-500">Update your company photo and business details</p>
+                            </div>
+                        </div>
+                        <div className="bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-full border border-emerald-100 dark:border-emerald-800 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-emerald-600 text-sm">verified</span>
+                            <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Verified Business</span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <Form.Item
+                                label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Business Name</span>}
+                                name="businessName"
+                                rules={[{ required: true, message: 'Required' }]}
+                            >
+                                <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Registered Category</span>}
+                            >
+                                <Input disabled value="Eco-Tourism & Cultural Workshops" className="w-full px-4 py-2.5 border-none bg-slate-50 dark:bg-slate-800 text-slate-500 cursor-not-allowed italic font-medium" />
+                            </Form.Item>
+                        </div>
+
+                        <Form.Item
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Description</span>}
+                            name="description"
+                        >
+                            <TextArea
+                                rows={4}
+                                className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Business Address</span>}
+                            name="address"
+                        >
+                            <Input
+                                prefix={<span className="material-symbols-outlined text-rose-500 text-lg mr-2">location_on</span>}
+                                className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all hover:border-primary"
+                                placeholder="Enter business address..."
+                            />
+                        </Form.Item>
+
+                        <div className="py-4">
+                            <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 block">Location on Map</span>
+                            <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner">
+                                <MapPicker value={location} onChange={handleLocationChange} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <Form
-                form={form}
-                layout="vertical"
-                initialValues={{
-                    businessName: vendor.businessName,
-                    description: vendor.description,
-                    address: vendor.address,
-                    taxCode: vendor.taxCode,
-                    bankName: vendor.bankName,
-                    bankAccountNumber: vendor.bankAccountNumber,
-                    bankAccountName: vendor.bankAccountName,
-                }}
-                onFinish={handleSubmit}
-            >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Business Name</span>}
-                        name="businessName"
-                        rules={[
-                            { required: true, message: 'Please enter your business name' },
-                            { min: 3, message: 'Business name must be at least 3 characters' },
-                        ]}
-                        className="md:col-span-2"
-                    >
-                        <Input
-                            placeholder="Enter your shop name"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
+            {/* Right Column: Banking info & Sidebar */}
+            <div className="lg:col-span-4 space-y-6">
+                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-8">
+                    <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Banking Information</h2>
 
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Description</span>}
-                        name="description"
-                        className="md:col-span-2"
-                    >
-                        <TextArea
-                            placeholder="Describe your business"
-                            rows={4}
-                            maxLength={500}
-                            showCount
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
+                    <div className="space-y-4">
+                        <Form.Item
+                            label={<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tax Code / ID</span>}
+                            name="taxCode"
+                        >
+                            <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                        </Form.Item>
 
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Business Address</span>}
-                        name="address"
-                        className="md:col-span-2"
-                    >
-                        <Input
-                            placeholder="Enter your business address"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
+                        <Form.Item
+                            label={<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bank Name</span>}
+                            name="bankName"
+                        >
+                            <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" />
+                        </Form.Item>
 
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Tax Code</span>}
-                        name="taxCode"
-                    >
-                        <Input
-                            placeholder="Enter tax code"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
+                        <Form.Item
+                            label={<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Account Number</span>}
+                            name="bankAccountNumber"
+                        >
+                            <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-mono" />
+                        </Form.Item>
 
-                    <Divider className="md:col-span-2 my-2">Bank Information</Divider>
+                        <Form.Item
+                            label={<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Beneficiary Name</span>}
+                            name="bankAccountName"
+                        >
+                            <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all uppercase" />
+                        </Form.Item>
+                    </div>
 
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Bank Name</span>}
-                        name="bankName"
-                    >
-                        <Input
-                            placeholder="e.g. Vietcombank"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Account Number</span>}
-                        name="bankAccountNumber"
-                    >
-                        <Input
-                            placeholder="Enter bank account number"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
-
-                    <Form.Item
-                        label={<span className="text-sm font-semibold text-gray-700">Account Name</span>}
-                        name="bankAccountName"
-                        className="md:col-span-2"
-                    >
-                        <Input
-                            placeholder="Enter bank account name"
-                            size="large"
-                            className="rounded-xl border-gray-300 hover:border-green-400 focus:border-green-500 transition-colors"
-                        />
-                    </Form.Item>
+                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={loading}
+                            block
+                            className="bg-primary hover:bg-primary/90 text-white h-12 rounded-lg text-sm font-bold shadow-md shadow-primary/20 transition-all active:scale-95"
+                        >
+                            Save All Business Details
+                        </Button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                form.setFieldsValue({
+                                    businessName: vendor.businessName,
+                                    description: vendor.description,
+                                    address: vendor.address,
+                                    taxCode: vendor.taxCode,
+                                    bankName: vendor.bankName,
+                                    bankAccountNumber: vendor.bankAccountNumber,
+                                    bankAccountName: vendor.bankAccountName,
+                                });
+                                setLocation(vendor.latitude && vendor.longitude
+                                    ? { lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude) }
+                                    : undefined);
+                            }}
+                            className="w-full mt-4 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors"
+                        >
+                            Cancel Changes
+                        </button>
+                    </div>
                 </div>
 
-                <Divider className="my-2">Location on Map</Divider>
-                <div className="mb-6">
-                    <MapPicker value={location} onChange={handleLocationChange} />
+                <div className="bg-blue-50 dark:bg-blue-900/10 rounded-xl p-6 border border-blue-100 dark:border-blue-900/20">
+                    <div className="flex items-center gap-3 text-blue-700 dark:text-blue-400 mb-3">
+                        <span className="material-symbols-outlined">info</span>
+                        <span className="font-bold">Security Tip</span>
+                    </div>
+                    <p className="text-sm text-blue-600/80 dark:text-blue-400/60 leading-relaxed">
+                        Ensure your banking details match your official registration documents to avoid payment delays.
+                    </p>
                 </div>
-
-                <div className="flex gap-3 mt-6">
-                    <Button
-                        type="primary"
-                        htmlType="submit"
-                        loading={loading}
-                        size="large"
-                        className="flex-1 h-12 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 border-none shadow-lg shadow-green-500/50 font-semibold"
-                    >
-                        Save Changes
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            form.resetFields();
-                            setLocation(vendor.latitude && vendor.longitude
-                                ? { lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude) }
-                                : undefined);
-                        }}
-                        size="large"
-                        className="h-12 rounded-xl border-2 border-gray-300 hover:border-green-500 hover:text-green-600 font-semibold"
-                    >
-                        Reset
-                    </Button>
-                </div>
-            </Form>
-        </motion.div>
+            </div>
+        </Form>
     );
 }

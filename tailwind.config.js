@@ -8,10 +8,11 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: [
+					'Plus Jakarta Sans',
 					'Roboto',
 					...defaultTheme.fontFamily.sans
 				],
-				display: ['Public Sans', 'sans-serif'],
+				display: ['Plus Jakarta Sans', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -20,12 +21,12 @@ export default {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				primary: {
-					DEFAULT: '#1f6f43',
+					DEFAULT: '#137fec',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
-				'sidebar-bg': '#185835',
-				'background-light': '#F4F9F6',
-				'background-dark': '#131f18',
+				'sidebar-bg': '#101922',
+				'background-light': '#f6f7f8',
+				'background-dark': '#101922',
 				'accent-gold': '#FFD700',
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
