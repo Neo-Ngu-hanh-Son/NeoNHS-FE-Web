@@ -11,6 +11,7 @@ import NewPassword from '@/pages/AuthPage/NewPassword'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import ProfilePage from '@/pages/ProfilePage'
 import { AboutUs } from '@/pages/AboutUs'
+import { SimpleMapView } from '@/pages/SimpleMapView'
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
           { path: '/register', element: <Register /> },
           { path: '/verify-otp', element: <VerifyOTP /> },
           { path: '/new-password', element: <NewPassword /> },
+          { path: '/simple-map', element: <SimpleMapView /> },
         ],
       },
       {
