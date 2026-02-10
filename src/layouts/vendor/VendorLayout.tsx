@@ -139,7 +139,7 @@ export function VendorLayout() {
                             <div className="flex items-center gap-3">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{user?.fullname || 'Vendor'}</p>
-                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">Business Owner</p>
+                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">Vendor</p>
                                 </div>
                                 <div
                                     className="size-10 rounded-full bg-primary/10 bg-center bg-cover border-2 border-primary/20"
