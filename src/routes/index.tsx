@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '@/layouts/RootLayout'
 import { AppLayout } from '@/layouts/AppLayout'
 import { BlankLayout } from '@/layouts/BlankLayout'
+import { AdminLayout } from '@/layouts/AdminLayout'
 import { HomePage } from '@/pages/HomePage'
 import Login from '@/pages/AuthPage/Login'
 import Forgot from '@/pages/AuthPage/Forgot'
@@ -12,6 +13,7 @@ import { NotFoundPage } from '@/pages/NotFoundPage'
 import ProfilePage from '@/pages/ProfilePage'
 import { AboutUs } from '@/pages/AboutUs'
 import { SimpleMapView } from '@/pages/SimpleMapView'
+import { BlogCategoryList } from '@/pages/admin/BlogCategoryList'
 
 export const router = createBrowserRouter([
   {
@@ -26,6 +28,14 @@ export const router = createBrowserRouter([
           { path: '/verify-otp', element: <VerifyOTP /> },
           { path: '/new-password', element: <NewPassword /> },
           { path: '/simple-map', element: <SimpleMapView /> },
+        ],
+      },
+      {
+        path: '/admin',
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <BlogCategoryList /> },
+          { path: 'blog-categories', element: <BlogCategoryList /> },
         ],
       },
       {
