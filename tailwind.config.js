@@ -24,9 +24,9 @@ export default {
 					DEFAULT: '#137fec',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
-				'sidebar-bg': '#101922',
+				'sidebar-bg': '#0f2e1b',
 				'background-light': '#f6f7f8',
-				'background-dark': '#101922',
+				'background-dark': '#0f2e1b',
 				'accent-gold': '#FFD700',
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',

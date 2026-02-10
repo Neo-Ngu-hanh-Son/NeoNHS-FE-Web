@@ -37,13 +37,13 @@ export function VendorLayout() {
         <div className="flex h-screen overflow-hidden font-display">
             {/* Sidebar */}
             <aside
-                className={`bg-[#0f2e1b] flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
+                className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? 'w-20' : 'w-64'
                     }`}
             >
                 <div className={`flex flex-col gap-8 ${isCollapsed ? 'items-center px-2' : 'px-6'}`}>
                     {/* Brand */}
                     <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-                        <div className="size-10 rounded-lg bg-accent-gold flex items-center justify-center text-[#0f2e1b] shrink-0">
+                        <div className="size-10 rounded-lg bg-accent-gold flex items-center justify-center text-sidebar-bg shrink-0">
                             <span className="material-symbols-outlined font-bold">storefront</span>
                         </div>
                         {!isCollapsed && (
