@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import {
     Table,
     Button,
@@ -15,7 +16,8 @@ import {
     Select,
     Typography,
     Upload,
-    Alert
+    Alert,
+    Tooltip
 } from 'antd';
 import {
     EditOutlined,
@@ -38,9 +40,16 @@ import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudi
 import { attractionService } from '@/services/api/attractionService';
 import { pointService } from '@/services/api/pointService';
 import { AttractionResponse, AttractionRequest } from '@/types/attraction';
-import { PointResponse, PointRequest } from '@/types/point';
+import { PointRequest, PointResponse, PointType } from '@/types/point';
 
 const { Text } = Typography;
+
+const statusColors: { [key: string]: string } = {
+    OPEN: 'blue',
+    CLOSED: 'red',
+    MAINTENANCE: 'orange',
+    TEMPORARILY_CLOSED: 'volcano'
+};
 
 // Fix for leaflet default icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -69,15 +78,6 @@ let PointMarkerIcon = L.icon({
     iconSize: [22, 36],
     iconAnchor: [11, 36],
     className: 'point-marker-hue'
-});
-
-// Marker icon for Attractions (Deep Blue)
-let AttractionMarkerIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    className: 'attraction-marker-hue'
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -129,12 +129,14 @@ export function AdminDestinationsPage() {
     const [isPointModalVisible, setIsPointModalVisible] = useState(false);
     const [editingPoint, setEditingPoint] = useState<Point | null>(null);
     const [mapCenter, setMapCenter] = useState<[number, number]>([16.0028, 108.2638]);
+    const [mapZoom, setMapZoom] = useState(15);
     const [form] = Form.useForm();
     const [pointForm] = Form.useForm();
     const mapRef = useRef<HTMLDivElement>(null);
 
     const handleFocus = (lat: number, lng: number) => {
         setMapCenter([lat, lng]);
+        setMapZoom(18); // Zoom in closer for detail
         if (mapRef.current) {
             mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -417,6 +419,121 @@ export function AdminDestinationsPage() {
         });
     };
 
+    const handleImportPoints = async (file: File) => {
+        if (!currentPointDestination) return;
+        setPointsLoading(true);
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const row of jsonData as any[]) {
+                    try {
+                        const pointData: PointRequest = {
+                            name: row.name || row.Name,
+                            description: row.description || row.Description,
+                            history: row.history || row.History || '',
+                            latitude: Number(row.latitude || row.Latitude),
+                            longitude: Number(row.longitude || row.Longitude),
+                            orderIndex: Number(row.orderIndex || row.OrderIndex || row.order || 1),
+                            estTimeSpent: Number(row.estTimeSpent || row.EstTimeSpent || 30),
+                            type: (row.type || row.Type || 'GENERAL') as PointType,
+                            attractionId: currentPointDestination.id
+                        };
+
+                        if (!pointData.name || isNaN(pointData.latitude) || isNaN(pointData.longitude)) {
+                            failCount++;
+                            continue;
+                        }
+
+                        const response = await pointService.createPoint(pointData);
+                        if (response.success) successCount++;
+                        else failCount++;
+                    } catch {
+                        failCount++;
+                    }
+                }
+
+                message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+                // Refresh points
+                const pointsResponse = await pointService.getPointsByAttraction(currentPointDestination.id);
+                if (pointsResponse.success) {
+                    setCurrentPointDestination({
+                        ...currentPointDestination,
+                        points: pointsResponse.data
+                    });
+                    setDestinations(destinations.map(d =>
+                        d.id === currentPointDestination.id ? { ...d, points: pointsResponse.data } : d
+                    ));
+                }
+            } catch (error) {
+                message.error('Failed to parse Excel file.');
+            } finally {
+                setPointsLoading(false);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
+    const handleImportDestinations = async (file: File) => {
+        setLoading(true);
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const row of jsonData as any[]) {
+                    try {
+                        const destData: AttractionRequest = {
+                            name: row.name || row.Name,
+                            address: row.address || row.Address || '',
+                            description: row.description || row.Description || '',
+                            latitude: Number(row.latitude || row.Latitude),
+                            longitude: Number(row.longitude || row.Longitude),
+                            status: (row.status || row.Status || 'OPEN') as 'OPEN' | 'CLOSED' | 'MAINTENANCE' | 'TEMPORARILY_CLOSED',
+                            openHour: row.openHour || row.OpenHour || '08:00',
+                            closeHour: row.closeHour || row.CloseHour || '17:00',
+                            isActive: true
+                        };
+
+                        if (!destData.name || isNaN(destData.latitude) || isNaN(destData.longitude)) {
+                            failCount++;
+                            continue;
+                        }
+
+                        const response = await attractionService.createAttraction(destData);
+                        if (response.success) successCount++;
+                        else failCount++;
+                    } catch {
+                        failCount++;
+                    }
+                }
+
+                message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+                fetchAttractions();
+            } catch (error) {
+                message.error('Failed to parse Excel file.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
     const filteredDestinations = destinations.filter(d =>
         d.name.toLowerCase().includes(searchText.toLowerCase()) ||
         (d.description && d.description.toLowerCase().includes(searchText.toLowerCase())) ||
@@ -427,11 +544,11 @@ export function AdminDestinationsPage() {
         {
             title: 'Info',
             key: 'info',
-            width: '30%',
+            width: 300,
             render: (record: Destination) => (
                 <div className="flex flex-col gap-1">
-                    <Text strong className="text-primary">{record.name}</Text>
-                    <Text type="secondary" className="text-xs line-clamp-1">
+                    <Text strong className="text-primary truncate block" style={{ maxWidth: 280 }}>{record.name}</Text>
+                    <Text type="secondary" className="text-xs truncate block" title={record.address} style={{ maxWidth: 280 }}>
                         <EnvironmentOutlined className="mr-1" />{record.address || 'No address'}
                     </Text>
                 </div>
@@ -440,7 +557,7 @@ export function AdminDestinationsPage() {
         {
             title: 'Hours',
             key: 'hours',
-            width: '15%',
+            width: 120,
             render: (record: Destination) => (
                 <div className="flex items-center gap-1 text-xs">
                     <ClockCircleOutlined />
@@ -452,21 +569,19 @@ export function AdminDestinationsPage() {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            width: '15%',
+            width: 120,
             render: (status: string) => (
-                <Space direction="vertical" size={0}>
-                    <Tag color={status === 'OPEN' ? 'green' : status === 'CLOSED' ? 'red' : 'orange'}>
-                        {status}
-                    </Tag>
-                </Space>
+                <Tag color={status === 'OPEN' ? 'green' : (status === 'CLOSED' || status === 'TEMPORARILY_CLOSED') ? 'red' : 'orange'} className="m-0">
+                    {status}
+                </Tag>
             )
         },
         {
             title: 'Points',
             key: 'points',
-            width: '10%',
+            width: 100,
             render: (record: Destination) => (
-                <Tag color="cyan">
+                <Tag color="cyan" className="m-0">
                     {(record.points || []).length} POIs
                 </Tag>
             )
@@ -474,10 +589,13 @@ export function AdminDestinationsPage() {
         {
             title: 'Actions',
             key: 'actions',
-            width: '35%',
+            width: 250,
+            fixed: 'right' as const,
             render: (_: any, record: Destination) => (
-                <Space size="small">
-                    <Button type="link" size="small" className="p-0" icon={<EyeOutlined />} onClick={() => { setViewingDestination(record); setIsDetailVisible(true); }} />
+                <Space size="small" wrap>
+                    <Tooltip title="View Details">
+                        <Button type="link" size="small" className="p-0" icon={<EyeOutlined />} onClick={() => { setViewingDestination(record); setIsDetailVisible(true); }} />
+                    </Tooltip>
                     <Button size="small" icon={<EnvironmentOutlined />} onClick={() => handleFocus(record.latitude, record.longitude)}>Focus</Button>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEditDestination(record)} />
                     <Button size="small" icon={<PushpinOutlined />} onClick={() => handleManagePoints(record)}>Points</Button>
@@ -531,9 +649,12 @@ export function AdminDestinationsPage() {
                         z-index: 900 !important;
                     }
                     .attraction-marker-hue {
-                        filter: hue-rotate(-15deg) brightness(0.8) contrast(1.2);
                         z-index: 800 !important;
                     }
+                    .marker-open { filter: hue-rotate(-15deg) brightness(0.8) contrast(1.2); }
+                    .marker-closed { filter: hue-rotate(120deg) brightness(0.8); }
+                    .marker-maintenance { filter: hue-rotate(40deg) brightness(1.1); }
+                    .marker-temp-closed { filter: hue-rotate(180deg) grayscale(0.5); }
                     /* Custom Scrollbar for Map Popups */
                     .popup-poi-scroll::-webkit-scrollbar {
                         width: 4px;
@@ -563,46 +684,61 @@ export function AdminDestinationsPage() {
                         className="shadow-sm border-none bg-white/80 backdrop-blur-sm"
                     >
                         <div style={{ height: '400px', width: '100%' }} className="rounded-xl overflow-hidden border border-gray-100 shadow-inner">
-                            <MapContainer center={mapCenter} zoom={15} style={{ height: '100%', width: '100%' }}>
-                                <ChangeView center={mapCenter} zoom={15} />
+                            <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+                                <ChangeView center={mapCenter} zoom={mapZoom} />
                                 <MapEvents onMapClick={handleMapClick} />
                                 <TileLayer
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 />
-                                {destinations.map(dest => (
-                                    <Marker key={dest.id} position={[dest.latitude, dest.longitude]} opacity={dest.isActive ? 1 : 0.5} icon={AttractionMarkerIcon}>
-                                        <Popup>
-                                            <div className="p-2 min-w-[200px]">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <h3 className="font-bold text-primary m-0">{dest.name}</h3>
-                                                    <Tag color={dest.status === 'OPEN' ? 'green' : 'red'}>{dest.status}</Tag>
+                                {destinations.map(dest => {
+                                    const statusClass = dest.status === 'OPEN' ? 'marker-open' :
+                                        dest.status === 'CLOSED' ? 'marker-closed' :
+                                            dest.status === 'MAINTENANCE' ? 'marker-maintenance' :
+                                                'marker-temp-closed';
+
+                                    const statusIcon = L.icon({
+                                        iconUrl: icon,
+                                        shadowUrl: iconShadow,
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        className: `attraction-marker-hue ${statusClass}`
+                                    });
+
+                                    return (
+                                        <Marker key={dest.id} position={[dest.latitude, dest.longitude]} opacity={dest.isActive ? 1 : 0.5} icon={statusIcon}>
+                                            <Popup>
+                                                <div className="p-2 min-w-[200px]">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <h3 className="font-bold text-primary m-0">{dest.name}</h3>
+                                                        <Tag color={statusColors[dest.status] || 'blue'}>{dest.status}</Tag>
+                                                    </div>
+                                                    <p className="text-[11px] text-gray-500 mb-2 italic">
+                                                        <EnvironmentOutlined className="mr-1" />{dest.address}
+                                                    </p>
+                                                    <p className="text-[11px] font-semibold text-gray-700 m-0 flex items-center gap-1">
+                                                        <ClockCircleOutlined /> {dest.openHour} - {dest.closeHour}
+                                                    </p>
+                                                    <Divider className="my-2" />
+                                                    <p className="text-[10px] font-bold uppercase text-emerald-600 mb-1">Points of interest ({dest.points.length}):</p>
+                                                    <div className="max-h-[120px] overflow-y-auto popup-poi-scroll mb-3 pr-1">
+                                                        <ul className="text-xs list-none p-0 m-0">
+                                                            {dest.points.map(p => (
+                                                                <li key={p.id} className="flex items-center gap-1 py-0.5 border-b border-gray-50 last:border-0">
+                                                                    <Text className="text-[10px] font-bold text-gray-400 w-4">{p.orderIndex}.</Text>
+                                                                    <span className="text-[11px] truncate">{p.name}</span>
+                                                                    <Text type="secondary" className="text-[9px] ml-auto">{p.estTimeSpent}m</Text>
+                                                                </li>
+                                                            ))}
+                                                            {dest.points.length === 0 && <li className="text-gray-400 italic text-[10px]">No points added yet</li>}
+                                                        </ul>
+                                                    </div>
+                                                    <Button size="small" type="primary" ghost block icon={<EyeOutlined />} onClick={() => { setViewingDestination(dest); setIsDetailVisible(true); }}>View Details</Button>
                                                 </div>
-                                                <p className="text-[11px] text-gray-500 mb-2 italic">
-                                                    <EnvironmentOutlined className="mr-1" />{dest.address}
-                                                </p>
-                                                <p className="text-[11px] font-semibold text-gray-700 m-0 flex items-center gap-1">
-                                                    <ClockCircleOutlined /> {dest.openHour} - {dest.closeHour}
-                                                </p>
-                                                <Divider className="my-2" />
-                                                <p className="text-[10px] font-bold uppercase text-emerald-600 mb-1">Points of interest ({dest.points.length}):</p>
-                                                <div className="max-h-[120px] overflow-y-auto popup-poi-scroll mb-3 pr-1">
-                                                    <ul className="text-xs list-none p-0 m-0">
-                                                        {dest.points.map(p => (
-                                                            <li key={p.id} className="flex items-center gap-1 py-0.5 border-b border-gray-50 last:border-0">
-                                                                <Text className="text-[10px] font-bold text-gray-400 w-4">{p.orderIndex}.</Text>
-                                                                <span className="text-[11px] truncate">{p.name}</span>
-                                                                <Text type="secondary" className="text-[9px] ml-auto">{p.estTimeSpent}m</Text>
-                                                            </li>
-                                                        ))}
-                                                        {dest.points.length === 0 && <li className="text-gray-400 italic text-[10px]">No points added yet</li>}
-                                                    </ul>
-                                                </div>
-                                                <Button size="small" type="primary" ghost block icon={<EyeOutlined />} onClick={() => { setViewingDestination(dest); setIsDetailVisible(true); }}>View Details</Button>
-                                            </div>
-                                        </Popup>
-                                    </Marker>
-                                ))}
+                                            </Popup>
+                                        </Marker>
+                                    );
+                                })}
 
                                 {/* Render Points of the currently selected destination */}
                                 {currentPointDestination && currentPointDestination.points.map(p => (
@@ -642,7 +778,19 @@ export function AdminDestinationsPage() {
                         title={
                             <div className="flex justify-between items-center">
                                 <span className="flex items-center gap-2">Destinations <Tag color="blue">{filteredDestinations.length}</Tag></span>
-                                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDestination} className="rounded-lg">Add Destination</Button>
+                                <Space>
+                                    <Upload
+                                        accept=".xlsx, .xls"
+                                        showUploadList={false}
+                                        beforeUpload={(file) => {
+                                            handleImportDestinations(file);
+                                            return false;
+                                        }}
+                                    >
+                                        <Button icon={<UploadOutlined />} className="rounded-lg">Import Excel</Button>
+                                    </Upload>
+                                    <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDestination} className="rounded-lg">Add Destination</Button>
+                                </Space>
                             </div>
                         }
                     >
@@ -680,9 +828,23 @@ export function AdminDestinationsPage() {
                                     <h3 className="font-bold text-base text-gray-800 m-0">{currentPointDestination.name}</h3>
                                     <Text type="secondary" className="text-xs block mt-1 line-clamp-1"><EnvironmentOutlined size={10} /> {currentPointDestination.address}</Text>
                                     <Divider className="my-2 opacity-50" />
-                                    <div className="flex justify-between items-center">
-                                        <Text strong className="text-[11px] text-emerald-700 uppercase tracking-wider">{currentPointDestination.points.length} POIs</Text>
-                                        <Button size="small" type="primary" ghost icon={<PlusOutlined />} onClick={handleAddPoint} className="text-xs px-2">Add Point</Button>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-center">
+                                            <Text strong className="text-[11px] text-emerald-700 uppercase tracking-wider">{currentPointDestination.points.length} POIs</Text>
+                                            <Space size="small">
+                                                <Upload
+                                                    accept=".xlsx, .xls"
+                                                    showUploadList={false}
+                                                    beforeUpload={(file) => {
+                                                        handleImportPoints(file);
+                                                        return false;
+                                                    }}
+                                                >
+                                                    <Button size="small" icon={<UploadOutlined />} className="text-xs">Import</Button>
+                                                </Upload>
+                                                <Button size="small" type="primary" ghost icon={<PlusOutlined />} onClick={handleAddPoint} className="text-xs">Add Point</Button>
+                                            </Space>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="w-full overflow-x-auto">
@@ -765,7 +927,7 @@ export function AdminDestinationsPage() {
                             <Select placeholder="Select status">
                                 <Option value="OPEN">Open</Option>
                                 <Option value="CLOSED">Closed</Option>
-                                <Option value="CONSTRUCTION">Construction</Option>
+                                <Option value="MAINTENANCE">Maintenance</Option>
                                 <Option value="TEMPORARILY_CLOSED">Temporarily Closed</Option>
                             </Select>
                         </Form.Item>
@@ -865,6 +1027,13 @@ export function AdminDestinationsPage() {
                             <Button icon={<EnvironmentOutlined />} onClick={() => openMapPicker('point')}>
                                 Open Map Picker
                             </Button>
+                        </Form.Item>
+                        <Form.Item name="type" label="Point Type" rules={[{ required: true }]}>
+                            <Select placeholder="Select point type">
+                                {Object.keys(PointType).map(type => (
+                                    <Option key={type} value={type}>{type}</Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Form.Item name="orderIndex" label="Display Order" rules={[{ required: true }]}>
                             <InputNumber style={{ width: '100%' }} min={1} placeholder="1, 2, 3..." />
