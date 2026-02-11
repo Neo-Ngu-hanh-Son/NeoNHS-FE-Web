@@ -4,7 +4,12 @@
  */
 
 import apiClient from "./apiClient";
-import type { BlogCategoryListParams, BlogCategoryPageResponse } from "@/types/blog";
+import type {
+  BlogCategoryListParams,
+  BlogCategoryPageResponse,
+  BlogCategoryResponse,
+  BlogCategoryRequest,
+} from "@/types/blog";
 import type { ApiResponse } from "@/types";
 
 const BASE = "/admin/blog-categories";
@@ -29,6 +34,25 @@ export const blogCategoryService = {
     const url = queryString ? `${BASE}?${queryString}` : BASE;
 
     return await apiClient.get<ApiResponse<BlogCategoryPageResponse>>(url);
+  },
+
+  async createCategory(data: BlogCategoryRequest): Promise<ApiResponse<BlogCategoryResponse>> {
+    return await apiClient.post<ApiResponse<BlogCategoryResponse>>(BASE, data);
+  },
+
+  async updateCategory(
+    id: string,
+    data: BlogCategoryRequest,
+  ): Promise<ApiResponse<BlogCategoryResponse>> {
+    return await apiClient.put<ApiResponse<BlogCategoryResponse>>(`${BASE}/${id}`, data);
+  },
+
+  async deleteCategory(id: string): Promise<ApiResponse<BlogCategoryResponse>> {
+    return await apiClient.delete<ApiResponse<BlogCategoryResponse>>(`${BASE}/${id}`);
+  },
+
+  async getCategoryById(id: string): Promise<ApiResponse<BlogCategoryResponse>> {
+    return await apiClient.get<ApiResponse<BlogCategoryResponse>>(`${BASE}/${id}`);
   },
 };
 

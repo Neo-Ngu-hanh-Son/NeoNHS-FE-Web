@@ -33,3 +33,9 @@ export interface BlogCategoryListParams {
   sortBy?: string;
   sortDir?: "asc" | "desc";
 }
+
+export interface BlogCategoryRequest {
+  name: string;
+  description?: string;
+  status?: BlogCategoryStatus;
+}

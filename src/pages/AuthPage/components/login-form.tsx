@@ -8,12 +8,9 @@ import {
   UserOutlined,
   LockOutlined,
   MailOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined
 } from "@ant-design/icons"
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { notification } from "antd"
+import { Link } from "react-router-dom"
 import { LoginCredentials } from "@/services/api/authService"
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google"
 import { useAuth } from "@/hooks/useAuth"
@@ -23,10 +20,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const navigate = useNavigate()
-  // Use login and loginGoogle from AuthContext to sync state
+  // Navigation is now handled by the parent LoginPage
   const { login, loginGoogle } = useAuth()
-  const [api, contextHolder] = notification.useNotification()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -51,28 +46,17 @@ export function LoginForm({
       // Use context login instead of direct service call
       await login(formData)
 
-      api.success({
-        title: 'Login Successful!',
-        description: 'Welcome back! Redirecting to homepage...',
-        icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
-        placement: 'topRight',
-        duration: 3,
-      })
+      // Delay to keep the spinner active during the "load a bit" period
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      setTimeout(() => {
-        navigate("/")
-      }, 3000)
+      // Redirection handled by LoginPage via AuthContext
+
+      // The redirection is now handled by the parent LoginPage 
+      // via AuthContext's isAuthenticated state for better consistency.
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials."
       setError(errorMessage)
 
-      api.error({
-        title: 'Login Failed',
-        description: errorMessage,
-        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
-        placement: 'topRight',
-        duration: 3,
-      })
     } finally {
       setIsLoading(false)
     }
@@ -86,13 +70,6 @@ export function LoginForm({
     if (!idToken) {
       const errorMessage = "Cannot retrieve Google ID Token.";
       setError(errorMessage);
-      api.error({
-        message: 'Google Login Failed',
-        description: errorMessage,
-        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
-        placement: 'topRight',
-        duration: 3,
-      });
       return;
     }
 
@@ -102,28 +79,16 @@ export function LoginForm({
       // Use context loginGoogle
       await loginGoogle({ idToken });
 
-      api.success({
-        message: 'Google Login Successful!',
-        description: 'Welcome! Redirecting to homepage...',
-        icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
-        placement: 'topRight',
-        duration: 3,
-      });
+      // Delay to keep the spinner active during the "load a bit" period
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
+      // Redirection handled by LoginPage via AuthContext
+
+      // Redirection handled by LoginPage via AuthContext
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
       const errorMessage = err.response?.data?.message || err.message || "Google login failed on server.";
       setError(errorMessage);
-      api.error({
-        message: 'Google Login Failed',
-        description: errorMessage,
-        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
-        placement: 'topRight',
-        duration: 3,
-      });
     } finally {
       setIsLoading(false);
     }
@@ -133,18 +98,10 @@ export function LoginForm({
   const handleGoogleError = () => {
     const errorMessage = "Google Login failed connection.";
     setError(errorMessage);
-    api.error({
-      message: 'Google Login Failed',
-      description: errorMessage,
-      icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
-      placement: 'topRight',
-      duration: 3,
-    });
   };
 
   return (
     <>
-      {contextHolder}
       <div className={cn("w-full max-w-md mx-auto", className)}>
         {/* Header */}
         <div className="text-center mb-8">

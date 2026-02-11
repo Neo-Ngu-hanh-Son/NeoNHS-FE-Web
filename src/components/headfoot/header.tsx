@@ -69,11 +69,10 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`text-base transition-colors duration-300 ${
-                      isActiveLink(link.href)
-                        ? 'text-emerald-400 font-semibold'
-                        : 'text-gray-900 hover:text-emerald-400'
-                    }`}
+                    className={`text-base transition-colors duration-300 ${isActiveLink(link.href)
+                      ? 'text-emerald-400 font-semibold'
+                      : 'text-gray-900 hover:text-emerald-400'
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -140,11 +139,10 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`block text-base transition-colors duration-300 ${
-                      isActiveLink(link.href)
-                        ? 'text-emerald-400 font-semibold'
-                        : 'text-gray-300 hover:text-emerald-400'
-                    }`}
+                    className={`block text-base transition-colors duration-300 ${isActiveLink(link.href)
+                      ? 'text-emerald-400 font-semibold'
+                      : 'text-gray-300 hover:text-emerald-400'
+                      }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -168,7 +166,7 @@ const Header: FunctionComponent = () => {
                       {user?.fullname || 'User'}
                     </span>
                   </div>
-                  <Link to="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
                       className="w-full justify-start text-gray-700 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
