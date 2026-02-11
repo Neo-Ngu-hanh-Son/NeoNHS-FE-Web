@@ -28,3 +28,12 @@ export {
   useFormField,
 } from './form'
 export { Alert, AlertTitle, AlertDescription } from './alert'
+export {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  BreadcrumbEllipsis,
+} from './breadcrumb'
