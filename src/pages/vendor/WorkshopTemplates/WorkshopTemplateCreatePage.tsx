@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeftOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { WorkshopTemplateForm } from "./components/workshop-template-form"
@@ -22,14 +22,14 @@ export default function WorkshopTemplateCreatePage() {
       thumbnailIndex: data.thumbnailIndex,
       tagIds: data.tagIds,
     }
-    
+
     // TODO: Call API to create template
     console.log("Creating new template:", createRequest)
     // In real implementation:
     // const newTemplate = await workshopTemplateApi.create(createRequest)
     // The template will be created with status: DRAFT
     // navigate(`/vendor/workshop-templates/${newTemplate.id}`)
-    
+
     // Navigate back to list page
     navigate("/vendor/workshop-templates")
   }
@@ -47,7 +47,7 @@ export default function WorkshopTemplateCreatePage() {
           size="icon"
           onClick={() => navigate("/vendor/workshop-templates")}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeftOutlined />
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Create New Workshop Template</h1>
@@ -59,7 +59,7 @@ export default function WorkshopTemplateCreatePage() {
       <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
         <CardContent className="pt-6">
           <p className="text-sm">
-            💡 <strong>Tip:</strong> Your template will be saved as a <strong>DRAFT</strong>. 
+            💡 <strong>Tip:</strong> Your template will be saved as a <strong>DRAFT</strong>.
             You can edit it anytime before submitting for admin approval.
           </p>
         </CardContent>

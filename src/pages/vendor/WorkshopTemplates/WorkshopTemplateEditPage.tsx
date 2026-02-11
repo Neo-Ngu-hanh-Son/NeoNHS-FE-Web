@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Send } from "lucide-react"
+import { ArrowLeftOutlined, SendOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { WorkshopTemplateForm } from "./components/workshop-template-form"
@@ -30,7 +30,7 @@ export default function WorkshopTemplateEditPage() {
 
   // Check if template can be edited
   const canEdit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
-  
+
   if (!canEdit) {
     return (
       <div className="flex flex-col gap-6 max-w-5xl mx-auto py-6">
@@ -40,7 +40,7 @@ export default function WorkshopTemplateEditPage() {
             size="icon"
             onClick={() => navigate(`/vendor/workshop-templates/${id}`)}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeftOutlined />
           </Button>
           <div>
             <h1 className="text-2xl font-bold">Cannot Edit Template</h1>
@@ -54,12 +54,12 @@ export default function WorkshopTemplateEditPage() {
               ⚠️ This template is currently <TemplateStatusBadge status={template.status} size="sm" /> and cannot be edited.
             </p>
             <p className="text-sm mt-2 text-muted-foreground">
-              {template.status === WorkshopStatus.PENDING 
+              {template.status === WorkshopStatus.PENDING
                 ? "The template is under admin review. Please wait for approval or rejection."
                 : "This template is active and published. Contact admin to make changes."
               }
             </p>
-            <Button 
+            <Button
               className="mt-4"
               onClick={() => navigate(`/vendor/workshop-templates/${id}`)}
             >
@@ -85,14 +85,14 @@ export default function WorkshopTemplateEditPage() {
       thumbnailIndex: data.thumbnailIndex,
       tagIds: data.tagIds,
     }
-    
+
     // TODO: Call API to update template
     console.log("Updating template:", id, updateRequest)
     // In real implementation:
     // const updatedTemplate = await workshopTemplateApi.update(id, updateRequest)
     // Template stays in DRAFT or REJECTED status after update
     // navigate(`/vendor/workshop-templates/${id}`)
-    
+
     // Navigate to detail page
     navigate(`/vendor/workshop-templates/${id}`)
   }
@@ -120,7 +120,7 @@ export default function WorkshopTemplateEditPage() {
             size="icon"
             onClick={handleCancel}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeftOutlined />
           </Button>
           <div>
             <div className="flex items-center gap-3">
@@ -135,8 +135,9 @@ export default function WorkshopTemplateEditPage() {
         <Button
           onClick={() => setSubmitDialog(true)}
           variant="default"
+          className="gap-2"
         >
-          <Send className="w-4 h-4 mr-2" />
+          <SendOutlined />
           Submit for Approval
         </Button>
       </div>
@@ -150,7 +151,7 @@ export default function WorkshopTemplateEditPage() {
       <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
         <CardContent className="pt-6">
           <p className="text-sm">
-            💡 <strong>Tip:</strong> After saving your changes, you can submit this template for admin approval. 
+            💡 <strong>Tip:</strong> After saving your changes, you can submit this template for admin approval.
             Once submitted, you won't be able to edit it until it's approved or rejected.
           </p>
         </CardContent>

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react"
 import { WTagResponse } from "../types"
 import { mockWTags } from "../data"
-import { Badge } from "@/components/ui/badge"
-import { Check } from "lucide-react"
+import { CheckOutlined } from "@ant-design/icons"
 import { Label } from "@/components/ui/label"
 
 interface WTagSelectorProps {
@@ -61,7 +60,7 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
           {selectedTagIds.length} selected
         </span>
       </div>
-      
+
       <div className="flex flex-wrap gap-3">
         {tags.map(tag => {
           const isSelected = selectedTagIds.includes(tag.id)
@@ -73,8 +72,8 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
               disabled={disabled}
               className={`
                 relative flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all
-                ${isSelected 
-                  ? "border-primary bg-primary/10 shadow-sm" 
+                ${isSelected
+                  ? "border-primary bg-primary/10 shadow-sm"
                   : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                 }
                 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
@@ -86,7 +85,7 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
               />
               <span className="font-medium text-sm">{tag.name}</span>
               {isSelected && (
-                <Check className="w-4 h-4 text-primary ml-1" />
+                <CheckOutlined className="text-primary ml-1" />
               )}
             </button>
           )

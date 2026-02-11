@@ -1,13 +1,4 @@
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+import { Modal } from "antd"
 
 interface SubmitApprovalDialogProps {
   open: boolean
@@ -23,30 +14,23 @@ export function SubmitApprovalDialog({
   onConfirm,
 }: SubmitApprovalDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Submit template for approval?</AlertDialogTitle>
-          <AlertDialogDescription className="space-y-2">
-            <p>
-              You are about to submit <span className="font-semibold text-foreground">"{templateName}"</span> for admin approval.
-            </p>
-            <p className="font-medium text-yellow-600 dark:text-yellow-500">
-              ⚠️ Once submitted, you will not be able to edit this template until it is approved or rejected.
-            </p>
-            <p>Do you want to proceed?</p>
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={onConfirm}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
-          >
-            Submit for Approval
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Modal
+      title="Submit template for approval?"
+      open={open}
+      onCancel={() => onOpenChange(false)}
+      onOk={onConfirm}
+      okText="Submit for Approval"
+      cancelText="Cancel"
+    >
+      <div className="space-y-2">
+        <p>
+          You are about to submit <span className="font-semibold text-foreground">"{templateName}"</span> for admin approval.
+        </p>
+        <p className="font-medium text-yellow-600 dark:text-yellow-500">
+          ⚠️ Once submitted, you will not be able to edit this template until it is approved or rejected.
+        </p>
+        <p>Do you want to proceed?</p>
+      </div>
+    </Modal>
   )
 }

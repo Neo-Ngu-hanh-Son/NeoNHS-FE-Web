@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PlusCircle, Search } from 'lucide-react'
+import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons'
+import { notification } from 'antd'
 import { mockWorkshopTemplates } from './data'
 import { WorkshopTemplateResponse, WorkshopStatus } from './types'
 import { DeleteTemplateDialog } from './components/delete-template-dialog'
@@ -16,12 +17,12 @@ export default function WorkshopTemplatesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('updatedAt')
-  
+
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; template: WorkshopTemplateResponse | null }>({
     open: false,
     template: null,
   })
-  
+
   const [submitDialog, setSubmitDialog] = useState<{ open: boolean; template: WorkshopTemplateResponse | null }>({
     open: false,
     template: null,
@@ -34,7 +35,7 @@ export default function WorkshopTemplatesPage() {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         t.name.toLowerCase().includes(query) ||
         t.shortDescription.toLowerCase().includes(query)
       )
@@ -73,7 +74,10 @@ export default function WorkshopTemplatesPage() {
 
   const handleDeleteClick = (template: WorkshopTemplateResponse) => {
     if (template.status === WorkshopStatus.ACTIVE) {
-      alert("Cannot delete an active template. Please contact admin if you need to remove this template.")
+      notification.error({
+        message: 'Cannot Deleted',
+        description: "Cannot delete an active template. Please contact admin if you need to remove this template."
+      })
       return
     }
     setDeleteDialog({ open: true, template })
@@ -87,6 +91,10 @@ export default function WorkshopTemplatesPage() {
       // await workshopTemplateApi.delete(deleteDialog.template.id)
       // Refresh templates list
       setDeleteDialog({ open: false, template: null })
+      notification.success({
+        message: 'Template Deleted',
+        description: `Template "${deleteDialog.template.name}" has been deleted.`
+      })
     }
   }
 
@@ -103,6 +111,10 @@ export default function WorkshopTemplatesPage() {
       // Update template status to PENDING
       // Refresh templates list
       setSubmitDialog({ open: false, template: null })
+      notification.success({
+        message: 'Template Submitted',
+        description: `Template "${submitDialog.template.name}" has been submitted for approval.`
+      })
     }
   }
 
@@ -119,7 +131,7 @@ export default function WorkshopTemplatesPage() {
           onClick={() => navigate('/vendor/workshop-templates/new')}
           className="gap-2"
         >
-          <PlusCircle className="w-5 h-5" />
+          <PlusCircleOutlined className="text-lg" />
           Create New Template
         </Button>
       </div>
@@ -128,7 +140,7 @@ export default function WorkshopTemplatesPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <SearchOutlined className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search templates..."
             value={searchQuery}
@@ -207,7 +219,7 @@ export default function WorkshopTemplatesPage() {
           </p>
           {!searchQuery && statusFilter === 'all' && (
             <Button onClick={() => navigate('/vendor/workshop-templates/new')}>
-              <PlusCircle className="w-4 h-4 mr-2" />
+              <PlusCircleOutlined className="mr-2" />
               Create Template
             </Button>
           )}

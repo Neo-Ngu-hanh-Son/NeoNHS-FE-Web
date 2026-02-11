@@ -1,9 +1,9 @@
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { X, Image as ImageIcon, Star } from "lucide-react"
+import { CloseOutlined, PictureOutlined, StarOutlined, StarFilled, UploadOutlined } from "@ant-design/icons"
 import { Card } from "@/components/ui/card"
+import { Upload, message } from "antd"
+import type { RcFile } from "antd/es/upload"
 
 interface ImageUploaderProps {
   imageUrls: string[]
@@ -20,35 +20,6 @@ export function ImageUploader({
   error,
   disabled,
 }: ImageUploaderProps) {
-  const [newImageUrl, setNewImageUrl] = useState("")
-  const [urlError, setUrlError] = useState("")
-
-  const handleAddImage = () => {
-    const url = newImageUrl.trim()
-    
-    if (!url) {
-      setUrlError("Please enter an image URL")
-      return
-    }
-
-    // Basic URL validation
-    try {
-      new URL(url)
-    } catch {
-      setUrlError("Please enter a valid URL")
-      return
-    }
-
-    if (imageUrls.includes(url)) {
-      setUrlError("This image URL has already been added")
-      return
-    }
-
-    onChange([...imageUrls, url], thumbnailIndex)
-    setNewImageUrl("")
-    setUrlError("")
-  }
-
   const handleRemoveImage = (index: number) => {
     const newUrls = imageUrls.filter((_, i) => i !== index)
     let newThumbnailIndex = thumbnailIndex
@@ -68,11 +39,26 @@ export function ImageUploader({
     onChange(imageUrls, index)
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      handleAddImage()
+  const handleBeforeUpload = (file: RcFile) => {
+    const isImage = file.type.startsWith('image/')
+    if (!isImage) {
+      message.error('You can only upload image files!')
+      return Upload.LIST_IGNORE
     }
+
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      const url = reader.result as string
+      if (imageUrls.includes(url)) {
+        message.warning("This image has already been added")
+        return
+      }
+      onChange([...imageUrls, url], thumbnailIndex)
+    }
+
+    // Prevent auto upload since we handle it locally
+    return false
   }
 
   return (
@@ -84,33 +70,20 @@ export function ImageUploader({
         </p>
       </div>
 
-      {/* Add Image Input */}
+      {/* Upload Button */}
       <div className="flex gap-2">
-        <Input
-          type="url"
-          placeholder="https://example.com/image.jpg"
-          value={newImageUrl}
-          onChange={(e) => {
-            setNewImageUrl(e.target.value)
-            setUrlError("")
-          }}
-          onKeyPress={handleKeyPress}
+        <Upload
+          accept="image/*"
+          showUploadList={false}
+          beforeUpload={handleBeforeUpload}
           disabled={disabled}
-          className="flex-1"
-        />
-        <Button
-          type="button"
-          onClick={handleAddImage}
-          disabled={disabled || !newImageUrl.trim()}
-          variant="outline"
         >
-          Add Image
-        </Button>
+          <Button type="button" variant="outline" disabled={disabled}>
+            <UploadOutlined className="mr-2" />
+            Upload Image
+          </Button>
+        </Upload>
       </div>
-
-      {urlError && (
-        <p className="text-sm text-red-500">{urlError}</p>
-      )}
 
       {/* Image Grid */}
       {imageUrls.length > 0 && (
@@ -126,11 +99,11 @@ export function ImageUploader({
                     e.currentTarget.src = "https://via.placeholder.com/400x300?text=Invalid+Image"
                   }}
                 />
-                
+
                 {/* Thumbnail Badge */}
                 {index === thumbnailIndex && (
                   <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-current" />
+                    <StarFilled />
                     Thumbnail
                   </div>
                 )}
@@ -145,7 +118,7 @@ export function ImageUploader({
                     disabled={disabled || index === thumbnailIndex}
                     className="text-xs"
                   >
-                    <Star className={`w-3 h-3 mr-1 ${index === thumbnailIndex ? "fill-current" : ""}`} />
+                    {index === thumbnailIndex ? <StarFilled className="mr-1" /> : <StarOutlined className="mr-1" />}
                     Set Thumbnail
                   </Button>
                   <Button
@@ -155,7 +128,7 @@ export function ImageUploader({
                     onClick={() => handleRemoveImage(index)}
                     disabled={disabled}
                   >
-                    <X className="w-4 h-4" />
+                    <CloseOutlined />
                   </Button>
                 </div>
               </div>
@@ -167,9 +140,9 @@ export function ImageUploader({
       {/* Empty State */}
       {imageUrls.length === 0 && (
         <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
-          <ImageIcon className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+          <PictureOutlined className="text-4xl text-gray-400 mb-3" />
           <p className="text-sm text-muted-foreground">
-            No images added yet. Add at least one image URL above.
+            No images added yet. Upload an image above.
           </p>
         </div>
       )}

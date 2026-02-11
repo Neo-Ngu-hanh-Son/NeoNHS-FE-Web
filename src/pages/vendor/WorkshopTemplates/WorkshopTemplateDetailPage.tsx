@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, Edit, Trash2, Send, Calendar, User } from "lucide-react"
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -60,7 +60,7 @@ export default function WorkshopTemplateDetailPage() {
             size="icon"
             onClick={() => navigate("/vendor/workshop-templates")}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeftOutlined />
           </Button>
           <div>
             <div className="flex items-center gap-3">
@@ -74,20 +74,20 @@ export default function WorkshopTemplateDetailPage() {
         {/* Action Buttons based on status */}
         <div className="flex gap-2">
           {canEdit && (
-            <Button onClick={() => navigate(`/vendor/workshop-templates/${id}/edit`)}>
-              <Edit className="w-4 h-4 mr-2" />
+            <Button onClick={() => navigate(`/vendor/workshop-templates/${id}/edit`)} className="gap-2">
+              <EditOutlined />
               Edit
             </Button>
           )}
           {canSubmit && (
-            <Button onClick={() => setSubmitDialog(true)} variant="default">
-              <Send className="w-4 h-4 mr-2" />
+            <Button onClick={() => setSubmitDialog(true)} variant="default" className="gap-2">
+              <SendOutlined />
               Submit for Approval
             </Button>
           )}
           {canDelete && (
-            <Button onClick={() => setDeleteDialog(true)} variant="destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
+            <Button onClick={() => setDeleteDialog(true)} variant="destructive" className="gap-2">
+              <DeleteOutlined />
               Delete
             </Button>
           )}
@@ -104,7 +104,7 @@ export default function WorkshopTemplateDetailPage() {
         <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
           <CardContent className="pt-6">
             <p className="text-sm font-medium">
-              {template.status === WorkshopStatus.PENDING 
+              {template.status === WorkshopStatus.PENDING
                 ? "⏳ This template is currently under review and cannot be edited."
                 : "✅ This template is active and published. Contact admin to make changes."
               }
@@ -137,9 +137,8 @@ export default function WorkshopTemplateDetailPage() {
                       key={img.id}
                       src={img.imageUrl}
                       alt={`Workshop image ${idx + 1}`}
-                      className={`w-full h-20 object-cover rounded-md cursor-pointer ${
-                        img.isThumbnail ? "ring-2 ring-primary" : ""
-                      }`}
+                      className={`w-full h-20 object-cover rounded-md cursor-pointer ${img.isThumbnail ? "ring-2 ring-primary" : ""
+                        }`}
                       onError={(e) => {
                         e.currentTarget.src = "https://via.placeholder.com/200x200?text=Image"
                       }}
@@ -216,7 +215,7 @@ export default function WorkshopTemplateDetailPage() {
               <div>
                 <p className="text-sm font-medium text-muted-foreground mb-1">Vendor</p>
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
+                  <UserOutlined />
                   <p className="text-base">{template.vendorName}</p>
                 </div>
               </div>
@@ -254,7 +253,7 @@ export default function WorkshopTemplateDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <CalendarOutlined className="text-muted-foreground" />
                 <div>
                   <p className="font-medium">Created</p>
                   <p className="text-muted-foreground">{formatDate(template.createdAt)}</p>
@@ -262,7 +261,7 @@ export default function WorkshopTemplateDetailPage() {
               </div>
               <Separator />
               <div className="flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <CalendarOutlined className="text-muted-foreground" />
                 <div>
                   <p className="font-medium">Last Updated</p>
                   <p className="text-muted-foreground">{formatDate(template.updatedAt)}</p>
@@ -272,7 +271,7 @@ export default function WorkshopTemplateDetailPage() {
                 <>
                   <Separator />
                   <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="w-4 h-4 text-green-500" />
+                    <CalendarOutlined className="text-green-500" />
                     <div>
                       <p className="font-medium text-green-600 dark:text-green-400">Approved</p>
                       <p className="text-muted-foreground">{formatDate(template.approvedAt)}</p>

@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TemplateStatusBadge } from "./template-status-badge"
-import { Edit, Eye, Trash2, Send, Clock, Users, DollarSign } from "lucide-react"
+import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled } from "@ant-design/icons"
 import { formatDuration, formatPrice, formatDate } from "../utils/formatters"
 
 interface WorkshopTemplateCardProps {
@@ -22,10 +22,6 @@ export function WorkshopTemplateCard({
   onView,
 }: WorkshopTemplateCardProps) {
   const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
-
-  const canEdit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
-  const canDelete = template.status !== WorkshopStatus.ACTIVE
-  const canSubmit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
@@ -64,14 +60,14 @@ export function WorkshopTemplateCard({
             <span className="text-lg">{formatPrice(template.defaultPrice)}</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
-            <Clock className="w-4 h-4" />
+            <ClockCircleOutlined />
             <span>{formatDuration(template.estimatedDuration)}</span>
           </div>
         </div>
 
         {/* Participants */}
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-          <Users className="w-4 h-4" />
+          <TeamOutlined />
           <span>{template.minParticipants}-{template.maxParticipants} participants</span>
         </div>
 
@@ -111,20 +107,20 @@ export function WorkshopTemplateCard({
         {template.status === WorkshopStatus.DRAFT && (
           <>
             {onEdit && (
-              <Button size="sm" variant="outline" onClick={onEdit} className="flex-1">
-                <Edit className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" variant="outline" onClick={onEdit} className="flex-1 gap-1">
+                <EditOutlined />
                 Edit
               </Button>
             )}
             {onSubmit && (
-              <Button size="sm" onClick={onSubmit} className="flex-1">
-                <Send className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" onClick={onSubmit} className="flex-1 gap-1">
+                <SendOutlined />
                 Submit
               </Button>
             )}
             {onDelete && (
               <Button size="sm" variant="destructive" onClick={onDelete}>
-                <Trash2 className="w-3.5 h-3.5" />
+                <DeleteOutlined />
               </Button>
             )}
           </>
@@ -133,8 +129,8 @@ export function WorkshopTemplateCard({
         {template.status === WorkshopStatus.PENDING && (
           <>
             {onView && (
-              <Button size="sm" variant="outline" onClick={onView} className="flex-1">
-                <Eye className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" variant="outline" onClick={onView} className="flex-1 gap-1">
+                <EyeOutlined />
                 View
               </Button>
             )}
@@ -147,14 +143,14 @@ export function WorkshopTemplateCard({
         {template.status === WorkshopStatus.ACTIVE && (
           <>
             {onView && (
-              <Button size="sm" variant="outline" onClick={onView} className="flex-1">
-                <Eye className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" variant="outline" onClick={onView} className="flex-1 gap-1">
+                <EyeOutlined />
                 View
               </Button>
             )}
             {template.averageRating && (
               <div className="flex items-center gap-1 text-sm">
-                <span className="text-yellow-500">★</span>
+                <StarFilled className="text-yellow-500" />
                 <span className="font-semibold">{template.averageRating.toFixed(1)}</span>
                 <span className="text-muted-foreground">({template.totalReview})</span>
               </div>
@@ -165,20 +161,20 @@ export function WorkshopTemplateCard({
         {template.status === WorkshopStatus.REJECTED && (
           <>
             {onEdit && (
-              <Button size="sm" variant="outline" onClick={onEdit} className="flex-1">
-                <Edit className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" variant="outline" onClick={onEdit} className="flex-1 gap-1">
+                <EditOutlined />
                 Edit
               </Button>
             )}
             {onView && (
-              <Button size="sm" variant="outline" onClick={onView} className="flex-1">
-                <Eye className="w-3.5 h-3.5 mr-1" />
+              <Button size="sm" variant="outline" onClick={onView} className="flex-1 gap-1">
+                <EyeOutlined />
                 View Reason
               </Button>
             )}
             {onDelete && (
               <Button size="sm" variant="destructive" onClick={onDelete}>
-                <Trash2 className="w-3.5 h-3.5" />
+                <DeleteOutlined />
               </Button>
             )}
           </>
