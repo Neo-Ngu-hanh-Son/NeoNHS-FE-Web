@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import * as XLSX from 'xlsx';
 import {
     Table,
     Button,
@@ -15,7 +16,8 @@ import {
     Select,
     Typography,
     Upload,
-    Alert
+    Alert,
+    Tooltip
 } from 'antd';
 import {
     EditOutlined,
@@ -417,6 +419,121 @@ export function AdminDestinationsPage() {
         });
     };
 
+    const handleImportPoints = async (file: File) => {
+        if (!currentPointDestination) return;
+        setPointsLoading(true);
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const row of jsonData as any[]) {
+                    try {
+                        const pointData: PointRequest = {
+                            name: row.name || row.Name,
+                            description: row.description || row.Description,
+                            history: row.history || row.History || '',
+                            latitude: Number(row.latitude || row.Latitude),
+                            longitude: Number(row.longitude || row.Longitude),
+                            orderIndex: Number(row.orderIndex || row.OrderIndex || row.order || 1),
+                            estTimeSpent: Number(row.estTimeSpent || row.EstTimeSpent || 30),
+                            type: (row.type || row.Type || 'GENERAL') as PointType,
+                            attractionId: currentPointDestination.id
+                        };
+
+                        if (!pointData.name || isNaN(pointData.latitude) || isNaN(pointData.longitude)) {
+                            failCount++;
+                            continue;
+                        }
+
+                        const response = await pointService.createPoint(pointData);
+                        if (response.success) successCount++;
+                        else failCount++;
+                    } catch {
+                        failCount++;
+                    }
+                }
+
+                message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+                // Refresh points
+                const pointsResponse = await pointService.getPointsByAttraction(currentPointDestination.id);
+                if (pointsResponse.success) {
+                    setCurrentPointDestination({
+                        ...currentPointDestination,
+                        points: pointsResponse.data
+                    });
+                    setDestinations(destinations.map(d =>
+                        d.id === currentPointDestination.id ? { ...d, points: pointsResponse.data } : d
+                    ));
+                }
+            } catch (error) {
+                message.error('Failed to parse Excel file.');
+            } finally {
+                setPointsLoading(false);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
+    const handleImportDestinations = async (file: File) => {
+        setLoading(true);
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                let successCount = 0;
+                let failCount = 0;
+
+                for (const row of jsonData as any[]) {
+                    try {
+                        const destData: AttractionRequest = {
+                            name: row.name || row.Name,
+                            address: row.address || row.Address || '',
+                            description: row.description || row.Description || '',
+                            latitude: Number(row.latitude || row.Latitude),
+                            longitude: Number(row.longitude || row.Longitude),
+                            status: (row.status || row.Status || 'OPEN') as 'OPEN' | 'CLOSED' | 'MAINTENANCE' | 'TEMPORARILY_CLOSED',
+                            openHour: row.openHour || row.OpenHour || '08:00',
+                            closeHour: row.closeHour || row.CloseHour || '17:00',
+                            isActive: true
+                        };
+
+                        if (!destData.name || isNaN(destData.latitude) || isNaN(destData.longitude)) {
+                            failCount++;
+                            continue;
+                        }
+
+                        const response = await attractionService.createAttraction(destData);
+                        if (response.success) successCount++;
+                        else failCount++;
+                    } catch {
+                        failCount++;
+                    }
+                }
+
+                message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+                fetchAttractions();
+            } catch (error) {
+                message.error('Failed to parse Excel file.');
+            } finally {
+                setLoading(false);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
     const filteredDestinations = destinations.filter(d =>
         d.name.toLowerCase().includes(searchText.toLowerCase()) ||
         (d.description && d.description.toLowerCase().includes(searchText.toLowerCase())) ||
@@ -427,11 +544,11 @@ export function AdminDestinationsPage() {
         {
             title: 'Info',
             key: 'info',
-            width: '30%',
+            width: 300,
             render: (record: Destination) => (
                 <div className="flex flex-col gap-1">
-                    <Text strong className="text-primary">{record.name}</Text>
-                    <Text type="secondary" className="text-xs line-clamp-1">
+                    <Text strong className="text-primary truncate block" style={{ maxWidth: 280 }}>{record.name}</Text>
+                    <Text type="secondary" className="text-xs truncate block" title={record.address} style={{ maxWidth: 280 }}>
                         <EnvironmentOutlined className="mr-1" />{record.address || 'No address'}
                     </Text>
                 </div>
@@ -440,7 +557,7 @@ export function AdminDestinationsPage() {
         {
             title: 'Hours',
             key: 'hours',
-            width: '15%',
+            width: 120,
             render: (record: Destination) => (
                 <div className="flex items-center gap-1 text-xs">
                     <ClockCircleOutlined />
@@ -452,21 +569,19 @@ export function AdminDestinationsPage() {
             title: 'Status',
             dataIndex: 'status',
             key: 'status',
-            width: '15%',
+            width: 120,
             render: (status: string) => (
-                <Space direction="vertical" size={0}>
-                    <Tag color={status === 'OPEN' ? 'green' : (status === 'CLOSED' || status === 'TEMPORARILY_CLOSED') ? 'red' : 'orange'}>
-                        {status}
-                    </Tag>
-                </Space>
+                <Tag color={status === 'OPEN' ? 'green' : (status === 'CLOSED' || status === 'TEMPORARILY_CLOSED') ? 'red' : 'orange'} className="m-0">
+                    {status}
+                </Tag>
             )
         },
         {
             title: 'Points',
             key: 'points',
-            width: '10%',
+            width: 100,
             render: (record: Destination) => (
-                <Tag color="cyan">
+                <Tag color="cyan" className="m-0">
                     {(record.points || []).length} POIs
                 </Tag>
             )
@@ -474,10 +589,13 @@ export function AdminDestinationsPage() {
         {
             title: 'Actions',
             key: 'actions',
-            width: '35%',
+            width: 250,
+            fixed: 'right' as const,
             render: (_: any, record: Destination) => (
-                <Space size="small">
-                    <Button type="link" size="small" className="p-0" icon={<EyeOutlined />} onClick={() => { setViewingDestination(record); setIsDetailVisible(true); }} />
+                <Space size="small" wrap>
+                    <Tooltip title="View Details">
+                        <Button type="link" size="small" className="p-0" icon={<EyeOutlined />} onClick={() => { setViewingDestination(record); setIsDetailVisible(true); }} />
+                    </Tooltip>
                     <Button size="small" icon={<EnvironmentOutlined />} onClick={() => handleFocus(record.latitude, record.longitude)}>Focus</Button>
                     <Button size="small" icon={<EditOutlined />} onClick={() => handleEditDestination(record)} />
                     <Button size="small" icon={<PushpinOutlined />} onClick={() => handleManagePoints(record)}>Points</Button>
@@ -660,7 +778,19 @@ export function AdminDestinationsPage() {
                         title={
                             <div className="flex justify-between items-center">
                                 <span className="flex items-center gap-2">Destinations <Tag color="blue">{filteredDestinations.length}</Tag></span>
-                                <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDestination} className="rounded-lg">Add Destination</Button>
+                                <Space>
+                                    <Upload
+                                        accept=".xlsx, .xls"
+                                        showUploadList={false}
+                                        beforeUpload={(file) => {
+                                            handleImportDestinations(file);
+                                            return false;
+                                        }}
+                                    >
+                                        <Button icon={<UploadOutlined />} className="rounded-lg">Import Excel</Button>
+                                    </Upload>
+                                    <Button type="primary" icon={<PlusOutlined />} onClick={handleAddDestination} className="rounded-lg">Add Destination</Button>
+                                </Space>
                             </div>
                         }
                     >
@@ -698,9 +828,23 @@ export function AdminDestinationsPage() {
                                     <h3 className="font-bold text-base text-gray-800 m-0">{currentPointDestination.name}</h3>
                                     <Text type="secondary" className="text-xs block mt-1 line-clamp-1"><EnvironmentOutlined size={10} /> {currentPointDestination.address}</Text>
                                     <Divider className="my-2 opacity-50" />
-                                    <div className="flex justify-between items-center">
-                                        <Text strong className="text-[11px] text-emerald-700 uppercase tracking-wider">{currentPointDestination.points.length} POIs</Text>
-                                        <Button size="small" type="primary" ghost icon={<PlusOutlined />} onClick={handleAddPoint} className="text-xs px-2">Add Point</Button>
+                                    <div className="flex flex-col gap-2">
+                                        <div className="flex justify-between items-center">
+                                            <Text strong className="text-[11px] text-emerald-700 uppercase tracking-wider">{currentPointDestination.points.length} POIs</Text>
+                                            <Space size="small">
+                                                <Upload
+                                                    accept=".xlsx, .xls"
+                                                    showUploadList={false}
+                                                    beforeUpload={(file) => {
+                                                        handleImportPoints(file);
+                                                        return false;
+                                                    }}
+                                                >
+                                                    <Button size="small" icon={<UploadOutlined />} className="text-xs">Import</Button>
+                                                </Upload>
+                                                <Button size="small" type="primary" ghost icon={<PlusOutlined />} onClick={handleAddPoint} className="text-xs">Add Point</Button>
+                                            </Space>
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="w-full overflow-x-auto">
