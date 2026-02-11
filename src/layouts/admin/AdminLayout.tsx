@@ -25,6 +25,8 @@ export function AdminLayout() {
         { label: 'Vouchers', path: '/admin/vouchers', icon: 'loyalty' },
         { label: 'Reports', path: '/admin/reports', icon: 'analytics' },
         { label: 'Events', path: '/admin/events', icon: 'event' },
+        { label: 'Blog Categories', path: '/admin/blog-categories', icon: 'category' },
+
     ];
 
     // Helper to get breadcrumb from path

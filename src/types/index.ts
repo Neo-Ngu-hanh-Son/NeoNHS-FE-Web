@@ -4,12 +4,12 @@
  */
 
 export const UserRole = {
-  TOURIST: 'TOURIST',
-  ADMIN: 'ADMIN',
-  VENDOR: 'VENDOR',
+  TOURIST: "TOURIST",
+  ADMIN: "ADMIN",
+  VENDOR: "VENDOR",
 } as const;
 
-export type UserRole = typeof UserRole[keyof typeof UserRole];
+export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
 export interface User {
   id: string;
@@ -51,10 +51,12 @@ export interface VendorStats {
 }
 
 export interface ApiResponse<T> {
+  status: number;
   success: boolean;
   data: T;
   message?: string;
   error?: string;
+  timestamp?: string;
 }
 
 export interface PaginationParams {

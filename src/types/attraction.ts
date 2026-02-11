@@ -1,4 +1,4 @@
-export type AttractionStatus = 'OPEN' | 'CLOSED' | 'CONSTRUCTION' | 'TEMPORARILY_CLOSED';
+export type AttractionStatus = 'OPEN' | 'CLOSED' | 'MAINTENANCE' | 'TEMPORARILY_CLOSED';
 
 import { PointResponse } from './point';
 
