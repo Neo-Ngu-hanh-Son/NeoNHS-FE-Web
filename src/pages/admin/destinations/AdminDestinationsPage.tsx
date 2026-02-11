@@ -38,9 +38,16 @@ import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudi
 import { attractionService } from '@/services/api/attractionService';
 import { pointService } from '@/services/api/pointService';
 import { AttractionResponse, AttractionRequest } from '@/types/attraction';
-import { PointResponse, PointRequest } from '@/types/point';
+import { PointRequest, PointResponse, PointType } from '@/types/point';
 
 const { Text } = Typography;
+
+const statusColors: { [key: string]: string } = {
+    OPEN: 'blue',
+    CLOSED: 'red',
+    MAINTENANCE: 'orange',
+    TEMPORARILY_CLOSED: 'volcano'
+};
 
 // Fix for leaflet default icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -69,15 +76,6 @@ let PointMarkerIcon = L.icon({
     iconSize: [22, 36],
     iconAnchor: [11, 36],
     className: 'point-marker-hue'
-});
-
-// Marker icon for Attractions (Deep Blue)
-let AttractionMarkerIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    className: 'attraction-marker-hue'
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -129,12 +127,14 @@ export function AdminDestinationsPage() {
     const [isPointModalVisible, setIsPointModalVisible] = useState(false);
     const [editingPoint, setEditingPoint] = useState<Point | null>(null);
     const [mapCenter, setMapCenter] = useState<[number, number]>([16.0028, 108.2638]);
+    const [mapZoom, setMapZoom] = useState(15);
     const [form] = Form.useForm();
     const [pointForm] = Form.useForm();
     const mapRef = useRef<HTMLDivElement>(null);
 
     const handleFocus = (lat: number, lng: number) => {
         setMapCenter([lat, lng]);
+        setMapZoom(18); // Zoom in closer for detail
         if (mapRef.current) {
             mapRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -455,7 +455,7 @@ export function AdminDestinationsPage() {
             width: '15%',
             render: (status: string) => (
                 <Space direction="vertical" size={0}>
-                    <Tag color={status === 'OPEN' ? 'green' : status === 'CLOSED' ? 'red' : 'orange'}>
+                    <Tag color={status === 'OPEN' ? 'green' : (status === 'CLOSED' || status === 'TEMPORARILY_CLOSED') ? 'red' : 'orange'}>
                         {status}
                     </Tag>
                 </Space>
@@ -531,9 +531,12 @@ export function AdminDestinationsPage() {
                         z-index: 900 !important;
                     }
                     .attraction-marker-hue {
-                        filter: hue-rotate(-15deg) brightness(0.8) contrast(1.2);
                         z-index: 800 !important;
                     }
+                    .marker-open { filter: hue-rotate(-15deg) brightness(0.8) contrast(1.2); }
+                    .marker-closed { filter: hue-rotate(120deg) brightness(0.8); }
+                    .marker-maintenance { filter: hue-rotate(40deg) brightness(1.1); }
+                    .marker-temp-closed { filter: hue-rotate(180deg) grayscale(0.5); }
                     /* Custom Scrollbar for Map Popups */
                     .popup-poi-scroll::-webkit-scrollbar {
                         width: 4px;
@@ -563,46 +566,61 @@ export function AdminDestinationsPage() {
                         className="shadow-sm border-none bg-white/80 backdrop-blur-sm"
                     >
                         <div style={{ height: '400px', width: '100%' }} className="rounded-xl overflow-hidden border border-gray-100 shadow-inner">
-                            <MapContainer center={mapCenter} zoom={15} style={{ height: '100%', width: '100%' }}>
-                                <ChangeView center={mapCenter} zoom={15} />
+                            <MapContainer center={mapCenter} zoom={mapZoom} style={{ height: '100%', width: '100%' }}>
+                                <ChangeView center={mapCenter} zoom={mapZoom} />
                                 <MapEvents onMapClick={handleMapClick} />
                                 <TileLayer
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                 />
-                                {destinations.map(dest => (
-                                    <Marker key={dest.id} position={[dest.latitude, dest.longitude]} opacity={dest.isActive ? 1 : 0.5} icon={AttractionMarkerIcon}>
-                                        <Popup>
-                                            <div className="p-2 min-w-[200px]">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <h3 className="font-bold text-primary m-0">{dest.name}</h3>
-                                                    <Tag color={dest.status === 'OPEN' ? 'green' : 'red'}>{dest.status}</Tag>
+                                {destinations.map(dest => {
+                                    const statusClass = dest.status === 'OPEN' ? 'marker-open' :
+                                        dest.status === 'CLOSED' ? 'marker-closed' :
+                                            dest.status === 'MAINTENANCE' ? 'marker-maintenance' :
+                                                'marker-temp-closed';
+
+                                    const statusIcon = L.icon({
+                                        iconUrl: icon,
+                                        shadowUrl: iconShadow,
+                                        iconSize: [25, 41],
+                                        iconAnchor: [12, 41],
+                                        className: `attraction-marker-hue ${statusClass}`
+                                    });
+
+                                    return (
+                                        <Marker key={dest.id} position={[dest.latitude, dest.longitude]} opacity={dest.isActive ? 1 : 0.5} icon={statusIcon}>
+                                            <Popup>
+                                                <div className="p-2 min-w-[200px]">
+                                                    <div className="flex justify-between items-start mb-1">
+                                                        <h3 className="font-bold text-primary m-0">{dest.name}</h3>
+                                                        <Tag color={statusColors[dest.status] || 'blue'}>{dest.status}</Tag>
+                                                    </div>
+                                                    <p className="text-[11px] text-gray-500 mb-2 italic">
+                                                        <EnvironmentOutlined className="mr-1" />{dest.address}
+                                                    </p>
+                                                    <p className="text-[11px] font-semibold text-gray-700 m-0 flex items-center gap-1">
+                                                        <ClockCircleOutlined /> {dest.openHour} - {dest.closeHour}
+                                                    </p>
+                                                    <Divider className="my-2" />
+                                                    <p className="text-[10px] font-bold uppercase text-emerald-600 mb-1">Points of interest ({dest.points.length}):</p>
+                                                    <div className="max-h-[120px] overflow-y-auto popup-poi-scroll mb-3 pr-1">
+                                                        <ul className="text-xs list-none p-0 m-0">
+                                                            {dest.points.map(p => (
+                                                                <li key={p.id} className="flex items-center gap-1 py-0.5 border-b border-gray-50 last:border-0">
+                                                                    <Text className="text-[10px] font-bold text-gray-400 w-4">{p.orderIndex}.</Text>
+                                                                    <span className="text-[11px] truncate">{p.name}</span>
+                                                                    <Text type="secondary" className="text-[9px] ml-auto">{p.estTimeSpent}m</Text>
+                                                                </li>
+                                                            ))}
+                                                            {dest.points.length === 0 && <li className="text-gray-400 italic text-[10px]">No points added yet</li>}
+                                                        </ul>
+                                                    </div>
+                                                    <Button size="small" type="primary" ghost block icon={<EyeOutlined />} onClick={() => { setViewingDestination(dest); setIsDetailVisible(true); }}>View Details</Button>
                                                 </div>
-                                                <p className="text-[11px] text-gray-500 mb-2 italic">
-                                                    <EnvironmentOutlined className="mr-1" />{dest.address}
-                                                </p>
-                                                <p className="text-[11px] font-semibold text-gray-700 m-0 flex items-center gap-1">
-                                                    <ClockCircleOutlined /> {dest.openHour} - {dest.closeHour}
-                                                </p>
-                                                <Divider className="my-2" />
-                                                <p className="text-[10px] font-bold uppercase text-emerald-600 mb-1">Points of interest ({dest.points.length}):</p>
-                                                <div className="max-h-[120px] overflow-y-auto popup-poi-scroll mb-3 pr-1">
-                                                    <ul className="text-xs list-none p-0 m-0">
-                                                        {dest.points.map(p => (
-                                                            <li key={p.id} className="flex items-center gap-1 py-0.5 border-b border-gray-50 last:border-0">
-                                                                <Text className="text-[10px] font-bold text-gray-400 w-4">{p.orderIndex}.</Text>
-                                                                <span className="text-[11px] truncate">{p.name}</span>
-                                                                <Text type="secondary" className="text-[9px] ml-auto">{p.estTimeSpent}m</Text>
-                                                            </li>
-                                                        ))}
-                                                        {dest.points.length === 0 && <li className="text-gray-400 italic text-[10px]">No points added yet</li>}
-                                                    </ul>
-                                                </div>
-                                                <Button size="small" type="primary" ghost block icon={<EyeOutlined />} onClick={() => { setViewingDestination(dest); setIsDetailVisible(true); }}>View Details</Button>
-                                            </div>
-                                        </Popup>
-                                    </Marker>
-                                ))}
+                                            </Popup>
+                                        </Marker>
+                                    );
+                                })}
 
                                 {/* Render Points of the currently selected destination */}
                                 {currentPointDestination && currentPointDestination.points.map(p => (
@@ -765,7 +783,7 @@ export function AdminDestinationsPage() {
                             <Select placeholder="Select status">
                                 <Option value="OPEN">Open</Option>
                                 <Option value="CLOSED">Closed</Option>
-                                <Option value="CONSTRUCTION">Construction</Option>
+                                <Option value="MAINTENANCE">Maintenance</Option>
                                 <Option value="TEMPORARILY_CLOSED">Temporarily Closed</Option>
                             </Select>
                         </Form.Item>
@@ -865,6 +883,13 @@ export function AdminDestinationsPage() {
                             <Button icon={<EnvironmentOutlined />} onClick={() => openMapPicker('point')}>
                                 Open Map Picker
                             </Button>
+                        </Form.Item>
+                        <Form.Item name="type" label="Point Type" rules={[{ required: true }]}>
+                            <Select placeholder="Select point type">
+                                {Object.keys(PointType).map(type => (
+                                    <Option key={type} value={type}>{type}</Option>
+                                ))}
+                            </Select>
                         </Form.Item>
                         <Form.Item name="orderIndex" label="Display Order" rules={[{ required: true }]}>
                             <InputNumber style={{ width: '100%' }} min={1} placeholder="1, 2, 3..." />
