@@ -1,12 +1,13 @@
 /**
- * BlogCategoryList Page
- * Lean page component that composes the toolbar, table,
- * and delegates data logic to the useBlogCategories hook.
+ * BlogCategoryPage
+ * Lean page component that composes toolbar, table, and a single unified modal.
+ * All data and modal logic is delegated to the useBlogCategories hook.
  */
 
 import { useBlogCategories } from '@/hooks/useBlogCategories';
 import { formatShortDate, exportToCsv } from '@/utils/helpers';
 import { BlogCategoryToolbar, BlogCategoryTable } from '@/components';
+import BlogCategoryModal from '@/components/blog-categories/BlogCategoryModal';
 
 export function BlogCategoryPage() {
   const {
@@ -15,7 +16,6 @@ export function BlogCategoryPage() {
     error,
     currentPage,
     totalElements,
-    totalPages,
     pageSize,
     goToPage,
     searchQuery,
@@ -25,7 +25,11 @@ export function BlogCategoryPage() {
     setStatusFilter,
     sortIndex,
     setSortIndex,
-    refresh,
+    modalMode,
+    modalCategory,
+    openModal,
+    closeModal,
+    handleModalSuccess,
   } = useBlogCategories();
 
   const handleExport = () => {
@@ -48,8 +52,8 @@ export function BlogCategoryPage() {
         onStatusChange={setStatusFilter}
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
-        onRefresh={refresh}
         onExport={handleExport}
+        onAdd={() => openModal('create')}
       />
 
       <BlogCategoryTable
@@ -60,7 +64,23 @@ export function BlogCategoryPage() {
         totalElements={totalElements}
         pageSize={pageSize}
         onPageChange={goToPage}
-        onRetry={refresh}
+        onRetry={applySearch}
+        onView={(id) => {
+          const cat = categories.find((c) => c.id === id);
+          if (cat) openModal('view', cat);
+        }}
+        onEdit={(id) => {
+          const cat = categories.find((c) => c.id === id);
+          if (cat) openModal('edit', cat);
+        }}
+        onDelete={(cat) => openModal('delete', cat)}
+      />
+
+      <BlogCategoryModal
+        mode={modalMode}
+        category={modalCategory}
+        onCancel={closeModal}
+        onSuccess={handleModalSuccess}
       />
     </div>
   );

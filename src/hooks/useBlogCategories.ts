@@ -1,7 +1,7 @@
 /**
  * Custom Hook: useBlogCategories
- * Encapsulates all data fetching, filtering, sorting, and pagination logic
- * for the blog category list.
+ * Encapsulates all data fetching, filtering, sorting, pagination,
+ * and a single unified modal state for the blog category list.
  */
 
 import { useEffect, useState, useCallback } from "react";
@@ -11,6 +11,7 @@ import type {
   BlogCategoryStatus,
   BlogCategoryListParams,
 } from "@/types/blog";
+import type { BlogCategoryModalMode } from "@/components/blog-categories/BlogCategoryModal";
 import { BLOG_CATEGORY_PAGE_SIZE, BLOG_CATEGORY_SORT_OPTIONS } from "@/constants/blogCategory";
 
 export interface UseBlogCategoriesReturn {
@@ -39,8 +40,12 @@ export interface UseBlogCategoriesReturn {
   sortIndex: number;
   setSortIndex: (index: number) => void;
 
-  /** Actions */
-  refresh: () => void;
+  /** Unified modal */
+  modalMode: BlogCategoryModalMode;
+  modalCategory: BlogCategoryResponse | null;
+  openModal: (mode: NonNullable<BlogCategoryModalMode>, category?: BlogCategoryResponse) => void;
+  closeModal: () => void;
+  handleModalSuccess: () => void;
 }
 
 export function useBlogCategories(): UseBlogCategoriesReturn {
@@ -59,6 +64,11 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
   const [statusFilter, setStatusFilterRaw] = useState<BlogCategoryStatus | "">("");
   const [sortIndex, setSortIndexRaw] = useState(0);
 
+  // Unified modal state
+  const [modalMode, setModalMode] = useState<BlogCategoryModalMode>(null);
+  const [modalCategory, setModalCategory] = useState<BlogCategoryResponse | null>(null);
+
+  /* ── Data fetching ── */
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
@@ -92,9 +102,11 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     fetchCategories();
   }, [fetchCategories]);
 
+  /* ── Search / Filter / Sort / Pagination ── */
   const applySearch = useCallback(() => {
     setCurrentPage(0);
     setAppliedSearch(searchQuery);
+    console.log("appliedSearch: ", searchQuery);
   }, [searchQuery]);
 
   const setStatusFilter = useCallback((status: BlogCategoryStatus | "") => {
@@ -114,6 +126,26 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     [totalPages],
   );
 
+  /* ── Unified modal ── */
+  const openModal = useCallback(
+    (mode: NonNullable<BlogCategoryModalMode>, category?: BlogCategoryResponse) => {
+      setModalMode(mode);
+      setModalCategory(category ?? null);
+    },
+    [],
+  );
+
+  const closeModal = useCallback(() => {
+    setModalMode(null);
+    setModalCategory(null);
+  }, []);
+
+  const handleModalSuccess = useCallback(() => {
+    setModalMode(null);
+    setModalCategory(null);
+    fetchCategories();
+  }, [fetchCategories]);
+
   return {
     categories,
     loading,
@@ -130,6 +162,10 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     setStatusFilter,
     sortIndex,
     setSortIndex,
-    refresh: fetchCategories,
+    modalMode,
+    modalCategory,
+    openModal,
+    closeModal,
+    handleModalSuccess,
   };
 }

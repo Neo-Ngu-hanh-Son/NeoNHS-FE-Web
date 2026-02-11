@@ -4,10 +4,9 @@
  * Uses Ant Design Table, Tag, Tooltip, Button and the shared EmptyState component.
  */
 
-import { Table, Tag, Tooltip, Button } from 'antd';
+import { Table, Tag, Tooltip, Button, message } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { EyeOutlined, EditOutlined, TagsOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { EyeOutlined, EditOutlined, TagsOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { BlogCategoryResponse } from '@/types/blog';
 import { getInitials, formatShortDate } from '@/utils/helpers';
 import { EmptyState } from '@/components/dashboard/EmptyState';
@@ -21,6 +20,9 @@ interface BlogCategoryTableProps {
   pageSize: number;
   onPageChange: (page: number) => void;
   onRetry: () => void;
+  onView: (id: string) => void;
+  onEdit: (id: string) => void;
+  onDelete: (category: BlogCategoryResponse) => void;
 }
 
 export function BlogCategoryTable({
@@ -32,8 +34,19 @@ export function BlogCategoryTable({
   pageSize,
   onPageChange,
   onRetry,
+  onView,
+  onEdit,
+  onDelete,
 }: BlogCategoryTableProps) {
-  const navigate = useNavigate();
+
+  const handleDelete = (category: BlogCategoryResponse) => {
+    // Check if the category is already archived
+    if (category.status === 'ARCHIVED') {
+      message.error('Category is already archived, please update the status to ACTIVE');
+      return;
+    }
+    onDelete(category);
+  };
 
   const columns: ColumnsType<BlogCategoryResponse> = [
     {
@@ -47,6 +60,14 @@ export function BlogCategoryTable({
           </div>
           <span className="text-sm font-semibold text-gray-800">{name}</span>
         </div>
+      ),
+    },
+    {
+      title: 'Slug',
+      dataIndex: 'slug',
+      key: 'slug',
+      render: (slug: string) => (
+        <span className="text-sm font-medium text-gray-600">{slug}</span>
       ),
     },
     {
@@ -85,7 +106,7 @@ export function BlogCategoryTable({
     {
       title: 'Actions',
       key: 'actions',
-      width: 100,
+      width: 130,
       align: 'right',
       render: (_: unknown, record: BlogCategoryResponse) => (
         <div className="flex items-center justify-end gap-1">
@@ -95,7 +116,7 @@ export function BlogCategoryTable({
               type="text"
               size="small"
               icon={<EyeOutlined />}
-              onClick={() => navigate(`/admin/blog-categories/${record.id}`)}
+              onClick={() => onView(record.id)}
               className="!text-gray-400 hover:!text-emerald-700 hover:!bg-emerald-50"
             />
           </Tooltip>
@@ -105,8 +126,18 @@ export function BlogCategoryTable({
               type="text"
               size="small"
               icon={<EditOutlined />}
-              onClick={() => navigate(`/admin/blog-categories/${record.id}/edit`)}
+              onClick={() => onEdit(record.id)}
               className="!text-gray-400 hover:!text-emerald-700 hover:!bg-emerald-50"
+            />
+          </Tooltip>
+          <Tooltip title="Delete category">
+            <Button
+              id={`delete-${record.id}`}
+              type="text"
+              size="small"
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record)}
+              className="!text-gray-400 hover:!text-red-700 hover:!bg-red-50"
             />
           </Tooltip>
         </div>
@@ -157,13 +188,13 @@ export function BlogCategoryTable({
       className="blog-category-table"
       rowClassName="hover:bg-emerald-50/30 transition-colors"
       pagination={{
-        current: currentPage + 1, // Ant uses 1-indexed, our API is 0-indexed
+        current: currentPage + 1,
         pageSize,
         total: totalElements,
         showSizeChanger: false,
         showTotal: (total, range) =>
           `Showing ${range[0]} to ${range[1]} of ${total} results`,
-        onChange: (page) => onPageChange(page - 1), // Convert back to 0-indexed
+        onChange: (page) => onPageChange(page - 1),
       }}
     />
   );

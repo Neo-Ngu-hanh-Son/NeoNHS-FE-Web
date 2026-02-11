@@ -4,11 +4,11 @@
  * Uses Ant Design Input, Select, and Button components.
  */
 
-import { Input, Select, Button, Space } from 'antd';
+import { Input, Select, Button, Space, Tooltip } from 'antd';
 import {
   SearchOutlined,
-  ReloadOutlined,
   ExportOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import type { BlogCategoryStatus } from '@/types/blog';
 import {
@@ -24,8 +24,8 @@ interface BlogCategoryToolbarProps {
   onStatusChange: (value: BlogCategoryStatus | '') => void;
   sortIndex: number;
   onSortChange: (index: number) => void;
-  onRefresh: () => void;
   onExport: () => void;
+  onAdd: () => void;
 }
 
 export function BlogCategoryToolbar({
@@ -36,12 +36,12 @@ export function BlogCategoryToolbar({
   onStatusChange,
   sortIndex,
   onSortChange,
-  onRefresh,
   onExport,
+  onAdd
 }: BlogCategoryToolbarProps) {
   return (
-    <div className="space-y-4">
-      <Space className="flex items-center gap-3">
+    <div className="w-full flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <Space.Compact block orientation='horizontal'>
         <Input
           id="search-input"
           prefix={<SearchOutlined className="text-gray-400" />}
@@ -50,7 +50,7 @@ export function BlogCategoryToolbar({
           onChange={(e) => onSearchChange(e.target.value)}
           onPressEnter={onSearchApply}
           allowClear
-          className="flex-1"
+          className="max-w-[250px]"
           size="middle"
         />
 
@@ -62,7 +62,7 @@ export function BlogCategoryToolbar({
             label: `Status: ${o.label}`,
             value: o.value,
           }))}
-          className="w-[170px]"
+          className="max-w-[170px] w-full"
           size="middle"
         />
 
@@ -74,7 +74,7 @@ export function BlogCategoryToolbar({
             label: `Sort: ${o.label}`,
             value: i,
           }))}
-          className="w-[170px]"
+          className="max-w-[170px] w-full"
           size="middle"
         />
 
@@ -82,22 +82,35 @@ export function BlogCategoryToolbar({
           id="refresh-btn"
           type="primary"
           icon={<SearchOutlined />}
-          onClick={onRefresh}
+          onClick={onSearchApply}
           size="middle"
           className="!bg-emerald-700 hover:!bg-emerald-800"
         >
           Search
         </Button>
+      </Space.Compact>
+
+      <Space.Compact>
         <Button
-          id="export-btn"
-          icon={<ExportOutlined />}
-          onClick={onExport}
-          className="!border-emerald-200 !text-emerald-700 hover:!bg-emerald-50 !font-semibold"
-          size='middle'
+          id="add-btn"
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={onAdd}
+          size="middle"
+          className="!bg-emerald-700 hover:!bg-emerald-800"
         >
-          Export
+          Add Category
         </Button>
-      </Space>
+        <Tooltip title="Export categories to CSV">
+          <Button
+            id="export-btn"
+            icon={<ExportOutlined />}
+            onClick={onExport}
+            className="!border-emerald-200 !text-emerald-700 hover:!bg-emerald-50 !font-semibold"
+            size="middle"
+          />
+        </Tooltip>
+      </Space.Compact>
     </div>
   );
 }

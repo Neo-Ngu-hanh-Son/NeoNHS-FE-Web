@@ -7,6 +7,7 @@ export type BlogCategoryStatus = "ACTIVE" | "ARCHIVED";
 export interface BlogCategoryResponse {
   id: string;
   name: string;
+  slug: string;
   description?: string;
   status: BlogCategoryStatus;
   postCount: number;

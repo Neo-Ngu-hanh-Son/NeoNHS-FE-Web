@@ -32,7 +32,6 @@ export const blogCategoryService = {
 
     const queryString = query.toString();
     const url = queryString ? `${BASE}?${queryString}` : BASE;
-
     return await apiClient.get<ApiResponse<BlogCategoryPageResponse>>(url);
   },
 
