@@ -27,7 +27,10 @@ export function WorkshopTemplateCard({
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
       {/* Thumbnail Image */}
       {thumbnail && (
-        <div className="relative h-48 overflow-hidden">
+        <div
+          className="relative h-48 overflow-hidden cursor-pointer"
+          onClick={onView}
+        >
           <img
             src={thumbnail}
             alt={template.name}
