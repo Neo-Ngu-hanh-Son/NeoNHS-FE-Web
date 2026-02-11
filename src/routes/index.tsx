@@ -32,6 +32,8 @@ import WorkshopSessionsPage from '@/pages/vendor/WorkshopSessions/WorkshopSessio
 import WorkshopCalendarPage from '@/pages/vendor/WorkshopCalendar/CalendarPage.tsx'
 import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPage'
 import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage'
+import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage'
+import SimpleMapView from '@/pages/SimpleMapView'
 
 export const router = createBrowserRouter([
   {
@@ -45,6 +47,15 @@ export const router = createBrowserRouter([
           { path: '/register', element: <Register /> },
           { path: '/verify-otp', element: <VerifyOTP /> },
           { path: '/new-password', element: <NewPassword /> },
+          { path: '/simple-map', element: <SimpleMapView /> },
+        ],
+      },
+      {
+        path: '/admin',
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <BlogCategoryPage /> },
+          { path: 'blog-categories', element: <BlogCategoryPage /> },
         ],
       },
       {
@@ -85,6 +96,7 @@ export const router = createBrowserRouter([
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "events", element: <AdminEventsPage /> },
+          { path: 'blog-categories', element: <BlogCategoryPage /> },
         ],
       },
     ],
