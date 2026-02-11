@@ -49,6 +49,19 @@ export const userService = {
       throw error;
     }
   },
+
+  /**
+   * Change current user's password
+   * @param data - Password change data (oldPassword, newPassword, confirmNewPassword)
+   */
+  async changePassword(data: any): Promise<any> {
+    try {
+      const res = await apiClient.post('/auth/change-password', data);
+      return res?.data ?? res;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default userService;
