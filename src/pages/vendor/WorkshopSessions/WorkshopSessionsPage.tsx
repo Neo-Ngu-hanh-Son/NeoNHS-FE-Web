@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -11,17 +10,17 @@ import { CancelSessionDialog } from './components/cancel-session-dialog'
 import { CreateSessionDialog } from './components/create-session-dialog'
 import { EditSessionDialog } from './components/edit-session-dialog'
 import { ViewSessionDialog } from './components/view-session-dialog'
-import { Card } from '@/components/ui/card'
+import { SessionCalendar } from './components/calendar'
 import { formatDate } from './utils/formatters'
 
 export default function WorkshopSessionsPage() {
-  const navigate = useNavigate()
   const [sessions] = useState<WorkshopSessionResponse[]>(mockWorkshopSessions)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
   
   const [createDialog, setCreateDialog] = useState(false)
+  const [preselectedDate, setPreselectedDate] = useState<Date | undefined>()
   const [editDialog, setEditDialog] = useState<{ open: boolean; session: WorkshopSessionResponse | null }>({
     open: false,
     session: null,
@@ -81,6 +80,10 @@ export default function WorkshopSessionsPage() {
     }
   }
 
+  const handleCalendarSessionView = (session: WorkshopSessionResponse) => {
+    setViewDialog({ open: true, session })
+  }
+
   const handleEdit = (sessionId: string) => {
     const session = sessions.find(s => s.id === sessionId)
     if (session) {
@@ -100,8 +103,22 @@ export default function WorkshopSessionsPage() {
     }
   }
 
-  const handleCreateSession = () => {
+  const handleCreateSession = (date?: Date) => {
+    setPreselectedDate(date)
     setCreateDialog(true)
+  }
+
+  const handleCalendarDateClick = (date: Date) => {
+    // When clicking a date in calendar, open create dialog with that date
+    handleCreateSession(date)
+  }
+
+  const handleCalendarSessionEdit = (session: WorkshopSessionResponse) => {
+    setEditDialog({ open: true, session })
+  }
+
+  const handleCalendarSessionCancel = (session: WorkshopSessionResponse) => {
+    setCancelDialog({ open: true, session })
   }
 
   const handleDialogSuccess = () => {
@@ -121,7 +138,7 @@ export default function WorkshopSessionsPage() {
         </div>
         <Button
           size="lg"
-          onClick={handleCreateSession}
+          onClick={() => handleCreateSession()}
           className="gap-2"
         >
           <PlusCircle className="w-5 h-5" />
@@ -220,17 +237,15 @@ export default function WorkshopSessionsPage() {
             ))}
           </div>
         ) : (
-          // Calendar View (Placeholder)
-          <Card className="p-12 text-center">
-            <CalendarDays className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Calendar View Coming Soon</h3>
-            <p className="text-muted-foreground mb-4">
-              Interactive calendar view with drag-and-drop is under development.
-            </p>
-            <Button onClick={() => setView('list')} variant="outline">
-              Switch to List View
-            </Button>
-          </Card>
+          // Calendar View
+          <SessionCalendar
+            sessions={filteredSessions}
+            onSessionClick={handleCalendarSessionView}
+            onDateClick={handleCalendarDateClick}
+            onSessionEdit={handleCalendarSessionEdit}
+            onSessionCancel={handleCalendarSessionCancel}
+            defaultView="month"
+          />
         )
       ) : (
         // Empty State
@@ -244,7 +259,7 @@ export default function WorkshopSessionsPage() {
             }
           </p>
           {!searchQuery && statusFilter === 'all' && (
-            <Button onClick={handleCreateSession}>
+            <Button onClick={() => handleCreateSession()}>
               <PlusCircle className="w-4 h-4 mr-2" />
               Create Session
             </Button>
@@ -255,7 +270,11 @@ export default function WorkshopSessionsPage() {
       {/* Dialogs */}
       <CreateSessionDialog
         open={createDialog}
-        onOpenChange={setCreateDialog}
+        onOpenChange={(open) => {
+          setCreateDialog(open)
+          if (!open) setPreselectedDate(undefined)
+        }}
+        preselectedDate={preselectedDate}
         onSuccess={handleDialogSuccess}
       />
 

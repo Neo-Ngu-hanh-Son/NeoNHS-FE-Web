@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { SessionStatusBadge } from "./session-status-badge"
-import { Calendar, Clock, Users, DollarSign, Eye, Edit, XCircle } from "lucide-react"
+import { Calendar, Clock, Users, Eye, Edit, XCircle } from "lucide-react"
 import { formatDate, formatTimeRange, formatPrice, getEnrollmentPercentage } from "../utils/formatters"
 
 interface SessionCardProps {
@@ -64,7 +64,6 @@ export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardPr
 
         {/* Price */}
         <div className="flex items-center gap-2 text-sm">
-          <DollarSign className="w-4 h-4 text-muted-foreground" />
           <span className="font-semibold text-primary text-base">{formatPrice(session.price)}</span>
         </div>
 

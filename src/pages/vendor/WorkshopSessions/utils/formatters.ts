@@ -1,27 +1,34 @@
 // Date and Time Formatting
+// Sử dụng locale 'vi-VN' cho định dạng ngày tháng Việt Nam
+
 export const formatDate = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString('en-US', {
+  return new Date(isoDate).toLocaleDateString('vi-VN', {
     year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+    month: '2-digit',
+    day: '2-digit'
   })
+  // Kết quả ví dụ: 13/02/2026
 }
 
 export const formatDateTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleString('en-US', {
+  return new Date(isoDate).toLocaleString('vi-VN', {
     year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: false // Sử dụng hệ 24 giờ
   })
+  // Kết quả ví dụ: 13:30 13/02/2026
 }
 
 export const formatTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleTimeString('en-US', {
+  return new Date(isoDate).toLocaleTimeString('vi-VN', {
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    hour12: false // Sử dụng hệ 24 giờ
   })
+  // Kết quả ví dụ: 14:30
 }
 
 export const formatTimeRange = (startTime: string, endTime: string) => {
@@ -31,22 +38,25 @@ export const formatTimeRange = (startTime: string, endTime: string) => {
 }
 
 export const formatDayOfWeek = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString('en-US', {
+  // Viết hoa chữ cái đầu (ví dụ: thứ Hai -> Thứ Hai) nếu cần thiết
+  const day = new Date(isoDate).toLocaleDateString('vi-VN', {
     weekday: 'long'
   })
+  return day.charAt(0).toUpperCase() + day.slice(1)
 }
 
 export const formatFullDateTime = (isoDate: string) => {
-  const date = new Date(isoDate)
-  return `${formatDayOfWeek(isoDate)}, ${formatDate(isoDate)} at ${formatTime(isoDate)}`
+  // Định dạng: Thứ Sáu, 13/02/2026 lúc 14:30
+  return `${formatDayOfWeek(isoDate)}, ${formatDate(isoDate)} lúc ${formatTime(isoDate)}`
 }
 
 // Price Formatting
 export const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'VND'
   }).format(price)
+  // Kết quả ví dụ: 100.000 ₫
 }
 
 // Duration Formatting (in minutes)
@@ -54,9 +64,9 @@ export const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)
   const mins = minutes % 60
   
-  if (hours === 0) return `${mins} min`
-  if (mins === 0) return `${hours} hr`
-  return `${hours}h ${mins}m`
+  if (hours === 0) return `${mins} phút`
+  if (mins === 0) return `${hours} giờ`
+  return `${hours}h ${mins}p` // Hoặc dùng "giờ", "phút" nếu muốn đầy đủ
 }
 
 // Calculate duration between two dates
@@ -68,13 +78,13 @@ export const calculateDuration = (startTime: string, endTime: string): number =>
 
 // Enrollment/Availability Formatting
 export const formatEnrollmentStatus = (current: number, max: number) => {
-  return `${current} / ${max} enrolled`
+  return `${current} / ${max} đã đăng ký`
 }
 
 export const formatAvailability = (available: number) => {
-  if (available === 0) return "Fully Booked"
-  if (available === 1) return "1 spot left"
-  return `${available} spots available`
+  if (available === 0) return "Đã kín chỗ"
+  if (available === 1) return "Còn 1 chỗ"
+  return `Còn ${available} chỗ`
 }
 
 export const getEnrollmentPercentage = (current: number, max: number) => {
@@ -105,7 +115,8 @@ export const isOngoing = (startTime: string, endTime: string) => {
 
 // Calendar Helpers
 export const getMonthName = (date: Date) => {
-  return date.toLocaleDateString('en-US', { month: 'long' })
+  // 'Tháng 2' thay vì 'February'
+  return date.toLocaleDateString('vi-VN', { month: 'long' })
 }
 
 export const getYear = (date: Date) => {
@@ -113,7 +124,12 @@ export const getYear = (date: Date) => {
 }
 
 export const getMonthYear = (date: Date) => {
-  return `${getMonthName(date)} ${getYear(date)}`
+  // Kết quả: Tháng 2 năm 2026
+  // Ở VN thường thêm chữ "năm" ở giữa, nhưng format mặc định có thể là "Tháng 2 2026"
+  // Code dưới đây tùy chỉnh để tự nhiên hơn:
+  const month = getMonthName(date)
+  const year = getYear(date)
+  return `${month} năm ${year}`
 }
 
 // Get days in month
