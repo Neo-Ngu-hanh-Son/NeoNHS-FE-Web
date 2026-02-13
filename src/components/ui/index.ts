@@ -37,3 +37,16 @@ export {
   BreadcrumbSeparator,
   BreadcrumbEllipsis,
 } from './breadcrumb'
+export { Progress } from './progress'
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from './dialog'
