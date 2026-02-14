@@ -1,9 +1,10 @@
 /**
  * BlogCategoryDeleteContent
  * Confirmation content for deleting a blog category.
+ * Uses Lucide icons + Tailwind. No Ant Design dependencies.
  */
 
-import { ExclamationCircleFilled } from '@ant-design/icons';
+import { TriangleAlert } from 'lucide-react';
 import type { BlogCategoryResponse } from '@/types/blog';
 import { getInitials } from '@/utils/helpers';
 
@@ -17,33 +18,32 @@ export default function BlogCategoryDeleteContent({
   return (
     <div className="flex flex-col items-center text-center pt-2 pb-1">
       {/* Warning icon */}
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50 mb-4">
-        <ExclamationCircleFilled className="text-red-500 text-2xl" />
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 mb-4">
+        <TriangleAlert className="h-7 w-7 text-destructive" />
       </div>
 
-      <h3 className="text-lg font-bold text-gray-900 mb-1">
-        Delete Category
-      </h3>
-      <p className="text-sm text-gray-500 mb-3">
+      <h3 className="text-lg font-bold text-foreground mb-1">Delete Category</h3>
+      <p className="text-sm text-muted-foreground mb-3">
         Are you sure you want to delete this category?
       </p>
 
       {/* Category info card */}
-      <div className="w-full flex items-center gap-3 p-3 bg-red-50/60 rounded-lg border border-red-100">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-100 text-xs font-bold text-red-700">
+      <div className="w-full flex items-center gap-3 p-3 bg-destructive/5 rounded-lg border border-destructive/15">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-xs font-bold text-destructive">
           {getInitials(category.name)}
         </div>
         <div className="text-left">
-          <p className="text-sm font-semibold text-gray-800">
+          <p className="text-sm font-semibold text-foreground">
             {category.name}
           </p>
-          <p className="text-xs text-gray-500">
-            {category.postCount} post{category.postCount !== 1 ? 's' : ''} associated
+          <p className="text-xs text-muted-foreground">
+            {category.postCount} post{category.postCount !== 1 ? 's' : ''}{' '}
+            associated
           </p>
         </div>
       </div>
 
-      <p className="text-xs text-red-500 mt-3">
+      <p className="text-xs text-destructive mt-3">
         This action cannot be undone.
       </p>
     </div>

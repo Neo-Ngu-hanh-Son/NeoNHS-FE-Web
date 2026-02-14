@@ -5,6 +5,7 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
+import NavlinkWithChildren from '@/components/adminLayout/NavlinkWithChildren';
 
 export function AdminLayout() {
     const { user, logout } = useAuth();
@@ -25,8 +26,13 @@ export function AdminLayout() {
         { label: 'Vouchers', path: '/admin/vouchers', icon: 'loyalty' },
         { label: 'Reports', path: '/admin/reports', icon: 'analytics' },
         { label: 'Events', path: '/admin/events', icon: 'event' },
-        { label: 'Blog Categories', path: '/admin/blog-categories', icon: 'category' },
-
+        {
+            label: 'Manage blogs', path: '', icon: 'dynamic_feed', children: [
+                { label: 'Blog Categories', path: '/admin/blog-categories', icon: 'category' },
+                { label: 'Blog', path: '/admin/blogs', icon: 'post' },
+                { label: 'Blog Creation', path: '/admin/blog/create', icon: 'add' },
+            ]
+        }
     ];
 
     // Helper to get breadcrumb from path
@@ -59,23 +65,30 @@ export function AdminLayout() {
 
                     {/* Nav */}
                     <nav className="flex flex-col gap-2 w-full">
-                        {navItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                title={isCollapsed ? item.label : ''}
-                                className={({ isActive }) =>
-                                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
-                                    } ${isActive
-                                        ? 'bg-white/10 text-white'
-                                        : 'text-white/70 hover:bg-white/5 hover:text-white'
-                                    }`
-                                }
-                            >
-                                <span className="material-symbols-outlined shrink-0">{item.icon}</span>
-                                {!isCollapsed && <p className="text-sm font-medium whitespace-nowrap overflow-hidden">{item.label}</p>}
-                            </NavLink>
-                        ))}
+                        {navItems.map((item) => {
+                            if (item.children) {
+                                return (
+                                    <NavlinkWithChildren key={item.path} navItem={item} isCollapsed={isCollapsed} />
+                                );
+                            }
+                            return (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    title={isCollapsed ? item.label : ''}
+                                    className={({ isActive }) =>
+                                        `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                                        } ${isActive
+                                            ? 'bg-white/10 text-white'
+                                            : 'text-white/70 hover:bg-white/5 hover:text-white'
+                                        }`
+                                    }
+                                >
+                                    <span className="material-symbols-outlined shrink-0">{item.icon}</span>
+                                    {!isCollapsed && <p className="text-sm font-medium whitespace-nowrap overflow-hidden">{item.label}</p>}
+                                </NavLink>
+                            );
+                        })}
                     </nav>
                 </div>
 

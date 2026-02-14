@@ -34,6 +34,8 @@ import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPag
 import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage'
 import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage'
 import SimpleMapView from '@/pages/SimpleMapView'
+import BlogPage from '@/pages/admin/blog/BlogPage'
+import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
 
 export const router = createBrowserRouter([
   {
@@ -97,6 +99,8 @@ export const router = createBrowserRouter([
           { path: "reports", element: <AdminReportsPage /> },
           { path: "events", element: <AdminEventsPage /> },
           { path: 'blog-categories', element: <BlogCategoryPage /> },
+          { path: 'blog/create', element: <BlogCreationPage /> },
+          { path: 'blog', element: <BlogPage /> },
         ],
       },
     ],

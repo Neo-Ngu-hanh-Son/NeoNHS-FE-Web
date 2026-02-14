@@ -1,6 +1,8 @@
 /**
  * BlogCategoryModal
  * A single unified modal that handles all blog category operations.
+ * Uses shadcn/ui Dialog for the shell. Ant Design message for notifications.
+ *
  * Switches content based on the `mode` prop:
  *   - "create" : Shows the form for creating a new category
  *   - "edit"   : Shows the form pre-filled with existing data
@@ -8,17 +10,23 @@
  *   - "delete" : Shows delete confirmation
  */
 
-import { Modal, Form, Spin, Button, message } from 'antd';
+import { message } from 'antd';
+import { Tags, Pencil, Info, Loader2 } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
 import {
-  TagsOutlined,
-  EditOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
-import { useEffect, useState } from 'react';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { blogCategoryService } from '@/services/api/blogCategoryService';
 import type { BlogCategoryRequest, BlogCategoryResponse } from '@/types/blog';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
-import BlogCategoryForm from './BlogCategoryForm';
+import BlogCategoryForm, { type BlogCategoryFormErrors } from './BlogCategoryForm';
 import BlogCategoryViewContent from './BlogCategoryViewContent';
 import BlogCategoryDeleteContent from './BlogCategoryDeleteContent';
 
@@ -40,37 +48,43 @@ const MODAL_CONFIG: Record<
     iconBg: string;
     title: string;
     subtitle: string;
-    width: number;
+    maxWidth: string;
   }
 > = {
   create: {
-    icon: <TagsOutlined className="text-emerald-700 text-base" />,
-    iconBg: 'bg-emerald-100',
+    icon: <Tags className="h-4 w-4 text-primary" />,
+    iconBg: 'bg-primary/15',
     title: 'Add Blog Category',
     subtitle: 'Create a new category for your blog posts',
-    width: 520,
+    maxWidth: 'max-w-lg',
   },
   edit: {
-    icon: <EditOutlined className="text-amber-700 text-base" />,
-    iconBg: 'bg-amber-100',
+    icon: <Pencil className="h-4 w-4 text-chart-3" />,
+    iconBg: 'bg-chart-3/15',
     title: 'Edit Blog Category',
     subtitle: 'Update the category information below',
-    width: 520,
+    maxWidth: 'max-w-lg',
   },
   view: {
-    icon: <InfoCircleOutlined className="text-blue-600 text-base" />,
-    iconBg: 'bg-blue-100',
+    icon: <Info className="h-4 w-4 text-chart-4" />,
+    iconBg: 'bg-chart-4/15',
     title: 'Category Details',
     subtitle: 'Viewing detailed information about this category',
-    width: 560,
+    maxWidth: 'max-w-xl',
   },
   delete: {
     icon: null,
     iconBg: '',
     title: '',
     subtitle: '',
-    width: 440,
+    maxWidth: 'max-w-md',
   },
+};
+
+const INITIAL_FORM: BlogCategoryRequest = {
+  name: '',
+  description: '',
+  status: 'ACTIVE',
 };
 
 export default function BlogCategoryModal({
@@ -79,7 +93,8 @@ export default function BlogCategoryModal({
   onCancel,
   onSuccess,
 }: BlogCategoryModalProps) {
-  const [form] = Form.useForm<BlogCategoryRequest>();
+  const [formValues, setFormValues] = useState<BlogCategoryRequest>({ ...INITIAL_FORM });
+  const [formErrors, setFormErrors] = useState<BlogCategoryFormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [fetching, setFetching] = useState(false);
   const [fetchedCategory, setFetchedCategory] = useState<BlogCategoryResponse | null>(null);
@@ -87,7 +102,38 @@ export default function BlogCategoryModal({
   const isOpen = mode !== null;
   const config = mode ? MODAL_CONFIG[mode] : null;
 
-  // Fetch full category data for view/edit modes (if only ID was passed via the row)
+  /* ── Form field handler ── */
+  const handleFieldChange = useCallback(
+    (field: keyof BlogCategoryRequest, value: string) => {
+      setFormValues((prev) => ({ ...prev, [field]: value }));
+      // Clear error on change
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    },
+    [],
+  );
+
+  /* ── Validation ── */
+  const validate = useCallback((): boolean => {
+    const errors: BlogCategoryFormErrors = {};
+    const name = formValues.name.trim();
+
+    if (!name) {
+      errors.name = 'Please enter a category name';
+    } else if (name.length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    } else if (name.length > 100) {
+      errors.name = 'Name must be at most 100 characters';
+    }
+
+    if (formValues.description && formValues.description.length > 500) {
+      errors.description = 'Description must be at most 500 characters';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [formValues]);
+
+  /* ── Fetch data for view/edit ── */
   useEffect(() => {
     if (!isOpen || !category) {
       setFetchedCategory(null);
@@ -100,7 +146,7 @@ export default function BlogCategoryModal({
         .getCategoryById(category.id)
         .then((res) => setFetchedCategory(res.data))
         .catch((err: unknown) =>
-          message.error(getApiErrorMessage(err, 'Failed to load category details.'))
+          message.error(getApiErrorMessage(err, 'Failed to load category details.')),
         )
         .finally(() => setFetching(false));
     }
@@ -111,14 +157,14 @@ export default function BlogCategoryModal({
         .getCategoryById(category.id)
         .then((res) => {
           setFetchedCategory(res.data);
-          form.setFieldsValue({
+          setFormValues({
             name: res.data.name,
             description: res.data.description || '',
             status: res.data.status,
           });
         })
         .catch((err: unknown) =>
-          message.error(getApiErrorMessage(err, 'Failed to load category data.'))
+          message.error(getApiErrorMessage(err, 'Failed to load category data.')),
         )
         .finally(() => setFetching(false));
     }
@@ -126,28 +172,30 @@ export default function BlogCategoryModal({
     if (mode === 'delete') {
       setFetchedCategory(category);
     }
-  }, [isOpen, mode, category, form]);
+  }, [isOpen, mode, category]);
 
-  // Reset on close
+  /* ── Reset on close ── */
   useEffect(() => {
     if (!isOpen) {
-      form.resetFields();
+      setFormValues({ ...INITIAL_FORM });
+      setFormErrors({});
       setFetchedCategory(null);
       setSubmitting(false);
       setFetching(false);
     }
-  }, [isOpen, form]);
+  }, [isOpen]);
 
   /* ── Handlers ── */
   const handleCreateOrEdit = async () => {
+    if (!validate()) return;
+
     try {
-      const values = await form.validateFields();
       setSubmitting(true);
 
       const payload: BlogCategoryRequest = {
-        name: values.name.trim(),
-        description: values.description?.trim() || undefined,
-        status: mode === 'edit' ? values.status : 'ACTIVE',
+        name: formValues.name.trim(),
+        description: formValues.description?.trim() || undefined,
+        status: mode === 'edit' ? formValues.status : 'ACTIVE',
       };
 
       if (mode === 'create') {
@@ -158,17 +206,15 @@ export default function BlogCategoryModal({
         message.success('Blog category updated successfully!');
       }
 
-      form.resetFields();
       onSuccess();
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'errorFields' in error) return;
       message.error(
         getApiErrorMessage(
           error,
           mode === 'create'
             ? 'Failed to create blog category. Please try again.'
-            : 'Failed to update blog category. Please try again.'
-        )
+            : 'Failed to update blog category. Please try again.',
+        ),
       );
     } finally {
       setSubmitting(false);
@@ -184,113 +230,152 @@ export default function BlogCategoryModal({
       onSuccess();
     } catch (error: unknown) {
       message.error(
-        getApiErrorMessage(error, 'Failed to delete blog category. Please try again.')
+        getApiErrorMessage(error, 'Failed to delete blog category. Please try again.'),
       );
     } finally {
       setSubmitting(false);
     }
   };
 
-  /* ── Footer config per mode ── */
-  const getFooter = () => {
-    if (mode === 'view') {
-      return <Button onClick={onCancel}>Close</Button>;
-    }
-    if (mode === 'delete') {
-      return undefined; // use default OK/Cancel
-    }
-    return undefined; // use default OK/Cancel for create/edit
-  };
-
-  const getOkHandler = () => {
-    if (mode === 'create' || mode === 'edit') return handleCreateOrEdit;
-    if (mode === 'delete') return handleDelete;
-    return undefined;
-  };
-
-  const getOkText = () => {
-    if (mode === 'create') return 'Create Category';
-    if (mode === 'edit') return 'Save Changes';
-    if (mode === 'delete') return 'Delete';
-    return undefined;
-  };
-
-  /* ── Title (not for delete — it handles its own header) ── */
+  /* ── Title ── */
   const renderTitle = () => {
     if (mode === 'delete' || !config) return null;
     return (
-      <div className="flex items-center gap-2.5 pb-1">
-        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${config.iconBg}`}>
-          {config.icon}
+      <DialogHeader>
+        <div className="flex items-center gap-2.5">
+          <div
+            className={`flex h-9 w-9 items-center justify-center rounded-lg ${config.iconBg}`}
+          >
+            {config.icon}
+          </div>
+          <div>
+            <DialogTitle className="text-base font-bold text-gray-900 leading-tight">
+              {config.title}
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-500">
+              {config.subtitle}
+            </DialogDescription>
+          </div>
         </div>
-        <div>
-          <h3 className="text-base font-bold text-gray-900 leading-tight">
-            {config.title}
-          </h3>
-          <p className="text-xs text-gray-500 font-normal">
-            {config.subtitle}
-          </p>
-        </div>
-      </div>
+      </DialogHeader>
     );
   };
 
-  /* ── Body content ── */
+  /* ── Body ── */
   const renderContent = () => {
-    // Loading spinner for view/edit
     if ((mode === 'view' || mode === 'edit') && fetching) {
       return (
-        <div className="flex items-center justify-center py-12">
-          <Spin size="large" />
+        <div className="space-y-4 py-6">
+          <Skeleton className="h-16 w-full rounded-xl" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
       );
     }
 
     switch (mode) {
       case 'create':
-        return <BlogCategoryForm form={form} mode="create" />;
-
+        return (
+          <BlogCategoryForm
+            mode="create"
+            values={formValues}
+            errors={formErrors}
+            onChange={handleFieldChange}
+          />
+        );
       case 'edit':
-        return <BlogCategoryForm form={form} mode="edit" />;
-
+        return (
+          <BlogCategoryForm
+            mode="edit"
+            values={formValues}
+            errors={formErrors}
+            onChange={handleFieldChange}
+          />
+        );
       case 'view':
         return fetchedCategory ? (
           <BlogCategoryViewContent category={fetchedCategory} />
         ) : null;
-
       case 'delete':
         return fetchedCategory ? (
           <BlogCategoryDeleteContent category={fetchedCategory} />
         ) : null;
-
       default:
         return null;
     }
   };
 
+  /* ── Footer ── */
+  const renderFooter = () => {
+    if (mode === 'view') {
+      return (
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel}>
+            Close
+          </Button>
+        </DialogFooter>
+      );
+    }
+
+    if (mode === 'create' || mode === 'edit') {
+      return (
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onCancel} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleCreateOrEdit}
+            disabled={submitting || fetching}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {mode === 'create' ? 'Create Category' : 'Save Changes'}
+          </Button>
+        </DialogFooter>
+      );
+    }
+
+    if (mode === 'delete') {
+      return (
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onCancel} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={submitting}
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+          >
+            {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Delete
+          </Button>
+        </DialogFooter>
+      );
+    }
+
+    return null;
+  };
+
   return (
-    <Modal
-      open={isOpen}
-      title={renderTitle()}
-      onCancel={onCancel}
-      onOk={getOkHandler()}
-      okText={getOkText()}
-      cancelText="Cancel"
-      confirmLoading={submitting}
-      okButtonProps={
-        mode === 'delete'
-          ? { danger: true, className: '!font-semibold' }
-          : {
-            className:
-              '!bg-emerald-700 hover:!bg-emerald-800 !border-emerald-700 !font-semibold',
-            disabled: fetching,
-          }
-      }
-      footer={getFooter()}
-      width={config?.width ?? 520}
-      centered
-    >
-      {renderContent()}
-    </Modal>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+      <DialogContent className={config?.maxWidth ?? 'max-w-lg'}>
+        {renderTitle()}
+
+        {/* Hidden title for modal when in delete mode */}
+        {mode === 'delete' && (
+          <>
+            <DialogTitle className="sr-only">Delete Category</DialogTitle>
+            <DialogDescription className="sr-only">
+              Confirm category deletion
+            </DialogDescription>
+          </>
+        )}
+
+        {renderContent()}
+        {renderFooter()}
+      </DialogContent>
+    </Dialog>
   );
 }

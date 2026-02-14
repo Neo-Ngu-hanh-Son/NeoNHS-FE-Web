@@ -42,7 +42,7 @@ export function BlogCategoryPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1100px] space-y-5 bg-white rounded-2xl shadow-lg border border-gray-100 
+    <div className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-2xl shadow-lg border border-border 
     overflow-hidden px-6 py-4">
       <BlogCategoryToolbar
         searchQuery={searchQuery}
