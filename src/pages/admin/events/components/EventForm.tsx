@@ -1,17 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Loader2, ImageIcon } from 'lucide-react';
+import { Loader2, MapPin, Upload, X } from 'lucide-react';
 import { TagCombobox } from './TagCombobox';
+import { MapPickerModal } from './MapPickerModal';
 import { EVENT_STATUS_OPTIONS } from '../constants';
+import { uploadImageToCloudinary, validateImageFile } from '@/utils/cloudinary';
 import type { EventResponse, CreateEventRequest, UpdateEventRequest } from '@/types/event';
 
 interface EventFormProps {
@@ -70,6 +74,9 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     const navigate = useNavigate();
     const [form, setForm] = useState<FormData>(emptyForm);
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+    const [mapPickerOpen, setMapPickerOpen] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (initialData) {
@@ -97,6 +104,47 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
+    const handleMapConfirm = (lat: number, lng: number) => {
+        setForm((prev) => ({
+            ...prev,
+            latitude: String(lat),
+            longitude: String(lng),
+        }));
+    };
+
+    const handleFileUpload = async (file: File) => {
+        const validationError = validateImageFile(file);
+        if (validationError) {
+            message.error(validationError);
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const url = await uploadImageToCloudinary(file);
+            if (url) {
+                handleChange('thumbnailUrl', url);
+                message.success('Image uploaded successfully!');
+            } else {
+                message.error('Image upload failed.');
+            }
+        } catch (error) {
+            message.error('Image upload error.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleFileUpload(file);
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    };
+
     const validate = (): boolean => {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
         if (!form.name.trim()) newErrors.name = 'Event name is required';
@@ -106,7 +154,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
             newErrors.endTime = 'End time must be after start time';
         }
         if (mode === 'create' && !form.thumbnailUrl.trim()) {
-            newErrors.thumbnailUrl = 'Thumbnail URL is required';
+            newErrors.thumbnailUrl = 'Thumbnail is required';
         }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -137,6 +185,10 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
 
         await onSubmit(data);
     };
+
+    const mapInitialPos = form.latitude && form.longitude
+        ? { lat: Number(form.latitude), lng: Number(form.longitude) }
+        : null;
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -178,18 +230,66 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                                 {errors.endTime && <p className="text-xs text-destructive mt-1">{errors.endTime}</p>}
                             </div>
                         </div>
+
+                        {/* Location */}
                         <div>
                             <Label htmlFor="locationName">Location Name</Label>
                             <Input id="locationName" value={form.locationName} onChange={(e) => handleChange('locationName', e.target.value)} placeholder="e.g. Ngu Hanh Son District" />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label htmlFor="latitude">Latitude</Label>
-                                <Input id="latitude" type="number" step="any" value={form.latitude} onChange={(e) => handleChange('latitude', e.target.value)} placeholder="16.0028" />
+
+                        {/* Map Picker */}
+                        <div>
+                            <Label>Coordinates</Label>
+                            <div className="flex items-center gap-2 mt-1">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setMapPickerOpen(true)}
+                                >
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    Pick on Map
+                                </Button>
+                                {form.latitude && form.longitude && (
+                                    <div className="flex items-center gap-1">
+                                        <Badge variant="outline" className="text-xs font-mono">
+                                            {form.latitude}, {form.longitude}
+                                        </Badge>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                handleChange('latitude', '');
+                                                handleChange('longitude', '');
+                                            }}
+                                            className="text-muted-foreground hover:text-foreground p-0.5"
+                                        >
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            <div>
-                                <Label htmlFor="longitude">Longitude</Label>
-                                <Input id="longitude" type="number" step="any" value={form.longitude} onChange={(e) => handleChange('longitude', e.target.value)} placeholder="108.2638" />
+                            {/* Hidden manual inputs, accessible via clicking coordinates */}
+                            <div className="grid grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <Label htmlFor="latitude" className="text-xs text-muted-foreground">Latitude</Label>
+                                    <Input
+                                        id="latitude" type="number" step="any"
+                                        value={form.latitude}
+                                        onChange={(e) => handleChange('latitude', e.target.value)}
+                                        placeholder="16.0028"
+                                        className="h-8 text-xs"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="longitude" className="text-xs text-muted-foreground">Longitude</Label>
+                                    <Input
+                                        id="longitude" type="number" step="any"
+                                        value={form.longitude}
+                                        onChange={(e) => handleChange('longitude', e.target.value)}
+                                        placeholder="108.2638"
+                                        className="h-8 text-xs"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </CardContent>
@@ -249,18 +349,63 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                     <CardHeader><CardTitle>Thumbnail {mode === 'create' && '*'}</CardTitle></CardHeader>
                     <CardContent className="space-y-3">
                         {form.thumbnailUrl ? (
-                            <div className="relative aspect-video rounded-lg overflow-hidden border">
+                            <div className="relative aspect-video rounded-lg overflow-hidden border group">
                                 <img src={form.thumbnailUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                                <button
+                                    type="button"
+                                    onClick={() => handleChange('thumbnailUrl', '')}
+                                    className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
                             </div>
                         ) : (
-                            <div className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30">
+                            <div
+                                className="aspect-video rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                                onClick={() => fileInputRef.current?.click()}
+                                onDrop={handleDrop}
+                                onDragOver={handleDragOver}
+                            >
                                 <div className="flex flex-col items-center text-muted-foreground">
-                                    <ImageIcon className="h-8 w-8 mb-1" />
-                                    <span className="text-xs">No thumbnail</span>
+                                    {uploading ? (
+                                        <>
+                                            <Loader2 className="h-8 w-8 mb-1 animate-spin" />
+                                            <span className="text-xs">Uploading...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Upload className="h-8 w-8 mb-1" />
+                                            <span className="text-xs">Click or drag to upload</span>
+                                            <span className="text-[10px] text-muted-foreground/60 mt-0.5">JPG, PNG, GIF, WebP (max 5MB)</span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         )}
-                        <Input value={form.thumbnailUrl} onChange={(e) => handleChange('thumbnailUrl', e.target.value)} placeholder="Enter image URL" />
+
+                        {/* Hidden file input */}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                            className="hidden"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleFileUpload(file);
+                                e.target.value = ''; // Reset so same file can be selected again
+                            }}
+                        />
+
+                        {/* Or enter URL manually */}
+                        <div>
+                            <Label className="text-xs text-muted-foreground">Or enter URL</Label>
+                            <Input
+                                value={form.thumbnailUrl}
+                                onChange={(e) => handleChange('thumbnailUrl', e.target.value)}
+                                placeholder="https://..."
+                                className="h-8 text-xs"
+                            />
+                        </div>
                         {errors.thumbnailUrl && <p className="text-xs text-destructive">{errors.thumbnailUrl}</p>}
                     </CardContent>
                 </Card>
@@ -282,6 +427,14 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                     {mode === 'create' ? 'Create Event' : 'Update Event'}
                 </Button>
             </div>
+
+            {/* Map Picker Modal */}
+            <MapPickerModal
+                open={mapPickerOpen}
+                onOpenChange={setMapPickerOpen}
+                initialPosition={mapInitialPos}
+                onConfirm={handleMapConfirm}
+            />
         </div>
     );
 }

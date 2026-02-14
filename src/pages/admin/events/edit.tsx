@@ -1,8 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EventForm } from './components/EventForm';
-import { useEvent } from '@/hooks/useEvent';
-import { useUpdateEvent } from '@/hooks/useUpdateEvent';
+import { useEvent, useUpdateEvent } from '@/hooks/event';
 import type { UpdateEventRequest } from '@/types/event';
 
 export default function EventEditPage() {

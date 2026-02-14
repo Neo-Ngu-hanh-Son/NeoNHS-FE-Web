@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +17,6 @@ export interface EventFiltersState {
     searchName: string;
     filterStatus: EventStatus | undefined;
     deleteFilter: 'active' | 'deleted' | 'all';
-    filterLocation: string;
     startDate: string;
     endDate: string;
     minPrice: number | undefined;
@@ -43,38 +42,36 @@ export function EventFilters({
     tagCombobox,
 }: EventFiltersProps) {
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [searchInput, setSearchInput] = useState(filters.searchName);
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+    // Local draft state — changes are only applied on "Search" click
+    const [draft, setDraft] = useState<EventFiltersState>(filters);
 
-    // Debounce search input
+    // Sync draft when filters are cleared externally
     useEffect(() => {
-        debounceRef.current = setTimeout(() => {
-            if (searchInput !== filters.searchName) {
-                onFiltersChange({ ...filters, searchName: searchInput });
-            }
-        }, 300);
-        return () => clearTimeout(debounceRef.current);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchInput]);
-
-    // Sync external changes
-    useEffect(() => {
-        setSearchInput(filters.searchName);
-    }, [filters.searchName]);
+        setDraft(filters);
+    }, [filters]);
 
     const hasActiveFilters =
         filters.searchName ||
         filters.filterStatus ||
         filters.deleteFilter !== 'active' ||
-        filters.filterLocation ||
         filters.startDate ||
         filters.endDate ||
         filters.minPrice !== undefined ||
         filters.maxPrice !== undefined ||
         filters.tagIds.length > 0;
 
-    const handleChange = (field: keyof EventFiltersState, value: unknown) => {
-        onFiltersChange({ ...filters, [field]: value });
+    const handleDraftChange = (field: keyof EventFiltersState, value: unknown) => {
+        setDraft((prev) => ({ ...prev, [field]: value }));
+    };
+
+    const handleSearch = () => {
+        onFiltersChange(draft);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
     };
 
     return (
@@ -104,13 +101,14 @@ export function EventFilters({
                 <Input
                     placeholder="Search by name..."
                     icon={<Search className="h-4 w-4" />}
-                    value={searchInput}
-                    onChange={(e) => setSearchInput(e.target.value)}
+                    value={draft.searchName}
+                    onChange={(e) => handleDraftChange('searchName', e.target.value)}
+                    onKeyDown={handleKeyDown}
                 />
 
                 <Select
-                    value={filters.filterStatus || '__all__'}
-                    onValueChange={(v) => handleChange('filterStatus', v === '__all__' ? undefined : v)}
+                    value={draft.filterStatus || '__all__'}
+                    onValueChange={(v) => handleDraftChange('filterStatus', v === '__all__' ? undefined : v)}
                 >
                     <SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger>
                     <SelectContent>
@@ -122,8 +120,8 @@ export function EventFilters({
                 </Select>
 
                 <Select
-                    value={filters.deleteFilter}
-                    onValueChange={(v) => handleChange('deleteFilter', v)}
+                    value={draft.deleteFilter}
+                    onValueChange={(v) => handleDraftChange('deleteFilter', v)}
                 >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -136,58 +134,58 @@ export function EventFilters({
 
             {/* Row 2: Advanced filters (collapsible) */}
             {showAdvanced && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mt-3 pt-3 border-t">
-                    <Input
-                        placeholder="Filter by location..."
-                        value={filters.filterLocation}
-                        onChange={(e) => handleChange('filterLocation', e.target.value)}
-                    />
-
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 pt-3 border-t">
+                    {/* Date range */}
                     <div className="flex items-center gap-2">
                         <Input
                             type="date"
                             placeholder="Start date"
-                            value={filters.startDate}
-                            onChange={(e) => handleChange('startDate', e.target.value)}
+                            value={draft.startDate}
+                            onChange={(e) => handleDraftChange('startDate', e.target.value)}
                             className="w-full"
                         />
                         <span className="text-muted-foreground text-xs shrink-0">to</span>
                         <Input
                             type="date"
                             placeholder="End date"
-                            value={filters.endDate}
-                            onChange={(e) => handleChange('endDate', e.target.value)}
+                            value={draft.endDate}
+                            onChange={(e) => handleDraftChange('endDate', e.target.value)}
                             className="w-full"
                         />
                     </div>
 
+                    {/* Price range */}
                     <div className="flex items-center gap-2">
                         <Input
                             type="number"
                             placeholder="Min price"
-                            value={filters.minPrice ?? ''}
-                            onChange={(e) => handleChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
+                            value={draft.minPrice ?? ''}
+                            onChange={(e) => handleDraftChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
                             min={0}
                             className="w-full"
                         />
-                        <span className="text-muted-foreground text-xs">-</span>
+                        <span className="text-muted-foreground text-xs shrink-0">-</span>
                         <Input
                             type="number"
                             placeholder="Max price"
-                            value={filters.maxPrice ?? ''}
-                            onChange={(e) => handleChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
+                            value={draft.maxPrice ?? ''}
+                            onChange={(e) => handleDraftChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
                             min={0}
                             className="w-full"
                         />
                     </div>
 
-                    {/* Tag combobox slot */}
-                    <div>{tagCombobox}</div>
+                    {/* Tag combobox */}
+                    <div className="min-h-[40px]">{tagCombobox}</div>
                 </div>
             )}
 
             {/* Action buttons */}
             <div className="flex gap-2 mt-4">
+                <Button size="sm" onClick={handleSearch} disabled={loading}>
+                    <Search className={`h-4 w-4 mr-1`} />
+                    Search
+                </Button>
                 <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
                     <RotateCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
                     Refresh

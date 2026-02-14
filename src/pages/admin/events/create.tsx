@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { EventForm } from './components/EventForm';
-import { useCreateEvent } from '@/hooks/useCreateEvent';
+import { useCreateEvent } from '@/hooks/event';
 import type { CreateEventRequest } from '@/types/event';
 
 export default function EventCreatePage() {

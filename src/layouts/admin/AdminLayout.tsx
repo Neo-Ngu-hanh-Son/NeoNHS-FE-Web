@@ -157,7 +157,7 @@ export function AdminLayout() {
                 </header>
 
                 {/* Content area with standardized padding */}
-                <div className="flex-1 overflow-y-auto p-8">
+                <div className="flex-1 overflow-y-auto p-8" style={{ scrollbarGutter: 'stable' }}>
                     <Outlet />
                 </div>
             </main>
