@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
     ArrowLeft, Pencil, Trash2, RotateCcw, MapPin, Calendar, Users,
-    DollarSign, Ticket,
+    DollarSign, Ticket, EyeOff,
 } from 'lucide-react';
-import { useEvent } from '@/hooks/useEvent';
+import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
 import { statusBadgeStyles, statusLabels } from './constants';
 import { formatEventDate, formatEventPrice } from './utils';
@@ -24,23 +24,39 @@ export default function EventDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { event, loading, fetchEvent } = useEvent(id!);
-    const [showDelete, setShowDelete] = useState(false);
+    const [showHide, setShowHide] = useState(false);
+    const [showPermanentDelete, setShowPermanentDelete] = useState(false);
 
     const isDeleted = !!event?.deletedAt;
 
-    const handleDelete = async () => {
+    const handleHide = async () => {
         try {
             const res = await eventService.deleteEvent(id!);
             if (res.success) {
-                message.success('Event deleted successfully');
+                message.success('Event hidden successfully');
                 await fetchEvent();
             } else {
-                message.error(res.message || 'Failed to delete event');
+                message.error(res.message || 'Failed to hide event');
             }
         } catch (err: unknown) {
-            message.error('Failed to delete event');
+            message.error('Failed to hide event');
         }
-        setShowDelete(false);
+        setShowHide(false);
+    };
+
+    const handlePermanentDelete = async () => {
+        try {
+            const res = await eventService.permanentDeleteEvent(id!);
+            if (res.success) {
+                message.success('Event permanently deleted');
+                navigate('/admin/events');
+            } else {
+                message.error(res.message || 'Failed to permanently delete event');
+            }
+        } catch (err: unknown) {
+            message.error('Failed to permanently delete event');
+        }
+        setShowPermanentDelete(false);
     };
 
     const handleRestore = async () => {
@@ -118,10 +134,13 @@ export default function EventDetailPage() {
                             <RotateCcw className="mr-2 h-4 w-4" />Restore
                         </Button>
                     ) : (
-                        <Button variant="destructive" onClick={() => setShowDelete(true)}>
-                            <Trash2 className="mr-2 h-4 w-4" />Delete
+                        <Button variant="outline" className="text-orange-600 border-orange-200 hover:bg-orange-50" onClick={() => setShowHide(true)}>
+                            <EyeOff className="mr-2 h-4 w-4" />Hide
                         </Button>
                     )}
+                    <Button variant="destructive" onClick={() => setShowPermanentDelete(true)}>
+                        <Trash2 className="mr-2 h-4 w-4" />Permanently Delete
+                    </Button>
                 </div>
             </div>
 
@@ -211,19 +230,44 @@ export default function EventDetailPage() {
                 </div>
             </div>
 
-            {/* Delete confirmation */}
-            <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
+            {/* Hide (soft-delete) confirmation */}
+            <AlertDialog open={showHide} onOpenChange={setShowHide}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                        <AlertDialogTitle>Hide Event</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to hide "{event.name}"? The event will be soft-deleted and can be restored later.
+                            Are you sure you want to hide "{event.name}"? The event will be hidden from public view but can be restored later.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Delete
+                        <AlertDialogAction onClick={handleHide} className="bg-orange-600 text-white hover:bg-orange-700">
+                            <EyeOff className="mr-2 h-4 w-4" />
+                            Hide Event
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Permanent delete confirmation */}
+            <AlertDialog open={showPermanentDelete} onOpenChange={setShowPermanentDelete}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Permanently Delete Event</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-2">
+                            <span className="block">
+                                Are you sure you want to <strong>permanently delete</strong> "{event.name}"?
+                            </span>
+                            <span className="block text-destructive font-medium">
+                                ⚠️ This action cannot be undone. The event and all associated data will be permanently removed.
+                            </span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handlePermanentDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Permanently Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

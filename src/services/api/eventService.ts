@@ -95,6 +95,13 @@ export const eventService = {
     restoreEvent: async (id: string): Promise<ApiResponse<EventResponse>> => {
         return apiClient.patch<ApiResponse<EventResponse>>(`/admin/events/${id}/restore`);
     },
+
+    /**
+     * Permanently delete an event (cannot be restored)
+     */
+    permanentDeleteEvent: async (id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/admin/events/${id}/permanent`);
+    },
 };
 
 export default eventService;

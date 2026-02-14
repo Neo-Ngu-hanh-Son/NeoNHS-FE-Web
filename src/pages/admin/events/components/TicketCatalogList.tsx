@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { message } from 'antd';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -6,10 +7,12 @@ import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Pencil, Trash2, RotateCcw, Ticket } from 'lucide-react';
-import { useTicketCatalogs } from '@/hooks/useTicketCatalogs';
-import { ticketStatusBadgeStyles } from '../constants';
-import { formatEventPrice, formatEventDate } from '../utils';
+import {
+    Plus, Pencil, RotateCcw, EyeOff, Trash2, DollarSign, Users, Calendar,
+    Ticket as TicketIcon,
+} from 'lucide-react';
+import { useTicketCatalogs } from '@/hooks/event';
+import { ticketCatalogService } from '@/services/api/ticketCatalogService';
 import { TicketCatalogFormDialog } from './TicketCatalogFormDialog';
 import type { TicketCatalogResponse, CreateTicketCatalogRequest, UpdateTicketCatalogRequest } from '@/types/ticketCatalog';
 
@@ -18,140 +21,162 @@ interface TicketCatalogListProps {
 }
 
 export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
-    const { catalogs, loading, createCatalog, updateCatalog, deleteCatalog, restoreCatalog } = useTicketCatalogs(eventId);
+    const { catalogs, loading, fetchCatalogs, createCatalog, updateCatalog, deleteCatalog, restoreCatalog } = useTicketCatalogs(eventId);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingCatalog, setEditingCatalog] = useState<TicketCatalogResponse | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<TicketCatalogResponse | null>(null);
+    const [hideTarget, setHideTarget] = useState<TicketCatalogResponse | null>(null);
+    const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<TicketCatalogResponse | null>(null);
 
-    const handleOpenCreate = () => {
+    const handleCreate = () => {
         setEditingCatalog(null);
         setFormOpen(true);
     };
 
-    const handleOpenEdit = (catalog: TicketCatalogResponse) => {
+    const handleEdit = (catalog: TicketCatalogResponse) => {
         setEditingCatalog(catalog);
         setFormOpen(true);
     };
 
-    const handleFormSubmit = async (data: CreateTicketCatalogRequest | UpdateTicketCatalogRequest): Promise<boolean> => {
+    const handleSubmit = async (data: CreateTicketCatalogRequest | UpdateTicketCatalogRequest) => {
         if (editingCatalog) {
-            return updateCatalog(editingCatalog.id, data);
+            return updateCatalog(editingCatalog.id, data as UpdateTicketCatalogRequest);
         }
         return createCatalog(data as CreateTicketCatalogRequest);
     };
 
-    const handleDeleteConfirm = async () => {
-        if (!deleteTarget) return;
-        await deleteCatalog(deleteTarget.id);
-        setDeleteTarget(null);
+    const handleHideConfirm = async () => {
+        if (!hideTarget) return;
+        await deleteCatalog(hideTarget.id);
+        setHideTarget(null);
+    };
+
+    const handlePermanentDeleteConfirm = async () => {
+        if (!permanentDeleteTarget) return;
+        try {
+            const res = await ticketCatalogService.permanentDelete(eventId, permanentDeleteTarget.id);
+            if (res.success) {
+                message.success('Ticket type permanently deleted');
+                await fetchCatalogs();
+            } else {
+                message.error(res.message || 'Failed to permanently delete');
+            }
+        } catch (err: unknown) {
+            message.error('Failed to permanently delete ticket type');
+        }
+        setPermanentDeleteTarget(null);
     };
 
     if (loading) {
         return (
             <div className="space-y-3">
-                {Array.from({ length: 2 }).map((_, i) => <Skeleton key={i} className="h-24" />)}
+                {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-24 w-full" />
+                ))}
             </div>
         );
     }
 
     return (
         <div>
-            {/* Header */}
             <div className="flex items-center justify-between mb-3">
-                <p className="text-sm text-muted-foreground">{catalogs.length} ticket type{catalogs.length !== 1 ? 's' : ''}</p>
-                <Button variant="outline" size="sm" onClick={handleOpenCreate}>
-                    <Plus className="mr-1 h-4 w-4" />Add
+                <span className="text-xs text-muted-foreground font-medium">
+                    {catalogs.length} ticket type{catalogs.length !== 1 ? 's' : ''}
+                </span>
+                <Button size="sm" variant="outline" onClick={handleCreate}>
+                    <Plus className="h-3 w-3 mr-1" />Add
                 </Button>
             </div>
 
-            {/* List */}
             {catalogs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
-                    <Ticket className="h-8 w-8 mb-2" />
+                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                    <TicketIcon className="h-8 w-8 mb-2 opacity-30" />
                     <p className="text-sm">No ticket types yet</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
                     {catalogs.map((catalog) => {
-                        const isDeleted = !!catalog.deletedAt;
-                        const quotaPercent = catalog.totalQuota > 0
-                            ? Math.round((catalog.soldQuantity / catalog.totalQuota) * 100)
-                            : 0;
-
+                        const isHidden = !!catalog.deletedAt;
                         return (
                             <div
                                 key={catalog.id}
-                                className={`rounded-lg border p-3 ${isDeleted ? 'opacity-50' : ''}`}
+                                className={`rounded-lg border p-3 transition-colors ${isHidden ? 'opacity-60 bg-muted/30' : 'hover:bg-muted/20'}`}
                             >
-                                <div className="flex items-start justify-between gap-2">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="font-medium text-sm">{catalog.name}</span>
-                                            <Badge variant="outline" className={ticketStatusBadgeStyles[catalog.status] + ' text-[10px]'}>
+                                <div className="flex items-start justify-between gap-2 mb-2">
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-1.5">
+                                            <p className="text-sm font-semibold truncate">{catalog.name}</p>
+                                            <Badge
+                                                variant="outline"
+                                                className={`text-[10px] px-1.5 py-0 ${
+                                                    catalog.status === 'ACTIVE' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                    catalog.status === 'INACTIVE' ? 'bg-gray-50 text-gray-600 border-gray-200' :
+                                                    'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                                }`}
+                                            >
                                                 {catalog.status}
                                             </Badge>
-                                            {isDeleted && (
-                                                <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200 text-[10px]">Hidden</Badge>
-                                            )}
-                                            {catalog.customerType && (
-                                                <Badge variant="secondary" className="text-[10px]">{catalog.customerType}</Badge>
+                                            {isHidden && (
+                                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-600 border-red-200">
+                                                    Hidden
+                                                </Badge>
                                             )}
                                         </div>
+                                        {catalog.customerType && (
+                                            <p className="text-[11px] text-muted-foreground mt-0.5">{catalog.customerType}</p>
+                                        )}
+                                    </div>
+                                </div>
 
-                                        {/* Price row */}
-                                        <div className="flex items-center gap-2 mt-1">
-                                            <span className="font-semibold text-sm text-emerald-600">
-                                                {formatEventPrice(catalog.price)}
+                                <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                                    <span className="flex items-center gap-1">
+                                        <DollarSign className="h-3 w-3" />
+                                        {catalog.price?.toLocaleString() ?? '—'}₫
+                                        {catalog.originalPrice && catalog.originalPrice > catalog.price && (
+                                            <span className="line-through text-[10px] ml-1">
+                                                {catalog.originalPrice.toLocaleString()}₫
                                             </span>
-                                            {catalog.originalPrice > 0 && catalog.originalPrice !== catalog.price && (
-                                                <span className="text-xs text-muted-foreground line-through">
-                                                    {formatEventPrice(catalog.originalPrice)}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Quota / Progress */}
-                                        {catalog.totalQuota > 0 && (
-                                            <div className="mt-2">
-                                                <div className="flex justify-between text-[11px] text-muted-foreground mb-0.5">
-                                                    <span>{catalog.soldQuantity} sold</span>
-                                                    <span>{catalog.remainingQuantity} remaining</span>
-                                                </div>
-                                                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                                                    <div
-                                                        className={`h-full rounded-full transition-all ${quotaPercent >= 90 ? 'bg-red-500' : quotaPercent >= 60 ? 'bg-amber-500' : 'bg-emerald-500'}`}
-                                                        style={{ width: `${Math.min(quotaPercent, 100)}%` }}
-                                                    />
-                                                </div>
-                                            </div>
                                         )}
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <Users className="h-3 w-3" />
+                                        {catalog.currentSold ?? 0}/{catalog.totalQuota ?? '∞'}
+                                    </span>
+                                    {catalog.validFromDate && (
+                                        <span className="flex items-center gap-1 col-span-2">
+                                            <Calendar className="h-3 w-3" />
+                                            {new Date(catalog.validFromDate).toLocaleDateString()} — {catalog.validToDate ? new Date(catalog.validToDate).toLocaleDateString() : 'Ongoing'}
+                                        </span>
+                                    )}
+                                </div>
 
-                                        {/* Validity */}
-                                        {(catalog.validFromDate || catalog.validToDate) && (
-                                            <p className="text-[11px] text-muted-foreground mt-1">
-                                                {catalog.validFromDate && formatEventDate(catalog.validFromDate)}
-                                                {catalog.validFromDate && catalog.validToDate && ' — '}
-                                                {catalog.validToDate && formatEventDate(catalog.validToDate)}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-1 shrink-0">
-                                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleOpenEdit(catalog)}>
-                                            <Pencil className="h-3.5 w-3.5" />
+                                {/* Actions */}
+                                <div className="flex items-center gap-1 mt-2 pt-2 border-t">
+                                    <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => handleEdit(catalog)}>
+                                        <Pencil className="h-3 w-3 mr-1" />Edit
+                                    </Button>
+                                    {isHidden ? (
+                                        <>
+                                            <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => restoreCatalog(catalog.id)}>
+                                                <RotateCcw className="h-3 w-3 mr-1" />Restore
+                                            </Button>
+                                            <Button
+                                                variant="ghost" size="sm"
+                                                className="h-7 text-xs px-2 text-destructive hover:text-destructive"
+                                                onClick={() => setPermanentDeleteTarget(catalog)}
+                                            >
+                                                <Trash2 className="h-3 w-3 mr-1" />Delete Forever
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <Button
+                                            variant="ghost" size="sm"
+                                            className="h-7 text-xs px-2 text-orange-600 hover:text-orange-700"
+                                            onClick={() => setHideTarget(catalog)}
+                                        >
+                                            <EyeOff className="h-3 w-3 mr-1" />Hide
                                         </Button>
-                                        {isDeleted ? (
-                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => restoreCatalog(catalog.id)}>
-                                                <RotateCcw className="h-3.5 w-3.5" />
-                                            </Button>
-                                        ) : (
-                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteTarget(catalog)}>
-                                                <Trash2 className="h-3.5 w-3.5" />
-                                            </Button>
-                                        )}
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         );
@@ -159,27 +184,50 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                 </div>
             )}
 
-            {/* Create / Edit Dialog */}
+            {/* Form Dialog */}
             <TicketCatalogFormDialog
                 open={formOpen}
                 onOpenChange={setFormOpen}
                 catalog={editingCatalog}
-                onSubmit={handleFormSubmit}
+                onSubmit={handleSubmit}
             />
 
-            {/* Delete confirmation */}
-            <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+            {/* Hide confirmation */}
+            <AlertDialog open={!!hideTarget} onOpenChange={(open) => !open && setHideTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Ticket Type</AlertDialogTitle>
+                        <AlertDialogTitle>Hide Ticket Type</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete "{deleteTarget?.name}"? It can be restored later.
+                            Are you sure you want to hide "{hideTarget?.name}"? It can be restored later.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Delete
+                        <AlertDialogAction onClick={handleHideConfirm} className="bg-orange-600 text-white hover:bg-orange-700">
+                            <EyeOff className="mr-2 h-4 w-4" />Hide
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Permanent delete confirmation */}
+            <AlertDialog open={!!permanentDeleteTarget} onOpenChange={(open) => !open && setPermanentDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Permanently Delete Ticket Type</AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-2">
+                            <span className="block">
+                                Are you sure you want to <strong>permanently delete</strong> "{permanentDeleteTarget?.name}"?
+                            </span>
+                            <span className="block text-destructive font-medium">
+                                ⚠️ This action cannot be undone.
+                            </span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handlePermanentDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            <Trash2 className="mr-2 h-4 w-4" />Delete Forever
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

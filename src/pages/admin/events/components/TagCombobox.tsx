@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Check, ChevronsUpDown, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTags } from '@/hooks/useTags';
+import { useTags } from '@/hooks/event';
 
 interface TagComboboxProps {
     selectedTagIds: string[];

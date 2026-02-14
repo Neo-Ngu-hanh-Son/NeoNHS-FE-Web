@@ -74,6 +74,15 @@ export const ticketCatalogService = {
             `/admin/events/${eventId}/ticket-catalogs/${id}/restore`
         );
     },
+
+    /**
+     * Permanently delete a ticket catalog (cannot be restored)
+     */
+    permanentDelete: async (eventId: string, id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(
+            `/admin/events/${eventId}/ticket-catalogs/${id}/permanent`
+        );
+    },
 };
 
 export default ticketCatalogService;

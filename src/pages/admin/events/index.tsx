@@ -8,9 +8,9 @@ import {
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { EventFilters, type EventFiltersState } from './components/EventFilters';
-import { EventsTable } from './components/EventsTable';
+import { EventCardGrid } from './components/EventCardGrid';
 import { TagCombobox } from './components/TagCombobox';
-import { useEvents } from '@/hooks/useEvents';
+import { useEvents } from '@/hooks/event';
 import type { EventQueryParams } from '@/services/api/eventService';
 import type { EventResponse } from '@/types/event';
 
@@ -18,7 +18,6 @@ const initialFilters: EventFiltersState = {
     searchName: '',
     filterStatus: undefined,
     deleteFilter: 'active',
-    filterLocation: '',
     startDate: '',
     endDate: '',
     minPrice: undefined,
@@ -30,7 +29,7 @@ export default function AdminEventsPage() {
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [pageSize, setPageSize] = useState(9);
     const [sortBy, setSortBy] = useState<string | undefined>(undefined);
     const [sortDir, setSortDir] = useState<'asc' | 'desc' | undefined>(undefined);
     const [filters, setFilters] = useState<EventFiltersState>(initialFilters);
@@ -44,7 +43,6 @@ export default function AdminEventsPage() {
         if (sortDir) params.sortDir = sortDir;
         if (filters.searchName.trim()) params.name = filters.searchName.trim();
         if (filters.filterStatus) params.status = filters.filterStatus;
-        if (filters.filterLocation.trim()) params.location = filters.filterLocation.trim();
         if (filters.startDate) params.startDate = filters.startDate;
         if (filters.endDate) params.endDate = filters.endDate;
         if (filters.minPrice !== undefined) params.minPrice = filters.minPrice;
@@ -94,7 +92,7 @@ export default function AdminEventsPage() {
 
     const hasActiveFilters =
         filters.searchName || filters.filterStatus || filters.deleteFilter !== 'active' ||
-        filters.filterLocation || filters.startDate || filters.endDate ||
+        filters.startDate || filters.endDate ||
         filters.minPrice !== undefined || filters.maxPrice !== undefined || filters.tagIds.length > 0;
 
     return (
@@ -125,12 +123,13 @@ export default function AdminEventsPage() {
                         }
                     />
 
-                    <EventsTable
+                    <EventCardGrid
                         events={events}
                         loading={loading}
                         pagination={{ current: currentPage, pageSize, total: totalElements }}
                         sortBy={sortBy}
                         sortDir={sortDir}
+                        deleteFilter={filters.deleteFilter}
                         onSort={handleSort}
                         onPageChange={setCurrentPage}
                         onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
@@ -142,19 +141,19 @@ export default function AdminEventsPage() {
                 </CardContent>
             </Card>
 
-            {/* Delete confirmation */}
+            {/* Hide (soft-delete) confirmation */}
             <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                        <AlertDialogTitle>Hide Event</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to hide "{deleteTarget?.name}"? The event will be soft-deleted and can be restored later.
+                            Are you sure you want to hide "{deleteTarget?.name}"? The event will be hidden and can be restored later.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Delete
+                            Hide Event
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
