@@ -4,17 +4,69 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-    Plus, Pencil, RotateCcw, EyeOff, Trash2, DollarSign, Users, Calendar,
-    Ticket as TicketIcon,
+    Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
+    DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+    DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+    Plus, Pencil, RotateCcw, EyeOff, Trash2, MoreHorizontal,
+    Ticket as TicketIcon, CalendarDays,
 } from 'lucide-react';
 import { useTicketCatalogs } from '@/hooks/event';
 import { ticketCatalogService } from '@/services/api/ticketCatalogService';
 import { TicketCatalogFormDialog } from './TicketCatalogFormDialog';
 import type { TicketCatalogResponse, CreateTicketCatalogRequest, UpdateTicketCatalogRequest } from '@/types/ticketCatalog';
+import dayjs from 'dayjs';
+
+// ── Helpers ──────────────────────────────────────────
+
+const DAY_LABELS: Record<string, string> = {
+    MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu',
+    FRI: 'Fri', SAT: 'Sat', SUN: 'Sun',
+};
+
+function formatDays(applyOnDays: string | null | undefined): string {
+    if (!applyOnDays) return 'Every day';
+    const days = applyOnDays.split(',').map((d) => d.trim());
+    if (days.length === 7) return 'Every day';
+    return days.map((d) => DAY_LABELS[d] || d).join(', ');
+}
+
+function formatPrice(price: number | null | undefined): string {
+    if (!price || price === 0) return 'Free';
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+}
+
+function formatDate(date: string | null | undefined): string {
+    if (!date) return '—';
+    return dayjs(date).format('DD/MM/YYYY');
+}
+
+function statusStyle(status: string) {
+    switch (status) {
+        case 'ACTIVE': return 'bg-green-50 text-green-700 border-green-200';
+        case 'INACTIVE': return 'bg-gray-50 text-gray-600 border-gray-200';
+        case 'SOLD_OUT': return 'bg-yellow-50 text-yellow-700 border-yellow-200';
+        default: return '';
+    }
+}
+
+function quotaBar(sold: number, total: number) {
+    const pct = total > 0 ? Math.min((sold / total) * 100, 100) : 0;
+    const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-green-500';
+    return { pct, color };
+}
+
+// ── Component ────────────────────────────────────────
 
 interface TicketCatalogListProps {
     eventId: string;
@@ -71,7 +123,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
         return (
             <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
-                    <Skeleton key={i} className="h-24 w-full" />
+                    <Skeleton key={i} className="h-12 w-full" />
                 ))}
             </div>
         );
@@ -79,108 +131,185 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-muted-foreground font-medium">
+            <div className="flex items-center justify-between mb-4">
+                <span className="text-sm text-muted-foreground">
                     {catalogs.length} ticket type{catalogs.length !== 1 ? 's' : ''}
                 </span>
-                <Button size="sm" variant="outline" onClick={handleCreate}>
-                    <Plus className="h-3 w-3 mr-1" />Add
+                <Button size="sm" onClick={handleCreate}>
+                    <Plus className="h-4 w-4 mr-1" />Add Ticket Type
                 </Button>
             </div>
 
             {catalogs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                    <TicketIcon className="h-8 w-8 mb-2 opacity-30" />
-                    <p className="text-sm">No ticket types yet</p>
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                    <TicketIcon className="h-10 w-10 mb-3 opacity-30" />
+                    <p className="text-sm font-medium">No ticket types yet</p>
+                    <p className="text-xs mt-1">Create one to get started</p>
                 </div>
             ) : (
-                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                    {catalogs.map((catalog) => {
-                        const isHidden = !!catalog.deletedAt;
-                        return (
-                            <div
-                                key={catalog.id}
-                                className={`rounded-lg border p-3 transition-colors ${isHidden ? 'opacity-60 bg-muted/30' : 'hover:bg-muted/20'}`}
-                            >
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                    <div className="min-w-0">
-                                        <div className="flex items-center gap-1.5">
-                                            <p className="text-sm font-semibold truncate">{catalog.name}</p>
-                                            <Badge
-                                                variant="outline"
-                                                className={`text-[10px] px-1.5 py-0 ${
-                                                    catalog.status === 'ACTIVE' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                    catalog.status === 'INACTIVE' ? 'bg-gray-50 text-gray-600 border-gray-200' :
-                                                    'bg-yellow-50 text-yellow-700 border-yellow-200'
-                                                }`}
-                                            >
+                <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="min-w-[160px]">Name</TableHead>
+                                <TableHead className="min-w-[90px]">Status</TableHead>
+                                <TableHead className="min-w-[100px]">Customer</TableHead>
+                                <TableHead className="min-w-[120px] text-right">Price</TableHead>
+                                <TableHead className="min-w-[100px]">Apply On</TableHead>
+                                <TableHead className="min-w-[170px]">Valid Period</TableHead>
+                                <TableHead className="min-w-[150px]">Quota</TableHead>
+                                <TableHead className="min-w-[100px]">Updated</TableHead>
+                                <TableHead className="w-[50px]"></TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {catalogs.map((catalog) => {
+                                const isHidden = !!catalog.deletedAt;
+                                const { pct, color } = quotaBar(catalog.soldQuantity ?? 0, catalog.totalQuota ?? 0);
+                                const remaining = catalog.remainingQuantity ?? (catalog.totalQuota ? catalog.totalQuota - (catalog.soldQuantity ?? 0) : null);
+
+                                return (
+                                    <TableRow
+                                        key={catalog.id}
+                                        className={isHidden ? 'opacity-50 bg-muted/30' : ''}
+                                    >
+                                        {/* Name + Description */}
+                                        <TableCell>
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-medium text-sm">{catalog.name}</span>
+                                                {isHidden && (
+                                                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-600 border-red-200">
+                                                        Hidden
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                            {catalog.description && (
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-[200px] cursor-help">
+                                                                {catalog.description}
+                                                            </p>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent side="bottom" className="max-w-xs">
+                                                            <p className="text-xs">{catalog.description}</p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            )}
+                                        </TableCell>
+
+                                        {/* Status */}
+                                        <TableCell>
+                                            <Badge variant="outline" className={`text-[11px] ${statusStyle(catalog.status)}`}>
                                                 {catalog.status}
                                             </Badge>
-                                            {isHidden && (
-                                                <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-600 border-red-200">
-                                                    Hidden
-                                                </Badge>
+                                        </TableCell>
+
+                                        {/* Customer Type */}
+                                        <TableCell>
+                                            <span className="text-sm">{catalog.customerType || '—'}</span>
+                                        </TableCell>
+
+                                        {/* Price */}
+                                        <TableCell className="text-right">
+                                            <div>
+                                                <span className="text-sm font-medium">{formatPrice(catalog.price)}</span>
+                                                {catalog.originalPrice != null && catalog.originalPrice > catalog.price && (
+                                                    <span className="block text-xs text-muted-foreground line-through">
+                                                        {formatPrice(catalog.originalPrice)}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </TableCell>
+
+                                        {/* Apply On Days */}
+                                        <TableCell>
+                                            <span className="text-xs text-muted-foreground">{formatDays(catalog.applyOnDays)}</span>
+                                        </TableCell>
+
+                                        {/* Valid Period */}
+                                        <TableCell>
+                                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                <CalendarDays className="h-3 w-3 shrink-0" />
+                                                <span>
+                                                    {formatDate(catalog.validFromDate)} — {formatDate(catalog.validToDate)}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+
+                                        {/* Quota (progress bar) */}
+                                        <TableCell>
+                                            {catalog.totalQuota ? (
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <span className="text-muted-foreground">
+                                                            {catalog.soldQuantity ?? 0} / {catalog.totalQuota}
+                                                        </span>
+                                                        {remaining !== null && (
+                                                            <span className="text-muted-foreground font-medium">
+                                                                {remaining} left
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                                                        <div
+                                                            className={`h-full rounded-full transition-all ${color}`}
+                                                            style={{ width: `${pct}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">Unlimited</span>
                                             )}
-                                        </div>
-                                        {catalog.customerType && (
-                                            <p className="text-[11px] text-muted-foreground mt-0.5">{catalog.customerType}</p>
-                                        )}
-                                    </div>
-                                </div>
+                                        </TableCell>
 
-                                <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                                    <span className="flex items-center gap-1">
-                                        <DollarSign className="h-3 w-3" />
-                                        {catalog.price?.toLocaleString() ?? '—'}₫
-                                        {catalog.originalPrice && catalog.originalPrice > catalog.price && (
-                                            <span className="line-through text-[10px] ml-1">
-                                                {catalog.originalPrice.toLocaleString()}₫
-                                            </span>
-                                        )}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <Users className="h-3 w-3" />
-                                        {catalog.currentSold ?? 0}/{catalog.totalQuota ?? '∞'}
-                                    </span>
-                                    {catalog.validFromDate && (
-                                        <span className="flex items-center gap-1 col-span-2">
-                                            <Calendar className="h-3 w-3" />
-                                            {new Date(catalog.validFromDate).toLocaleDateString()} — {catalog.validToDate ? new Date(catalog.validToDate).toLocaleDateString() : 'Ongoing'}
-                                        </span>
-                                    )}
-                                </div>
+                                        {/* Updated */}
+                                        <TableCell>
+                                            <span className="text-xs text-muted-foreground">{formatDate(catalog.updatedAt)}</span>
+                                        </TableCell>
 
-                                {/* Actions */}
-                                <div className="flex items-center gap-1 mt-2 pt-2 border-t">
-                                    <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => handleEdit(catalog)}>
-                                        <Pencil className="h-3 w-3 mr-1" />Edit
-                                    </Button>
-                                    {isHidden ? (
-                                        <>
-                                            <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => restoreCatalog(catalog.id)}>
-                                                <RotateCcw className="h-3 w-3 mr-1" />Restore
-                                            </Button>
-                                            <Button
-                                                variant="ghost" size="sm"
-                                                className="h-7 text-xs px-2 text-destructive hover:text-destructive"
-                                                onClick={() => setPermanentDeleteTarget(catalog)}
-                                            >
-                                                <Trash2 className="h-3 w-3 mr-1" />Delete Forever
-                                            </Button>
-                                        </>
-                                    ) : (
-                                        <Button
-                                            variant="ghost" size="sm"
-                                            className="h-7 text-xs px-2 text-orange-600 hover:text-orange-700"
-                                            onClick={() => setHideTarget(catalog)}
-                                        >
-                                            <EyeOff className="h-3 w-3 mr-1" />Hide
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
+                                        {/* Actions */}
+                                        <TableCell>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                        <MoreHorizontal className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem onClick={() => handleEdit(catalog)}>
+                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {isHidden ? (
+                                                        <>
+                                                            <DropdownMenuItem onClick={() => restoreCatalog(catalog.id)}>
+                                                                <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                className="text-destructive focus:text-destructive"
+                                                                onClick={() => setPermanentDeleteTarget(catalog)}
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete Forever
+                                                            </DropdownMenuItem>
+                                                        </>
+                                                    ) : (
+                                                        <DropdownMenuItem
+                                                            className="text-orange-600 focus:text-orange-700"
+                                                            onClick={() => setHideTarget(catalog)}
+                                                        >
+                                                            <EyeOff className="mr-2 h-4 w-4" /> Hide
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
                 </div>
             )}
 

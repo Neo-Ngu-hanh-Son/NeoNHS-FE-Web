@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
     ArrowLeft, Pencil, Trash2, RotateCcw, MapPin, Calendar, Users,
-    DollarSign, Ticket, EyeOff,
+    DollarSign, Ticket, EyeOff, Image as ImageIcon, Info,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
@@ -77,11 +78,11 @@ export default function EventDetailPage() {
         return (
             <div className="max-w-7xl mx-auto space-y-6">
                 <Skeleton className="h-8 w-96" />
+                <Skeleton className="h-10 w-80" />
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="lg:col-span-2 space-y-6">
                         <Skeleton className="h-64" />
                         <Skeleton className="h-40" />
-                        <Skeleton className="h-60" />
                     </div>
                     <div><Skeleton className="h-96" /></div>
                 </div>
@@ -144,81 +145,110 @@ export default function EventDetailPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left column */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Event Info Card */}
-                    <Card>
-                        <CardHeader><CardTitle>Event Information</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <InfoItem icon={<Calendar className="h-4 w-4" />} label="Start Time" value={formatEventDate(event.startTime)} />
-                                <InfoItem icon={<Calendar className="h-4 w-4" />} label="End Time" value={formatEventDate(event.endTime)} />
-                                <InfoItem icon={<MapPin className="h-4 w-4" />} label="Location" value={event.locationName || '—'} />
-                                <InfoItem icon={<DollarSign className="h-4 w-4" />} label="Price" value={formatEventPrice(event.price)} />
-                                <InfoItem icon={<Users className="h-4 w-4" />} label="Enrolled" value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants}` : ''}`} />
-                                <InfoItem icon={<Ticket className="h-4 w-4" />} label="Ticket Required" value={event.isTicketRequired ? 'Yes' : 'No'} />
-                            </div>
+            {/* Tabs */}
+            <Tabs defaultValue="overview" className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="overview" className="gap-1.5">
+                        <Info className="h-4 w-4" />
+                        Overview
+                    </TabsTrigger>
+                    <TabsTrigger value="gallery" className="gap-1.5">
+                        <ImageIcon className="h-4 w-4" />
+                        Gallery
+                        {event.images && event.images.length > 0 && (
+                            <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
+                                {event.images.length}
+                            </Badge>
+                        )}
+                    </TabsTrigger>
+                    <TabsTrigger value="tickets" className="gap-1.5">
+                        <Ticket className="h-4 w-4" />
+                        Tickets
+                    </TabsTrigger>
+                </TabsList>
 
-                            {/* Tags */}
-                            {event.tags && event.tags.length > 0 && (
-                                <div className="mt-4 pt-4 border-t">
-                                    <p className="text-sm font-medium mb-2">Tags</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {event.tags.map((tag) => (
-                                            <Badge
-                                                key={tag.id}
-                                                variant="secondary"
-                                                style={tag.tagColor ? { backgroundColor: tag.tagColor + '20', color: tag.tagColor } : undefined}
-                                            >
-                                                {tag.name}
-                                            </Badge>
-                                        ))}
+                {/* Overview Tab */}
+                <TabsContent value="overview">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left column */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Event Info Card */}
+                            <Card>
+                                <CardHeader><CardTitle>Event Information</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="Start Time" value={formatEventDate(event.startTime)} />
+                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="End Time" value={formatEventDate(event.endTime)} />
+                                        <InfoItem icon={<MapPin className="h-4 w-4" />} label="Location" value={event.locationName || '—'} />
+                                        <InfoItem icon={<DollarSign className="h-4 w-4" />} label="Price" value={formatEventPrice(event.price)} />
+                                        <InfoItem icon={<Users className="h-4 w-4" />} label="Enrolled" value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants}` : ''}`} />
+                                        <InfoItem icon={<Ticket className="h-4 w-4" />} label="Ticket Required" value={event.isTicketRequired ? 'Yes' : 'No'} />
                                     </div>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
 
-                    {/* Description Card */}
-                    <Card>
-                        <CardHeader><CardTitle>Description</CardTitle></CardHeader>
-                        <CardContent>
-                            {event.shortDescription && (
-                                <p className="text-muted-foreground text-sm mb-4">{event.shortDescription}</p>
-                            )}
-                            {event.fullDescription ? (
-                                <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: event.fullDescription }} />
-                            ) : (
-                                <p className="text-muted-foreground text-sm italic">No description provided</p>
-                            )}
-                        </CardContent>
-                    </Card>
+                                    {/* Tags */}
+                                    {event.tags && event.tags.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t">
+                                            <p className="text-sm font-medium mb-2">Tags</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {event.tags.map((tag) => (
+                                                    <Badge
+                                                        key={tag.id}
+                                                        variant="secondary"
+                                                        style={tag.tagColor ? { backgroundColor: tag.tagColor + '20', color: tag.tagColor } : undefined}
+                                                    >
+                                                        {tag.name}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
 
-                    {/* Image Gallery Card */}
+                            {/* Description Card */}
+                            <Card>
+                                <CardHeader><CardTitle>Description</CardTitle></CardHeader>
+                                <CardContent>
+                                    {event.shortDescription && (
+                                        <p className="text-muted-foreground text-sm mb-4">{event.shortDescription}</p>
+                                    )}
+                                    {event.fullDescription ? (
+                                        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: event.fullDescription }} />
+                                    ) : (
+                                        <p className="text-muted-foreground text-sm italic">No description provided</p>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Right column — Thumbnail */}
+                        <div className="space-y-6">
+                            {event.thumbnailUrl && (
+                                <Card>
+                                    <CardHeader><CardTitle>Thumbnail</CardTitle></CardHeader>
+                                    <CardContent>
+                                        <div className="aspect-video rounded-lg overflow-hidden">
+                                            <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover" />
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                        </div>
+                    </div>
+                </TabsContent>
+
+                {/* Gallery Tab */}
+                <TabsContent value="gallery">
                     <Card>
                         <CardHeader><CardTitle>Image Gallery</CardTitle></CardHeader>
                         <CardContent>
                             <ImageGallery images={event.images || []} />
                         </CardContent>
                     </Card>
-                </div>
+                </TabsContent>
 
-                {/* Right column */}
-                <div className="space-y-6">
-                    {/* Thumbnail */}
-                    {event.thumbnailUrl && (
-                        <Card>
-                            <CardHeader><CardTitle>Thumbnail</CardTitle></CardHeader>
-                            <CardContent>
-                                <div className="aspect-video rounded-lg overflow-hidden">
-                                    <img src={event.thumbnailUrl} alt={event.name} className="w-full h-full object-cover" />
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Ticket Catalogs */}
+                {/* Tickets Tab */}
+                <TabsContent value="tickets">
                     <Card>
                         <CardHeader>
                             <CardTitle>Ticket Types</CardTitle>
@@ -227,8 +257,8 @@ export default function EventDetailPage() {
                             <TicketCatalogList eventId={id!} />
                         </CardContent>
                     </Card>
-                </div>
-            </div>
+                </TabsContent>
+            </Tabs>
 
             {/* Hide (soft-delete) confirmation */}
             <AlertDialog open={showHide} onOpenChange={setShowHide}>
