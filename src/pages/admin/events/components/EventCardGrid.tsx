@@ -283,7 +283,7 @@ export function EventCardGrid({
             </div>
 
             {/* Pagination */}
-            {totalPages > 1 && (
+            {pagination.total > 0 && (
                 <div className="flex items-center justify-between mt-6 pt-4 border-t">
                     <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">Rows per page:</span>
@@ -300,10 +300,13 @@ export function EventCardGrid({
                                 ))}
                             </SelectContent>
                         </Select>
+                        <span className="text-xs text-muted-foreground ml-2">
+                            {pagination.total} total
+                        </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <span className="text-xs text-muted-foreground mr-2">
-                            Page {pagination.current} of {totalPages}
+                            Page {pagination.current} of {totalPages || 1}
                         </span>
                         <Button
                             variant="outline" size="icon" className="h-7 w-7"
