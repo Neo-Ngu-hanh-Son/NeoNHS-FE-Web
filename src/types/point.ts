@@ -1,3 +1,21 @@
+export const PointType = {
+    PAGODA: 'PAGODA',
+    CAVE: 'CAVE',
+    VIEWPOINT: 'VIEWPOINT',
+    GENERAL: 'GENERAL',
+    CHECKIN: 'CHECKIN',
+    STATUE: 'STATUE',
+    GATE: 'GATE',
+    SHOP: 'SHOP',
+    ELEVATOR: 'ELEVATOR',
+    EVENT: 'EVENT',
+    WORKSHOP: 'WORKSHOP',
+    ATTRACTION: 'ATTRACTION',
+    DEFAULT: 'DEFAULT'
+} as const;
+
+export type PointType = typeof PointType[keyof typeof PointType];
+
 export interface PointRequest {
     name: string;
     description?: string;
@@ -9,6 +27,7 @@ export interface PointRequest {
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
+    type: PointType;
 }
 
 export interface PointResponse {
@@ -23,4 +42,5 @@ export interface PointResponse {
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
+    type: PointType;
 }

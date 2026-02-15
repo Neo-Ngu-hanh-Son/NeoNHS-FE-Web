@@ -66,6 +66,7 @@ export const apiClient = {
   get: <T = any>(endpoint: string) => axiosInstance.get<T, T>(endpoint),
   post: <T = any>(endpoint: string, data: any) => axiosInstance.post<T, T>(endpoint, data),
   put: <T = any>(endpoint: string, data: any) => axiosInstance.put<T, T>(endpoint, data),
+  patch: <T = any>(endpoint: string, data?: any) => axiosInstance.patch<T, T>(endpoint, data ?? {}),
   delete: <T = any>(endpoint: string) => axiosInstance.delete<T, T>(endpoint),
 };
 

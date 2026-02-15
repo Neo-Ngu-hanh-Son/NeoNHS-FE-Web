@@ -24,7 +24,10 @@ import AdminVendorsPage from '@/pages/admin/vendors/AdminVendorsPage'
 import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage'
 import AdminVouchersPage from '@/pages/admin/vouchers/AdminVouchersPage'
 import AdminReportsPage from '@/pages/admin/reports/AdminReportsPage'
-import AdminEventsPage from '@/pages/admin/events/AdminEventsPage'
+import AdminEventsPage from '@/pages/admin/events'
+import EventCreatePage from '@/pages/admin/events/create'
+import EventDetailPage from '@/pages/admin/events/detail'
+import EventEditPage from '@/pages/admin/events/edit'
 
 // Vendor specific pages
 import WorkshopTemplatesPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage'
@@ -98,6 +101,9 @@ export const router = createBrowserRouter([
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "events", element: <AdminEventsPage /> },
+          { path: "events/create", element: <EventCreatePage /> },
+          { path: "events/:id", element: <EventDetailPage /> },
+          { path: "events/:id/edit", element: <EventEditPage /> },
           { path: 'blog-categories', element: <BlogCategoryPage /> },
           { path: 'blog/create', element: <BlogCreationPage /> },
           { path: 'blog', element: <BlogPage /> },
