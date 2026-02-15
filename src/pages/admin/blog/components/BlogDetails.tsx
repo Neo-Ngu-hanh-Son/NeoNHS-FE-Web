@@ -36,6 +36,7 @@ export default function BlogDetails({ form }: { form: UseFormReturn<z.infer<type
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter blog title"
                     autoComplete="off"
+                    className={`${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -43,52 +44,29 @@ export default function BlogDetails({ form }: { form: UseFormReturn<z.infer<type
             }}
           />
         </FieldGroup>
-        {/* <div className="space-y-2">
-          <Label htmlFor="title" className={errors.title ? "text-destructive" : ""}>
-            Title
-          </Label>
-          <Input
-            id="title"
-            placeholder="Enter blog title"
-            value={formData.title}
-            onChange={(e) => handleInputChange("title", e.target.value)}
-            className={errors.title ? "border-destructive focus-visible:ring-destructive" : ""}
-          />
-          {errors.title && <p className="text-xs text-destructive">{errors.title}</p>}
-        </div> */}
-
-        {/* Slug */}
-        {/* <div className="space-y-2">
-          <Label htmlFor="slug" className={errors.slug ? "text-destructive" : ""}>
-            Slug
-          </Label>
-          <Input
-            id="slug"
-            placeholder="blog-slug-url"
-            value={formData.slug}
-            onChange={(e) => handleInputChange("slug", e.target.value)}
-            className={errors.slug ? "border-destructive focus-visible:ring-destructive" : ""}
-          />
-          {errors.slug && <p className="text-xs text-destructive">{errors.slug}</p>}
-          <p className="text-xs text-muted-foreground">
-            The "slug" is the URL-friendly version of the name. It is usually all lowercase and contains only letters, numbers, and hyphens.
-          </p>
-        </div> */}
 
         {/* Summary */}
-        <div className="space-y-2">
-          <Label htmlFor="summary" className={errors.summary ? "text-destructive" : ""}>
-            Summary
-          </Label>
-          <Textarea
-            id="summary"
-            placeholder="Enter a brief summary..."
-            className={`min-h-[100px] ${errors.summary ? "border-destructive focus-visible:ring-destructive" : ""}`}
-            value={formData.summary}
-            onChange={(e) => handleInputChange("summary", e.target.value)}
+        <FieldGroup>
+          <Controller
+            name={"summary"}
+            control={form.control}
+            render={({ field, fieldState, formState }) => {
+              return (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="summary">Summary</FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="summary"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Enter a brief summary..."
+                    className={`min-h-[100px] ${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                  />
+                  {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                </Field>
+              );
+            }}
           />
-          {errors.summary && <p className="text-xs text-destructive">{errors.summary}</p>}
-        </div>
+        </FieldGroup>
       </CardContent>
     </Card>
   );

@@ -1,29 +1,39 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBlogForm } from "@/contexts/Blog/BlogFormContext";
+import { Controller, UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "@/components/blog/type";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogTags() {
-  const { formData, handleInputChange } = useBlogForm();
-
+export default function BlogTags({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Tags</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="tags">Tags</Label>
-          <Input
-            id="tags"
-            placeholder="Travel, Guides, Tips"
-            value={formData.tags}
-            onChange={(e) => handleInputChange("tags", e.target.value)}
+        <FieldGroup>
+          <Controller
+            name="tags"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="tags">Tags</FieldLabel>
+                <Input
+                  {...field}
+                  id="tags"
+                  placeholder="Travel, Guides, Tips"
+                  aria-invalid={fieldState.invalid}
+                  className={
+                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-2">Comma separated tags.</p>
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
           />
-          <p className="text-xs text-muted-foreground">
-            Comma separated tags.
-          </p>
-        </div>
+        </FieldGroup>
       </CardContent>
     </Card>
   );

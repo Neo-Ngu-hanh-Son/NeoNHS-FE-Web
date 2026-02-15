@@ -28,7 +28,7 @@ import ToolbarModal from "./editor/ToolbarElements/ToolbarModal";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import ClickableLinkPlugin from "./editor/ClickableLinkPlugin";
 import { BlogEditorRef, EditorSaveResult } from "./type";
-import { LexicalEditor } from "lexical";
+import { $getRoot, LexicalEditor } from "lexical";
 import EditorRefPlugin from "./editor/EditorRefPlugin";
 import { $generateHtmlFromNodes } from "@lexical/html";
 
@@ -74,8 +74,10 @@ function onError(error: Error) {
 function EditorPlaceholder() {
   return <div className="blog-editor-placeholder">Start writing your blog post…</div>;
 }
+import CharacterCountPlugin from "./editor/CharacterCountPlugin";
+
 const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
-  ({ onSave, onImageUpload, initialEditorState }, ref) => {
+  ({ onSave, onImageUpload, initialEditorState, onChange }, ref) => {
     const editorRef = useRef<LexicalEditor | null>(null);
     const [open, setOpen] = useState(false);
     const initialConfig = {
@@ -88,14 +90,16 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
 
     useImperativeHandle(ref, () => ({
       save() {
+        if (!editorRef.current) return;
         const editor = editorRef.current;
         if (!editor) return;
 
         editor.read(() => {
           const lexicalJSON = JSON.stringify(editor.getEditorState().toJSON());
           const html = $generateHtmlFromNodes(editor);
-
-          onSave({ lexicalJSON, html });
+          const textContent = $getRoot().getTextContent();
+          const charCount = textContent.trim().length;
+          onSave({ lexicalJSON, html, charCount });
         });
       },
 
@@ -131,10 +135,8 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
           <ListPlugin />
           <LinkPlugin validateUrl={validateUrl} />
           <ClickableLinkPlugin />
-          {/* <ImagePlugin onUpload={onImageUpload} /> */}
           <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
-
-          {/* Modal for toolbar (for now it is table row only)*/}
+          <CharacterCountPlugin />
           <ToolbarModal open={open} onOpenChange={setOpen} />
         </LexicalComposer>
       </div>

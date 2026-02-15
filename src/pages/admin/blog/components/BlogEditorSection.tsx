@@ -4,19 +4,24 @@ import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
 import { Ref } from "react";
 import { message, notification } from "antd";
+import { Controller, UseFormReturn } from "react-hook-form";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { z } from "zod";
+import { formSchema } from "@/components/blog/type";
 
 interface BlogEditorSectionProps {
   editorRef: Ref<BlogEditorRef>;
   handleSave: (content: EditorSaveResult) => Promise<void>;
+  form: UseFormReturn<z.infer<typeof formSchema>>;
 }
 
-export default function BlogEditorSection({ editorRef, handleSave }: BlogEditorSectionProps) {
+export default function BlogEditorSection({ editorRef, handleSave, form }: BlogEditorSectionProps) {
   const [api, contextHolder] = notification.useNotification();
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
-      const resultUrl = await uploadImageToCloudinary(file)
-      console.log("Result url: " + resultUrl)
+      const resultUrl = await uploadImageToCloudinary(file);
+      console.log("Result url: " + resultUrl);
       if (!resultUrl) {
         message.error("Error uploading image, please try again");
       }
@@ -36,11 +41,7 @@ export default function BlogEditorSection({ editorRef, handleSave }: BlogEditorS
           <CardTitle>Content</CardTitle>
         </CardHeader>
         <CardContent className="flex-1">
-          <BlogEditor
-            ref={editorRef}
-            onSave={handleSave}
-            onImageUpload={handleEditorImageUpload}
-          />
+          <BlogEditor ref={editorRef} onSave={handleSave} onImageUpload={handleEditorImageUpload} />
         </CardContent>
       </Card>
     </>

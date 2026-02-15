@@ -18,6 +18,7 @@ export type BlockType = (typeof BLOCK_TYPES)[number]["value"];
 export type EditorSaveResult = {
   lexicalJSON: string;
   html: string;
+  charCount: number;
 };
 
 export type BlogEditorRef = {
@@ -26,15 +27,21 @@ export type BlogEditorRef = {
 };
 
 export const formSchema = z.object({
-  title: z.string().min(10, "Title is required").max(100, "Title must be at most 100 characters"),
+  title: z
+    .string()
+    .min(10, "Title need to be at least 10 characters")
+    .max(100, "Title must be at most 100 characters"),
+  slug: z.string().optional(),
   summary: z
     .string()
-    .min(10, "Summary is required")
+    .min(10, "Summary need to be at least 10 characters")
     .max(100, "Summary must be at most 100 characters"),
-  contentJSON: z.string().min(100, "Content is required"),
-  contentHTML: z.string().min(100, "Content is required"),
-  status: z.enum([BlogStatus.DRAFT, BlogStatus.PUBLISHED]),
+  contentJSON: z.string().optional(),
+  contentHTML: z.string().optional(),
+  status: z.enum([BlogStatus.DRAFT, BlogStatus.PUBLISHED, BlogStatus.ARCHIVED]),
   isFeatured: z.boolean(),
   categoryId: z.string().min(1, "Category is required"),
-  tags: z.array(z.string()).min(1, "Tags are required"),
+  tags: z.string().optional(),
+  thumbnailUrl: z.string().optional(),
+  bannerUrl: z.string().optional(),
 });

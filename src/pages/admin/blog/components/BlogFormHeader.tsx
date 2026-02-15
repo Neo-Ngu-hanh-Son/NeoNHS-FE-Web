@@ -14,12 +14,15 @@ export default function BlogFormHeader({
   onSubmit: (data: z.infer<typeof formSchema>) => void;
 }) {
   const navigate = useNavigate();
-
-  const handleSaveDraft = () => {
-    form.handleSubmit((data) => {
-      return { ...data, status: BlogStatus.DRAFT };
-    });
-  };
+  const handlePublish = form.handleSubmit(
+    (data) => {
+      console.log("Blog form submit: ", data);
+      onSubmit(data);
+    },
+    (errors) => {
+      console.log("Blog form error: ", errors);
+    },
+  );
 
   const isPublished = form.getValues("status") === BlogStatus.PUBLISHED;
 
@@ -35,10 +38,7 @@ export default function BlogFormHeader({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Button variant="outline" onClick={handleSaveDraft} disabled={form.formState.isSubmitting}>
-          Save Draft
-        </Button>
-        <Button onClick={form.handleSubmit(onSubmit)} disabled={form.formState.isSubmitting}>
+        <Button onClick={handlePublish} disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting ? (
             "Saving..."
           ) : (

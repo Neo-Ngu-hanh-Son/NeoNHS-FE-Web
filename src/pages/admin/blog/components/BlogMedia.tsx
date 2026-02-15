@@ -1,15 +1,17 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useBlogForm } from "@/contexts/Blog/BlogFormContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
-import { useState } from "react";
 import { message } from "antd";
+import { Controller, UseFormReturn } from "react-hook-form";
+import { z } from "zod";
+import { formSchema } from "@/components/blog/type";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogMedia() {
-  const { formData, handleInputChange, errors, setErrors } = useBlogForm();
-
-  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+export default function BlogMedia({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+  const handleUploadImage = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    onChange: (value: string) => void,
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const error = validateImageFile(file);
@@ -20,7 +22,7 @@ export default function BlogMedia() {
       try {
         const url = await uploadImageToCloudinary(file);
         if (url) {
-          handleInputChange(type as keyof typeof formData, url);
+          onChange(url);
         } else {
           message.error("Error uploading image, please try again");
         }
@@ -39,78 +41,84 @@ export default function BlogMedia() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Thumbnail URL */}
-        <div className="space-y-2">
-          <Label htmlFor="thumbnail" className={errors.thumbnailUrl ? "text-destructive" : ""}>
-            Thumbnail URL
-          </Label>
-          <Input
-            id="thumbnail"
-            type="file"
-            placeholder="https://example.com/image.jpg"
-            onChange={(e) => handleUploadImage(e, "thumbnailUrl")}
-            className={errors.thumbnailUrl ? "border-destructive focus-visible:ring-destructive" : ""}
-            accept="image/*"
+        <FieldGroup>
+          <Controller
+            name="thumbnailUrl"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="thumbnail">Thumbnail URL</FieldLabel>
+                <Input
+                  id="thumbnail"
+                  type="file"
+                  onChange={(e) => handleUploadImage(e, field.onChange)}
+                  className={
+                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
+                  }
+                  accept="image/*"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {field.value && !fieldState.invalid && (
+                  <div className="mt-2 rounded-md overflow-hidden aspect-video border bg-muted relative group">
+                    <img
+                      src={field.value}
+                      alt="Thumbnail preview"
+                      className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        form.setError("thumbnailUrl", { message: "Invalid image URL" });
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.style.display = "block";
+                        form.clearErrors("thumbnailUrl");
+                      }}
+                    />
+                  </div>
+                )}
+              </Field>
+            )}
           />
-          {errors.thumbnailUrl && <p className="text-xs text-destructive">{errors.thumbnailUrl}</p>}
-          {formData.thumbnailUrl && !errors.thumbnailUrl && (
-            <div className="mt-2 rounded-md overflow-hidden aspect-video border bg-muted relative group">
-              <img
-                src={formData.thumbnailUrl}
-                alt="Thumbnail preview"
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  setErrors((prev) => ({ ...prev, thumbnailUrl: "Invalid image URL" }));
-                }}
-                onLoad={(e) => {
-                  e.currentTarget.style.display = "block";
-                  setErrors((prev) => {
-                    const newErrors = { ...prev };
-                    delete newErrors.thumbnailUrl;
-                    return newErrors;
-                  });
-                }}
-              />
-            </div>
-          )}
-        </div>
+        </FieldGroup>
 
         {/* Banner URL */}
-        <div className="space-y-2">
-          <Label htmlFor="banner" className={errors.bannerUrl ? "text-destructive" : ""}>
-            Banner URL
-          </Label>
-          <Input
-            id="banner"
-            type="file"
-            placeholder="https://example.com/banner.jpg"
-            onChange={(e) => handleUploadImage(e, "bannerUrl")}
-            className={errors.bannerUrl ? "border-destructive focus-visible:ring-destructive" : ""}
-            accept="image/*"
+        <FieldGroup>
+          <Controller
+            name="bannerUrl"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="banner">Banner URL</FieldLabel>
+                <Input
+                  id="banner"
+                  type="file"
+                  onChange={(e) => handleUploadImage(e, field.onChange)}
+                  className={
+                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
+                  }
+                  accept="image/*"
+                />
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                {field.value && !fieldState.invalid && (
+                  <div className="mt-2 rounded-md overflow-hidden aspect-[21/9] border bg-muted relative group">
+                    <img
+                      src={field.value}
+                      alt="Banner preview"
+                      className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        form.setError("bannerUrl", { message: "Invalid image URL" });
+                      }}
+                      onLoad={(e) => {
+                        e.currentTarget.style.display = "block";
+                        form.clearErrors("bannerUrl");
+                      }}
+                    />
+                  </div>
+                )}
+              </Field>
+            )}
           />
-          {errors.bannerUrl && <p className="text-xs text-destructive">{errors.bannerUrl}</p>}
-          {formData.bannerUrl && !errors.bannerUrl && (
-            <div className="mt-2 rounded-md overflow-hidden aspect-[21/9] border bg-muted relative group">
-              <img
-                src={formData.bannerUrl}
-                alt="Banner preview"
-                className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-75"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  setErrors((prev) => ({ ...prev, bannerUrl: "Invalid image URL" }));
-                }}
-                onLoad={(e) => {
-                  e.currentTarget.style.display = "block";
-                  setErrors((prev) => {
-                    const newErrors = { ...prev };
-                    delete newErrors.bannerUrl;
-                    return newErrors;
-                  });
-                }}
-              />
-            </div>
-          )}
-        </div>
+        </FieldGroup>
       </CardContent>
     </Card>
   );

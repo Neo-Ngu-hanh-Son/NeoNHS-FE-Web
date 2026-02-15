@@ -1,4 +1,4 @@
-import { BlogFormProvider, useBlogForm } from "@/contexts/Blog/BlogFormContext";
+import { BlogFormProvider } from "@/contexts/Blog/BlogFormContext";
 import BlogFormHeader from "@/pages/admin/blog/components/BlogFormHeader";
 import BlogDetails from "@/pages/admin/blog/components/BlogDetails";
 import BlogEditorSection from "@/pages/admin/blog/components/BlogEditorSection";
@@ -6,38 +6,72 @@ import BlogPublishing from "@/pages/admin/blog/components/BlogPublishing";
 import BlogCategory from "@/pages/admin/blog/components/BlogCategory";
 import BlogTags from "@/pages/admin/blog/components/BlogTags";
 import BlogMedia from "@/pages/admin/blog/components/BlogMedia";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { message } from "antd";
 import { BlogStatus } from "@/types/blog";
+import blogService from "@/services/api/blogService";
+import { useNavigate } from "react-router-dom";
 
 function BlogCreationPageInner() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
+      slug: "",
       summary: "",
       contentJSON: "",
       contentHTML: "",
       status: BlogStatus.DRAFT,
       isFeatured: false,
       categoryId: "",
-      tags: [],
+      tags: "",
+      thumbnailUrl: "",
+      bannerUrl: "",
     },
   });
 
   const editorRef = useRef<BlogEditorRef>(null);
+  const navigate = useNavigate();
 
   const handleSaveEditorState = async (content: EditorSaveResult) => {
-    console.log(content);
+    console.log("Saving editor state: " + content);
+    if (content.charCount < 30) {
+      message.warning("Blog content must be at least 30 characters");
+      return;
+    }
+    const formData = form.getValues();
+    const payload = {
+      ...formData,
+      contentJSON: content.lexicalJSON,
+      contentHTML: content.html,
+      blogCategoryId: formData.categoryId,
+    };
+
+    try {
+      const res = await blogService.createBlog(payload);
+      if (res.success || res.data) {
+        message.success("Blog created successfully!");
+        navigate("/admin/blog");
+      } else {
+        message.error(res.message || "Failed to create blog");
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("An error occurred while creating the blog");
+    }
   };
 
   function submitHandler(data: z.infer<typeof formSchema>) {
-    message.info("Form submitted!");
-    console.log("Form data: ", data);
+    if (editorRef.current) {
+      console.log("Saving form data: " + data);
+      editorRef.current.save();
+    } else {
+      console.error("Editor ref not found");
+    }
   }
 
   return (
@@ -48,15 +82,15 @@ function BlogCreationPageInner() {
         {/* Main Content (Left Column) */}
         <div className="lg:col-span-2 space-y-6">
           <BlogDetails form={form} />
-          <BlogEditorSection editorRef={editorRef} handleSave={handleSaveEditorState} />
+          <BlogEditorSection editorRef={editorRef} handleSave={handleSaveEditorState} form={form} />
         </div>
 
         {/* Sidebar (Right Column) */}
         <div className="space-y-6">
-          <BlogPublishing />
-          <BlogMedia />
-          <BlogCategory />
-          <BlogTags />
+          <BlogPublishing form={form} isCreating />
+          <BlogMedia form={form} />
+          <BlogCategory form={form} />
+          <BlogTags form={form} />
         </div>
       </div>
     </div>
