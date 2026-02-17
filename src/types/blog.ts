@@ -91,6 +91,7 @@ export interface BlogListParams {
   size?: number;
   search?: string;
   status?: BlogStatus | "";
+  tags?: string[];
   categoryId?: string;
   isFeatured?: boolean;
   sortBy?: string;

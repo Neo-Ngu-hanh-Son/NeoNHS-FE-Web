@@ -118,9 +118,7 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
 
           <div className="blog-editor-content-wrapper">
             <RichTextPlugin
-              contentEditable={
-                <ContentEditable className="blog-editor-content" spellCheck={false} />
-              }
+              contentEditable={<ContentEditable className="blog-editor-content" spellCheck={false} />}
               placeholder={<EditorPlaceholder />}
               ErrorBoundary={LexicalErrorBoundary}
             />

@@ -7,11 +7,8 @@ import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogMedia({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
-  const handleUploadImage = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    onChange: (value: string) => void,
-  ) => {
+export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>, onChange: (value: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
       const error = validateImageFile(file);
@@ -52,9 +49,7 @@ export default function BlogMedia({ form }: { form: UseFormReturn<z.infer<typeof
                   id="thumbnail"
                   type="file"
                   onChange={(e) => handleUploadImage(e, field.onChange)}
-                  className={
-                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
                   accept="image/*"
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -92,9 +87,7 @@ export default function BlogMedia({ form }: { form: UseFormReturn<z.infer<typeof
                   id="banner"
                   type="file"
                   onChange={(e) => handleUploadImage(e, field.onChange)}
-                  className={
-                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
                   accept="image/*"
                 />
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

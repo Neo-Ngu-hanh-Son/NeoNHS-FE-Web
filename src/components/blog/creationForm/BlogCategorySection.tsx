@@ -1,10 +1,4 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBlogForm } from "@/contexts/Blog/BlogFormContext";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -12,11 +6,7 @@ import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogCategory({
-  form,
-}: {
-  form: UseFormReturn<z.infer<typeof formSchema>>;
-}) {
+export default function BlogCategorySection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
   const { categories, loadingCategories } = useBlogForm();
 
   return (
@@ -36,17 +26,13 @@ export default function BlogCategory({
                   <SelectTrigger
                     id="category"
                     aria-invalid={fieldState.invalid}
-                    className={
-                      fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
-                    }
+                    className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
                   >
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
                     {loadingCategories ? (
-                      <div className="p-2 text-sm text-center text-muted-foreground">
-                        Loading...
-                      </div>
+                      <div className="p-2 text-sm text-center text-muted-foreground">Loading...</div>
                     ) : categories.length > 0 ? (
                       categories.map((cat) => (
                         <SelectItem key={cat.id} value={cat.id}>
@@ -54,9 +40,7 @@ export default function BlogCategory({
                         </SelectItem>
                       ))
                     ) : (
-                      <div className="p-2 text-sm text-center text-muted-foreground">
-                        No categories found
-                      </div>
+                      <div className="p-2 text-sm text-center text-muted-foreground">No categories found</div>
                     )}
                   </SelectContent>
                 </Select>

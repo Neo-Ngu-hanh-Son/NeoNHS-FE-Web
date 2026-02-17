@@ -13,9 +13,10 @@ interface BlogEditorSectionProps {
   editorRef: Ref<BlogEditorRef>;
   handleSave: (content: EditorSaveResult) => Promise<void>;
   form: UseFormReturn<z.infer<typeof formSchema>>;
+  editorPrestateJSON?: string;
 }
 
-export default function BlogEditorSection({ editorRef, handleSave, form }: BlogEditorSectionProps) {
+export default function BlogEditorSection({ editorRef, handleSave, form, editorPrestateJSON }: BlogEditorSectionProps) {
   const [api, contextHolder] = notification.useNotification();
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
@@ -41,7 +42,12 @@ export default function BlogEditorSection({ editorRef, handleSave, form }: BlogE
           <CardTitle>Content</CardTitle>
         </CardHeader>
         <CardContent className="flex-1">
-          <BlogEditor ref={editorRef} onSave={handleSave} onImageUpload={handleEditorImageUpload} />
+          <BlogEditor
+            ref={editorRef}
+            onSave={handleSave}
+            onImageUpload={handleEditorImageUpload}
+            initialEditorState={editorPrestateJSON}
+          />
         </CardContent>
       </Card>
     </>

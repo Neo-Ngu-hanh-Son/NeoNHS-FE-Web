@@ -1,12 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BlogStatus } from "@/types/blog";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -14,7 +8,7 @@ import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogPublishing({
+export default function BlogPublishingSection({
   form,
   isCreating,
 }: {
@@ -42,7 +36,7 @@ export default function BlogPublishing({
                   <SelectContent>
                     <SelectItem value={BlogStatus.DRAFT}>Draft</SelectItem>
                     <SelectItem value={BlogStatus.PUBLISHED}>Published</SelectItem>
-                    {isCreating && <SelectItem value={BlogStatus.ARCHIVED}>Archived</SelectItem>}
+                    {!isCreating && <SelectItem value={BlogStatus.ARCHIVED}>Archived</SelectItem>}
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

@@ -1,11 +1,11 @@
 import { BlogFormProvider } from "@/contexts/Blog/BlogFormContext";
-import BlogFormHeader from "@/pages/admin/blog/components/BlogFormHeader";
-import BlogDetails from "@/pages/admin/blog/components/BlogDetails";
-import BlogEditorSection from "@/pages/admin/blog/components/BlogEditorSection";
-import BlogPublishing from "@/pages/admin/blog/components/BlogPublishing";
-import BlogCategory from "@/pages/admin/blog/components/BlogCategory";
-import BlogTags from "@/pages/admin/blog/components/BlogTags";
-import BlogMedia from "@/pages/admin/blog/components/BlogMedia";
+import BlogFormHeaderSection from "@/components/blog/creationForm/BlogFormHeaderSection";
+import BlogDetailsSection from "@/components/blog/creationForm/BlogDetailsSection";
+import BlogEditorSection from "@/components/blog/creationForm/BlogEditorSection";
+import BlogPublishingSection from "@/components/blog/creationForm/BlogPublishingSection";
+import BlogCategorySection from "@/components/blog/creationForm/BlogCategorySection";
+import BlogTagsSection from "@/components/blog/creationForm/BlogTagsSection";
+import BlogMediaSection from "@/components/blog/creationForm/BlogMediaSection";
 import { useRef } from "react";
 import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,7 +61,7 @@ function BlogCreationPageInner() {
       }
     } catch (error) {
       console.error(error);
-      message.error("An error occurred while creating the blog");
+      message.error((error as Error).message);
     }
   };
 
@@ -76,21 +76,21 @@ function BlogCreationPageInner() {
 
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
-      <BlogFormHeader form={form} onSubmit={submitHandler} />
+      <BlogFormHeaderSection form={form} onSubmit={submitHandler} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content (Left Column) */}
         <div className="lg:col-span-2 space-y-6">
-          <BlogDetails form={form} />
+          <BlogDetailsSection form={form} />
           <BlogEditorSection editorRef={editorRef} handleSave={handleSaveEditorState} form={form} />
         </div>
 
         {/* Sidebar (Right Column) */}
         <div className="space-y-6">
-          <BlogPublishing form={form} isCreating />
-          <BlogMedia form={form} />
-          <BlogCategory form={form} />
-          <BlogTags form={form} />
+          <BlogPublishingSection form={form} isCreating />
+          <BlogMediaSection form={form} />
+          <BlogCategorySection form={form} />
+          <BlogTagsSection form={form} />
         </div>
       </div>
     </div>

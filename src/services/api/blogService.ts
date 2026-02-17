@@ -24,6 +24,9 @@ export const blogService = {
     if (params.sortDir) query.set("sortDir", params.sortDir);
     if (params.categoryId) query.set("categoryId", params.categoryId);
     if (params.isFeatured !== undefined) query.set("isFeatured", String(params.isFeatured));
+    if (params.tags && params.tags.length > 0) {
+      params.tags.forEach((tag) => query.append("tags", tag));
+    }
 
     const queryString = query.toString();
     const url = queryString ? `${BASE}?${queryString}` : BASE;

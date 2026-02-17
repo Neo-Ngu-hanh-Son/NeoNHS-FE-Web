@@ -5,7 +5,7 @@ import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogTags({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
   return (
     <Card>
       <CardHeader>
@@ -24,9 +24,7 @@ export default function BlogTags({ form }: { form: UseFormReturn<z.infer<typeof 
                   id="tags"
                   placeholder="Travel, Guides, Tips"
                   aria-invalid={fieldState.invalid}
-                  className={
-                    fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""
-                  }
+                  className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
                 />
                 <p className="text-xs text-muted-foreground mt-2">Comma separated tags.</p>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

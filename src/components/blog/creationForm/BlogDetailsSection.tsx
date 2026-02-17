@@ -1,21 +1,12 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useBlogForm } from "@/contexts/Blog/BlogFormContext";
-import {
-  Controller,
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldValues,
-  UseFormReturn,
-  UseFormStateReturn,
-} from "react-hook-form";
+import { Controller, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogDetails({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
   return (
     <Card>
       <CardHeader>

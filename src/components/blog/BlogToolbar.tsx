@@ -1,37 +1,33 @@
-/**
- * BlogCategoryToolbar
- * Filter & search bar for the blog category list.
- * Uses shadcn/ui Input, Select, Button + Lucide icons.
- */
-
 import { Search, Plus, Download } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { BlogCategoryStatus } from "@/types/blog";
-import { BLOG_CATEGORY_STATUS_OPTIONS, BLOG_CATEGORY_SORT_OPTIONS } from "@/constants/blogCategory";
+import type { BlogStatus } from "@/types/blog";
+import { BLOG_STATUS_OPTIONS, BLOG_SORT_OPTIONS } from "@/constants/blog";
 import { useState } from "react";
 
-interface BlogCategoryToolbarProps {
+interface BlogToolbarProps {
   onSearchApply: (query: string) => void;
-  statusFilter: BlogCategoryStatus | "";
-  onStatusChange: (value: BlogCategoryStatus | "") => void;
+  statusFilter: BlogStatus | "";
+  onStatusChange: (value: BlogStatus | "") => void;
   sortIndex: number;
   onSortChange: (index: number) => void;
   onExport: () => void;
-  onAdd: () => void;
+  onSearch: (query: string) => void;
 }
 
-export function BlogCategoryToolbar({
+export function BlogToolbar({
   onSearchApply,
   statusFilter,
   onStatusChange,
   sortIndex,
   onSortChange,
   onExport,
-  onAdd,
-}: BlogCategoryToolbarProps) {
+  onSearch,
+}: BlogToolbarProps) {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
 
   return (
@@ -40,30 +36,25 @@ export function BlogCategoryToolbar({
       <div className="flex items-center gap-2 flex-wrap">
         <div className="relative max-w-[250px]">
           <Input
-            id="search-input"
+            id="blog-search-input"
             icon={<Search className="h-4 w-4" />}
-            placeholder="Search categories..."
+            placeholder="Search blogs..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => {
-              if (e?.key === "Enter") {
-                onSearchApply(query);
-              }
-            }}
-            maxLength={200}
+            onKeyDown={(e) => e.key === "Enter" && onSearch(query)}
             className="h-9"
           />
         </div>
 
         <Select
           value={statusFilter || "_all"}
-          onValueChange={(val) => onStatusChange(val === "_all" ? "" : (val as BlogCategoryStatus))}
+          onValueChange={(val) => onStatusChange(val === "_all" ? "" : (val as BlogStatus))}
         >
-          <SelectTrigger id="status-filter" className="w-[160px] h-9">
+          <SelectTrigger id="blog-status-filter" className="w-[160px] h-9">
             <SelectValue placeholder="Status: All" />
           </SelectTrigger>
           <SelectContent>
-            {BLOG_CATEGORY_STATUS_OPTIONS.map((o) => (
+            {BLOG_STATUS_OPTIONS.map((o) => (
               <SelectItem key={o.value || "_all"} value={o.value || "_all"}>
                 Status: {o.label}
               </SelectItem>
@@ -72,11 +63,11 @@ export function BlogCategoryToolbar({
         </Select>
 
         <Select value={String(sortIndex)} onValueChange={(val) => onSortChange(Number(val))}>
-          <SelectTrigger id="sort-filter" className="w-[170px]">
+          <SelectTrigger id="blog-sort-filter" className="w-[170px] h-9">
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
-            {BLOG_CATEGORY_SORT_OPTIONS.map((o, i) => (
+            {BLOG_SORT_OPTIONS.map((o, i) => (
               <SelectItem key={i} value={String(i)}>
                 Sort: {o.label}
               </SelectItem>
@@ -84,7 +75,7 @@ export function BlogCategoryToolbar({
           </SelectContent>
         </Select>
 
-        <Button size="default" onClick={() => onSearchApply(query)} className="h-9">
+        <Button size="default" onClick={() => onSearch(query)} className="h-9">
           <Search className="h-3.5 w-3.5" />
           Search
         </Button>
@@ -92,9 +83,9 @@ export function BlogCategoryToolbar({
 
       {/* Actions */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Button size="default" onClick={onAdd} className="h-9">
+        <Button size="default" onClick={() => navigate("/admin/blog/create")} className="h-9">
           <Plus className="h-3.5 w-3.5" />
-          Add Category
+          New Blog
         </Button>
 
         <TooltipProvider delayDuration={200}>
@@ -109,7 +100,7 @@ export function BlogCategoryToolbar({
                 <Download className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Export categories to CSV</TooltipContent>
+            <TooltipContent>Export blogs to CSV</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

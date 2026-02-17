@@ -27,15 +27,12 @@ export type BlogEditorRef = {
 };
 
 export const formSchema = z.object({
-  title: z
-    .string()
-    .min(10, "Title need to be at least 10 characters")
-    .max(100, "Title must be at most 100 characters"),
+  title: z.string().min(10, "Title need to be at least 10 characters").max(100, "Title must be at most 100 characters"),
   slug: z.string().optional(),
   summary: z
     .string()
     .min(10, "Summary need to be at least 10 characters")
-    .max(100, "Summary must be at most 100 characters"),
+    .max(500, "Summary must be at most 100 characters"),
   contentJSON: z.string().optional(),
   contentHTML: z.string().optional(),
   status: z.enum([BlogStatus.DRAFT, BlogStatus.PUBLISHED, BlogStatus.ARCHIVED]),

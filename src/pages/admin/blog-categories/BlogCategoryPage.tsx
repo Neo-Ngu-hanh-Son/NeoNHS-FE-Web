@@ -1,13 +1,7 @@
-/**
- * BlogCategoryPage
- * Lean page component that composes toolbar, table, and a single unified modal.
- * All data and modal logic is delegated to the useBlogCategories hook.
- */
-
-import { useBlogCategories } from '@/hooks/useBlogCategories';
-import { formatShortDate, exportToCsv } from '@/utils/helpers';
-import { BlogCategoryToolbar, BlogCategoryTable } from '@/components';
-import BlogCategoryModal from '@/components/blog-categories/BlogCategoryModal';
+import { useBlogCategories } from "@/hooks/useBlogCategories";
+import { formatShortDate, exportToCsv } from "@/utils/helpers";
+import { BlogCategoryToolbar, BlogCategoryTable } from "@/components";
+import BlogCategoryModal from "@/components/blog-categories/BlogCategoryModal";
 
 export function BlogCategoryPage() {
   const {
@@ -18,8 +12,6 @@ export function BlogCategoryPage() {
     totalElements,
     pageSize,
     goToPage,
-    searchQuery,
-    setSearchQuery,
     applySearch,
     statusFilter,
     setStatusFilter,
@@ -30,30 +22,28 @@ export function BlogCategoryPage() {
     openModal,
     closeModal,
     handleModalSuccess,
+    retryLastSearch,
   } = useBlogCategories();
 
   const handleExport = () => {
-    const header = 'Category Name,Status,Number of Posts,Created Date\n';
-    const rows = categories.map(
-      (c) =>
-        `"${c.name}","${c.status}",${c.postCount},"${formatShortDate(c.createdAt)}"`
-    );
-    exportToCsv('blog-categories.csv', header, rows);
+    const header = "Category Name,Status,Number of Posts,Created Date\n";
+    const rows = categories.map((c) => `"${c.name}","${c.status}",${c.postCount},"${formatShortDate(c.createdAt)}"`);
+    exportToCsv("blog-categories.csv", header, rows);
   };
 
   return (
-    <div className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-2xl shadow-lg border border-border 
-    overflow-hidden px-6 py-4">
+    <div
+      className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-2xl shadow-lg border border-border
+    overflow-hidden px-6 py-4"
+    >
       <BlogCategoryToolbar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         onSearchApply={applySearch}
         statusFilter={statusFilter}
         onStatusChange={setStatusFilter}
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
         onExport={handleExport}
-        onAdd={() => openModal('create')}
+        onAdd={() => openModal("create")}
       />
 
       <BlogCategoryTable
@@ -64,16 +54,16 @@ export function BlogCategoryPage() {
         totalElements={totalElements}
         pageSize={pageSize}
         onPageChange={goToPage}
-        onRetry={applySearch}
+        onRetry={retryLastSearch}
         onView={(id) => {
           const cat = categories.find((c) => c.id === id);
-          if (cat) openModal('view', cat);
+          if (cat) openModal("view", cat);
         }}
         onEdit={(id) => {
           const cat = categories.find((c) => c.id === id);
-          if (cat) openModal('edit', cat);
+          if (cat) openModal("edit", cat);
         }}
-        onDelete={(cat) => openModal('delete', cat)}
+        onDelete={(cat) => openModal("delete", cat)}
       />
 
       <BlogCategoryModal

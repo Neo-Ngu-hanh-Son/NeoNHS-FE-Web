@@ -1,16 +1,6 @@
-/**
- * Custom Hook: useBlogCategories
- * Encapsulates all data fetching, filtering, sorting, pagination,
- * and a single unified modal state for the blog category list.
- */
-
 import { useEffect, useState, useCallback } from "react";
 import { blogCategoryService } from "@/services/api/blogCategoryService";
-import type {
-  BlogCategoryResponse,
-  BlogCategoryStatus,
-  BlogCategoryListParams,
-} from "@/types/blog";
+import type { BlogCategoryResponse, BlogCategoryStatus, BlogCategoryListParams } from "@/types/blog";
 import type { BlogCategoryModalMode } from "@/components/blog-categories/BlogCategoryModal";
 import { BLOG_CATEGORY_PAGE_SIZE, BLOG_CATEGORY_SORT_OPTIONS } from "@/constants/blogCategory";
 
@@ -28,9 +18,8 @@ export interface UseBlogCategoriesReturn {
   goToPage: (page: number) => void;
 
   /** Search */
-  searchQuery: string;
-  setSearchQuery: (q: string) => void;
-  applySearch: () => void;
+  applySearch: (query: string) => void;
+  retryLastSearch: () => void;
 
   /** Filters */
   statusFilter: BlogCategoryStatus | "";
@@ -53,61 +42,63 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // Filters
-  const [searchQuery, setSearchQuery] = useState("");
-  const [appliedSearch, setAppliedSearch] = useState("");
+  const [lastSearchQuery, setLastSearchQuery] = useState<string>("");
   const [statusFilter, setStatusFilterRaw] = useState<BlogCategoryStatus | "">("");
   const [sortIndex, setSortIndexRaw] = useState(0);
 
-  // Unified modal state
   const [modalMode, setModalMode] = useState<BlogCategoryModalMode>(null);
   const [modalCategory, setModalCategory] = useState<BlogCategoryResponse | null>(null);
 
-  /* ── Data fetching ── */
-  const fetchCategories = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const fetchCategories = useCallback(
+    async (query?: string) => {
+      try {
+        setLoading(true);
+        setError(null);
 
-      const sort = BLOG_CATEGORY_SORT_OPTIONS[sortIndex];
-      const params: BlogCategoryListParams = {
-        page: currentPage,
-        size: BLOG_CATEGORY_PAGE_SIZE,
-        search: appliedSearch || undefined,
-        status: statusFilter || undefined,
-        sortBy: sort.sortBy,
-        sortDir: sort.sortDir,
-      };
+        const sort = BLOG_CATEGORY_SORT_OPTIONS[sortIndex];
+        const params: BlogCategoryListParams = {
+          page: currentPage,
+          size: BLOG_CATEGORY_PAGE_SIZE,
+          search: query || undefined,
+          status: statusFilter || undefined,
+          sortBy: sort.sortBy,
+          sortDir: sort.sortDir,
+        };
 
-      const response = await blogCategoryService.getCategories(params);
-      const page = response.data;
+        const response = await blogCategoryService.getCategories(params);
+        const page = response.data;
 
-      setCategories(page.content);
-      setTotalElements(page.totalElements);
-      setTotalPages(page.totalPages);
-    } catch {
-      setError("Unable to load blog categories. Please try again later.");
-      setCategories([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, appliedSearch, statusFilter, sortIndex]);
+        setCategories(page.content);
+        setTotalElements(page.totalElements);
+        setTotalPages(page.totalPages);
+      } catch {
+        setError("Unable to load blog categories. Please try again later.");
+        setCategories([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [currentPage, statusFilter, sortIndex],
+  );
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
 
   /* ── Search / Filter / Sort / Pagination ── */
-  const applySearch = useCallback(() => {
+  const applySearch = (query: string) => {
     setCurrentPage(0);
-    setAppliedSearch(searchQuery);
-    console.log("appliedSearch: ", searchQuery);
-  }, [searchQuery]);
+    fetchCategories(query);
+    setLastSearchQuery(query);
+  };
+
+  const retryLastSearch = () => {
+    fetchCategories(lastSearchQuery);
+  };
 
   const setStatusFilter = useCallback((status: BlogCategoryStatus | "") => {
     setStatusFilterRaw(status);
@@ -127,13 +118,10 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
   );
 
   /* ── Unified modal ── */
-  const openModal = useCallback(
-    (mode: NonNullable<BlogCategoryModalMode>, category?: BlogCategoryResponse) => {
-      setModalMode(mode);
-      setModalCategory(category ?? null);
-    },
-    [],
-  );
+  const openModal = useCallback((mode: NonNullable<BlogCategoryModalMode>, category?: BlogCategoryResponse) => {
+    setModalMode(mode);
+    setModalCategory(category ?? null);
+  }, []);
 
   const closeModal = useCallback(() => {
     setModalMode(null);
@@ -155,8 +143,6 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     totalPages,
     pageSize: BLOG_CATEGORY_PAGE_SIZE,
     goToPage,
-    searchQuery,
-    setSearchQuery,
     applySearch,
     statusFilter,
     setStatusFilter,
@@ -167,5 +153,6 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     openModal,
     closeModal,
     handleModalSuccess,
+    retryLastSearch,
   };
 }

@@ -1,33 +1,73 @@
-import BlogEditor from "@/components/blog/BlogEditor";
-import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
-import AdminPageContentLayout from "@/components/common/AdminPageContentLayout";
-import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBlogs } from "@/hooks/useBlogs";
+import { BlogToolbar } from "@/components/blog/BlogToolbar";
+import { BlogTable } from "@/components/blog/Table/BlogTable";
+import { BlogDeleteDialog } from "@/components/blog/BlogDeleteDialog";
+import { formatShortDate, exportToCsv } from "@/utils/helpers";
 
-type Props = {};
+export default function BlogPage() {
+  const navigate = useNavigate();
+  const {
+    blogs,
+    loading,
+    error,
+    currentPage,
+    totalElements,
+    pageSize,
+    goToPage,
+    applySearch,
+    statusFilter,
+    setStatusFilter,
+    sortIndex,
+    setSortIndex,
+    deleteTarget,
+    openDeleteDialog,
+    closeDeleteDialog,
+    refetch,
+    retryLastSearch,
+  } = useBlogs();
 
-export default function BlogPage({ }: Props) {
-  const editorRef = useRef<BlogEditorRef>(null);
-  const [htmlOutput, setHtmlOutput] = useState<string>("");
+  const handleExport = () => {
+    const header = "Title,Category,Status,Views,Created Date\n";
+    const rows = blogs.map(
+      (b) =>
+        `"${b.title}","${b.blogCategory?.name ?? ""}","${b.status}",${b.viewCount},"${b.createdAt ? formatShortDate(b.createdAt) : ""}"`,
+    );
+    exportToCsv("blogs.csv", header, rows);
+  };
 
-  const handleSaveBlog = (editorState: EditorSaveResult) => {
-    console.log("Blog saved:", editorState);
-    setHtmlOutput(editorState.html);
+  const handleDeleteSuccess = () => {
+    closeDeleteDialog();
+    refetch();
   };
 
   return (
-    <AdminPageContentLayout>
-      <BlogEditor ref={editorRef} onSave={(editorState) => handleSaveBlog(editorState)} />
+    <div className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-2xl shadow-lg border border-border overflow-hidden px-6 py-4">
+      <BlogToolbar
+        onSearchApply={applySearch}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        sortIndex={sortIndex}
+        onSortChange={setSortIndex}
+        onExport={handleExport}
+        onSearch={applySearch}
+      />
 
-      <div>
-        <h2>Editor JSON Output:</h2>
-        <div dangerouslySetInnerHTML={{ __html: htmlOutput }}></div>
-      </div>
+      <BlogTable
+        blogs={blogs}
+        loading={loading}
+        error={error}
+        currentPage={currentPage}
+        totalElements={totalElements}
+        pageSize={pageSize}
+        onPageChange={goToPage}
+        onRetry={retryLastSearch}
+        onView={(id) => navigate(`/admin/blog/${id}`)}
+        onEdit={(id) => navigate(`/admin/blog/${id}/edit`)}
+        onDelete={openDeleteDialog}
+      />
 
-      {/* Listen to the on save method for the returned value */}
-      <Button variant="default" onClick={() => editorRef.current?.save()}>
-        Create blog
-      </Button>
-    </AdminPageContentLayout>
+      <BlogDeleteDialog blog={deleteTarget} onClose={closeDeleteDialog} onSuccess={handleDeleteSuccess} />
+    </div>
   );
 }

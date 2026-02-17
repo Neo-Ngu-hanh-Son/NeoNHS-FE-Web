@@ -5,8 +5,9 @@ import { BlogStatus } from "@/types/blog";
 import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { UseFormReturn } from "react-hook-form";
+import { message } from "antd";
 
-export default function BlogFormHeader({
+export default function BlogFormHeaderSection({
   form,
   onSubmit,
 }: {
@@ -20,6 +21,7 @@ export default function BlogFormHeader({
       onSubmit(data);
     },
     (errors) => {
+      message.error("There are errors in the form. Please fix them before submitting.");
       console.log("Blog form error: ", errors);
     },
   );
