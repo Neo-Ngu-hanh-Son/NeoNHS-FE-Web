@@ -32,6 +32,7 @@ interface BlogTableProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (blog: BlogResponse) => void;
+  currentStatusFilter?: BlogStatus | "";
 }
 
 const STATUS_STYLES: Record<BlogStatus, { label: string; className: string }> = {
@@ -61,6 +62,7 @@ export function BlogTable({
   onView,
   onEdit,
   onDelete,
+  currentStatusFilter,
 }: BlogTableProps) {
   const totalPages = Math.ceil(totalElements / pageSize);
   const rangeStart = currentPage * pageSize + 1;
@@ -220,19 +222,21 @@ export function BlogTable({
                           <TooltipContent>Edit blog</TooltipContent>
                         </Tooltip>
 
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => onDelete(blog)}
-                              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Delete blog</TooltipContent>
-                        </Tooltip>
+                        {blog.status !== "ARCHIVED" && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => onDelete(blog)}
+                                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Archive blog</TooltipContent>
+                          </Tooltip>
+                        )}
                       </div>
                     </TooltipProvider>
                   </TableCell>

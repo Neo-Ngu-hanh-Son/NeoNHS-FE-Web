@@ -38,13 +38,13 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
       setDeleting(true);
       const res = await blogService.deleteBlog(blog.id);
       if (res.success) {
-        message.success(res.message || "Blog deleted successfully");
+        message.success(res.message || "Blog archived successfully");
         onSuccess();
       } else {
-        message.error(res.message || "Failed to delete blog");
+        message.error(res.message || "Failed to archive blog");
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, "Failed to delete blog"));
+      message.error(getApiErrorMessage(err, "Failed to archive blog"));
     } finally {
       setDeleting(false);
     }
@@ -58,9 +58,9 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 mb-4">
               <TriangleAlert className="h-7 w-7 text-destructive" />
             </div>
-            <AlertDialogTitle className="text-lg font-bold">Delete Blog</AlertDialogTitle>
+            <AlertDialogTitle className="text-lg font-bold">Archive Blog</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-muted-foreground mt-1">
-              Are you sure you want to delete this blog post?
+              Are you sure you want to archive this blog post?
             </AlertDialogDescription>
           </div>
         </AlertDialogHeader>
@@ -88,7 +88,7 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
         )}
 
         <p className="text-xs text-destructive text-center">
-          This action cannot be undone. The blog will be permanently removed.
+          You can restore archived blogs from the admin dashboard.
         </p>
 
         <AlertDialogFooter>
@@ -101,10 +101,10 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
             {deleting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                Deleting...
+                Archiving...
               </>
             ) : (
-              "Delete"
+              "Archive Blog"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -31,7 +31,7 @@ const STATUS_CONFIG: Record<BlogStatus, { label: string; className: string }> = 
   },
 };
 
-export default function BlogDetailPage() {
+export default function AdminBlogDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [blog, setBlog] = useState<BlogResponse | null>(null);
@@ -92,15 +92,29 @@ export default function BlogDetailPage() {
           <Button variant="outline" size="icon" onClick={() => navigate("/admin/blog")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">{blog.title}</h1>
-            <p className="text-sm text-muted-foreground">{blog.slug}</p>
+          <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">{blog.title}</h1>
+              <p className="text-sm text-muted-foreground">{blog.slug}</p>
+            </div>
+            <Badge variant="secondary" className={`${statusCfg.className} rounded-full px-3 py-1`}>
+              {statusCfg.label}
+            </Badge>
           </div>
         </div>
-        <Button onClick={() => navigate(`/admin/blog/${blog.id}/edit`)}>
-          <Pencil className="h-4 w-4 mr-2" />
-          Edit Blog
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => window.open(`/blog/${blog.id}`, "_blank", "noopener,noreferrer")}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            View as Tourist
+          </Button>
+          <Button onClick={() => navigate(`/admin/blog/${blog.id}/edit`)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Blog
+          </Button>
+        </div>
       </div>
 
       {/* Meta info cards */}
@@ -118,9 +132,15 @@ export default function BlogDetailPage() {
         </Card>
         <Card>
           <CardContent className="p-4 flex items-center gap-3">
-            <Badge variant="secondary" className={`${statusCfg.className} rounded-full px-3 py-1`}>
-              {statusCfg.label}
-            </Badge>
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Last Updated</p>
+              <p className="text-sm font-medium">
+                {blog.updatedAt ? formatShortDate(blog.updatedAt) : "—"}
+              </p>
+            </div>
           </CardContent>
         </Card>
         <Card>

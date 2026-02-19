@@ -37,10 +37,11 @@ import TicketVerificationPage from "@/pages/vendor/Tickets/TicketVerificationPag
 import VouchersPage from "@/pages/vendor/Vouchers/VouchersPage";
 import BlogCategoryPage from "@/pages/admin/blog-categories/BlogCategoryPage";
 import SimpleMapView from "@/pages/SimpleMapView";
-import BlogPage from "@/pages/admin/blog/BlogPage";
+import ManageBlogPage from "@/pages/admin/blog/ManageBlogPage";
 import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
-import BlogDetailPage from "@/pages/admin/blog/BlogDetailPage";
+import AdminBlogDetailPage from "@/pages/admin/blog/AdminBlogDetailPage";
 import BlogEditPage from "@/pages/admin/blog/BlogEditPage";
+import BlogDetailsPage from "@/pages/blog/BlogDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/about-us", element: <AboutUs /> },
+          { path: "/blog/:id", element: <BlogDetailsPage /> },
 
           // Profile Routes - Auto-redirect based on role
           { path: "/account", element: <ProfilePage /> },
@@ -104,9 +106,9 @@ export const router = createBrowserRouter([
           { path: "events/:id", element: <EventDetailPage /> },
           { path: "events/:id/edit", element: <EventEditPage /> },
           { path: "blog-categories", element: <BlogCategoryPage /> },
-          { path: "blog", element: <BlogPage /> },
+          { path: "blog", element: <ManageBlogPage /> },
           { path: "blog/create", element: <BlogCreationPage /> },
-          { path: "blog/:id", element: <BlogDetailPage /> },
+          { path: "blog/:id", element: <AdminBlogDetailPage /> },
           { path: "blog/:id/edit", element: <BlogEditPage /> },
         ],
       },

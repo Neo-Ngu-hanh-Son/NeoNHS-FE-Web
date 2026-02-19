@@ -5,7 +5,7 @@ import { BlogTable } from "@/components/blog/Table/BlogTable";
 import { BlogDeleteDialog } from "@/components/blog/BlogDeleteDialog";
 import { formatShortDate, exportToCsv } from "@/utils/helpers";
 
-export default function BlogPage() {
+export default function ManageBlogPage() {
   const navigate = useNavigate();
   const {
     blogs,
@@ -65,9 +65,14 @@ export default function BlogPage() {
         onView={(id) => navigate(`/admin/blog/${id}`)}
         onEdit={(id) => navigate(`/admin/blog/${id}/edit`)}
         onDelete={openDeleteDialog}
+        currentStatusFilter={statusFilter}
       />
 
-      <BlogDeleteDialog blog={deleteTarget} onClose={closeDeleteDialog} onSuccess={handleDeleteSuccess} />
+      <BlogDeleteDialog
+        blog={deleteTarget}
+        onClose={closeDeleteDialog}
+        onSuccess={handleDeleteSuccess}
+      />
     </div>
   );
 }
