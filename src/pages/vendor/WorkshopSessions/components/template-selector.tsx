@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { WorkshopTemplateResponse, WorkshopStatus } from "../../WorkshopTemplates/types"
-import { mockWorkshopTemplates } from "../../WorkshopTemplates/data"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -11,6 +10,8 @@ import {
 } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
 import { formatPrice, formatDuration } from "../../WorkshopTemplates/utils/formatters"
+import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { notification } from "antd"
 
 interface TemplateSelectorProps {
   value: string
@@ -25,20 +26,32 @@ export function TemplateSelector({ value, onChange, error, disabled }: TemplateS
   const [selectedTemplate, setSelectedTemplate] = useState<WorkshopTemplateResponse | undefined>()
 
   useEffect(() => {
-    // Simulate API call to fetch ACTIVE templates
-    const fetchTemplates = async () => {
-      setLoading(true)
-      // TODO: Replace with actual API call
-      // const response = await workshopTemplateApi.getMyTemplates(...)
-      // Filter only ACTIVE templates
-      setTimeout(() => {
-        const activeTemplates = mockWorkshopTemplates.filter(t => t.status === WorkshopStatus.ACTIVE)
-        setTemplates(activeTemplates)
-        setLoading(false)
-      }, 300)
-    }
     fetchTemplates()
   }, [])
+
+  const fetchTemplates = async () => {
+    try {
+      setLoading(true)
+      const response = await WorkshopTemplateService.getMyTemplates({
+        page: 0,
+        size: 100,
+        sortBy: 'name',
+        sortDirection: 'ASC',
+      })
+      
+      // Filter only ACTIVE templates (can create sessions only from ACTIVE templates)
+      const activeTemplates = (response.content || []).filter(t => t.status === WorkshopStatus.ACTIVE)
+      setTemplates(activeTemplates)
+    } catch (error: any) {
+      console.error('Failed to fetch templates:', error)
+      notification.error({
+        message: 'Failed to Load Templates',
+        description: error.message || 'Unable to fetch workshop templates. Please try again.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (value) {

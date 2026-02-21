@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react"
 import { WTagResponse } from "../types"
-import { mockWTags } from "../data"
 import { CheckOutlined } from "@ant-design/icons"
 import { Label } from "@/components/ui/label"
+import { WTagService } from "@/services/api/wtagService"
+import { notification } from "antd"
 
 interface WTagSelectorProps {
   selectedTagIds: string[]
@@ -16,18 +17,24 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Simulate API call
-    const fetchTags = async () => {
-      setLoading(true)
-      // TODO: Replace with actual API call
-      // const response = await wtagApi.getAll()
-      setTimeout(() => {
-        setTags(mockWTags)
-        setLoading(false)
-      }, 300)
-    }
     fetchTags()
   }, [])
+
+  const fetchTags = async () => {
+    try {
+      setLoading(true)
+      const data = await WTagService.getAllTags()
+      setTags(data)
+    } catch (error: any) {
+      console.error('Failed to fetch tags:', error)
+      notification.error({
+        message: 'Failed to Load Tags',
+        description: error.message || 'Unable to fetch workshop tags. Please try again.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleToggleTag = (tagId: string) => {
     if (disabled) return

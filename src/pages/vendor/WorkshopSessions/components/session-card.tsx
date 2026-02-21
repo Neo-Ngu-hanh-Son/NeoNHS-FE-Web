@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { SessionStatusBadge } from "./session-status-badge"
-import { Calendar, Clock, Users, Eye, Edit, XCircle } from "lucide-react"
+import { Calendar, Users, Eye, Edit, XCircle } from "lucide-react"
 import { formatDate, formatTimeRange, formatPrice, getEnrollmentPercentage } from "../utils/formatters"
 
 interface SessionCardProps {
@@ -15,8 +15,8 @@ interface SessionCardProps {
 }
 
 export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardProps) {
-  const thumbnail = session.workshopTemplate.images.find(img => img.isThumbnail)?.imageUrl 
-    || session.workshopTemplate.images[0]?.imageUrl
+  const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
+    || session.workshopTemplate?.images?.[0]?.imageUrl
 
   const canEdit = session.status === SessionStatus.SCHEDULED
   const canCancel = session.status === SessionStatus.SCHEDULED && session.currentEnrollments > 0
@@ -48,7 +48,7 @@ export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardPr
 
       <CardHeader className="pb-3">
         <h3 className="font-semibold text-lg line-clamp-2 leading-tight">
-          {session.workshopTemplate.name}
+          {session.workshopTemplate?.name || 'Unnamed Workshop'}
         </h3>
       </CardHeader>
 
@@ -82,7 +82,7 @@ export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardPr
         </div>
 
         {/* Tags */}
-        {session.workshopTemplate.tags.length > 0 && (
+        {session.workshopTemplate?.tags && session.workshopTemplate.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {session.workshopTemplate.tags.slice(0, 2).map((tag) => (
               <Badge

@@ -1,7 +1,6 @@
 import { WorkshopSessionResponse, SessionStatus } from "../../types"
 import { isSameDay } from "../../utils/formatters"
 import { cn } from "@/lib/utils"
-import { SessionStatusBadge } from "../session-status-badge"
 
 interface WeekViewProps {
   currentDate: Date
@@ -138,7 +137,7 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
                         }}
                       >
                         <div className="font-semibold truncate">
-                          {session.workshopTemplate.name}
+                          {session.workshopTemplate?.name || 'Workshop'}
                         </div>
                         <div className="text-[10px] opacity-90">
                           {new Date(session.startTime).toLocaleTimeString('en-US', { 

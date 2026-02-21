@@ -9,6 +9,9 @@ import { SessionForm } from "./session-form"
 import { WorkshopSessionFormData, UpdateWorkshopSessionRequest, WorkshopSessionResponse, SessionStatus } from "../types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
+import { WorkshopSessionService } from "@/services/api/workshopSessionService"
+import { notification } from "antd"
+import { useState } from "react"
 
 interface EditSessionDialogProps {
   open: boolean
@@ -23,13 +26,14 @@ export function EditSessionDialog({
   session,
   onSuccess,
 }: EditSessionDialogProps) {
+  const [submitting, setSubmitting] = useState(false)
   
   if (!session) return null
 
   // Can only edit SCHEDULED sessions
   const canEdit = session.status === SessionStatus.SCHEDULED
 
-  const handleSubmit = (data: WorkshopSessionFormData) => {
+  const handleSubmit = async (data: WorkshopSessionFormData) => {
     // Transform form data to API request format
     const updateRequest: UpdateWorkshopSessionRequest = {
       startTime: data.startTime.toISOString(),
@@ -38,14 +42,29 @@ export function EditSessionDialog({
       maxParticipants: data.maxParticipants,
     }
     
-    // TODO: Call API to update session
-    console.log('Updating session:', session.id, updateRequest)
-    // In real implementation:
-    // const updatedSession = await workshopSessionApi.update(session.id, updateRequest)
-    
-    // Close dialog and refresh
-    onOpenChange(false)
-    if (onSuccess) onSuccess()
+    try {
+      setSubmitting(true)
+      const updatedSession = await WorkshopSessionService.updateSession(session.id, updateRequest)
+      
+      notification.success({
+        message: 'Session Updated',
+        description: updatedSession?.workshopTemplate?.name
+          ? `Session for "${updatedSession.workshopTemplate.name}" has been updated successfully.`
+          : 'Workshop session has been updated successfully.'
+      })
+      
+      // Close dialog and refresh
+      onOpenChange(false)
+      if (onSuccess) onSuccess()
+    } catch (error: any) {
+      console.error('Update failed:', error)
+      notification.error({
+        message: 'Update Failed',
+        description: error.message || 'Failed to update session. Please try again.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -76,6 +95,7 @@ export function EditSessionDialog({
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isEditing={true}
+            submitting={submitting}
           />
         )}
       </DialogContent>

@@ -20,6 +20,7 @@ interface SessionFormProps {
   onSubmit: (data: WorkshopSessionFormData) => void
   onCancel: () => void
   isEditing?: boolean
+  submitting?: boolean
 }
 
 export function SessionForm({
@@ -28,6 +29,7 @@ export function SessionForm({
   onSubmit,
   onCancel,
   isEditing = false,
+  submitting = false,
 }: SessionFormProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<WorkshopTemplateResponse | undefined>()
   
@@ -242,11 +244,18 @@ export function SessionForm({
 
         {/* Form Actions */}
         <div className="flex justify-end gap-4 pt-4 border-t">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit">
-            {isEditing ? "Save Changes" : "Create Session"}
+          <Button type="submit" disabled={submitting}>
+            {submitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                {isEditing ? "Saving..." : "Creating..."}
+              </>
+            ) : (
+              isEditing ? "Save Changes" : "Create Session"
+            )}
           </Button>
         </div>
       </form>

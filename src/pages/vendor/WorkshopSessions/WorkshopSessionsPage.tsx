@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Calendar as CalendarIcon, PlusCircle, Search, List, CalendarDays } from 'lucide-react'
-import { mockWorkshopSessions } from './data'
+import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
 import { CancelSessionDialog } from './components/cancel-session-dialog'
@@ -12,9 +12,11 @@ import { EditSessionDialog } from './components/edit-session-dialog'
 import { ViewSessionDialog } from './components/view-session-dialog'
 import { SessionCalendar } from './components/calendar'
 import { formatDate } from './utils/formatters'
+import { WorkshopSessionService } from '@/services/api/workshopSessionService'
 
 export default function WorkshopSessionsPage() {
-  const [sessions] = useState<WorkshopSessionResponse[]>(mockWorkshopSessions)
+  const [sessions, setSessions] = useState<WorkshopSessionResponse[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
@@ -33,6 +35,32 @@ export default function WorkshopSessionsPage() {
     open: false,
     session: null,
   })
+
+  // Fetch sessions on mount
+  useEffect(() => {
+    fetchSessions()
+  }, [])
+
+  const fetchSessions = async () => {
+    try {
+      setLoading(true)
+      const response = await WorkshopSessionService.getMySessions({
+        page: 0,
+        size: 100, // Get all for now
+        sortBy: 'startTime',
+        sortDirection: 'ASC',
+      })
+      setSessions(response.content || [])
+    } catch (error: any) {
+      console.error('Failed to fetch sessions:', error)
+      notification.error({
+        message: 'Failed to Load Sessions',
+        description: error.message || 'Unable to fetch workshop sessions. Please try again.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and sort sessions
   const filteredSessions = useMemo(() => {
@@ -95,11 +123,30 @@ export default function WorkshopSessionsPage() {
     setCancelDialog({ open: true, session })
   }
 
-  const handleCancelConfirm = () => {
+  const handleCancelConfirm = async () => {
     if (cancelDialog.session) {
-      // TODO: Call API to cancel session
-      console.log('Cancelling session:', cancelDialog.session.id)
-      setCancelDialog({ open: false, session: null })
+      try {
+        await WorkshopSessionService.cancelSession(cancelDialog.session.id)
+        
+        // Update local state
+        setSessions(prev => prev.map(s => 
+          s.id === cancelDialog.session!.id 
+            ? { ...s, status: SessionStatus.CANCELLED }
+            : s
+        ))
+        
+        setCancelDialog({ open: false, session: null })
+        notification.success({
+          message: 'Session Cancelled',
+          description: `Session for "${cancelDialog.session.workshopTemplate.name}" has been cancelled.`
+        })
+      } catch (error: any) {
+        console.error('Cancel failed:', error)
+        notification.error({
+          message: 'Cancellation Failed',
+          description: error.message || 'Failed to cancel session. Please try again.',
+        })
+      }
     }
   }
 
@@ -122,10 +169,8 @@ export default function WorkshopSessionsPage() {
   }
 
   const handleDialogSuccess = () => {
-    // TODO: Refresh sessions list from API
-    console.log('Session created/updated, refreshing list...')
-    // In real implementation:
-    // fetchSessions()
+    // Refresh sessions list from API
+    fetchSessions()
   }
 
   return (
@@ -202,7 +247,14 @@ export default function WorkshopSessionsPage() {
       </div>
 
       {/* Sessions Display */}
-      {filteredSessions.length > 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading sessions...</p>
+          </div>
+        </div>
+      ) : filteredSessions.length > 0 ? (
         view === 'list' ? (
           // List View - Grouped by Date
           <div className="space-y-6">

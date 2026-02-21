@@ -4,11 +4,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { WorkshopTemplateForm } from "./components/workshop-template-form"
 import { WorkshopTemplateFormData, CreateWorkshopTemplateRequest } from "./types"
+import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { notification } from "antd"
+import { useState } from "react"
 
 export default function WorkshopTemplateCreatePage() {
   const navigate = useNavigate()
+  const [submitting, setSubmitting] = useState(false)
 
-  const handleSubmit = (data: WorkshopTemplateFormData) => {
+  const handleSubmit = async (data: WorkshopTemplateFormData) => {
     // Transform form data to API request format
     const createRequest: CreateWorkshopTemplateRequest = {
       name: data.name,
@@ -23,15 +27,26 @@ export default function WorkshopTemplateCreatePage() {
       tagIds: data.tagIds,
     }
 
-    // TODO: Call API to create template
-    console.log("Creating new template:", createRequest)
-    // In real implementation:
-    // const newTemplate = await workshopTemplateApi.create(createRequest)
-    // The template will be created with status: DRAFT
-    // navigate(`/vendor/workshop-templates/${newTemplate.id}`)
-
-    // Navigate back to list page
-    navigate("/vendor/workshop-templates")
+    try {
+      setSubmitting(true)
+      const newTemplate = await WorkshopTemplateService.createTemplate(createRequest)
+      
+      notification.success({
+        message: 'Template Created',
+        description: `Template "${newTemplate.name}" has been created as DRAFT.`
+      })
+      
+      // Navigate to the new template's detail page
+      navigate(`/vendor/workshop-templates/${newTemplate.id}`)
+    } catch (error: any) {
+      console.error('Create failed:', error)
+      notification.error({
+        message: 'Creation Failed',
+        description: error.message || 'Failed to create template. Please try again.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -78,6 +93,7 @@ export default function WorkshopTemplateCreatePage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isEditing={false}
+            submitting={submitting}
           />
         </CardContent>
       </Card>

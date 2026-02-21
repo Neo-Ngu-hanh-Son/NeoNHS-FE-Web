@@ -1,25 +1,60 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { mockWorkshopTemplates } from "./data"
-import { WorkshopStatus } from "./types"
+import { WorkshopStatus, WorkshopTemplateResponse } from "./types"
 import { TemplateStatusBadge } from "./components/template-status-badge"
 import { RejectionAlert } from "./components/rejection-alert"
 import { DeleteTemplateDialog } from "./components/delete-template-dialog"
 import { SubmitApprovalDialog } from "./components/submit-approval-dialog"
 import { formatPrice, formatDuration, formatDate, formatDateTime } from "./utils/formatters"
+import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { notification } from "antd"
 
 export default function WorkshopTemplateDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const template = mockWorkshopTemplates.find((t) => t.id === id)
+  const [template, setTemplate] = useState<WorkshopTemplateResponse | null>(null)
+  const [loading, setLoading] = useState(true)
 
   const [deleteDialog, setDeleteDialog] = useState(false)
   const [submitDialog, setSubmitDialog] = useState(false)
+
+  useEffect(() => {
+    if (id) {
+      fetchTemplate()
+    }
+  }, [id])
+
+  const fetchTemplate = async () => {
+    if (!id) return
+    
+    try {
+      setLoading(true)
+      const data = await WorkshopTemplateService.getTemplateById(id)
+      setTemplate(data)
+    } catch (error: any) {
+      console.error('Failed to fetch template:', error)
+      notification.error({
+        message: 'Failed to Load Template',
+        description: error.message || 'Unable to fetch template details.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground">Loading template...</p>
+      </div>
+    )
+  }
 
   if (!template) {
     return (
@@ -38,16 +73,47 @@ export default function WorkshopTemplateDetailPage() {
   const canSubmit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
   const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
 
-  const handleDelete = () => {
-    // TODO: Call API to delete
-    console.log("Deleting template:", template.id)
-    navigate("/vendor/workshop-templates")
+  const handleDelete = async () => {
+    if (!template) return
+    
+    try {
+      await WorkshopTemplateService.deleteTemplate(template.id)
+      
+      notification.success({
+        message: 'Template Deleted',
+        description: `Template "${template.name}" has been deleted successfully.`
+      })
+      
+      navigate("/vendor/workshop-templates")
+    } catch (error: any) {
+      console.error('Delete failed:', error)
+      notification.error({
+        message: 'Delete Failed',
+        description: error.message || 'Failed to delete template. Please try again.',
+      })
+    }
   }
 
-  const handleSubmit = () => {
-    // TODO: Call API to submit for approval
-    console.log("Submitting template for approval:", template.id)
-    navigate("/vendor/workshop-templates")
+  const handleSubmit = async () => {
+    if (!template) return
+    
+    try {
+      await WorkshopTemplateService.submitForApproval(template.id)
+      
+      notification.success({
+        message: 'Submitted for Approval',
+        description: `Template "${template.name}" has been submitted for admin review.`
+      })
+      
+      // Refresh the template to show updated status
+      await fetchTemplate()
+    } catch (error: any) {
+      console.error('Submit failed:', error)
+      notification.error({
+        message: 'Submission Failed',
+        description: error.message || 'Failed to submit template. Please try again.',
+      })
+    }
   }
 
   return (

@@ -105,7 +105,7 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
                           "w-2 h-2 rounded-full",
                           getStatusColor(session.status)
                         )}
-                        title={session.workshopTemplate.name}
+                        title={session.workshopTemplate?.name || 'Workshop'}
                       />
                     ))}
                     {dateSessions.length > 3 && (
@@ -120,9 +120,9 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
                     {dateSessions.length} session{dateSessions.length !== 1 ? 's' : ''}
                   </div>
 
-                  {/* Mini Session List (max 2) */}
+                  {/* Mini Session List (max 3) */}
                   <div className="space-y-0.5 mt-1">
-                    {dateSessions.slice(0, 2).map(session => {
+                    {dateSessions.slice(0, 3).map(session => {
                       const startTime = new Date(session.startTime)
                       const timeStr = startTime.toLocaleTimeString('en-US', { 
                         hour: 'numeric', 
@@ -144,9 +144,9 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
                             session.status === SessionStatus.COMPLETED && "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400",
                             session.status === SessionStatus.CANCELLED && "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200"
                           )}
-                          title={session.workshopTemplate.name}
+                          title={session.workshopTemplate?.name || 'Workshop'}
                         >
-                          {timeStr} {session.workshopTemplate.name.substring(0, 15)}
+                          {timeStr} {session.workshopTemplate?.name?.substring(0, 15) || 'Workshop'}
                         </div>
                       )
                     })}

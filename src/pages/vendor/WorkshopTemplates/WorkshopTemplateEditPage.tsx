@@ -1,20 +1,56 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeftOutlined, SendOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { WorkshopTemplateForm } from "./components/workshop-template-form"
-import { WorkshopTemplateFormData, UpdateWorkshopTemplateRequest, WorkshopStatus } from "./types"
-import { mockWorkshopTemplates } from "./data"
+import { WorkshopTemplateFormData, UpdateWorkshopTemplateRequest, WorkshopStatus, WorkshopTemplateResponse } from "./types"
 import { TemplateStatusBadge } from "./components/template-status-badge"
 import { RejectionAlert } from "./components/rejection-alert"
 import { SubmitApprovalDialog } from "./components/submit-approval-dialog"
+import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { notification } from "antd"
 
 export default function WorkshopTemplateEditPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const template = mockWorkshopTemplates.find((t) => t.id === id)
+  const [template, setTemplate] = useState<WorkshopTemplateResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [submitDialog, setSubmitDialog] = useState(false)
+
+  useEffect(() => {
+    if (id) {
+      fetchTemplate()
+    }
+  }, [id])
+
+  const fetchTemplate = async () => {
+    if (!id) return
+    
+    try {
+      setLoading(true)
+      const data = await WorkshopTemplateService.getTemplateById(id)
+      setTemplate(data)
+    } catch (error: any) {
+      console.error('Failed to fetch template:', error)
+      notification.error({
+        message: 'Failed to Load Template',
+        description: error.message || 'Unable to fetch template details.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground">Loading template...</p>
+      </div>
+    )
+  }
 
   if (!template) {
     return (
@@ -71,7 +107,9 @@ export default function WorkshopTemplateEditPage() {
     )
   }
 
-  const handleSubmit = (data: WorkshopTemplateFormData) => {
+  const handleSubmit = async (data: WorkshopTemplateFormData) => {
+    if (!id) return
+
     // Transform form data to API request format
     const updateRequest: UpdateWorkshopTemplateRequest = {
       name: data.name,
@@ -86,28 +124,51 @@ export default function WorkshopTemplateEditPage() {
       tagIds: data.tagIds,
     }
 
-    // TODO: Call API to update template
-    console.log("Updating template:", id, updateRequest)
-    // In real implementation:
-    // const updatedTemplate = await workshopTemplateApi.update(id, updateRequest)
-    // Template stays in DRAFT or REJECTED status after update
-    // navigate(`/vendor/workshop-templates/${id}`)
-
-    // Navigate to detail page
-    navigate(`/vendor/workshop-templates/${id}`)
+    try {
+      setSubmitting(true)
+      const updatedTemplate = await WorkshopTemplateService.updateTemplate(id, updateRequest)
+      
+      notification.success({
+        message: 'Template Updated',
+        description: `Template "${updatedTemplate.name}" has been updated successfully.`
+      })
+      
+      // Navigate to detail page
+      navigate(`/vendor/workshop-templates/${id}`)
+    } catch (error: any) {
+      console.error('Update failed:', error)
+      notification.error({
+        message: 'Update Failed',
+        description: error.message || 'Failed to update template. Please try again.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
     navigate(`/vendor/workshop-templates/${id}`)
   }
 
-  const handleSubmitForApproval = () => {
-    // TODO: Call API to submit for approval
-    console.log("Submitting template for approval:", id)
-    // In real implementation:
-    // await workshopTemplateApi.register(id)
-    // Status changes to PENDING
-    navigate(`/vendor/workshop-templates/${id}`)
+  const handleSubmitForApproval = async () => {
+    if (!id) return
+    
+    try {
+      await WorkshopTemplateService.submitForApproval(id)
+      
+      notification.success({
+        message: 'Submitted for Approval',
+        description: 'Template has been submitted for admin review.'
+      })
+      
+      navigate(`/vendor/workshop-templates/${id}`)
+    } catch (error: any) {
+      console.error('Submit failed:', error)
+      notification.error({
+        message: 'Submission Failed',
+        description: error.message || 'Failed to submit template. Please try again.',
+      })
+    }
   }
 
   return (
@@ -171,6 +232,7 @@ export default function WorkshopTemplateEditPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             isEditing={true}
+            submitting={submitting}
           />
         </CardContent>
       </Card>

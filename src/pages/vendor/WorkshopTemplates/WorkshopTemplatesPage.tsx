@@ -1,19 +1,20 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
-import { mockWorkshopTemplates } from './data'
 import { WorkshopTemplateResponse, WorkshopStatus } from './types'
 import { DeleteTemplateDialog } from './components/delete-template-dialog'
 import { SubmitApprovalDialog } from './components/submit-approval-dialog'
 import { WorkshopTemplateCard } from './components/workshop-template-card'
+import { WorkshopTemplateService } from '@/services/api/workshopTemplateService'
 
 export default function WorkshopTemplatesPage() {
   const navigate = useNavigate()
-  const [templates] = useState<WorkshopTemplateResponse[]>(mockWorkshopTemplates)
+  const [templates, setTemplates] = useState<WorkshopTemplateResponse[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('updatedAt')
@@ -27,6 +28,32 @@ export default function WorkshopTemplatesPage() {
     open: false,
     template: null,
   })
+
+  // Fetch templates on mount
+  useEffect(() => {
+    fetchTemplates()
+  }, [])
+
+  const fetchTemplates = async () => {
+    try {
+      setLoading(true)
+      const response = await WorkshopTemplateService.getMyTemplates({
+        page: 0, // TODO: Add pagination later
+        size: 100, // Get all for now
+        sortBy: 'updatedAt',
+        sortDirection: 'DESC',
+      })
+      setTemplates(response.content || [])
+    } catch (error: any) {
+      console.error('Failed to fetch templates:', error)
+      notification.error({
+        message: 'Failed to Load Templates',
+        description: error.message || 'Unable to fetch workshop templates. Please try again.',
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Filter and sort templates
   const filteredTemplates = useMemo(() => {
@@ -83,18 +110,26 @@ export default function WorkshopTemplatesPage() {
     setDeleteDialog({ open: true, template })
   }
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     if (deleteDialog.template) {
-      // TODO: Call API to delete template
-      console.log('Deleting template:', deleteDialog.template.id)
-      // In real implementation:
-      // await workshopTemplateApi.delete(deleteDialog.template.id)
-      // Refresh templates list
-      setDeleteDialog({ open: false, template: null })
-      notification.success({
-        message: 'Template Deleted',
-        description: `Template "${deleteDialog.template.name}" has been deleted.`
-      })
+      try {
+        await WorkshopTemplateService.deleteTemplate(deleteDialog.template.id)
+        
+        // Remove from local state
+        setTemplates(prev => prev.filter(t => t.id !== deleteDialog.template!.id))
+        
+        setDeleteDialog({ open: false, template: null })
+        notification.success({
+          message: 'Template Deleted',
+          description: `Template "${deleteDialog.template.name}" has been deleted.`
+        })
+      } catch (error: any) {
+        console.error('Delete failed:', error)
+        notification.error({
+          message: 'Delete Failed',
+          description: error.message || 'Failed to delete template. Please try again.',
+        })
+      }
     }
   }
 
@@ -102,19 +137,26 @@ export default function WorkshopTemplatesPage() {
     setSubmitDialog({ open: true, template })
   }
 
-  const handleSubmitConfirm = () => {
+  const handleSubmitConfirm = async () => {
     if (submitDialog.template) {
-      // TODO: Call API to submit template for approval
-      console.log('Submitting template for approval:', submitDialog.template.id)
-      // In real implementation:
-      // await workshopTemplateApi.register(submitDialog.template.id)
-      // Update template status to PENDING
-      // Refresh templates list
-      setSubmitDialog({ open: false, template: null })
-      notification.success({
-        message: 'Template Submitted',
-        description: `Template "${submitDialog.template.name}" has been submitted for approval.`
-      })
+      try {
+        const updated = await WorkshopTemplateService.submitForApproval(submitDialog.template.id)
+        
+        // Update local state
+        setTemplates(prev => prev.map(t => t.id === updated.id ? updated : t))
+        
+        setSubmitDialog({ open: false, template: null })
+        notification.success({
+          message: 'Template Submitted',
+          description: `Template "${submitDialog.template.name}" has been submitted for approval.`
+        })
+      } catch (error: any) {
+        console.error('Submit failed:', error)
+        notification.error({
+          message: 'Submission Failed',
+          description: error.message || 'Failed to submit template for approval. Please try again.',
+        })
+      }
     }
   }
 
@@ -183,7 +225,14 @@ export default function WorkshopTemplatesPage() {
       </div>
 
       {/* Templates Grid */}
-      {filteredTemplates.length > 0 ? (
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading templates...</p>
+          </div>
+        </div>
+      ) : filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTemplates.map((template) => (
             <WorkshopTemplateCard

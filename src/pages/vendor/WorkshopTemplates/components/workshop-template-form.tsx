@@ -23,6 +23,7 @@ interface WorkshopTemplateFormProps {
   onSubmit: (data: WorkshopTemplateFormData) => void
   onCancel: () => void
   isEditing?: boolean
+  submitting?: boolean
 }
 
 export function WorkshopTemplateForm({
@@ -30,6 +31,7 @@ export function WorkshopTemplateForm({
   onSubmit,
   onCancel,
   isEditing = false,
+  submitting = false,
 }: WorkshopTemplateFormProps) {
   const [durationDisplay, setDurationDisplay] = useState("")
 
@@ -305,11 +307,28 @@ export function WorkshopTemplateForm({
 
         {/* Form Actions */}
         <div className="flex justify-end gap-4 pt-6 border-t">
-          <Button type="button" variant="outline" onClick={onCancel} size="lg">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel} 
+            size="lg"
+            disabled={submitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" size="lg">
-            {isEditing ? "Save Changes" : "Create Template"}
+          <Button 
+            type="submit" 
+            size="lg"
+            disabled={submitting}
+          >
+            {submitting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                {isEditing ? "Saving..." : "Creating..."}
+              </>
+            ) : (
+              isEditing ? "Save Changes" : "Create Template"
+            )}
           </Button>
         </div>
       </form>

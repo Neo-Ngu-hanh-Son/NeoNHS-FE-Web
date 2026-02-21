@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/dialog"
 import { SessionForm } from "./session-form"
 import { WorkshopSessionFormData, CreateWorkshopSessionRequest } from "../types"
+import { WorkshopSessionService } from "@/services/api/workshopSessionService"
+import { notification } from "antd"
+import { useState } from "react"
 
 interface CreateSessionDialogProps {
   open: boolean
@@ -21,8 +24,9 @@ export function CreateSessionDialog({
   preselectedDate,
   onSuccess,
 }: CreateSessionDialogProps) {
+  const [submitting, setSubmitting] = useState(false)
   
-  const handleSubmit = (data: WorkshopSessionFormData) => {
+  const handleSubmit = async (data: WorkshopSessionFormData) => {
     // Transform form data to API request format
     const createRequest: CreateWorkshopSessionRequest = {
       workshopTemplateId: data.workshopTemplateId,
@@ -32,15 +36,29 @@ export function CreateSessionDialog({
       maxParticipants: data.maxParticipants,
     }
     
-    // TODO: Call API to create session
-    console.log('Creating new session:', createRequest)
-    // In real implementation:
-    // const newSession = await workshopSessionApi.create(createRequest)
-    // The session will be created with status: SCHEDULED
-    
-    // Close dialog and refresh
-    onOpenChange(false)
-    if (onSuccess) onSuccess()
+    try {
+      setSubmitting(true)
+      const newSession = await WorkshopSessionService.createSession(createRequest)
+      
+      notification.success({
+        message: 'Session Created',
+        description: newSession?.workshopTemplate?.name 
+          ? `Session for "${newSession.workshopTemplate.name}" has been created successfully.`
+          : 'Workshop session has been created successfully.'
+      })
+      
+      // Close dialog and refresh
+      onOpenChange(false)
+      if (onSuccess) onSuccess()
+    } catch (error: any) {
+      console.error('Create failed:', error)
+      notification.error({
+        message: 'Creation Failed',
+        description: error.message || 'Failed to create session. Please try again.',
+      })
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const handleCancel = () => {
@@ -62,6 +80,7 @@ export function CreateSessionDialog({
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isEditing={false}
+          submitting={submitting}
         />
       </DialogContent>
     </Dialog>

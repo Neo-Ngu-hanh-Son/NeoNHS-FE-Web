@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
-import { CloseOutlined, PictureOutlined, StarOutlined, StarFilled, UploadOutlined } from "@ant-design/icons"
+import { CloseOutlined, PictureOutlined, StarOutlined, StarFilled, UploadOutlined, LoadingOutlined } from "@ant-design/icons"
 import { Card } from "@/components/ui/card"
 import { Upload, message } from "antd"
 import type { RcFile } from "antd/es/upload"
+import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary"
+import { useState } from "react"
 
 interface ImageUploaderProps {
   imageUrls: string[]
@@ -21,6 +23,7 @@ export function ImageUploader({
   disabled,
 }: ImageUploaderProps) {
   const [messageApi, contextHolder] = message.useMessage();
+  const [uploading, setUploading] = useState(false);
 
   const handleRemoveImage = (index: number) => {
     const newUrls = imageUrls.filter((_, i) => i !== index)
@@ -41,42 +44,57 @@ export function ImageUploader({
     onChange(imageUrls, index)
   }
 
-  const handleBeforeUpload = (file: RcFile) => {
-    // 1. Kiểm tra định dạng file
-    const isImage = file.type.startsWith('image/')
-    if (!isImage) {
-      messageApi.error('Lỗi: Bạn chỉ có thể tải lên file hình ảnh!')
+  const handleBeforeUpload = async (file: RcFile) => {
+    // 1. Validate image file
+    const validationError = validateImageFile(file, 5) // Max 5MB
+    if (validationError) {
+      messageApi.error(validationError)
       return Upload.LIST_IGNORE
     }
 
-    const reader = new FileReader()
+    // 2. Upload to Cloudinary
+    setUploading(true)
+    messageApi.loading({
+      content: 'Uploading image to Cloudinary...',
+      key: 'upload',
+      duration: 0, // Keep showing until we dismiss it
+    })
 
-    // 2. Xử lý khi đọc file THÀNH CÔNG (Success)
-    reader.onload = () => {
-      const url = reader.result as string
-
-      // Kiểm tra trùng lặp
-      if (imageUrls.includes(url)) {
-        messageApi.warning('Hình ảnh này đã được thêm từ trước!')
-        return
+    try {
+      const cloudinaryUrl = await uploadImageToCloudinary(file)
+      
+      if (!cloudinaryUrl) {
+        throw new Error('Failed to get Cloudinary URL')
       }
 
-      // Cập nhật state
-      onChange([...imageUrls, url], thumbnailIndex)
+      // 3. Check for duplicates
+      if (imageUrls.includes(cloudinaryUrl)) {
+        messageApi.warning({
+          content: 'This image has already been added!',
+          key: 'upload',
+        })
+        return Upload.LIST_IGNORE
+      }
 
-      // Hiện thông báo thành công
-      messageApi.success('Tải ảnh lên thành công!')
+      // 4. Add Cloudinary URL to the list
+      onChange([...imageUrls, cloudinaryUrl], thumbnailIndex)
+
+      // 5. Show success message
+      messageApi.success({
+        content: 'Image uploaded successfully!',
+        key: 'upload',
+      })
+    } catch (error: any) {
+      console.error('Upload failed:', error)
+      messageApi.error({
+        content: error.message || 'Failed to upload image. Please try again.',
+        key: 'upload',
+      })
+    } finally {
+      setUploading(false)
     }
 
-    // 3. Xử lý khi đọc file THẤT BẠI (Error)
-    reader.onerror = () => {
-      messageApi.error('Lỗi: Không thể đọc được file ảnh này!')
-    }
-
-    // Lưu ý: Nên gọi hàm readAsDataURL SAU KHI đã khai báo xong onload và onerror
-    reader.readAsDataURL(file)
-
-    // Ngăn chặn hành vi tự động upload của component (vì ta đang xử lý local)
+    // Prevent default upload behavior
     return false
   }
 
@@ -97,14 +115,32 @@ export function ImageUploader({
             accept="image/*"
             showUploadList={false}
             beforeUpload={handleBeforeUpload}
-            disabled={disabled}
+            disabled={disabled || uploading}
           >
-            <Button type="button" variant="outline" disabled={disabled}>
-              <UploadOutlined className="mr-2" />
-              Upload Image
+            <Button type="button" variant="outline" disabled={disabled || uploading}>
+              {uploading ? (
+                <>
+                  <LoadingOutlined className="mr-2 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <UploadOutlined className="mr-2" />
+                  Upload Image
+                </>
+              )}
             </Button>
           </Upload>
         </div>
+
+        {/* Upload Info */}
+        {uploading && (
+          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              ⏳ Uploading to Cloudinary... Please wait.
+            </p>
+          </div>
+        )}
 
         {/* Image Grid */}
         {imageUrls.length > 0 && (

@@ -34,8 +34,8 @@ export function ViewSessionDialog({
   
   if (!session) return null
 
-  const thumbnail = session.workshopTemplate.images.find(img => img.isThumbnail)?.imageUrl 
-    || session.workshopTemplate.images[0]?.imageUrl
+  const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
+    || session.workshopTemplate?.images?.[0]?.imageUrl
   const enrollmentPercentage = getEnrollmentPercentage(session.currentEnrollments, session.maxParticipants)
   const duration = calculateDuration(session.startTime, session.endTime)
 
@@ -45,9 +45,9 @@ export function ViewSessionDialog({
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-2xl">{session.workshopTemplate.name}</DialogTitle>
+              <DialogTitle className="text-2xl">{session.workshopTemplate?.name || 'Unnamed Workshop'}</DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                {session.workshopTemplate.shortDescription}
+                {session.workshopTemplate?.shortDescription || 'No description available'}
               </p>
             </div>
             <SessionStatusBadge status={session.status} size="lg" />
@@ -60,7 +60,7 @@ export function ViewSessionDialog({
             <div className="relative h-64 rounded-lg overflow-hidden">
               <img
                 src={thumbnail}
-                alt={session.workshopTemplate.name}
+                alt={session.workshopTemplate?.name || 'Workshop'}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src = "https://via.placeholder.com/800x400?text=No+Image"
@@ -128,15 +128,17 @@ export function ViewSessionDialog({
           <Separator />
 
           {/* Workshop Description */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">About This Workshop</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {session.workshopTemplate.fullDescription}
-            </p>
-          </div>
+          {session.workshopTemplate?.fullDescription && (
+            <div className="space-y-3">
+              <h3 className="text-lg font-semibold">About This Workshop</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {session.workshopTemplate.fullDescription}
+              </p>
+            </div>
+          )}
 
           {/* Tags */}
-          {session.workshopTemplate.tags.length > 0 && (
+          {session.workshopTemplate?.tags && session.workshopTemplate.tags.length > 0 && (
             <>
               <Separator />
               <div className="space-y-3">
@@ -161,32 +163,36 @@ export function ViewSessionDialog({
           )}
 
           {/* Vendor Information */}
-          <Separator />
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Hosted By</h3>
-            <div className="flex items-start gap-4">
-              {session.vendor.avatar && (
-                <img
-                  src={session.vendor.avatar}
-                  alt={session.vendor.name}
-                  className="w-12 h-12 rounded-full"
-                />
-              )}
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">{session.vendor.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">{session.vendor.email}</span>
+          {session.vendor && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">Hosted By</h3>
+                <div className="flex items-start gap-4">
+                  {session.vendor.avatar && (
+                    <img
+                      src={session.vendor.avatar}
+                      alt={session.vendor.name}
+                      className="w-12 h-12 rounded-full"
+                    />
+                  )}
+                  <div className="space-y-1 text-sm">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">{session.vendor.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-muted-foreground">{session.vendor.email}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
 
           {/* Rating (if available) */}
-          {session.workshopTemplate.averageRating && (
+          {session.workshopTemplate?.averageRating && (
             <>
               <Separator />
               <div className="space-y-2">

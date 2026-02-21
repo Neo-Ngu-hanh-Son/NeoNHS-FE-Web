@@ -77,8 +77,8 @@ export function DayView({
                 {hourSessions.length > 0 ? (
                   <div className="space-y-2">
                     {hourSessions.map(session => {
-                      const thumbnail = session.workshopTemplate.images.find(img => img.isThumbnail)?.imageUrl 
-                        || session.workshopTemplate.images[0]?.imageUrl
+                      const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
+                        || session.workshopTemplate?.images?.[0]?.imageUrl
                       const canEdit = session.status === SessionStatus.SCHEDULED
                       const canCancel = session.status === SessionStatus.SCHEDULED && session.currentEnrollments > 0
 
@@ -100,7 +100,7 @@ export function DayView({
                               {thumbnail && (
                                 <img
                                   src={thumbnail}
-                                  alt={session.workshopTemplate.name}
+                                  alt={session.workshopTemplate?.name || 'Workshop'}
                                   className="w-20 h-20 rounded-lg object-cover shrink-0"
                                   onError={(e) => {
                                     e.currentTarget.src = "https://via.placeholder.com/80x80?text=No+Image"
@@ -112,7 +112,7 @@ export function DayView({
                               <div className="flex-1 space-y-2">
                                 <div className="flex items-start justify-between gap-2">
                                   <h3 className="font-semibold text-lg">
-                                    {session.workshopTemplate.name}
+                                    {session.workshopTemplate?.name || 'Unnamed Workshop'}
                                   </h3>
                                   <SessionStatusBadge status={session.status} size="sm" />
                                 </div>
@@ -141,8 +141,9 @@ export function DayView({
                                 </div>
 
                                 {/* Tags */}
-                                <div className="flex flex-wrap gap-1.5">
-                                  {session.workshopTemplate.tags.slice(0, 3).map(tag => (
+                                {session.workshopTemplate?.tags && session.workshopTemplate.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {session.workshopTemplate.tags.slice(0, 3).map(tag => (
                                     <Badge
                                       key={tag.id}
                                       variant="outline"
@@ -156,7 +157,8 @@ export function DayView({
                                       {tag.name}
                                     </Badge>
                                   ))}
-                                </div>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Actions */}
