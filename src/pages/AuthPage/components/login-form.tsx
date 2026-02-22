@@ -9,6 +9,7 @@ import {
   LockOutlined,
   MailOutlined,
 } from "@ant-design/icons"
+import { notification } from "antd"
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { LoginCredentials } from "@/services/api/authService"
@@ -25,6 +26,8 @@ export function LoginForm({
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [api, contextHolder] = notification.useNotification()
+  
 
   const [formData, setFormData] = useState<LoginCredentials>({
     email: "",
@@ -49,6 +52,14 @@ export function LoginForm({
       // Delay to keep the spinner active during the "load a bit" period
       await new Promise(resolve => setTimeout(resolve, 1000));
 
+      // Show success notification
+      api.success({
+        message: "Login Successful",
+        description: "Welcome back! You have logged in successfully.",
+        placement: "topRight",
+        duration: 3,
+      });
+
       // Redirection handled by LoginPage via AuthContext
 
       // The redirection is now handled by the parent LoginPage 
@@ -57,6 +68,13 @@ export function LoginForm({
       const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials."
       setError(errorMessage)
 
+      // Show error notification
+      api.error({
+        message: "Login Failed",
+        description: errorMessage,
+        placement: "topRight",
+        duration: 4,
+      });
     } finally {
       setIsLoading(false)
     }
@@ -82,13 +100,27 @@ export function LoginForm({
       // Delay to keep the spinner active during the "load a bit" period
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Redirection handled by LoginPage via AuthContext
+      // Show success notification
+      api.success({
+        message: "Login Successful",
+        description: "Welcome! You have logged in with Google successfully.",
+        placement: "topRight",
+        duration: 3,
+      });
 
       // Redirection handled by LoginPage via AuthContext
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
       const errorMessage = err.response?.data?.message || err.message || "Google login failed on server.";
       setError(errorMessage);
+
+      // Show error notification
+      api.error({
+        message: "Google Login Failed",
+        description: errorMessage,
+        placement: "topRight",
+        duration: 4,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -98,10 +130,19 @@ export function LoginForm({
   const handleGoogleError = () => {
     const errorMessage = "Google Login failed connection.";
     setError(errorMessage);
+
+    // Show error notification
+    api.error({
+      message: "Google Login Failed",
+      description: errorMessage,
+      placement: "topRight",
+      duration: 4,
+    });
   };
 
   return (
     <>
+      {contextHolder}
       <div className={cn("w-full max-w-md mx-auto", className)}>
         {/* Header */}
         <div className="text-center mb-8">

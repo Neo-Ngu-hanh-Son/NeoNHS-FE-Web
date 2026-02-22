@@ -1,10 +1,19 @@
 import { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
+import { mockWorkshopTemplates } from '@/pages/vendor/WorkshopTemplates/data';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 export function VendorLayout() {
     const { user, logout } = useAuth();
@@ -26,12 +35,87 @@ export function VendorLayout() {
         { label: 'Vouchers', path: '/vendor/vouchers', icon: 'loyalty' },
     ];
 
+    const location = useLocation();
+    const params = useParams();
+
     // Helper to get breadcrumb from path
-    const getPageTitle = () => {
-        const path = window.location.pathname;
+    const getBreadcrumb = () => {
+        const path = location.pathname;
+        
+        // Workshop Templates routes
+        if (path.startsWith('/vendor/workshop-templates')) {
+            if (path === '/vendor/workshop-templates') {
+                return {
+                    items: [
+                        { label: 'Vendor', path: '/vendor/dashboard' },
+                        { label: 'Workshop Templates', path: '/vendor/workshop-templates' }
+                    ],
+                    title: 'Workshop Templates'
+                };
+            }
+            
+            if (path === '/vendor/workshop-templates/new') {
+                return {
+                    items: [
+                        { label: 'Vendor', path: '/vendor/dashboard' },
+                        { label: 'Workshop Templates', path: '/vendor/workshop-templates' },
+                        { label: 'Create New', path: '/vendor/workshop-templates/new' }
+                    ],
+                    title: 'Create New Template'
+                };
+            }
+            
+            // Detail or Edit page - get template name
+            const templateId = params.id;
+            if (templateId) {
+                const template = mockWorkshopTemplates.find(t => t.id === templateId);
+                const templateName = template ? template.name : 'Template Details';
+                
+                if (path.includes('/edit')) {
+                    return {
+                        items: [
+                            { label: 'Vendor', path: '/vendor/dashboard' },
+                            { label: 'Workshop Templates', path: '/vendor/workshop-templates' },
+                            { label: templateName, path: `/vendor/workshop-templates/${templateId}` },
+                            { label: 'Edit', path: `/vendor/workshop-templates/${templateId}/edit` }
+                        ],
+                        title: `Edit ${templateName}`
+                    };
+                }
+                
+                return {
+                    items: [
+                        { label: 'Vendor', path: '/vendor/dashboard' },
+                        { label: 'Workshop Templates', path: '/vendor/workshop-templates' },
+                        { label: templateName, path: `/vendor/workshop-templates/${templateId}` }
+                    ],
+                    title: templateName
+                };
+            }
+        }
+        
+        // Default navigation items
         const item = navItems.find(i => i.path === path);
-        return item ? item.label : 'Vendor Portal';
+        if (item) {
+            return {
+                items: [
+                    { label: 'Vendor', path: '/vendor/dashboard' },
+                    { label: item.label, path: item.path }
+                ],
+                title: item.label
+            };
+        }
+        
+        return {
+            items: [
+                { label: 'Vendor', path: '/vendor/dashboard' },
+                { label: 'Portal', path: '/vendor/dashboard' }
+            ],
+            title: 'Vendor Portal'
+        };
     };
+
+    const breadcrumb = getBreadcrumb();
 
     return (
         <div className="flex h-screen overflow-hidden font-display">
@@ -110,12 +194,29 @@ export function VendorLayout() {
                             {isCollapsed ? <MenuUnfoldOutlined style={{ fontSize: '20px' }} /> : <MenuFoldOutlined style={{ fontSize: '20px' }} />}
                         </button>
                         <div className="flex flex-col">
-                            <div className="flex items-center gap-2 text-sm text-[#588d70]">
-                                <span>Vendor</span>
-                                <span>/</span>
-                                <span className="text-primary font-medium">{getPageTitle()}</span>
-                            </div>
-                            <h2 className="text-xl font-bold mt-1">{getPageTitle()} Area</h2>
+                            <Breadcrumb>
+                                <BreadcrumbList>
+                                    {breadcrumb.items.map((item, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            {index > 0 && <BreadcrumbSeparator />}
+                                            <BreadcrumbItem>
+                                                {index === breadcrumb.items.length - 1 ? (
+                                                    <BreadcrumbPage className="text-primary font-medium">
+                                                        {item.label}
+                                                    </BreadcrumbPage>
+                                                ) : (
+                                                    <BreadcrumbLink asChild>
+                                                        <Link to={item.path} className="text-[#588d70] hover:text-primary transition-colors">
+                                                            {item.label}
+                                                        </Link>
+                                                    </BreadcrumbLink>
+                                                )}
+                                            </BreadcrumbItem>
+                                        </div>
+                                    ))}
+                                </BreadcrumbList>
+                            </Breadcrumb>
+                            <h2 className="text-xl font-bold mt-1">{breadcrumb.title}</h2>
                         </div>
                     </div>
 
@@ -139,7 +240,7 @@ export function VendorLayout() {
                             <div className="flex items-center gap-3">
                                 <div className="text-right hidden sm:block">
                                     <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">{user?.fullname || 'Vendor'}</p>
-                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">Business Owner</p>
+                                    <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">Vendor</p>
                                 </div>
                                 <div
                                     className="size-10 rounded-full bg-primary/10 bg-center bg-cover border-2 border-primary/20"

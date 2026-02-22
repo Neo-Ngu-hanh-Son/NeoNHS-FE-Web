@@ -31,6 +31,9 @@ import EventEditPage from "@/pages/admin/events/edit";
 
 // Vendor specific pages
 import WorkshopTemplatesPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage";
+import WorkshopTemplateDetailPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateDetailPage'
+import WorkshopTemplateCreatePage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateCreatePage'
+import WorkshopTemplateEditPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateEditPage'
 import WorkshopSessionsPage from "@/pages/vendor/WorkshopSessions/WorkshopSessionsPage";
 import WorkshopCalendarPage from "@/pages/vendor/WorkshopCalendar/CalendarPage.tsx";
 import TicketVerificationPage from "@/pages/vendor/Tickets/TicketVerificationPage";
@@ -84,6 +87,9 @@ export const router = createBrowserRouter([
           { path: "dashboard", element: <VendorDashboardPage /> },
           { path: "profile", element: <VendorProfilePage /> },
           { path: "workshop-templates", element: <WorkshopTemplatesPage /> },
+          { path: "workshop-templates/new", element: <WorkshopTemplateCreatePage /> },
+          { path: "workshop-templates/:id", element: <WorkshopTemplateDetailPage /> },
+          { path: "workshop-templates/:id/edit", element: <WorkshopTemplateEditPage /> },
           { path: "workshop-sessions", element: <WorkshopSessionsPage /> },
           { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
           { path: "ticket-verification", element: <TicketVerificationPage /> },
