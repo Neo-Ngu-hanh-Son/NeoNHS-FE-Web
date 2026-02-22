@@ -183,13 +183,13 @@ export function SessionForm({
               name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Price (USD)</FormLabel>
+                  <FormLabel>Price (VND)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder="45.00"
+                      step="1000"
+                      min="1000"
+                      placeholder="450000"
                       {...field}
                       value={field.value || ''}
                       onChange={e => field.onChange(parseFloat(e.target.value) || undefined)}

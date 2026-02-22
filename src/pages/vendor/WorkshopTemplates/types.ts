@@ -115,7 +115,7 @@ export const workshopTemplateSchema = z.object({
   
   defaultPrice: z.number()
     .positive("Price must be greater than 0")
-    .min(0.01, "Price must be at least $0.01"),
+    .min(1, "Price must be at least 1 VND"),
   
   minParticipants: z.number()
     .positive("Must be at least 1")

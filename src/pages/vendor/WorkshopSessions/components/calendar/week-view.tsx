@@ -28,7 +28,7 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
 
   const weekDates = getWeekDates(currentDate)
   const today = new Date()
-  const hours = Array.from({ length: 15 }, (_, i) => i + 6) // 6 AM to 8 PM
+  const hours = Array.from({ length: 24 }, (_, i) => i + 1) // 1 AM to 12 AM (24 hours)
 
   // Get sessions for a specific date
   const getSessionsForDate = (date: Date) => {
@@ -96,27 +96,30 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
 
       {/* Time Grid */}
       <div className="grid grid-cols-8 gap-2 relative">
-        {hours.map(hour => (
-          <div key={hour} className="contents">
-            {/* Hour Label */}
-            <div className="text-sm text-muted-foreground py-4 text-right pr-2">
-              {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
-            </div>
+        {hours.map(hour => {
+          const actualHour = hour % 24 // Convert 24 to 0 for midnight
+          
+          return (
+            <div key={hour} className="contents">
+              {/* Hour Label */}
+              <div className="text-sm text-muted-foreground py-4 text-right pr-2">
+                {actualHour === 0 ? '12 AM' : actualHour < 12 ? `${actualHour} AM` : actualHour === 12 ? '12 PM' : `${actualHour - 12} PM`}
+              </div>
 
-            {/* Day Columns */}
-            {weekDates.map(date => {
-              const dateSessions = getSessionsForDate(date)
-              
-              return (
-                <div
-                  key={`${hour}-${date.toISOString()}`}
-                  className="border-t border-gray-200 dark:border-gray-700 min-h-[60px] relative hover:bg-primary/5 cursor-pointer transition-colors"
-                  onClick={() => onDateClick(date)}
-                >
-                  {/* Render sessions that start in this hour */}
-                  {dateSessions.map(session => {
-                    const position = getSessionPosition(session, hour)
-                    if (!position.show) return null
+              {/* Day Columns */}
+              {weekDates.map(date => {
+                const dateSessions = getSessionsForDate(date)
+                
+                return (
+                  <div
+                    key={`${hour}-${date.toISOString()}`}
+                    className="border-t border-gray-200 dark:border-gray-700 min-h-[60px] relative hover:bg-primary/5 cursor-pointer transition-colors"
+                    onClick={() => onDateClick(date)}
+                  >
+                    {/* Render sessions that start in this hour */}
+                    {dateSessions.map(session => {
+                      const position = getSessionPosition(session, actualHour)
+                      if (!position.show) return null
 
                     const heightInPixels = position.duration * 60 // 60px per hour
                     
@@ -156,7 +159,8 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
               )
             })}
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

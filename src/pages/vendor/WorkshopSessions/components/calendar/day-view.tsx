@@ -24,7 +24,7 @@ export function DayView({
   onSessionCancel,
   onEmptySlotClick 
 }: DayViewProps) {
-  const hours = Array.from({ length: 15 }, (_, i) => i + 6) // 6 AM to 8 PM
+  const hours = Array.from({ length: 24 }, (_, i) => i + 1) // 1 AM to 12 AM (24 hours)
 
   // Get sessions for the selected date
   const daySessions = sessions.filter(session => {
@@ -55,15 +55,16 @@ export function DayView({
       {/* Timeline */}
       <div className="space-y-2">
         {hours.map(hour => {
+          const actualHour = hour % 24 // Convert 24 to 0 for midnight
           const hourSessions = daySessions.filter(session => {
             const startHour = new Date(session.startTime).getHours()
-            return startHour === hour
+            return startHour === actualHour
           })
 
-          const timeLabel = hour === 0 ? '12:00 AM' 
-            : hour < 12 ? `${hour}:00 AM` 
-            : hour === 12 ? '12:00 PM' 
-            : `${hour - 12}:00 PM`
+          const timeLabel = actualHour === 0 ? '12:00 AM' 
+            : actualHour < 12 ? `${actualHour}:00 AM` 
+            : actualHour === 12 ? '12:00 PM' 
+            : `${actualHour - 12}:00 PM`
 
           return (
             <div key={hour} className="flex gap-4">
@@ -209,7 +210,7 @@ export function DayView({
                 ) : (
                   // Empty time slot
                   <div
-                    onClick={() => onEmptySlotClick(currentDate, hour)}
+                    onClick={() => onEmptySlotClick(currentDate, actualHour)}
                     className="border-2 border-dashed rounded-lg p-4 text-center text-muted-foreground hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer min-h-[60px] flex items-center justify-center"
                   >
                     <span className="text-sm">+ Add session</span>

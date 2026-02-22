@@ -155,18 +155,18 @@ export function WorkshopTemplateForm({
               name="defaultPrice"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Default Price ($) *</FormLabel>
+                  <FormLabel>Default Price (VND) *</FormLabel>
                   <FormControl>
                     <Input 
                       type="number" 
-                      step="0.01"
-                      min="0.01"
-                      placeholder="45.00" 
+                      step="1000"
+                      min="1000"
+                      placeholder="450000" 
                       {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                     />
                   </FormControl>
-                  <FormDescription>Minimum $0.01</FormDescription>
+                  <FormDescription>Minimum 1,000 VND</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
