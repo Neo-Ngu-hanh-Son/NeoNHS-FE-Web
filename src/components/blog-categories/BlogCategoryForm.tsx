@@ -1,94 +1,114 @@
 /**
  * BlogCategoryForm
  * Shared form content for Create and Edit modes.
+ * Uses shadcn/ui Input, Textarea, Label, Select.
  * In "create" mode the status field is hidden (defaults to ACTIVE).
  * In "edit" mode all fields are shown and pre-filled.
+ *
+ * This is a controlled component — the parent owns the form state.
  */
 
-import { Form, Input, Select } from 'antd';
-import type { FormInstance } from 'antd';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { BlogCategoryRequest, BlogCategoryStatus } from '@/types/blog';
 
-const { TextArea } = Input;
-
-const STATUS_OPTIONS: { label: string; value: BlogCategoryStatus }[] = [
-  { label: 'Active', value: 'ACTIVE' },
-  { label: 'Archived', value: 'ARCHIVED' },
-];
-
-interface BlogCategoryFormProps {
-  form: FormInstance<BlogCategoryRequest>;
-  mode: 'create' | 'edit';
+export interface BlogCategoryFormErrors {
+  name?: string;
+  description?: string;
 }
 
-export default function BlogCategoryForm({ form, mode }: BlogCategoryFormProps) {
+interface BlogCategoryFormProps {
+  mode: 'create' | 'edit';
+  values: BlogCategoryRequest;
+  errors: BlogCategoryFormErrors;
+  onChange: (field: keyof BlogCategoryRequest, value: string) => void;
+}
+
+export default function BlogCategoryForm({
+  mode,
+  values,
+  errors,
+  onChange,
+}: BlogCategoryFormProps) {
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      requiredMark="optional"
-      initialValues={{ status: 'ACTIVE' }}
-      className="pt-3"
-    >
+    <div className="space-y-5 pt-2">
       {/* Category Name */}
-      <Form.Item
-        name="name"
-        label={
-          <span className="text-sm font-medium text-gray-700">
-            Category Name
-          </span>
-        }
-        rules={[
-          { required: true, message: 'Please enter a category name' },
-          { min: 2, message: 'Name must be at least 2 characters' },
-          { max: 100, message: 'Name must be at most 100 characters' },
-        ]}
-      >
+      <div className="space-y-2">
+        <Label htmlFor="category-name" className="text-sm font-medium text-gray-700">
+          Category Name <span className="text-red-500">*</span>
+        </Label>
         <Input
+          id="category-name"
           placeholder="e.g. Travel Tips, Food & Culture..."
-          size="large"
+          value={values.name}
+          onChange={(e) => onChange('name', e.target.value)}
           maxLength={100}
-          showCount
-          className="!rounded-lg"
+          className={errors.name ? 'border-red-400 focus-visible:ring-red-400' : ''}
         />
-      </Form.Item>
+        <div className="flex items-center justify-between">
+          {errors.name ? (
+            <p className="text-xs text-red-500">{errors.name}</p>
+          ) : (
+            <span />
+          )}
+          <p className="text-xs text-gray-400">{values.name.length}/100</p>
+        </div>
+      </div>
 
       {/* Description */}
-      <Form.Item
-        name="description"
-        label={
-          <span className="text-sm font-medium text-gray-700">
-            Description
-          </span>
-        }
-        rules={[
-          { max: 500, message: 'Description must be at most 500 characters' },
-        ]}
-      >
-        <TextArea
+      <div className="space-y-2">
+        <Label htmlFor="category-desc" className="text-sm font-medium text-gray-700">
+          Description
+        </Label>
+        <Textarea
+          id="category-desc"
           placeholder="Briefly describe what this category is about..."
-          rows={3}
+          value={values.description || ''}
+          onChange={(e) => onChange('description', e.target.value)}
           maxLength={500}
-          showCount
-          className="!rounded-lg"
+          rows={3}
+          className={errors.description ? 'border-red-400 focus-visible:ring-red-400' : ''}
         />
-      </Form.Item>
+        <div className="flex items-center justify-between">
+          {errors.description ? (
+            <p className="text-xs text-red-500">{errors.description}</p>
+          ) : (
+            <span />
+          )}
+          <p className="text-xs text-gray-400">
+            {(values.description || '').length}/500
+          </p>
+        </div>
+      </div>
 
       {/* Status — only visible in edit mode */}
       {mode === 'edit' && (
-        <Form.Item
-          name="status"
-          label={
-            <span className="text-sm font-medium text-gray-700">Status</span>
-          }
-        >
+        <div className="space-y-2">
+          <Label htmlFor="category-status" className="text-sm font-medium text-gray-700">
+            Status
+          </Label>
           <Select
-            options={STATUS_OPTIONS}
-            size="large"
-            className="!rounded-lg"
-          />
-        </Form.Item>
+            value={values.status || 'ACTIVE'}
+            onValueChange={(val) => onChange('status', val as BlogCategoryStatus)}
+          >
+            <SelectTrigger id="category-status">
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="ARCHIVED">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       )}
-    </Form>
+    </div>
   );
 }

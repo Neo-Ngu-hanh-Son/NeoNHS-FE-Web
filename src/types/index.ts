@@ -70,4 +70,9 @@ export interface PaginatedResponse<T> {
   pagination: PaginationParams;
 }
 
+// Re-export domain types
+export * from './tag';
+export * from './ticketCatalog';
+export * from './event';
+
 // Add more global types as needed
