@@ -42,6 +42,8 @@ import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
 import AdminBlogDetailPage from "@/pages/admin/blog/AdminBlogDetailPage";
 import BlogEditPage from "@/pages/admin/blog/BlogEditPage";
 import BlogDetailsPage from "@/pages/blog/BlogDetailsPage";
+import EventTagPage from "@/pages/admin/tags/EventTagPage";
+import WorkshopTagPage from "@/pages/admin/tags/WorkshopTagPage";
 
 export const router = createBrowserRouter([
   {
@@ -102,6 +104,8 @@ export const router = createBrowserRouter([
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "events", element: <AdminEventsPage /> },
+          { path: "event-tags", element: <EventTagPage /> },
+          { path: "workshop-tags", element: <WorkshopTagPage /> },
           { path: "events/create", element: <EventCreatePage /> },
           { path: "events/:id", element: <EventDetailPage /> },
           { path: "events/:id/edit", element: <EventEditPage /> },

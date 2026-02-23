@@ -1,8 +1,3 @@
-/**
- * BlogContent
- * Renders the blog HTML content safely within a prose container.
- */
-
 interface BlogContentProps {
   html: string | undefined;
 }

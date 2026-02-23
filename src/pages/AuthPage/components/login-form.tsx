@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
@@ -8,59 +8,57 @@ import {
   UserOutlined,
   LockOutlined,
   MailOutlined,
-} from "@ant-design/icons"
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { LoginCredentials } from "@/services/api/authService"
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google"
-import { useAuth } from "@/hooks/useAuth"
+} from "@ant-design/icons";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { LoginCredentials } from "@/services/api/authService";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { useAuth } from "@/hooks/auth/useAuth";
 
-
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   // Navigation is now handled by the parent LoginPage
-  const { login, loginGoogle } = useAuth()
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { login, loginGoogle } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<LoginCredentials>({
     email: "",
     password: "",
-  })
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target
-    setFormData((prev) => ({ ...prev, [id]: value }))
-    setError(null)
-  }
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
       // Use context login instead of direct service call
-      await login(formData)
+      await login(formData);
 
       // Delay to keep the spinner active during the "load a bit" period
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Redirection handled by LoginPage via AuthContext
 
-      // The redirection is now handled by the parent LoginPage 
+      // The redirection is now handled by the parent LoginPage
       // via AuthContext's isAuthenticated state for better consistency.
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || "Login failed. Please check your credentials."
-      setError(errorMessage)
-
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setError(null);
@@ -80,20 +78,20 @@ export function LoginForm({
       await loginGoogle({ idToken });
 
       // Delay to keep the spinner active during the "load a bit" period
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Redirection handled by LoginPage via AuthContext
 
       // Redirection handled by LoginPage via AuthContext
     } catch (err: any) {
       console.error("Backend Google Login Error:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Google login failed on server.";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Google login failed on server.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   const handleGoogleError = () => {
     const errorMessage = "Google Login failed connection.";
@@ -129,7 +127,10 @@ export function LoginForm({
           <div className="space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
                 <MailOutlined className="text-gray-400" />
                 Email Address
               </label>
@@ -148,7 +149,10 @@ export function LoginForm({
             {/* Password Field */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
                   <LockOutlined className="text-gray-400" />
                   Password
                 </label>
@@ -176,7 +180,11 @@ export function LoginForm({
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
                   disabled={isLoading}
                 >
-                  {showPassword ? <EyeOutlined className="text-lg" /> : <EyeInvisibleOutlined className="text-lg" />}
+                  {showPassword ? (
+                    <EyeOutlined className="text-lg" />
+                  ) : (
+                    <EyeInvisibleOutlined className="text-lg" />
+                  )}
                 </button>
               </div>
             </div>
@@ -236,7 +244,5 @@ export function LoginForm({
         </form>
       </div>
     </>
-  )
+  );
 }
-
-

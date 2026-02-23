@@ -23,7 +23,6 @@ import type { ImageUploadHandler } from "./editor";
 import "./editor/styles/BlogEditor.css";
 import TableCellResizerPlugin from "./editor/TableCellResizerPlugin/TableCellResizerPlugin";
 import TableActionMenuPlugin from "./editor/TableActionMenuPlugin";
-import DomExportDebugPlugin from "./editor/DomExportDebugPlugin";
 import ToolbarModal from "./editor/ToolbarElements/ToolbarModal";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import ClickableLinkPlugin from "./editor/ClickableLinkPlugin";
@@ -118,7 +117,9 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
 
           <div className="blog-editor-content-wrapper">
             <RichTextPlugin
-              contentEditable={<ContentEditable className="blog-editor-content" spellCheck={false} />}
+              contentEditable={
+                <ContentEditable className="blog-editor-content" spellCheck={false} />
+              }
               placeholder={<EditorPlaceholder />}
               ErrorBoundary={LexicalErrorBoundary}
             />

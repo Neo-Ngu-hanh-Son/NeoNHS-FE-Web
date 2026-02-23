@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useBlogs } from "@/hooks/useBlogs";
+import { useBlogs } from "@/hooks/blog/useBlogs";
 import { BlogToolbar } from "@/components/blog/BlogToolbar";
 import { BlogTable } from "@/components/blog/Table/BlogTable";
 import { BlogDeleteDialog } from "@/components/blog/BlogDeleteDialog";

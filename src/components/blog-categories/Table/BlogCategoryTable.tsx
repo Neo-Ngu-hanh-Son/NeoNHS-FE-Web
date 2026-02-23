@@ -2,7 +2,14 @@ import { message } from "antd";
 import { Eye, Pencil, Trash2, Tags, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { BlogCategoryResponse } from "@/types/blog";
 import { getInitials, formatShortDate } from "@/utils/helpers";
@@ -55,7 +62,11 @@ export function BlogCategoryTable({
           <AlertTriangle className="h-7 w-7 text-red-500" />
         </div>
         <p className="text-sm font-medium text-gray-700 mb-4">{error}</p>
-        <Button size="sm" onClick={onRetry} className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button
+          size="sm"
+          onClick={onRetry}
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+        >
           Try Again
         </Button>
       </div>
@@ -86,12 +97,17 @@ export function BlogCategoryTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-              <TableHead className="font-semibold text-gray-600">Category Name</TableHead>
-              <TableHead className="font-semibold text-gray-600">Slug</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[100px]">Status</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px] text-center">Posts</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[200px]">Category Name</TableHead>
+
+              <TableHead className="font-semibold text-gray-600">Description</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[80px]">Status</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px] text-center">
+                Posts
+              </TableHead>
               <TableHead className="font-semibold text-gray-600 w-[140px]">Created Date</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Actions</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -107,9 +123,11 @@ export function BlogCategoryTable({
                   </div>
                 </TableCell>
 
-                {/* Slug */}
+                {/* Description */}
                 <TableCell>
-                  <span className="text-sm font-medium text-gray-600">{cat.slug}</span>
+                  <span className="text-sm font-medium text-gray-600 line-clamp-2">
+                    {cat.description || "No description provided."}
+                  </span>
                 </TableCell>
 
                 {/* Status */}

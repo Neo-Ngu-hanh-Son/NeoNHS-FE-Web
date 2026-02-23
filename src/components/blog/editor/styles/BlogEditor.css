@@ -276,7 +276,7 @@
 /* --- Content Editable Area --- */
 .blog-editor-content-wrapper {
   position: relative;
-  max-height: 580px;
+  max-height: 520px;
   overflow-y: scroll;
 }
 

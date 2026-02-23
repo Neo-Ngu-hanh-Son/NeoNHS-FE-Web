@@ -1,4 +1,4 @@
-import { useBlogCategories } from "@/hooks/useBlogCategories";
+import { useBlogCategories } from "@/hooks/blog/useBlogCategories";
 import { formatShortDate, exportToCsv } from "@/utils/helpers";
 import { BlogCategoryToolbar, BlogCategoryTable } from "@/components";
 import BlogCategoryModal from "@/components/blog-categories/BlogCategoryModal";
@@ -27,7 +27,9 @@ export function BlogCategoryPage() {
 
   const handleExport = () => {
     const header = "Category Name,Status,Number of Posts,Created Date\n";
-    const rows = categories.map((c) => `"${c.name}","${c.status}",${c.postCount},"${formatShortDate(c.createdAt)}"`);
+    const rows = categories.map(
+      (c) => `"${c.name}","${c.status}",${c.postCount},"${formatShortDate(c.createdAt)}"`,
+    );
     exportToCsv("blog-categories.csv", header, rows);
   };
 

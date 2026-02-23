@@ -1,20 +1,20 @@
-import { CheckOTPForm } from "./components/check-otp-form"
-import { AppstoreOutlined } from "@ant-design/icons"
-import loginImage from "@/assets/images/login-img.jpg"
+import { CheckOTPForm } from "./components/check-otp-form";
+import { AppstoreOutlined } from "@ant-design/icons";
+import loginImage from "@/assets/images/login-img.jpg";
 
-import { useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 export default function VerifyOTP() {
-  const { isAuthenticated } = useAuth()
-  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
+      navigate("/");
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate]);
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -40,5 +40,5 @@ export default function VerifyOTP() {
         />
       </div>
     </div>
-  )
+  );
 }

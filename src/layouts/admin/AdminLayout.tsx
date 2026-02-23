@@ -23,6 +23,8 @@ export function AdminLayout() {
     { label: "Vouchers", path: "/admin/vouchers", icon: "loyalty" },
     { label: "Reports", path: "/admin/reports", icon: "analytics" },
     { label: "Events", path: "/admin/events", icon: "event" },
+    { label: "Event Tags", path: "/admin/event-tags", icon: "label" },
+    { label: "Workshop Tags", path: "/admin/workshop-tags", icon: "sell" },
     {
       label: "Manage blogs",
       path: "",
