@@ -8,7 +8,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     id: "admin-template-1",
     name: "Traditional Vietnamese Silk Painting",
     shortDescription: "Learn the art of Vietnamese silk painting with master artists.",
-    fullDescription: "Experience the delicate art of Vietnamese silk painting. Our expert instructors will guide you through the traditional techniques of painting on silk, including color mixing, brush techniques, and finishing methods. Create your own beautiful silk artwork to take home!",
+    fullDescription:
+      "Experience the delicate art of Vietnamese silk painting. Our expert instructors will guide you through the traditional techniques of painting on silk, including color mixing, brush techniques, and finishing methods. Create your own beautiful silk artwork to take home!",
     estimatedDuration: 180,
     defaultPrice: 850000,
     minParticipants: 4,
@@ -42,7 +43,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     id: "admin-template-2",
     name: "Pho Cooking Masterclass",
     shortDescription: "Master the art of making authentic Vietnamese Pho from scratch.",
-    fullDescription: "Learn to make the iconic Vietnamese pho from a professional chef. We'll cover everything from preparing the perfect broth to assembling the dish with the right proportions. Includes market tour and full lunch.",
+    fullDescription:
+      "Learn to make the iconic Vietnamese pho from a professional chef. We'll cover everything from preparing the perfect broth to assembling the dish with the right proportions. Includes market tour and full lunch.",
     estimatedDuration: 240,
     defaultPrice: 950000,
     minParticipants: 6,
@@ -76,7 +78,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     id: "admin-template-3",
     name: "Meditation & Mindfulness Retreat",
     shortDescription: "Half-day meditation and mindfulness practice in peaceful surroundings.",
-    fullDescription: "Join our experienced meditation instructors for a transformative half-day retreat. Learn various meditation techniques, breathing exercises, and mindfulness practices. Perfect for beginners and experienced practitioners.",
+    fullDescription:
+      "Join our experienced meditation instructors for a transformative half-day retreat. Learn various meditation techniques, breathing exercises, and mindfulness practices. Perfect for beginners and experienced practitioners.",
     estimatedDuration: 240,
     defaultPrice: 650000,
     minParticipants: 5,
@@ -112,7 +115,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     id: "admin-template-4",
     name: "Traditional Pottery Workshop",
     shortDescription: "Learn the ancient art of pottery making from local artisans.",
-    fullDescription: "Learn the ancient art of pottery making from local artisans. This hands-on workshop will teach you the basics of clay preparation, wheel throwing, and traditional glazing techniques passed down through generations.",
+    fullDescription:
+      "Learn the ancient art of pottery making from local artisans. This hands-on workshop will teach you the basics of clay preparation, wheel throwing, and traditional glazing techniques passed down through generations.",
     estimatedDuration: 180,
     defaultPrice: 750000,
     minParticipants: 5,
@@ -148,7 +152,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     id: "admin-template-5",
     name: "Scuba Diving Experience",
     shortDescription: "Beginner scuba diving course with certified instructors.",
-    fullDescription: "Try scuba diving for the first time! Our certified instructors will teach you basic diving skills and safety procedures. Equipment included.",
+    fullDescription:
+      "Try scuba diving for the first time! Our certified instructors will teach you basic diving skills and safety procedures. Equipment included.",
     estimatedDuration: 300,
     defaultPrice: 1200000,
     minParticipants: 2,
@@ -164,7 +169,8 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
     createdAt: "2026-02-01T11:00:00Z",
     updatedAt: "2026-02-05T16:00:00Z",
     submittedAt: "2026-02-02T10:00:00Z",
-    rejectReason: "Missing required safety certifications and insurance documentation. Please provide: 1) Valid instructor certifications from recognized diving organizations (PADI, SSI, etc.), 2) Liability insurance coverage details, 3) Emergency contact procedures and medical support information. Once these documents are submitted, you may resubmit this template.",
+    rejectReason:
+      "Missing required safety certifications and insurance documentation. Please provide: 1) Valid instructor certifications from recognized diving organizations (PADI, SSI, etc.), 2) Liability insurance coverage details, 3) Emergency contact procedures and medical support information. Once these documents are submitted, you may resubmit this template.",
     approvedBy: null,
     approvedAt: null,
     reviewedBy: "admin-2",
@@ -181,14 +187,17 @@ export const mockAdminTemplates: AdminWorkshopTemplateResponse[] = [
 ]
 
 // Calculate template stats
-export const calculateAdminTemplateStats = (templates: AdminWorkshopTemplateResponse[]): AdminTemplateStats => {
+export const calculateAdminTemplateStats = (
+  templates: AdminWorkshopTemplateResponse[],
+): AdminTemplateStats => {
   return {
     total: templates.length,
-    pending: templates.filter(t => t.status === WorkshopStatus.PENDING).length,
-    approved: templates.filter(t => t.status === WorkshopStatus.ACTIVE).length,
-    rejected: templates.filter(t => t.status === WorkshopStatus.REJECTED).length,
-    draft: templates.filter(t => t.status === WorkshopStatus.DRAFT).length,
+    pending: templates.filter((t) => t.status === WorkshopStatus.PENDING).length,
+    approved: templates.filter((t) => t.status === WorkshopStatus.ACTIVE).length,
+    rejected: templates.filter((t) => t.status === WorkshopStatus.REJECTED).length,
+    draft: templates.filter((t) => t.status === WorkshopStatus.DRAFT).length,
   }
 }
 
 export const mockAdminTemplateStats = calculateAdminTemplateStats(mockAdminTemplates)
+

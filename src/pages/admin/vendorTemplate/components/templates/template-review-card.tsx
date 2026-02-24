@@ -1,9 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Eye, 
-  CheckCircle, 
+import {
+  Eye,
+  CheckCircle,
   XCircle,
   Clock,
   DollarSign,
@@ -16,8 +16,7 @@ import {
   Star,
 } from "lucide-react"
 import { AdminWorkshopTemplateResponse, WorkshopStatus } from "./types"
-import { formatDate } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
-import { formatPrice, formatDuration } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
+import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
 
 interface TemplateReviewCardProps {
   template: AdminWorkshopTemplateResponse
@@ -32,9 +31,10 @@ export function TemplateReviewCard({
   onApprove,
   onReject,
 }: TemplateReviewCardProps) {
-  const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl 
-    || template.images[0]?.imageUrl 
-    || "https://via.placeholder.com/400x300?text=No+Image"
+  const thumbnail =
+    template.images.find((img) => img.isThumbnail)?.imageUrl ||
+    template.images[0]?.imageUrl ||
+    "https://via.placeholder.com/400x300?text=No+Image"
 
   const getStatusBadge = () => {
     switch (template.status) {
@@ -80,9 +80,7 @@ export function TemplateReviewCard({
             e.currentTarget.src = "https://via.placeholder.com/400x300?text=No+Image"
           }}
         />
-        <div className="absolute top-2 right-2">
-          {getStatusBadge()}
-        </div>
+        <div className="absolute top-2 right-2">{getStatusBadge()}</div>
         {!template.vendorVerified && (
           <div className="absolute top-2 left-2">
             <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
@@ -96,9 +94,7 @@ export function TemplateReviewCard({
       <CardContent className="p-5 space-y-4">
         {/* Title */}
         <div>
-          <h3 className="font-bold text-lg line-clamp-2 mb-1">
-            {template.name}
-          </h3>
+          <h3 className="font-bold text-lg line-clamp-2 mb-1">{template.name}</h3>
           <p className="text-sm text-muted-foreground line-clamp-2">
             {template.shortDescription}
           </p>
@@ -137,7 +133,9 @@ export function TemplateReviewCard({
           </div>
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-muted-foreground" />
-            <span>{template.minParticipants}-{template.maxParticipants} people</span>
+            <span>
+              {template.minParticipants}-{template.maxParticipants} people
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -147,7 +145,7 @@ export function TemplateReviewCard({
 
         {/* Tags */}
         <div className="flex flex-wrap gap-1.5">
-          {template.tags.slice(0, 3).map(tag => (
+          {template.tags.slice(0, 3).map((tag) => (
             <Badge
               key={tag.id}
               variant="outline"
@@ -173,7 +171,9 @@ export function TemplateReviewCard({
           <div className="flex items-center gap-2 text-sm">
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
             <span className="font-medium">{template.averageRating.toFixed(1)}</span>
-            <span className="text-muted-foreground">({template.totalReview} reviews)</span>
+            <span className="text-muted-foreground">
+              ({template.totalReview} reviews)
+            </span>
           </div>
         )}
 
@@ -236,3 +236,4 @@ export function TemplateReviewCard({
     </Card>
   )
 }
+
