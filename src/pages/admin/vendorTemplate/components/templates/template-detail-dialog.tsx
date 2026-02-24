@@ -14,13 +14,15 @@ import {
   Clock,
   DollarSign,
   Mail,
-  MapPin,
   Phone,
   Star,
   Users,
 } from "lucide-react"
+import { useEffect, useState } from "react"
 import { AdminWorkshopTemplateResponse, WorkshopStatus } from "./types"
 import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
+import WorkshopTemplateService from "@/services/api/workshopTemplateService"
+import type { WorkshopTemplateResponse } from "@/pages/vendor/WorkshopTemplates/types"
 
 interface TemplateDetailDialogProps {
   template: AdminWorkshopTemplateResponse | null
@@ -65,14 +67,64 @@ export function TemplateDetailDialog({
   open,
   onOpenChange,
 }: TemplateDetailDialogProps) {
+  const [detail, setDetail] = useState<WorkshopTemplateResponse | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!open || !template?.id) {
+      return
+    }
+
+    let cancelled = false
+
+    const fetchDetail = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await WorkshopTemplateService.getTemplateById(template.id)
+        if (!cancelled) {
+          setDetail(data)
+        }
+      } catch (e) {
+        console.error("Failed to load workshop template detail", e)
+        if (!cancelled) {
+          setError("Failed to load template detail")
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    fetchDetail()
+
+    return () => {
+      cancelled = true
+    }
+  }, [open, template?.id])
+
   if (!template) return null
 
   const thumbnail =
+    detail?.images?.find((img) => img.isThumbnail)?.imageUrl ||
+    detail?.images?.[0]?.imageUrl ||
     template.images.find((img) => img.isThumbnail)?.imageUrl ||
     template.images[0]?.imageUrl ||
     "https://via.placeholder.com/800x400?text=Workshop+Template"
 
-  const tags = template.tags ?? []
+  const tags = (detail?.tags as AdminWorkshopTemplateResponse["tags"]) ?? template.tags ?? []
+
+  const name = detail?.name ?? template.name
+  const shortDescription = detail?.shortDescription ?? template.shortDescription
+  const fullDescription = detail?.fullDescription ?? template.fullDescription
+  const estimatedDuration = detail?.estimatedDuration ?? template.estimatedDuration
+  const defaultPrice = detail?.defaultPrice ?? template.defaultPrice
+  const minParticipants = detail?.minParticipants ?? template.minParticipants
+  const maxParticipants = detail?.maxParticipants ?? template.maxParticipants
+  const createdAt = detail?.createdAt ?? template.createdAt
+  const updatedAt = detail?.updatedAt ?? template.updatedAt
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -81,11 +133,21 @@ export function TemplateDetailDialog({
           <div className="flex items-start justify-between gap-4">
             <div>
               <DialogTitle className="text-2xl">
-                {template.name}
+                {name}
               </DialogTitle>
               <DialogDescription className="mt-1">
                 Review full details of this workshop template and its vendor.
               </DialogDescription>
+              {loading && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Loading latest template information...
+                </p>
+              )}
+              {error && (
+                <p className="mt-1 text-xs text-red-600">
+                  {error}
+                </p>
+              )}
             </div>
             <div className="flex flex-col items-end gap-2">
               {getStatusBadge(template.status)}
@@ -107,7 +169,7 @@ export function TemplateDetailDialog({
           <Card className="overflow-hidden">
             <img
               src={thumbnail}
-              alt={template.name}
+              alt={name}
               className="w-full h-64 object-cover"
               onError={(e) => {
                 e.currentTarget.src =
@@ -120,28 +182,28 @@ export function TemplateDetailDialog({
             {/* Main content */}
             <div className="lg:col-span-2 space-y-4">
               {/* Summary */}
-              {template.shortDescription && (
+              {shortDescription && (
                 <Card>
                   <CardContent className="p-4 space-y-2">
                     <h3 className="font-semibold text-sm text-muted-foreground">
                       Summary
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {template.shortDescription}
+                      {shortDescription}
                     </p>
                   </CardContent>
                 </Card>
               )}
 
               {/* Full description */}
-              {template.fullDescription && (
+              {fullDescription && (
                 <Card>
                   <CardContent className="p-4 space-y-2">
                     <h3 className="font-semibold text-sm text-muted-foreground">
                       Full Description
                     </h3>
                     <p className="text-sm leading-relaxed whitespace-pre-line">
-                      {template.fullDescription}
+                      {fullDescription}
                     </p>
                   </CardContent>
                 </Card>
@@ -179,7 +241,7 @@ export function TemplateDetailDialog({
                         Duration
                       </span>
                       <span className="font-medium">
-                        {formatDuration(template.estimatedDuration)}
+                        {formatDuration(estimatedDuration)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
@@ -188,7 +250,7 @@ export function TemplateDetailDialog({
                         Default Price
                       </span>
                       <span className="font-medium">
-                        {formatPrice(template.defaultPrice)}
+                        {formatPrice(defaultPrice)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
@@ -197,7 +259,7 @@ export function TemplateDetailDialog({
                         Capacity
                       </span>
                       <span className="font-medium">
-                        {template.minParticipants} - {template.maxParticipants}{" "}
+                        {minParticipants} - {maxParticipants}{" "}
                         participants
                       </span>
                     </div>
@@ -207,7 +269,7 @@ export function TemplateDetailDialog({
                         Created
                       </span>
                       <span className="font-medium">
-                        {formatDate(template.createdAt)}
+                        {formatDate(createdAt)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">
@@ -216,7 +278,7 @@ export function TemplateDetailDialog({
                         Last Updated
                       </span>
                       <span className="font-medium">
-                        {formatDate(template.updatedAt)}
+                        {formatDate(updatedAt)}
                       </span>
                     </div>
                   </div>
@@ -267,14 +329,6 @@ export function TemplateDetailDialog({
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-muted-foreground" />
                         <span>{template.vendorPhone}</span>
-                      </div>
-                    )}
-                    {template.location && (
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
-                        <span className="text-sm">
-                          {template.location}
-                        </span>
                       </div>
                     )}
                   </div>

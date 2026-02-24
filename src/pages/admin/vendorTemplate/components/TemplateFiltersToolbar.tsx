@@ -9,6 +9,8 @@ export type TemplatesSortDirection = "ASC" | "DESC"
 interface TemplateFiltersToolbarProps {
   searchQuery: string
   onSearchChange: (value: string) => void
+  vendorIdFilter: string
+  onVendorIdFilterChange: (value: string) => void
   statusFilter: string
   onStatusFilterChange: (value: string) => void
   verificationFilter: string
@@ -22,6 +24,8 @@ interface TemplateFiltersToolbarProps {
 export function TemplateFiltersToolbar({
   searchQuery,
   onSearchChange,
+  vendorIdFilter,
+  onVendorIdFilterChange,
   statusFilter,
   onStatusFilterChange,
   verificationFilter,
@@ -32,14 +36,23 @@ export function TemplateFiltersToolbar({
   onSortDirectionChange,
 }: TemplateFiltersToolbarProps) {
   return (
-    <div className="flex flex-col lg:flex-row gap-4">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by template name, vendor, or email..."
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
         <Input
-          placeholder="Search by template name, vendor, or email..."
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
+          placeholder="Filter by Vendor ID (optional)"
+          value={vendorIdFilter}
+          onChange={(e) => onVendorIdFilterChange(e.target.value.trim())}
+          className="w-full lg:w-[240px]"
         />
       </div>
 

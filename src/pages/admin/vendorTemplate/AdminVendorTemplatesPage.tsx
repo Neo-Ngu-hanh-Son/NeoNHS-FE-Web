@@ -1,13 +1,10 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { notification } from "antd"
 import {
   AdminWorkshopTemplateResponse,
   AdminTemplateStats,
 } from "./components/templates/types"
-import {
-  mockAdminTemplates,
-  mockAdminTemplateStats,
-} from "./components/templates/data"
+import { calculateAdminTemplateStats } from "./components/templates/data"
 import { TemplateStatsCards } from "./components/TemplateStatsCards"
 import {
   TemplateFiltersToolbar,
@@ -17,15 +14,17 @@ import {
 import { TemplatesTable } from "./components/TemplatesTable"
 import { ApproveTemplateDialog, RejectTemplateDialog } from "./components/templates/approve-reject-dialogs"
 import { TemplateDetailDialog } from "./components/templates/template-detail-dialog"
+import { adminWorkshopService } from "@/services/api/adminWorkshopService"
 
 type SortBy = TemplatesSortBy
 type SortDirection = TemplatesSortDirection
 
 export default function AdminVendorTemplatesPage() {
-  const [templates] = useState<AdminWorkshopTemplateResponse[]>(mockAdminTemplates)
-  const [stats] = useState<AdminTemplateStats>(mockAdminTemplateStats)
+  const [templates, setTemplates] = useState<AdminWorkshopTemplateResponse[]>([])
+  const [stats, setStats] = useState<AdminTemplateStats | null>(null)
 
   const [searchQuery, setSearchQuery] = useState("")
+  const [vendorIdFilter, setVendorIdFilter] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [verificationFilter, setVerificationFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<SortBy>("createdAt")
@@ -54,6 +53,47 @@ export default function AdminVendorTemplatesPage() {
     open: false,
     template: null,
   })
+
+  // Fetch templates from admin API (optionally filtered by vendorId)
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const apiSortDir = sortDirection === "ASC" ? "asc" : "desc"
+        const statusParam = statusFilter !== "all" ? statusFilter : undefined
+
+        const params = {
+          page: 1,
+          size: 10,
+          sortBy,
+          sortDir: apiSortDir,
+          status: statusParam,
+        } as const
+
+        let page
+        if (vendorIdFilter) {
+          page = await adminWorkshopService.getVendorWorkshopTemplates(
+            vendorIdFilter,
+            params,
+          )
+        } else {
+          page = await adminWorkshopService.getAllWorkshopTemplates(params)
+        }
+
+        setTemplates(page.content)
+        setStats(calculateAdminTemplateStats(page.content))
+      } catch (error) {
+        console.error("Failed to load admin workshop templates", error)
+        notification.error({
+          message: "Failed to load templates",
+          description:
+            "An error occurred while loading workshop templates. Please try again.",
+        })
+      } finally {
+      }
+    }
+
+    fetchTemplates()
+  }, [vendorIdFilter, sortBy, sortDirection, statusFilter])
 
   const filteredTemplates = useMemo(() => {
     let filtered = templates
@@ -147,6 +187,7 @@ export default function AdminVendorTemplatesPage() {
 
   const handleClearFilters = () => {
     setSearchQuery("")
+    setVendorIdFilter("")
     setStatusFilter("all")
     setVerificationFilter("all")
     setSortBy("createdAt")
@@ -166,12 +207,24 @@ export default function AdminVendorTemplatesPage() {
       </div>
 
       {/* Stats */}
-      <TemplateStatsCards stats={stats} />
+      <TemplateStatsCards
+        stats={
+          stats ?? {
+            total: templates.length,
+            pending: templates.filter((t) => t.status === "PENDING").length,
+            approved: templates.filter((t) => t.status === "ACTIVE").length,
+            rejected: templates.filter((t) => t.status === "REJECTED").length,
+            draft: templates.filter((t) => t.status === "DRAFT").length,
+          }
+        }
+      />
 
       {/* Filters */}
       <TemplateFiltersToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        vendorIdFilter={vendorIdFilter}
+        onVendorIdFilterChange={setVendorIdFilter}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         verificationFilter={verificationFilter}
