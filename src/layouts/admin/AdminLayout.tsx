@@ -69,7 +69,9 @@ export function AdminLayout() {
           <nav className="flex flex-col gap-2 w-full">
             {navItems.map((item) => {
               if (item.children) {
-                return <NavlinkWithChildren key={item.path} navItem={item} isCollapsed={isCollapsed} />;
+                return (
+                  <NavlinkWithChildren key={item.path} navItem={item} isCollapsed={isCollapsed} />
+                );
               }
               return (
                 <NavLink
@@ -84,7 +86,9 @@ export function AdminLayout() {
                 >
                   <span className="material-symbols-outlined shrink-0">{item.icon}</span>
                   {!isCollapsed && (
-                    <p className="text-sm font-medium whitespace-nowrap overflow-hidden">{item.label}</p>
+                    <p className="text-sm font-medium whitespace-nowrap overflow-hidden">
+                      {item.label}
+                    </p>
                   )}
                 </NavLink>
               );
@@ -157,7 +161,9 @@ export function AdminLayout() {
 
             <div className="flex items-center gap-2">
               <button className="p-2 rounded-lg bg-background-light dark:bg-white/5 hover:bg-[#e9f1ed] transition-colors relative border-none outline-none">
-                <span className="material-symbols-outlined text-[#101914] dark:text-white">notifications</span>
+                <span className="material-symbols-outlined text-[#101914] dark:text-white">
+                  notifications
+                </span>
                 <span className="absolute top-2 right-2.5 size-2 bg-red-500 rounded-full border border-white"></span>
               </button>
               <div className="h-8 w-px bg-[#d3e4da] mx-2"></div>
@@ -166,7 +172,9 @@ export function AdminLayout() {
                   <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
                     {user?.fullname || "Admin"}
                   </p>
-                  <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">System Admin</p>
+                  <p className="text-[11px] text-[#588d70] font-medium tracking-wide uppercase">
+                    System Admin
+                  </p>
                 </div>
                 <div
                   className="size-10 rounded-full bg-primary/10 bg-center bg-cover border-2 border-primary/20"

@@ -1,7 +1,7 @@
-import TagModal from '@/components/tags/TagModal';
-import TagTable from '@/components/tags/TagTable';
-import TagToolbar from '@/components/tags/TagToolbar';
-import { useAdminTags } from '@/hooks/tag/useAdminTags';
+import TagModal from "@/components/tags/TagModal";
+import TagTable from "@/components/tags/TagTable";
+import TagToolbar from "@/components/tags/TagToolbar";
+import { useAdminTags } from "@/hooks/tag/useAdminTags";
 
 export function EventTagPage() {
   const {
@@ -20,7 +20,7 @@ export function EventTagPage() {
     openModal,
     closeModal,
     handleModalSuccess,
-  } = useAdminTags({ kind: 'event' });
+  } = useAdminTags({ kind: "event" });
 
   return (
     <div
@@ -31,7 +31,7 @@ export function EventTagPage() {
         title="Event Tags"
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
-        onAdd={() => openModal('create')}
+        onAdd={() => openModal("create")}
       />
 
       <TagTable
@@ -44,9 +44,9 @@ export function EventTagPage() {
         pageSize={pageSize}
         onPageChange={goToPage}
         onRetry={retryFetch}
-        onEdit={(tag) => openModal('edit', tag)}
-        onDelete={(tag) => openModal('delete', tag)}
-        onRestore={(tag) => openModal('restore', tag)}
+        onEdit={(tag) => openModal("edit", tag)}
+        onDelete={(tag) => openModal("delete", tag)}
+        onRestore={(tag) => openModal("restore", tag)}
       />
 
       <TagModal

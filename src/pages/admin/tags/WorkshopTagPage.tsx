@@ -1,7 +1,7 @@
-import TagModal from '@/components/tags/TagModal';
-import TagTable from '@/components/tags/TagTable';
-import TagToolbar from '@/components/tags/TagToolbar';
-import { useAdminTags } from '@/hooks/tag/useAdminTags';
+import TagModal from "@/components/tags/TagModal";
+import TagTable from "@/components/tags/TagTable";
+import TagToolbar from "@/components/tags/TagToolbar";
+import { useAdminTags } from "@/hooks/tag/useAdminTags";
 
 export function WorkshopTagPage() {
   const {
@@ -20,7 +20,7 @@ export function WorkshopTagPage() {
     openModal,
     closeModal,
     handleModalSuccess,
-  } = useAdminTags({ kind: 'workshop' });
+  } = useAdminTags({ kind: "workshop" });
 
   return (
     <div
@@ -31,7 +31,7 @@ export function WorkshopTagPage() {
         title="Workshop Tags"
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
-        onAdd={() => openModal('create')}
+        onAdd={() => openModal("create")}
       />
 
       <TagTable
@@ -44,8 +44,8 @@ export function WorkshopTagPage() {
         pageSize={pageSize}
         onPageChange={goToPage}
         onRetry={retryFetch}
-        onEdit={(tag) => openModal('edit', tag)}
-        onDelete={(tag) => openModal('delete', tag)}
+        onEdit={(tag) => openModal("edit", tag)}
+        onDelete={(tag) => openModal("delete", tag)}
       />
 
       <TagModal
