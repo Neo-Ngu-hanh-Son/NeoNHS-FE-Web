@@ -1,4 +1,4 @@
-import { BlogFormProvider } from "@/contexts/Blog/BlogFormContext";
+import { BlogFormProvider, useBlogForm } from "@/contexts/Blog/BlogFormContext";
 import BlogFormHeaderSection from "@/components/blog/creationForm/BlogFormHeaderSection";
 import BlogDetailsSection from "@/components/blog/creationForm/BlogDetailsSection";
 import BlogEditorSection from "@/components/blog/creationForm/BlogEditorSection";
@@ -6,7 +6,7 @@ import BlogPublishingSection from "@/components/blog/creationForm/BlogPublishing
 import BlogCategorySection from "@/components/blog/creationForm/BlogCategorySection";
 import BlogTagsSection from "@/components/blog/creationForm/BlogTagsSection";
 import BlogMediaSection from "@/components/blog/creationForm/BlogMediaSection";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -33,10 +33,10 @@ function BlogCreationPageInner() {
       bannerUrl: "",
     },
   });
-
+  const [loading, setLoading] = useState(false);
   const editorRef = useRef<BlogEditorRef>(null);
   const navigate = useNavigate();
-
+  const { submitting } = useBlogForm();
   const handleSaveEditorState = async (content: EditorSaveResult) => {
     console.log("Saving editor state: " + content);
     if (content.charCount < 30) {
@@ -76,7 +76,7 @@ function BlogCreationPageInner() {
 
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
-      <BlogFormHeaderSection form={form} onSubmit={submitHandler} />
+      <BlogFormHeaderSection form={form} onSubmit={submitHandler} submitting={submitting} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content (Left Column) */}
