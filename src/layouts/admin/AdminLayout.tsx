@@ -18,7 +18,15 @@ export function AdminLayout() {
     { label: "Dashboard", path: "/admin/dashboard", icon: "dashboard" },
     { label: "Destination", path: "/admin/destinations", icon: "map" },
     { label: "Users", path: "/admin/users", icon: "group" },
-    { label: "Vendors", path: "/admin/vendors", icon: "storefront" },
+    { 
+      label: "Vendors", 
+      path: "", 
+      icon: "storefront",
+      children: [
+        { label: "Vendors Management", path: "/admin/vendors", icon: "storefront" },
+        { label: "Template Review", path: "/admin/vendors/templates", icon: "architecture" },
+      ],
+    },
     { label: "Tickets", path: "/admin/tickets", icon: "confirmation_number" },
     { label: "Vouchers", path: "/admin/vouchers", icon: "loyalty" },
     { label: "Reports", path: "/admin/reports", icon: "analytics" },

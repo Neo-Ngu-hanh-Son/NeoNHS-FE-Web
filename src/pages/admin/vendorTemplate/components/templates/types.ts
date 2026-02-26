@@ -38,8 +38,8 @@ export interface AdminTemplateFilterOptions {
   vendorId?: string
   keyword?: string
   isVerified?: boolean // Filter by vendor verification
-  sortBy?: 'createdAt' | 'updatedAt' | 'name' | 'vendorName'
-  sortDirection?: 'ASC' | 'DESC'
+  sortBy?: "createdAt" | "updatedAt" | "name" | "vendorName"
+  sortDirection?: "ASC" | "DESC"
 }
 
 // Template statistics for admin dashboard
@@ -65,3 +65,4 @@ export type RejectTemplateFormData = z.infer<typeof rejectTemplateSchema>
 
 // Re-export WorkshopStatus for convenience
 export { WorkshopStatus }
+

@@ -21,6 +21,7 @@ import AdminDashboardPage from "@/pages/admin/dashboard/AdminDashboardPage";
 import AdminUsersPage from "@/pages/admin/users/AdminUsersPage";
 import AdminDestinationsPage from "@/pages/admin/destinations/AdminDestinationsPage";
 import AdminVendorsPage from "@/pages/admin/vendors/AdminVendorsPage";
+import AdminVendorTemplatesPage from "@/pages/admin/vendorTemplate/AdminVendorTemplatesPage";
 import AdminTicketsPage from "@/pages/admin/tickets/AdminTicketsPage";
 import AdminVouchersPage from "@/pages/admin/vouchers/AdminVouchersPage";
 import AdminReportsPage from "@/pages/admin/reports/AdminReportsPage";
@@ -106,6 +107,7 @@ export const router = createBrowserRouter([
           { path: "destinations", element: <AdminDestinationsPage /> },
           { path: "users", element: <AdminUsersPage /> },
           { path: "vendors", element: <AdminVendorsPage /> },
+          { path: "vendors/templates", element: <AdminVendorTemplatesPage /> },
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
