@@ -5,10 +5,13 @@
 export interface TagResponse {
     id: string;
     name: string;
-    description: string;
-    tagColor: string;    // hex color e.g. "#FF5733"
-    iconUrl: string;
+    description?: string;
+    tagColor?: string;
+    iconUrl?: string;
+    deletedAt?: string | null;
 }
+
+export type WorkshopTagResponse = TagResponse;
 
 export interface CreateTagRequest {
     name: string;
@@ -24,8 +27,8 @@ export interface UpdateTagRequest {
     iconUrl?: string;
 }
 
-export interface PagedTagResponse {
-    content: TagResponse[];
+export interface PagedTagResponse<T = TagResponse> {
+    content: T[];
     totalElements: number;
     totalPages: number;
     number: number;

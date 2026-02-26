@@ -38,7 +38,7 @@ export const formSchema = z.object({
   status: z.enum([BlogStatus.DRAFT, BlogStatus.PUBLISHED, BlogStatus.ARCHIVED]),
   isFeatured: z.boolean(),
   categoryId: z.string().min(1, "Category is required"),
-  tags: z.string().optional(),
+  tags: z.string().max(200, "Tags must be at most 200 characters").optional(),
   thumbnailUrl: z.string().optional(),
   bannerUrl: z.string().optional(),
 });

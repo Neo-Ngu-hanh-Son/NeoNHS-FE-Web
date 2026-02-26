@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useBlogDetail } from "@/hooks/useBlogDetail";
+import { useBlogDetail } from "@/hooks/blog/useBlogDetail";
 import BlogHeader from "@/components/blog/visitor/BlogHeader";
 import BlogContent from "@/components/blog/visitor/BlogContent";
 

@@ -1,66 +1,67 @@
-import { NewPasswordForm } from "./components/new-password-form"
-import { useLocation, useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
-import { authService } from "@/services/api/authService"
-import { useAuth } from "@/hooks/useAuth"
-import { notification } from "antd"
-import { CheckCircleOutlined, CloseCircleOutlined, AppstoreOutlined } from "@ant-design/icons"
-import loginImage from "@/assets/images/login-img.jpg"
+import { NewPasswordForm } from "./components/new-password-form";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { authService } from "@/services/api/authService";
+import { useAuth } from "@/hooks/auth/useAuth";
+import { notification } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined, AppstoreOutlined } from "@ant-design/icons";
+import loginImage from "@/assets/images/login-img.jpg";
 
 export default function NewPassword() {
-  const { isAuthenticated } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation()
-  const state = location.state as { email: string; otp: string } | null
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as { email: string; otp: string } | null;
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
+      navigate("/");
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate]);
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [api, contextHolder] = notification.useNotification()
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [api, contextHolder] = notification.useNotification();
 
-  const email = state?.email || ""
+  const email = state?.email || "";
 
   // Redirect if no email/otp in state
   useEffect(() => {
     if (!state?.email || !state?.otp) {
-      navigate('/forgot-password')
+      navigate("/forgot-password");
     }
-  }, [state, navigate])
+  }, [state, navigate]);
 
   const handleSetNewPassword = async (password: string, confirmPassword: string) => {
-    setError("")
-    setLoading(true)
+    setError("");
+    setLoading(true);
     try {
-      await authService.resetPassword(email, password, confirmPassword)
+      await authService.resetPassword(email, password, confirmPassword);
       api.success({
-        message: 'Password Reset Successful!',
-        description: 'Your password has been successfully reset. Redirecting to login...',
-        icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
-        placement: 'topRight',
+        message: "Password Reset Successful!",
+        description: "Your password has been successfully reset. Redirecting to login...",
+        icon: <CheckCircleOutlined style={{ color: "#10b981" }} />,
+        placement: "topRight",
         duration: 3,
-      })
+      });
       setTimeout(() => {
-        navigate('/login')
-      }, 2000)
+        navigate("/login");
+      }, 2000);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err?.message || "Failed to reset password"
-      setError(errorMessage)
+      const errorMessage =
+        err.response?.data?.message || err?.message || "Failed to reset password";
+      setError(errorMessage);
       api.error({
-        message: 'Failed to Reset Password',
+        message: "Failed to Reset Password",
         description: errorMessage,
-        icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
-        placement: 'topRight',
+        icon: <CloseCircleOutlined style={{ color: "#ef4444" }} />,
+        placement: "topRight",
         duration: 3,
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -90,5 +91,5 @@ export default function NewPassword() {
         </div>
       </div>
     </>
-  )
+  );
 }

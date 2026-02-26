@@ -1,100 +1,140 @@
 # Codebase Index
 
-## Stack & Runtime
-- **Framework**: React 19 + TypeScript + Vite
-- **Styling**: Tailwind CSS + Ant Design + Radix UI primitives
-- **Routing**: `react-router-dom` (browser router)
-- **Editor**: Lexical-based rich text editor for blog content
-- **HTTP**: Axios via centralized API client
+Last updated: 2026-02-22
 
-## App Entry Points
-- `src/main.tsx` - App bootstrap, global styles/fonts, Google OAuth provider.
-- `src/app/App.tsx` - Mounts router provider.
-- `src/routes/index.tsx` - Full route tree and layout composition.
+## 1) Tech Stack
 
-## Layout & App Shell
-- `src/layouts/RootLayout.tsx` - Wraps all routes with `AuthProvider`.
-- `src/layouts/BlankLayout.tsx` - Auth/simple pages.
-- `src/layouts/AppLayout.tsx` - Public shell with header/footer.
-- `src/layouts/admin/AdminLayout.tsx` - Admin sidebar + topbar shell.
-- `src/layouts/vendor/VendorLayout.tsx` - Vendor shell.
+- React 19 + TypeScript + Vite
+- Routing: `react-router-dom` (browser router)
+- Styling/UI: Tailwind CSS, Ant Design, Radix UI primitives
+- Forms/validation: React Hook Form + Zod
+- Rich text: Lexical editor stack
+- Maps: Leaflet + React Leaflet
+- HTTP client: Axios
 
-## Routing Domains
-### Public / Auth
-- `/` → `src/pages/HomePage.tsx`
-- `/about-us` → `src/pages/AboutUs.tsx`
-- `/login`, `/register`, `/forgot-password`, `/verify-otp`, `/new-password`
+## 2) Runtime Entry Flow
+
+- `src/main.tsx`
+  - App bootstrap, global styles/fonts, Google OAuth provider.
+- `src/app/App.tsx`
+  - Mounts `RouterProvider`.
+- `src/routes/index.tsx`
+  - Defines route tree and layout nesting.
+
+## 3) Route Map
+
+### Public/Auth (BlankLayout)
+
+- `/login` → `src/pages/AuthPage/Login.tsx`
+- `/forgot-password` → `src/pages/AuthPage/Forgot.tsx`
+- `/register` → `src/pages/AuthPage/Register.tsx`
+- `/verify-otp` → `src/pages/AuthPage/VerifyOTP.tsx`
+- `/new-password` → `src/pages/AuthPage/NewPassword.tsx`
 - `/simple-map` → `src/pages/SimpleMapView.tsx`
 
-### Profile
-- `/account` → role-based profile entry page
-- `/account/user` → user profile
+### Public Site (AppLayout)
 
-### Admin
-- `/admin/dashboard`, `/admin/users`, `/admin/vendors`, `/admin/destinations`
-- `/admin/tickets`, `/admin/vouchers`, `/admin/reports`, `/admin/events`
-- `/admin/blog-categories`, `/admin/blog`
+- `/` → `src/pages/HomePage.tsx`
+- `/about-us` → `src/pages/AboutUs.tsx`
+- `/blog/:id` → `src/pages/blog/BlogDetailsPage.tsx`
+- `/account` → `src/pages/ProfilePage/index.tsx`
+- `/account/user` → `src/pages/ProfilePage/UserProfilePage.tsx`
+- `*` → `src/pages/NotFoundPage.tsx`
 
-### Vendor
-- `/vendor/dashboard`, `/vendor/profile`
-- `/vendor/workshop-templates`, `/vendor/workshop-sessions`, `/vendor/workshop-calendar`
-- `/vendor/ticket-verification`, `/vendor/vouchers`
+### Vendor (VendorLayout)
 
-## Core State & Context
+- `/vendor/dashboard` → `src/pages/vendor/dashboard/VendorDashboardPage.tsx`
+- `/vendor/profile` → `src/pages/ProfilePage/VendorProfilePage.tsx`
+- `/vendor/workshop-templates` → `src/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage.tsx`
+- `/vendor/workshop-sessions` → `src/pages/vendor/WorkshopSessions/WorkshopSessionsPage.tsx`
+- `/vendor/workshop-calendar` → `src/pages/vendor/WorkshopCalendar/CalendarPage.tsx`
+- `/vendor/ticket-verification` → `src/pages/vendor/Tickets/TicketVerificationPage.tsx`
+- `/vendor/vouchers` → `src/pages/vendor/Vouchers/VouchersPage.tsx`
+
+### Admin (AdminLayout)
+
+- `/admin/dashboard` → `src/pages/admin/dashboard/AdminDashboardPage.tsx`
+- `/admin/destinations` → `src/pages/admin/destinations/AdminDestinationsPage.tsx`
+- `/admin/users` → `src/pages/admin/users/AdminUsersPage.tsx`
+- `/admin/vendors` → `src/pages/admin/vendors/AdminVendorsPage.tsx`
+- `/admin/tickets` → `src/pages/admin/tickets/AdminTicketsPage.tsx`
+- `/admin/vouchers` → `src/pages/admin/vouchers/AdminVouchersPage.tsx`
+- `/admin/reports` → `src/pages/admin/reports/AdminReportsPage.tsx`
+- `/admin/events` → `src/pages/admin/events/index.tsx`
+- `/admin/events/create` → `src/pages/admin/events/create.tsx`
+- `/admin/events/:id` → `src/pages/admin/events/detail.tsx`
+- `/admin/events/:id/edit` → `src/pages/admin/events/edit.tsx`
+- `/admin/blog-categories` → `src/pages/admin/blog-categories/BlogCategoryPage.tsx`
+- `/admin/blog` → `src/pages/admin/blog/ManageBlogPage.tsx`
+- `/admin/blog/create` → `src/pages/admin/blog/BlogCreationPage.tsx`
+- `/admin/blog/:id` → `src/pages/admin/blog/AdminBlogDetailPage.tsx`
+- `/admin/blog/:id/edit` → `src/pages/admin/blog/BlogEditPage.tsx`
+
+## 4) Layout & Shell
+
+- `src/layouts/RootLayout.tsx` - top-level app wrapper (auth context boundary).
+- `src/layouts/BlankLayout.tsx` - auth/simple pages.
+- `src/layouts/AppLayout.tsx` - public shell.
+- `src/layouts/admin/AdminLayout.tsx` - admin shell.
+- `src/layouts/vendor/VendorLayout.tsx` - vendor shell.
+- `src/layouts/ProfileLayout.tsx`, `src/layouts/DashboardLayout.tsx` - role/profile-specific sub-layout support.
+
+## 5) State, Context, Hooks
+
 - `src/contexts/AuthContext.tsx`
-  - token bootstrap (`checkAuth`), login/logout, Google login, user state.
-- `src/hooks/useAuth.ts`
-  - Re-export/backward-compatible auth hook wrapper.
-- `src/hooks/useBlogCategories.ts`
-  - Encapsulates blog category list fetch/search/sort/pagination/modal state.
+  - Session bootstrap (`checkAuth`), login/logout, Google login, current user state.
+- `src/contexts/Blog/BlogFormContext.tsx`
+  - Blog create form state, validation, category loading, submission pipeline.
+- `src/hooks/auth/useAuth.ts`
+  - Auth hook wrapper/entry.
+- `src/hooks/blog/*`
+  - Blog list/detail/category hooks (`useBlogs`, `useBlogDetail`, `useBlogCategories`).
+- `src/hooks/event/*`
+  - Event CRUD/support hooks (`useEvents`, `useEvent`, `useCreateEvent`, `useUpdateEvent`, `useTags`, `useTicketCatalogs`).
 
-## API Layer
-- `src/services/api/apiClient.ts`
-  - Axios instance, auth header injection, response/error normalization.
-- `src/services/api/authService.ts`
-  - Login/register/google-login/logout/profile/OTP/reset APIs.
-- `src/services/api/blogCategoryService.ts`
-  - Admin blog category CRUD + paginated query params.
-- Additional domain services:
-  - `attractionService.ts`, `pointService.ts`, `userService.ts`, `vendorService.ts`
+## 6) API Layer (`src/services/api`)
 
-## Blog Editor Module (Lexical)
-- `src/components/blog/BlogEditor.tsx`
-  - Lexical composer, node registration, rich text plugins, image plugin.
-- `src/components/blog/editor/ImageNode.tsx`
-  - Custom `DecoratorNode` for image rendering + JSON/DOM import/export.
-- `src/components/blog/editor/ImagePlugin.tsx`
-  - Image insertion/upload plugin.
-- `src/components/blog/editor/ToolbarPlugin.tsx`
-  - Editor formatting toolbar.
-- `src/components/blog/editor/FloatingLinkEditor.tsx`
-  - Inline link editing UI.
-- `src/components/blog/editor/EditorTheme.ts`
-  - Lexical theme mapping.
-- `src/components/blog/editor/BlogEditor.css`
-  - Editor-specific styles.
+- `apiClient.ts` - Axios instance + interceptors.
+- `authService.ts` - auth/login/profile/reset APIs.
+- `blogService.ts`, `publicBlogService.ts` - admin/public blog APIs.
+- `blogCategoryService.ts` - blog category CRUD/list APIs.
+- `eventService.ts` - event APIs.
+- `tagService.ts` - tag APIs.
+- `ticketCatalogService.ts` - ticket catalog APIs.
+- `attractionService.ts`, `pointService.ts` - destination/point APIs.
+- `userService.ts`, `vendorService.ts` - user/vendor admin APIs.
 
-## Shared UI & Components
+## 7) Feature Component Areas
+
 - `src/components/ui/*`
-  - Reusable primitive UI components (button, dialog, select, table, etc.).
+  - Radix-based reusable primitives (dialog, table, select, input, tabs, etc.).
 - `src/components/common/*`
-  - App-level common components (layout blocks, wrappers, helpers).
+  - Shared app components (pagination, map picker, wrappers).
+- `src/components/blog/*`
+  - Blog admin UI: table, toolbar, delete dialog, creation sections.
+- `src/components/blog/editor/*`
+  - Lexical editor plugins/toolbars/image/table tooling.
 - `src/components/blog-categories/*`
-  - Feature UI for blog category management.
-- `src/components/index.ts`
-  - Barrel exports for shared components.
+  - Blog category management modal/form/toolbar/table.
+- `src/components/profile/*`
+  - Profile forms/cards/password/avatar/sidebar.
+- `src/components/dashboard/*`
+  - Dashboard cards/sidebar/empty state.
 
-## Constants / Types / Utilities
-- `src/constants/*` - Feature constants and options.
-- `src/types/*` - API/domain typings.
-- `src/utils/*` - General helpers and API error helpers.
-- `src/lib/utils.ts` - Utility helpers for UI/className composition.
+## 8) Data Contracts & Helpers
 
-## Conventions Observed
-- Alias `@/` resolves to `src/`.
-- Feature-centric pages under `src/pages/{domain}`.
-- API logic centralized in `src/services/api`.
-- Route-protected app structure achieved via layout nesting + auth context.
+- `src/types/*` - domain types (`event`, `blog`, `attraction`, `point`, `tag`, `ticketCatalog`).
+- `src/constants/*` - blog/blog-category constants.
+- `src/utils/*` - cloudinary, generic helpers, API error message extraction.
+- `src/lib/utils.ts` - shared UI helper utilities.
 
-## Notes
-- `src/routes/index.tsx` currently defines `/admin` in two route groups (one short block and one full block). This may be intentional but is worth keeping in mind when changing admin routing behavior.
+## 9) Notable Conventions
+
+- Import alias: `@/` → `src/`.
+- Feature-first structure in `src/pages/{domain}` + `src/components/{domain}`.
+- Service-first API access via `src/services/api`.
+- Route access boundaries are enforced mainly through layout composition + auth context.
+
+## 10) Current Notes
+
+- `src/routes/index.tsx` currently contains two `/admin` route blocks: one empty block and one full admin block. Consolidating these may reduce routing ambiguity.

@@ -1,10 +1,16 @@
-import { FunctionComponent, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MenuOutlined, CloseOutlined, UserOutlined, LogoutOutlined, ProfileOutlined } from '@ant-design/icons';
-import { Dropdown, Avatar } from 'antd';
-import type { MenuProps } from 'antd';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/hooks/useAuth';
+import { FunctionComponent, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  MenuOutlined,
+  CloseOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  ProfileOutlined,
+} from "@ant-design/icons";
+import { Dropdown, Avatar } from "antd";
+import type { MenuProps } from "antd";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/auth/useAuth";
 
 const Header: FunctionComponent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,22 +20,22 @@ const Header: FunctionComponent = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate("/login");
   };
 
-  const userMenuItems: MenuProps['items'] = [
+  const userMenuItems: MenuProps["items"] = [
     {
-      key: 'profile',
-      label: 'Profile',
+      key: "profile",
+      label: "Profile",
       icon: <ProfileOutlined />,
-      onClick: () => navigate('/account'),
+      onClick: () => navigate("/account"),
     },
     {
-      type: 'divider',
+      type: "divider",
     },
     {
-      key: 'logout',
-      label: 'Logout',
+      key: "logout",
+      label: "Logout",
       icon: <LogoutOutlined />,
       onClick: handleLogout,
       danger: true,
@@ -37,17 +43,17 @@ const Header: FunctionComponent = () => {
   ];
 
   const navLinks = [
-    { label: 'Landing Page', href: '/' },
-    { label: 'About Us', href: '/about-us' },
-    { label: 'Contact Us', href: '/contact-us' },
+    { label: "Landing Page", href: "/" },
+    { label: "About Us", href: "/about-us" },
+    { label: "Contact Us", href: "/contact-us" },
   ];
 
   const isActiveLink = (href: string) => {
     return location.pathname === href;
   };
 
-  console.log('Header render - user:', user);
-  console.log('Header render - isAuthenticated:', isAuthenticated);
+  console.log("Header render - user:", user);
+  console.log("Header render - isAuthenticated:", isAuthenticated);
 
   return (
     <header className="w-full bg-white text-gray-900 font-[Poppins] sticky top-0 z-50">
@@ -69,10 +75,11 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`text-base transition-colors duration-300 ${isActiveLink(link.href)
-                      ? 'text-emerald-400 font-semibold'
-                      : 'text-gray-900 hover:text-emerald-400'
-                      }`}
+                    className={`text-base transition-colors duration-300 ${
+                      isActiveLink(link.href)
+                        ? "text-emerald-400 font-semibold"
+                        : "text-gray-900 hover:text-emerald-400"
+                    }`}
                   >
                     {link.label}
                   </Link>
@@ -86,7 +93,7 @@ const Header: FunctionComponent = () => {
                 <Dropdown
                   menu={{ items: userMenuItems }}
                   placement="bottomRight"
-                  trigger={['click']}
+                  trigger={["click"]}
                 >
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                     <Avatar
@@ -139,10 +146,11 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`block text-base transition-colors duration-300 ${isActiveLink(link.href)
-                      ? 'text-emerald-400 font-semibold'
-                      : 'text-gray-300 hover:text-emerald-400'
-                      }`}
+                    className={`block text-base transition-colors duration-300 ${
+                      isActiveLink(link.href)
+                        ? "text-emerald-400 font-semibold"
+                        : "text-gray-300 hover:text-emerald-400"
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
@@ -162,9 +170,7 @@ const Header: FunctionComponent = () => {
                       icon={!user?.avatarUrl && <UserOutlined />}
                       className="bg-emerald-500"
                     />
-                    <span className="text-gray-900 font-medium">
-                      {user?.fullname || 'User'}
-                    </span>
+                    <span className="text-gray-900 font-medium">{user?.fullname || "User"}</span>
                   </div>
                   <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button

@@ -1,5 +1,5 @@
-import { Button } from '@/components/common';
-import TooltipWrapper from '@/components/common/TooltipWrapper';
+import { Button } from "@/components/common";
+import TooltipWrapper from "@/components/common/TooltipWrapper";
 
 // --- Toolbar Button ---
 type ToolbarButtonProps = {
@@ -21,8 +21,8 @@ export default function ToolbarButton({
     <TooltipWrapper content={title}>
       <Button
         variant="outline"
-        size={"icon-lg"}
-        className={`${isActive ? '!bg-primary/80 !border-primary/80 !text-primary-foreground' : ''}`}
+        size={"icon-sm"}
+        className={`${isActive ? "!bg-primary/80 !border-primary/80 !text-primary-foreground" : ""}`}
         onClick={onClick}
         disabled={disabled}
         aria-label={title}

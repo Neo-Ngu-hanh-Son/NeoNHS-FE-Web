@@ -1,20 +1,20 @@
-import { AppstoreOutlined } from "@ant-design/icons"
-import { useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
+import { AppstoreOutlined } from "@ant-design/icons";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/auth/useAuth";
 
-import { ForgotForm } from "./components/forgot-form"
-import loginImage from "@/assets/images/login-img.jpg"
+import { ForgotForm } from "./components/forgot-form";
+import loginImage from "@/assets/images/login-img.jpg";
 
 export default function ForgotPage() {
-  const { isAuthenticated } = useAuth()
-  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
+      navigate("/");
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, navigate]);
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -40,5 +40,5 @@ export default function ForgotPage() {
         />
       </div>
     </div>
-  )
+  );
 }

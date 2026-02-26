@@ -32,9 +32,9 @@ import EventEditPage from "@/pages/admin/events/edit";
 
 // Vendor specific pages
 import WorkshopTemplatesPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage";
-import WorkshopTemplateDetailPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateDetailPage'
-import WorkshopTemplateCreatePage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateCreatePage'
-import WorkshopTemplateEditPage from '@/pages/vendor/WorkshopTemplates/WorkshopTemplateEditPage'
+import WorkshopTemplateDetailPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplateDetailPage";
+import WorkshopTemplateCreatePage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplateCreatePage";
+import WorkshopTemplateEditPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplateEditPage";
 import WorkshopSessionsPage from "@/pages/vendor/WorkshopSessions/WorkshopSessionsPage";
 import WorkshopCalendarPage from "@/pages/vendor/WorkshopCalendar/CalendarPage.tsx";
 import TicketVerificationPage from "@/pages/vendor/Tickets/TicketVerificationPage";
@@ -46,6 +46,8 @@ import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
 import AdminBlogDetailPage from "@/pages/admin/blog/AdminBlogDetailPage";
 import BlogEditPage from "@/pages/admin/blog/BlogEditPage";
 import BlogDetailsPage from "@/pages/blog/BlogDetailsPage";
+import EventTagPage from "@/pages/admin/tags/EventTagPage";
+import WorkshopTagPage from "@/pages/admin/tags/WorkshopTagPage";
 
 export const router = createBrowserRouter([
   {
@@ -110,6 +112,8 @@ export const router = createBrowserRouter([
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "events", element: <AdminEventsPage /> },
+          { path: "event-tags", element: <EventTagPage /> },
+          { path: "workshop-tags", element: <WorkshopTagPage /> },
           { path: "events/create", element: <EventCreatePage /> },
           { path: "events/:id", element: <EventDetailPage /> },
           { path: "events/:id/edit", element: <EventEditPage /> },
