@@ -1,0 +1,201 @@
+/* --- THE NAVBAR (Bottom Bar) --- */
+.psv-navbar {
+  /* Darken the glass: Using 50% black overlay */
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid white;
+  color: white !important;
+}
+
+/* 1. RE-POSITION THE PANEL TO THE BOTTOM */
+.psv-panel {
+  top: auto !important; /* Remove the top: 0 */
+  bottom: 0 !important; /* Stick to bottom */
+  right: 0 !important;
+  left: 0 !important;
+  width: 100% !important; /* Full width instead of side width */
+  height: 35vh !important; /* Set a height (35% of viewport) */
+
+  /* Change the slide-in animation from right-to-left to bottom-to-top */
+  transform: translateY(100%) !important;
+  transition: transform 0.3s ease-in-out !important;
+
+  /* Glass Styling (Darkened as requested) */
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: none !important;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+
+  .psv-panel-content {
+    line-height: 1.6;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9); /* Slightly off-white for body text */
+    padding: 30px 20px 40px 20px !important; /* Extra bottom padding */
+    overflow-y: auto;
+  }
+}
+
+/* 2. HANDLE THE OPEN STATE */
+.psv-panel--open {
+  transform: translateY(60px) !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  bottom: 101px !important;
+}
+
+/* 3. FIX THE RESIZER (Remove it for now) */
+.psv-panel-resizer {
+  display: none !important; /* Hide the resizer since we're fixing the height */
+}
+
+.psv-panel-resizer:hover {
+  background-color: hsl(var(--primary) / 0.5) !important;
+}
+
+/* 5. ADJUST NAVBAR (Optional) 
+   If the panel is open, the navbar might get covered. 
+   You can hide the navbar when the panel is open if you want: */
+.psv-container--has-panel .psv-navbar {
+  transform: translateY(100%);
+  transition: transform 0.3s;
+}
+
+.psv-panel-header {
+  /* 1. Use your Primary Color for text or background */
+  background-color: transparent !important; /* Keep the glass look */
+  color: hsl(var(--primary)) !important;
+
+  background: transparent !important;
+
+  /* 2. Setup Centering */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+
+  /* 3. Layout adjustments */
+  position: relative; /* Needed to anchor the close button */
+  padding: 0 12px 12px 0px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.psv-panel-close-button {
+  margin-top: 12px !important;
+  margin-right: 14px !important;
+}
+
+/* ================================================================
+   CUSTOM INFO PANEL (React-rendered bottom sheet above the navbar)
+   ================================================================ */
+
+/* Backdrop overlay — tap to close */
+.pano-info-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.pano-info-backdrop--visible {
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+}
+
+/* Panel container */
+.pano-info-panel {
+  position: absolute;
+  bottom: 40px; /* sit right above the PSV navbar */
+  max-height: 30vh;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+
+  /* Glass styling — matching the navbar aesthetic */
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+
+  /* Hidden by default — slide up to reveal */
+  transform: translateY(calc(100% + 60px));
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pano-info-panel--open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Drag handle */
+.pano-info-panel__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 10px 0 6px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.pano-info-panel__handle:active {
+  cursor: grabbing;
+}
+
+.pano-info-panel__handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.2s;
+}
+
+.pano-info-panel__handle:hover .pano-info-panel__handle-bar {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Scrollable body */
+.pano-info-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px 24px;
+  color: rgba(255, 255, 255, 0.9);
+
+  /* Thin scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.pano-info-panel__body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pano-info-panel__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pano-info-panel__body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+
+/* Custom navbar info button */
+.psv-custom-info-button {
+  cursor: pointer !important;
+  transition: opacity 0.2s;
+}
+
+.psv-custom-info-button:hover {
+  opacity: 0.8;
+}
