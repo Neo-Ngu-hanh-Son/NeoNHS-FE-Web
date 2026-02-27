@@ -19,7 +19,7 @@ import type { User } from "@/types";
 
 interface UserTableProps {
     users: User[];
-    onToggleBan: (userId: string) => void;
+    onToggleBan: (user: User) => void;
     isLoading: boolean;
 }
 
@@ -82,12 +82,6 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                 <Table className="w-full text-left border-collapse">
                     <TableHeader>
                         <TableRow className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 hover:bg-transparent">
-                            <TableHead className="p-4 w-12 text-center">
-                                <input
-                                    type="checkbox"
-                                    className="rounded border-slate-300 text-primary focus:ring-primary"
-                                />
-                            </TableHead>
                             <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 User Name
                             </TableHead>
@@ -124,12 +118,6 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                                     key={user.id}
                                     className="hover:bg-primary/5 transition-colors border-none"
                                 >
-                                    <TableCell className="p-4 text-center">
-                                        <input
-                                            type="checkbox"
-                                            className="rounded border-slate-300 text-primary focus:ring-primary"
-                                        />
-                                    </TableCell>
                                     <TableCell className="p-4">
                                         <div className="flex items-center gap-3">
                                             <div
@@ -168,7 +156,7 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem
-                                                    onClick={() => onToggleBan(user.id)}
+                                                    onClick={() => onToggleBan(user)}
                                                     className={user.isBanned ? "text-green-600" : "text-red-600"}
                                                 >
                                                     {user.isBanned ? (

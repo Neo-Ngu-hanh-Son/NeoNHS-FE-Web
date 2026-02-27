@@ -48,10 +48,11 @@ export const adminUserService = {
     /**
      * Toggle ban status of a user
      */
-    async toggleBan(userId: string): Promise<ApiResponse<User>> {
+    async toggleBan(userId: string, reason?: string): Promise<ApiResponse<User>> {
         try {
             const res = await apiClient.patch<ApiResponse<User>>(
-                `/admin/users/${userId}/toggle-ban`
+                `/admin/users/${userId}/toggle-ban`,
+                reason ? { reason } : {}
             );
             return res; // res chính là data
         } catch (error) {

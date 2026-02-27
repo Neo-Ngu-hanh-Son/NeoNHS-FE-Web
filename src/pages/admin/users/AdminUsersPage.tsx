@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserFilter } from "./components/UserFilter";
 import { UserTable } from "./components/UserTable";
 import { adminUserService } from "@/services/api/adminUserService";
 import type { User } from "@/types";
 import { message } from "antd";
+import { BanUserDialog } from "./components/BanUserDialog";
+import { UnbanUserDialog } from "./components/UnbanUserDialog";
 
 export function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -17,6 +19,11 @@ export function AdminUsersPage() {
     const [searchText, setSearchText] = useState("");
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
+
+    // Dialog states
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isBanDialogOpen, setIsBanDialogOpen] = useState(false);
+    const [isUnbanDialogOpen, setIsUnbanDialogOpen] = useState(false);
 
     const fetchUsers = useCallback(async () => {
         setIsLoading(true);
@@ -50,13 +57,36 @@ export function AdminUsersPage() {
         fetchUsers();
     }, [fetchUsers]);
 
-    const handleToggleBan = async (userId: string) => {
+    const handleOpenToggleBan = (user: User) => {
+        setSelectedUser(user);
+        if (user.isBanned) {
+            setIsUnbanDialogOpen(true);
+        } else {
+            setIsBanDialogOpen(true);
+        }
+    };
+
+    const handleConfirmBan = async (userId: string, reason: string) => {
+        try {
+            await adminUserService.toggleBan(userId, reason);
+            message.success("User banned successfully.");
+            fetchUsers();
+            setIsBanDialogOpen(false);
+        } catch (error: any) {
+            message.error("Failed to ban user: " + (error.message || "Unknown error"));
+            throw error;
+        }
+    };
+
+    const handleConfirmUnban = async (userId: string) => {
         try {
             await adminUserService.toggleBan(userId);
-            message.success("User status updated successfully.");
+            message.success("User unbanned successfully.");
             fetchUsers();
+            setIsUnbanDialogOpen(false);
         } catch (error: any) {
-            message.error("Failed to update user status: " + (error.message || "Unknown error"));
+            message.error("Failed to unban user: " + (error.message || "Unknown error"));
+            throw error;
         }
     };
 
@@ -102,7 +132,21 @@ export function AdminUsersPage() {
             <UserTable
                 users={users}
                 isLoading={isLoading}
-                onToggleBan={handleToggleBan}
+                onToggleBan={handleOpenToggleBan}
+            />
+
+            {/* Dialogs */}
+            <BanUserDialog
+                user={selectedUser}
+                isOpen={isBanDialogOpen}
+                onClose={() => setIsBanDialogOpen(false)}
+                onConfirm={handleConfirmBan}
+            />
+            <UnbanUserDialog
+                user={selectedUser}
+                isOpen={isUnbanDialogOpen}
+                onClose={() => setIsUnbanDialogOpen(false)}
+                onConfirm={handleConfirmUnban}
             />
 
             {/* Pagination Footer */}
