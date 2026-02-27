@@ -24,13 +24,10 @@ import {
   Briefcase,
   Users,
   ClipboardList,
-  ExternalLink,
 } from "lucide-react"
 import { VendorProfileResponse } from "../types"
 import { VendorStatusBadge, VerificationBadge } from "./vendor-status-badge"
 import { formatDate, formatDateTime, formatPhoneNumber, formatBankAccount } from "../utils/formatters"
-import { VendorTemplatesModal } from "./vendor-templates-modal"
-import { useState } from "react"
 
 interface VendorDetailDialogProps {
   vendor: VendorProfileResponse | null
@@ -51,8 +48,6 @@ export function VendorDetailDialog({
   onUnban,
   onVerify,
 }: VendorDetailDialogProps) {
-  const [templatesModalOpen, setTemplatesModalOpen] = useState(false)
-
   if (!vendor) return null
 
   return (
@@ -201,17 +196,6 @@ export function VendorDetailDialog({
                 <ClipboardList className="w-4 h-4 text-primary" />
                 Statistics
               </h3>
-              {vendor.totalTemplates && vendor.totalTemplates > 0 && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setTemplatesModalOpen(true)}
-                  className="gap-1.5"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  View All Templates
-                </Button>
-              )}
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Card>
@@ -328,16 +312,6 @@ export function VendorDetailDialog({
         </div>
       </DialogContent>
     </Dialog>
-
-    {/* Vendor Templates Modal */}
-    {vendor && (
-      <VendorTemplatesModal
-        vendorId={vendor.id}
-        vendorName={vendor.businessName}
-        open={templatesModalOpen}
-        onOpenChange={setTemplatesModalOpen}
-      />
-    )}
-  </>
+    </>
   )
 }
