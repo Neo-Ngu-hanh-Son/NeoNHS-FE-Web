@@ -14,17 +14,18 @@ import {
 import { TemplatesTable } from "./components/TemplatesTable"
 import { ApproveTemplateDialog, RejectTemplateDialog } from "./components/templates/approve-reject-dialogs"
 import { TemplateDetailDialog } from "./components/templates/template-detail-dialog"
-import { adminWorkshopService } from "@/services/api/adminWorkshopService"
+import { adminWorkshopService, type AdminVendorSummary } from "@/services/api/adminWorkshopService"
 
 type SortBy = TemplatesSortBy
 type SortDirection = TemplatesSortDirection
 
 export default function AdminVendorTemplatesPage() {
-  const [templates, setTemplates] = useState<AdminWorkshopTemplateResponse[]>([])
-  const [stats, setStats] = useState<AdminTemplateStats | null>(null)
+  const [rawTemplates, setRawTemplates] = useState<AdminWorkshopTemplateResponse[]>([])
+  const [vendors, setVendors] = useState<AdminVendorSummary[]>([])
+  const [loading, setLoading] = useState(true)
 
   const [searchQuery, setSearchQuery] = useState("")
-  const [vendorIdFilter, setVendorIdFilter] = useState("")
+  const [vendorIdFilter, setVendorIdFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [verificationFilter, setVerificationFilter] = useState<string>("all")
   const [sortBy, setSortBy] = useState<SortBy>("createdAt")
@@ -54,46 +55,73 @@ export default function AdminVendorTemplatesPage() {
     template: null,
   })
 
-  // Fetch templates from admin API (optionally filtered by vendorId)
   useEffect(() => {
-    const fetchTemplates = async () => {
+    const fetchAll = async () => {
       try {
+        setLoading(true)
         const apiSortDir = sortDirection === "ASC" ? "asc" : "desc"
         const statusParam = statusFilter !== "all" ? statusFilter : undefined
 
-        const params = {
-          page: 1,
-          size: 10,
-          sortBy,
-          sortDir: apiSortDir,
-          status: statusParam,
-        } as const
+        const [templatesRes, vendorsRes] = await Promise.allSettled([
+          adminWorkshopService.getAllWorkshopTemplates({
+            page: 1,
+            size: 10,
+            sortBy,
+            sortDir: apiSortDir,
+            status: statusParam,
+          }),
+          vendors.length === 0
+            ? adminWorkshopService.getAllVendors()
+            : Promise.resolve(vendors),
+        ])
 
-        let page
-        if (vendorIdFilter) {
-          page = await adminWorkshopService.getVendorWorkshopTemplates(
-            vendorIdFilter,
-            params,
+        if (templatesRes.status === "fulfilled") {
+          const visibleTemplates = (templatesRes.value.content || []).filter(
+            (t) => t.status !== "DRAFT",
           )
+          setRawTemplates(visibleTemplates)
         } else {
-          page = await adminWorkshopService.getAllWorkshopTemplates(params)
+          console.error("Failed to load templates", templatesRes.reason)
+          notification.error({
+            message: "Failed to load templates",
+            description: "An error occurred while loading workshop templates. Please try again.",
+          })
         }
 
-        setTemplates(page.content)
-        setStats(calculateAdminTemplateStats(page.content))
-      } catch (error) {
-        console.error("Failed to load admin workshop templates", error)
-        notification.error({
-          message: "Failed to load templates",
-          description:
-            "An error occurred while loading workshop templates. Please try again.",
-        })
+        if (vendorsRes.status === "fulfilled") {
+          setVendors(vendorsRes.value)
+        } else {
+          console.error("Failed to load vendors", vendorsRes.reason)
+        }
       } finally {
+        setLoading(false)
       }
     }
 
-    fetchTemplates()
-  }, [vendorIdFilter, sortBy, sortDirection, statusFilter])
+    fetchAll()
+  }, [sortBy, sortDirection, statusFilter])
+
+  // Enrich templates with vendor data reactively (no extra API call)
+  const templates = useMemo(() => {
+    if (vendors.length === 0) return rawTemplates
+
+    return rawTemplates.map((t) => {
+      const vendor = vendors.find(
+        (v) => v.id === t.vendorId || v.businessName === t.vendorName || v.fullname === t.vendorName,
+      )
+      if (!vendor) return t
+      return {
+        ...t,
+        vendorVerified: vendor.isVerifiedVendor,
+        vendorEmail: t.vendorEmail || vendor.email,
+      }
+    })
+  }, [rawTemplates, vendors])
+
+  const stats = useMemo<AdminTemplateStats>(
+    () => calculateAdminTemplateStats(templates),
+    [templates],
+  )
 
   const filteredTemplates = useMemo(() => {
     let filtered = templates
@@ -103,15 +131,25 @@ export default function AdminVendorTemplatesPage() {
       filtered = filtered.filter((t) => {
         return (
           t.name.toLowerCase().includes(query) ||
-          t.shortDescription.toLowerCase().includes(query) ||
+          t.shortDescription?.toLowerCase().includes(query) ||
           t.vendorName.toLowerCase().includes(query) ||
           (t.vendorEmail ?? "").toLowerCase().includes(query)
         )
       })
     }
 
-    if (statusFilter !== "all") {
-      filtered = filtered.filter((t) => t.status === statusFilter)
+    // Vendor filter (client-side since backend has no per-vendor endpoint)
+    if (vendorIdFilter !== "all") {
+      const selectedVendor = vendors.find((v) => v.id === vendorIdFilter)
+      filtered = filtered.filter((t) => {
+        // Match by vendorId first, fallback to vendorName match
+        if (t.vendorId === vendorIdFilter) return true
+        if (selectedVendor) {
+          return t.vendorName === selectedVendor.businessName ||
+                 t.vendorName === selectedVendor.fullname
+        }
+        return false
+      })
     }
 
     if (verificationFilter !== "all") {
@@ -147,7 +185,7 @@ export default function AdminVendorTemplatesPage() {
     })
 
     return sorted
-  }, [templates, searchQuery, statusFilter, verificationFilter, sortBy, sortDirection])
+  }, [templates, searchQuery, vendorIdFilter, vendors, verificationFilter, sortBy, sortDirection])
 
   const handleView = (id: string) => {
     const template = templates.find((t) => t.id === id)
@@ -187,7 +225,7 @@ export default function AdminVendorTemplatesPage() {
 
   const handleClearFilters = () => {
     setSearchQuery("")
-    setVendorIdFilter("")
+    setVendorIdFilter("all")
     setStatusFilter("all")
     setVerificationFilter("all")
     setSortBy("createdAt")
@@ -207,17 +245,7 @@ export default function AdminVendorTemplatesPage() {
       </div>
 
       {/* Stats */}
-      <TemplateStatsCards
-        stats={
-          stats ?? {
-            total: templates.length,
-            pending: templates.filter((t) => t.status === "PENDING").length,
-            approved: templates.filter((t) => t.status === "ACTIVE").length,
-            rejected: templates.filter((t) => t.status === "REJECTED").length,
-            draft: templates.filter((t) => t.status === "DRAFT").length,
-          }
-        }
-      />
+      <TemplateStatsCards stats={stats} />
 
       {/* Filters */}
       <TemplateFiltersToolbar
@@ -225,6 +253,7 @@ export default function AdminVendorTemplatesPage() {
         onSearchChange={setSearchQuery}
         vendorIdFilter={vendorIdFilter}
         onVendorIdFilterChange={setVendorIdFilter}
+        vendors={vendors}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         verificationFilter={verificationFilter}
@@ -239,8 +268,10 @@ export default function AdminVendorTemplatesPage() {
       <TemplatesTable
         templates={filteredTemplates}
         totalCount={templates.length}
+        loading={loading}
         hasActiveFilters={
           !!searchQuery ||
+          vendorIdFilter !== "all" ||
           statusFilter !== "all" ||
           verificationFilter !== "all" ||
           sortBy !== "createdAt" ||

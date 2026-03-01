@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Calendar, Clock, DollarSign, AlertCircle, Building2, CheckCircle, FileText } from "lucide-react"
 import { AdminWorkshopTemplateResponse, WorkshopStatus } from "./templates/types"
 import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
@@ -7,6 +8,7 @@ import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/Workshop
 interface TemplatesTableProps {
   templates: AdminWorkshopTemplateResponse[]
   totalCount: number
+  loading?: boolean
   hasActiveFilters: boolean
   onView: (id: string) => void
   onApproveClick: (template: AdminWorkshopTemplateResponse) => void
@@ -46,9 +48,41 @@ const getStatusBadge = (status: WorkshopStatus) => {
   }
 }
 
+function SkeletonRow() {
+  return (
+    <tr className="border-b">
+      <td className="p-3">
+        <div className="flex items-start gap-3">
+          <Skeleton className="w-16 h-12 rounded shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-3 w-1/2" />
+          </div>
+        </div>
+      </td>
+      <td className="p-3">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-28" />
+          <Skeleton className="h-3 w-36" />
+        </div>
+      </td>
+      <td className="p-3"><Skeleton className="h-4 w-16" /></td>
+      <td className="p-3"><Skeleton className="h-4 w-20" /></td>
+      <td className="p-3"><Skeleton className="h-6 w-20 rounded-full" /></td>
+      <td className="p-3"><Skeleton className="h-4 w-24" /></td>
+      <td className="p-3">
+        <div className="flex justify-end gap-2">
+          <Skeleton className="h-8 w-16 rounded-md" />
+        </div>
+      </td>
+    </tr>
+  )
+}
+
 export function TemplatesTable({
   templates,
   totalCount,
+  loading = false,
   hasActiveFilters,
   onView,
   onApproveClick,
@@ -59,7 +93,28 @@ export function TemplatesTable({
 
   return (
     <div className="border rounded-lg overflow-hidden">
-      {hasTemplates ? (
+      {loading ? (
+        <div className="max-h-[600px] overflow-auto">
+          <table className="w-full">
+            <thead className="bg-muted/50 sticky top-0 z-10">
+              <tr className="border-b">
+                <th className="text-left p-3 font-semibold text-sm">Template</th>
+                <th className="text-left p-3 font-semibold text-sm">Vendor</th>
+                <th className="text-left p-3 font-semibold text-sm">Duration</th>
+                <th className="text-left p-3 font-semibold text-sm">Price</th>
+                <th className="text-left p-3 font-semibold text-sm">Status</th>
+                <th className="text-left p-3 font-semibold text-sm">Created</th>
+                <th className="text-right p-3 font-semibold text-sm">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : hasTemplates ? (
         <div className="max-h-[600px] overflow-auto">
           <table className="w-full">
             <thead className="bg-muted/50 sticky top-0 z-10">
@@ -110,14 +165,14 @@ export function TemplatesTable({
                         <span className="font-medium line-clamp-1">
                           {template.vendorName}
                         </span>
-                        {template.vendorVerified && (
+                        {template.vendorVerified === true && (
                           <CheckCircle className="w-3 h-3 text-green-600" />
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span>{template.vendorEmail}</span>
                       </div>
-                      {!template.vendorVerified && (
+                      {template.vendorVerified === false && (
                         <Badge
                           variant="outline"
                           className="mt-1 text-xs bg-amber-50 text-amber-700 border-amber-300 inline-flex items-center gap-1 w-fit"
@@ -200,12 +255,14 @@ export function TemplatesTable({
         </div>
       )}
 
-      <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
-        <span>
-          Showing <strong>{templates.length}</strong> of{" "}
-          <strong>{totalCount}</strong> templates
-        </span>
-      </div>
+      {!loading && (
+        <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
+          <span>
+            Showing <strong>{templates.length}</strong> of{" "}
+            <strong>{totalCount}</strong> templates
+          </span>
+        </div>
+      )}
     </div>
   )
 }

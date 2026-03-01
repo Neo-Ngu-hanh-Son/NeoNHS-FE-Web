@@ -81,14 +81,21 @@ export function TemplateReviewCard({
           }}
         />
         <div className="absolute top-2 right-2">{getStatusBadge()}</div>
-        {!template.vendorVerified && (
+        {template.vendorVerified === true ? (
+          <div className="absolute top-2 left-2">
+            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Verified
+            </Badge>
+          </div>
+        ) : template.vendorVerified === false ? (
           <div className="absolute top-2 left-2">
             <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
               <AlertCircle className="w-3 h-3 mr-1" />
               Unverified Vendor
             </Badge>
           </div>
-        )}
+        ) : null}
       </div>
 
       <CardContent className="p-5 space-y-4">
@@ -105,7 +112,7 @@ export function TemplateReviewCard({
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
             <span className="font-medium">{template.vendorName}</span>
-            {template.vendorVerified && (
+            {template.vendorVerified === true && (
               <CheckCircle className="w-3.5 h-3.5 text-green-600" />
             )}
           </div>

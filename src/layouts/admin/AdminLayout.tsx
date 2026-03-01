@@ -20,7 +20,7 @@ export function AdminLayout() {
     { label: "Users", path: "/admin/users", icon: "group" },
     { 
       label: "Vendors", 
-      path: "", 
+      path: "vendors", 
       icon: "storefront",
       children: [
         { label: "Vendors Management", path: "/admin/vendors", icon: "storefront" },
@@ -35,7 +35,7 @@ export function AdminLayout() {
     { label: "Workshop Tags", path: "/admin/workshop-tags", icon: "sell" },
     {
       label: "Manage blogs",
-      path: "",
+      path: "blogs",
       icon: "dynamic_feed",
       children: [
         { label: "Blog Categories", path: "/admin/blog-categories", icon: "category" },
