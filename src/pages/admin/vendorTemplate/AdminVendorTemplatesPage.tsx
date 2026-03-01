@@ -3,6 +3,7 @@ import { notification } from "antd"
 import {
   AdminWorkshopTemplateResponse,
   AdminTemplateStats,
+  WorkshopStatus,
 } from "./components/templates/types"
 import { calculateAdminTemplateStats } from "./components/templates/data"
 import { TemplateStatsCards } from "./components/TemplateStatsCards"
@@ -197,13 +198,33 @@ export default function AdminVendorTemplatesPage() {
     setApproveDialog({ open: true, template })
   }
 
-  const handleApproveConfirm = (notes: string) => {
-    if (approveDialog.template) {
-      console.log("Approving template:", approveDialog.template.id, "Notes:", notes)
+  const handleApproveConfirm = async (adminNote?: string) => {
+    if (!approveDialog.template) return
+    const templateName = approveDialog.template.name
+    const templateId = approveDialog.template.id
+
+    try {
       setApproveDialog({ open: false, template: null })
+      await adminWorkshopService.approveTemplate(templateId, adminNote)
+
+      setRawTemplates((prev) =>
+        prev.map((t) =>
+          t.id === templateId
+            ? { ...t, status: "ACTIVE" as WorkshopStatus, adminNote: null }
+            : t,
+        ),
+      )
+
       notification.success({
         message: "Template Approved",
-        description: `"${approveDialog.template.name}" has been approved.`,
+        description: `"${templateName}" has been approved and is now active.`,
+      })
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      notification.error({
+        message: "Failed to Approve",
+        description: message,
       })
     }
   }
@@ -212,13 +233,33 @@ export default function AdminVendorTemplatesPage() {
     setRejectDialog({ open: true, template })
   }
 
-  const handleRejectConfirm = (reason: string) => {
-    if (rejectDialog.template) {
-      console.log("Rejecting template:", rejectDialog.template.id, "Reason:", reason)
+  const handleRejectConfirm = async (adminNote: string) => {
+    if (!rejectDialog.template) return
+    const templateName = rejectDialog.template.name
+    const templateId = rejectDialog.template.id
+
+    try {
       setRejectDialog({ open: false, template: null })
+      await adminWorkshopService.rejectTemplate(templateId, adminNote)
+
+      setRawTemplates((prev) =>
+        prev.map((t) =>
+          t.id === templateId
+            ? { ...t, status: "REJECTED" as WorkshopStatus, adminNote }
+            : t,
+        ),
+      )
+
       notification.warning({
         message: "Template Rejected",
-        description: `"${rejectDialog.template.name}" has been rejected.`,
+        description: `"${templateName}" has been rejected.`,
+      })
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      notification.error({
+        message: "Failed to Reject",
+        description: message,
       })
     }
   }

@@ -185,13 +185,13 @@ export function TemplateReviewCard({
         )}
 
         {/* Rejection Reason */}
-        {template.status === WorkshopStatus.REJECTED && template.rejectReason && (
+        {template.status === WorkshopStatus.REJECTED && template.adminNote && (
           <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
             <p className="text-xs font-medium text-red-800 dark:text-red-200 mb-1">
               Rejection Reason:
             </p>
             <p className="text-xs text-red-700 dark:text-red-300 line-clamp-3">
-              {template.rejectReason}
+              {template.adminNote}
             </p>
           </div>
         )}

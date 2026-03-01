@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined } from "@ant-design/icons"
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined, StarFilled, StarOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -161,8 +161,8 @@ export default function WorkshopTemplateDetailPage() {
       </div>
 
       {/* Rejection Alert */}
-      {template.status === WorkshopStatus.REJECTED && template.rejectReason && (
-        <RejectionAlert rejectReason={template.rejectReason} />
+      {template.status === WorkshopStatus.REJECTED && template.adminNote && (
+        <RejectionAlert adminNote={template.adminNote} />
       )}
 
       {/* Locked Message for PENDING/ACTIVE */}
@@ -228,19 +228,37 @@ export default function WorkshopTemplateDetailPage() {
           </Card>
 
           {/* Approval Info for ACTIVE templates */}
-          {template.status === WorkshopStatus.ACTIVE && template.approvedAt && (
+          {template.status === WorkshopStatus.ACTIVE && template.reviewedAt && (
             <Card className="rounded-2xl border-green-200 bg-green-50 dark:bg-green-950/20 shadow-sm">
               <CardHeader>
                 <CardTitle className="text-green-700 dark:text-green-400">Approval Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-sm">
-                  <span className="font-medium">Approved at:</span> {formatDateTime(template.approvedAt)}
+                  <span className="font-medium">Approved at:</span> {formatDateTime(template.reviewedAt)}
                 </p>
-                {template.averageRating && (
-                  <p className="text-sm">
-                    <span className="font-medium">Rating:</span> ⭐ {template.averageRating.toFixed(1)} ({template.totalReview} reviews)
-                  </p>
+                {template.averageRating != null && (
+                  <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                    <div className="flex items-center gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <span key={star} className="text-base">
+                          {template.averageRating! >= star ? (
+                            <StarFilled className="text-amber-500" />
+                          ) : template.averageRating! >= star - 0.5 ? (
+                            <StarFilled className="text-amber-300" />
+                          ) : (
+                            <StarOutlined className="text-gray-300 dark:text-gray-600" />
+                          )}
+                        </span>
+                      ))}
+                    </div>
+                    <span className="font-bold text-lg text-amber-700 dark:text-amber-400">
+                      {template.averageRating.toFixed(1)}
+                    </span>
+                    <span className="text-sm text-muted-foreground">
+                      ({template.totalReview} reviews)
+                    </span>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -333,14 +351,14 @@ export default function WorkshopTemplateDetailPage() {
                   <p className="text-muted-foreground">{formatDate(template.updatedAt)}</p>
                 </div>
               </div>
-              {template.approvedAt && (
+              {template.reviewedAt && template.status === WorkshopStatus.ACTIVE && (
                 <>
                   <Separator />
                   <div className="flex items-center gap-2 text-sm">
                     <CalendarOutlined className="text-green-500" />
                     <div>
                       <p className="font-medium text-green-600 dark:text-green-400">Approved</p>
-                      <p className="text-muted-foreground">{formatDate(template.approvedAt)}</p>
+                      <p className="text-muted-foreground">{formatDate(template.reviewedAt)}</p>
                     </div>
                   </div>
                 </>

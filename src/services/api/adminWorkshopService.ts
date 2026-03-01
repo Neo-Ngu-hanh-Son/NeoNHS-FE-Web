@@ -75,36 +75,36 @@ export const adminWorkshopService = {
   },
 
   /**
-   * Approve a workshop template
+   * Approve a workshop template (PENDING -> ACTIVE)
    * POST /api/admin/vendors/workshop-templates/{id}/approve
+   * No request body required
    */
   async approveTemplate(
     id: string,
-    notes?: string,
+    adminNote?: string,
   ): Promise<WorkshopTemplateResponse> {
-    const payload = notes ? { notes } : undefined
-    const res =
-      await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(
-        `${BASE_URL}/${id}/approve`,
-        payload,
-      )
+    const payload = adminNote ? { adminNote } : undefined
+    const res = await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(
+      `${BASE_URL}/${id}/approve`,
+      payload,
+    )
     const data = (res?.data ?? res) as WorkshopTemplateResponse
     return data
   },
 
   /**
-   * Reject a workshop template
+   * Reject a workshop template (PENDING -> REJECTED)
    * POST /api/admin/vendors/workshop-templates/{id}/reject
+   * @param adminNote - Required reason for rejection
    */
   async rejectTemplate(
     id: string,
-    rejectReason: string,
+    adminNote: string,
   ): Promise<WorkshopTemplateResponse> {
-    const res =
-      await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(
-        `${BASE_URL}/${id}/reject`,
-        { rejectReason },
-      )
+    const res = await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(
+      `${BASE_URL}/${id}/reject`,
+      { adminNote },
+    )
     const data = (res?.data ?? res) as WorkshopTemplateResponse
     return data
   },

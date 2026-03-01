@@ -252,7 +252,7 @@ export function TemplateDetailDialog({
 
               {/* Rejection reason */}
               {template.status === WorkshopStatus.REJECTED &&
-                template.rejectReason && (
+                template.adminNote && (
                   <Card className="border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-950/20">
                     <CardContent className="p-4 space-y-2">
                       <h3 className="font-semibold text-sm text-red-700 flex items-center gap-2">
@@ -260,7 +260,7 @@ export function TemplateDetailDialog({
                         Rejection Reason
                       </h3>
                       <p className="text-xs text-red-700 leading-relaxed whitespace-pre-line">
-                        {template.rejectReason}
+                        {template.adminNote}
                       </p>
                     </CardContent>
                   </Card>
@@ -451,9 +451,7 @@ export function TemplateDetailDialog({
               )}
 
               {/* Review meta */}
-              {(template.submittedAt ||
-                template.reviewedAt ||
-                template.approvedAt) && (
+              {(template.submittedAt || template.reviewedAt) && (
                 <Card>
                   <CardContent className="p-4 space-y-1.5 text-xs text-muted-foreground">
                     <h3 className="font-semibold text-sm text-foreground mb-1">
@@ -474,14 +472,6 @@ export function TemplateDetailDialog({
                           {formatDate(template.reviewedAt)}
                           {template.reviewedBy &&
                             ` by Admin ${template.reviewedBy.slice(0, 8)}`}
-                        </span>
-                      </p>
-                    )}
-                    {template.approvedAt && (
-                      <p>
-                        Approved:{" "}
-                        <span className="font-medium">
-                          {formatDate(template.approvedAt)}
                         </span>
                       </p>
                     )}

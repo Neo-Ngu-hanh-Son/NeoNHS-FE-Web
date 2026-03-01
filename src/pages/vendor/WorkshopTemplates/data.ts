@@ -64,9 +64,9 @@ export const mockWorkshopTemplates: WorkshopTemplateResponse[] = [
     vendorName: "Da Nang Arts Studio",
     createdAt: "2026-01-15T10:00:00Z",
     updatedAt: "2026-01-20T14:30:00Z",
-    rejectReason: null,
-    approvedBy: "admin-1",
-    approvedAt: "2026-01-20T14:30:00Z",
+    adminNote: null,
+    reviewedBy: "admin-1",
+    reviewedAt: "2026-01-20T14:30:00Z",
     images: [
       {
         id: "img-1",
@@ -97,9 +97,9 @@ export const mockWorkshopTemplates: WorkshopTemplateResponse[] = [
     vendorName: "Da Nang Arts Studio",
     createdAt: "2026-02-05T08:00:00Z",
     updatedAt: "2026-02-06T09:15:00Z",
-    rejectReason: null,
-    approvedBy: null,
-    approvedAt: null,
+    adminNote: null,
+    reviewedBy: null,
+    reviewedAt: null,
     images: [
       {
         id: "img-3",
@@ -125,9 +125,9 @@ export const mockWorkshopTemplates: WorkshopTemplateResponse[] = [
     vendorName: "Da Nang Arts Studio",
     createdAt: "2026-01-10T07:00:00Z",
     updatedAt: "2026-01-12T11:00:00Z",
-    rejectReason: null,
-    approvedBy: "admin-1",
-    approvedAt: "2026-01-12T11:00:00Z",
+    adminNote: null,
+    reviewedBy: "admin-1",
+    reviewedAt: "2026-01-12T11:00:00Z",
     images: [
       {
         id: "img-4",
@@ -153,9 +153,9 @@ export const mockWorkshopTemplates: WorkshopTemplateResponse[] = [
     vendorName: "Da Nang Arts Studio",
     createdAt: "2026-02-10T15:30:00Z",
     updatedAt: "2026-02-10T15:30:00Z",
-    rejectReason: null,
-    approvedBy: null,
-    approvedAt: null,
+    adminNote: null,
+    reviewedBy: null,
+    reviewedAt: null,
     images: [
       {
         id: "img-5",
@@ -186,9 +186,9 @@ export const mockWorkshopTemplates: WorkshopTemplateResponse[] = [
     vendorName: "Da Nang Arts Studio",
     createdAt: "2026-02-01T10:00:00Z",
     updatedAt: "2026-02-03T16:20:00Z",
-    rejectReason: "The images provided are low quality. Please upload higher resolution images showing the workshop activities clearly. Also, the full description needs more detail about what equipment participants need to bring.",
-    approvedBy: null,
-    approvedAt: null,
+    adminNote: "The images provided are low quality. Please upload higher resolution images showing the workshop activities clearly. Also, the full description needs more detail about what equipment participants need to bring.",
+    reviewedBy: null,
+    reviewedAt: null,
     images: [
       {
         id: "img-7",

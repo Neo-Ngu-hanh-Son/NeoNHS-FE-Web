@@ -204,8 +204,8 @@ export default function WorkshopTemplateEditPage() {
       </div>
 
       {/* Rejection Alert */}
-      {template.status === WorkshopStatus.REJECTED && template.rejectReason && (
-        <RejectionAlert rejectReason={template.rejectReason} />
+      {template.status === WorkshopStatus.REJECTED && template.adminNote && (
+        <RejectionAlert adminNote={template.adminNote} />
       )}
 
       {/* Info Card */}

@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TemplateStatusBadge } from "./template-status-badge"
-import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled } from "@ant-design/icons"
+import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled, StarOutlined } from "@ant-design/icons"
 import { formatDuration, formatPrice, formatDate } from "../utils/formatters"
 
 interface WorkshopTemplateCardProps {
@@ -151,11 +151,27 @@ export function WorkshopTemplateCard({
                 View
               </Button>
             )}
-            {template.averageRating && (
-              <div className="flex items-center gap-1 text-sm">
-                <StarFilled className="text-yellow-500" />
-                <span className="font-semibold">{template.averageRating.toFixed(1)}</span>
-                <span className="text-muted-foreground">({template.totalReview})</span>
+            {template.averageRating != null && (
+              <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-full px-2.5 py-1">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className="text-xs">
+                      {template.averageRating! >= star ? (
+                        <StarFilled className="text-amber-500" />
+                      ) : template.averageRating! >= star - 0.5 ? (
+                        <StarFilled className="text-amber-300" />
+                      ) : (
+                        <StarOutlined className="text-gray-300 dark:text-gray-600" />
+                      )}
+                    </span>
+                  ))}
+                </div>
+                <span className="average-rating font-bold text-sm text-amber-700 dark:text-amber-400">
+                  {template.averageRating.toFixed(1)}
+                </span>
+                <span className="total-review text-xs text-muted-foreground">
+                  ({template.totalReview})
+                </span>
               </div>
             )}
           </>

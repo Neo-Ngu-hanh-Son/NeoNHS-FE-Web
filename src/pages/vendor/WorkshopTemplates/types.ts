@@ -43,9 +43,9 @@ export interface WorkshopTemplateResponse {
   updatedAt: string // ISO DateTime
   
   // Approval tracking
-  rejectReason: string | null
-  approvedBy: string | null // UUID
-  approvedAt: string | null // ISO DateTime
+  adminNote: string | null
+  reviewedBy: string | null // UUID
+  reviewedAt: string | null // ISO DateTime
   
   images: WorkshopImageResponse[]
   tags: WTagResponse[]
