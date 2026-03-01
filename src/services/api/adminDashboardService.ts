@@ -6,13 +6,19 @@ import {
     SalesByType,
     TopActivity,
     RegistrationTrendPoint,
-    RecentActivity
+    RecentActivity,
+    RevenueReport
 } from '@/types/adminDashboard';
 import { ApiResponse } from '@/types';
 
 const adminDashboardService = {
     getKPIs: async (): Promise<AdminKPIs> => {
         const response = await apiClient.get<ApiResponse<AdminKPIs>>('/admin/dashboard/kpi');
+        return response.data;
+    },
+
+    getRevenueReport: async (startDate: string, endDate: string): Promise<RevenueReport> => {
+        const response = await apiClient.get<ApiResponse<RevenueReport>>(`/admin/revenue/revenue-report?startDate=${startDate}&endDate=${endDate}`);
         return response.data;
     },
 

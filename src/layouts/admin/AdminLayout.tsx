@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
@@ -15,12 +15,20 @@ export function AdminLayout() {
   };
 
   const navItems = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: "dashboard" },
+    {
+      label: "Dashboard",
+      path: "",
+      icon: "dashboard",
+      children: [
+        { label: "Admin Dashboard", path: "/admin/dashboard", icon: "storefront" },
+        { label: "Revenue", path: "/admin/revenue", icon: "architecture" },
+      ],
+    },
     { label: "Destination", path: "/admin/destinations", icon: "map" },
     { label: "Users", path: "/admin/users", icon: "group" },
-    { 
-      label: "Vendors", 
-      path: "", 
+    {
+      label: "Vendors",
+      path: "",
       icon: "storefront",
       children: [
         { label: "Vendors Management", path: "/admin/vendors", icon: "storefront" },
@@ -45,11 +53,25 @@ export function AdminLayout() {
   ];
 
   // Helper to get breadcrumb from path
-  const getPageTitle = () => {
+  const getPageHierarchy = () => {
     const path = window.location.pathname;
-    const item = navItems.find((i) => i.path === path);
-    return item ? item.label : "System";
+    const findInItems = (items: any[]): string[] | null => {
+      for (const item of items) {
+        if (item.path === path) return [item.label];
+        if (item.children) {
+          const childPath = findInItems(item.children);
+          if (childPath) return [item.label, ...childPath];
+        }
+      }
+      return null;
+    };
+
+    const hierarchy = findInItems(navItems);
+    return hierarchy || ["System"];
   };
+
+  const hierarchy = getPageHierarchy();
+  const pageTitle = hierarchy[hierarchy.length - 1];
 
   return (
     <div className="flex h-screen overflow-hidden font-display">
@@ -135,10 +157,16 @@ export function AdminLayout() {
             <div className="flex flex-col">
               <div className="flex items-center gap-2 text-sm text-[#588d70]">
                 <span>System</span>
-                <span>/</span>
-                <span className="text-primary font-medium">{getPageTitle()}</span>
+                {hierarchy.map((label, index) => (
+                  <React.Fragment key={index}>
+                    <span>/</span>
+                    <span className={index === hierarchy.length - 1 ? "text-primary font-medium" : ""}>
+                      {label}
+                    </span>
+                  </React.Fragment>
+                ))}
               </div>
-              <h2 className="text-xl font-bold mt-1">{getPageTitle()} Overview</h2>
+              <h2 className="text-xl font-bold mt-1">{pageTitle} Overview</h2>
             </div>
           </div>
 
