@@ -55,9 +55,8 @@ export function AdminLayout() {
     <div className="flex h-screen overflow-hidden font-display">
       {/* Sidebar */}
       <aside
-        className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${
-          isCollapsed ? "w-20" : "w-64"
-        }`}
+        className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
+          }`}
       >
         <div className={`flex flex-col gap-8 ${isCollapsed ? "items-center px-2" : "px-6"}`}>
           {/* Brand */}
@@ -87,8 +86,7 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ""}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${
-                      isCollapsed ? "justify-center" : ""
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? "justify-center" : ""
                     } ${isActive ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`
                   }
                 >
@@ -108,19 +106,9 @@ export function AdminLayout() {
           className={`flex flex-col gap-2 border-t border-white/10 pt-6 ${isCollapsed ? "items-center px-2" : "px-6"}`}
         >
           <div
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-white/70 hover:bg-white/5 hover:text-white cursor-pointer transition-all ${
-              isCollapsed ? "justify-center" : ""
-            }`}
-            title={isCollapsed ? "Settings" : ""}
-          >
-            <span className="material-symbols-outlined shrink-0">settings</span>
-            {!isCollapsed && <p className="text-sm font-medium">Settings</p>}
-          </div>
-          <div
             onClick={handleLogout}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${
-              isCollapsed ? "justify-center" : ""
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${isCollapsed ? "justify-center" : ""
+              }`}
             title={isCollapsed ? "Logout" : ""}
           >
             <span className="material-symbols-outlined shrink-0">logout</span>

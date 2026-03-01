@@ -25,8 +25,10 @@ export default {
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				'sidebar-bg': '#0f2e1b',
-				'background-light': '#f6f7f8',
-				'background-dark': '#0f2e1b',
+				'sidebar-dark': '#185835',
+				'background-light': '#E8F2ED',
+				'background-dark': '#131f18',
+				'toolbar-light': '#F4F9F6',
 				'accent-gold': '#FFD700',
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
