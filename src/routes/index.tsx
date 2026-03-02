@@ -25,6 +25,7 @@ import AdminVendorTemplatesPage from "@/pages/admin/vendorTemplate/AdminVendorTe
 import AdminTicketsPage from "@/pages/admin/tickets/AdminTicketsPage";
 import AdminVouchersPage from "@/pages/admin/vouchers/AdminVouchersPage";
 import AdminReportsPage from "@/pages/admin/reports/AdminReportsPage";
+import AdminReportDetailPage from "@/pages/admin/reports/AdminReportDetailPage";
 import AdminEventsPage from "@/pages/admin/events";
 import EventCreatePage from "@/pages/admin/events/create";
 import EventDetailPage from "@/pages/admin/events/detail";
@@ -112,6 +113,7 @@ export const router = createBrowserRouter([
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
+          { path: "reports/:id", element: <AdminReportDetailPage /> },
           { path: "revenue", element: <RevenuePage /> },
           { path: "events", element: <AdminEventsPage /> },
           { path: "event-tags", element: <EventTagPage /> },
