@@ -8,6 +8,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 // Use relative URL in development to leverage Vite proxy and avoid CORS
 // Or use environment variable
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// const API_BASE_URL = "https://fwbgft4w-5173.asse.devtunnels.ms/api"
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

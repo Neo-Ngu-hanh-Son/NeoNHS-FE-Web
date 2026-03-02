@@ -28,6 +28,7 @@ import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 import { BlogStatus } from "@/types/blog";
 import type { BlogResponse } from "@/types/blog";
 import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
+import { Spinner } from "@/components/ui/spinner";
 
 function BlogEditPageInner() {
   const { id } = useParams<{ id: string }>();
@@ -188,7 +189,7 @@ function BlogEditPageInner() {
           <Button onClick={handlePublish} disabled={submitting}>
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Spinner className="h-4 w-4 animate-spin mr-2" />
                 Saving...
               </>
             ) : (

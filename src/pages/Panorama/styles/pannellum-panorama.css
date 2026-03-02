@@ -1,0 +1,271 @@
+/* ================================================================
+   PANNELLUM PANORAMA — Custom styles matching the SpherePanorama
+   glass-morphism aesthetic, carried over from panorama.css
+   ================================================================ */
+
+/* ── Container root — ensure full coverage ── */
+.pannellum-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Override pannellum's default controls bar ── */
+.pannellum-root .pnlm-controls-container {
+  bottom: 4px;
+  top: auto;
+}
+
+/* Make pannellum zoom controls match the glass style */
+.pannellum-root .pnlm-zoom-controls {
+  bottom: 8px;
+  right: 8px;
+  top: auto !important;
+  left: auto !important;
+}
+
+.pannellum-root .pnlm-controls .pnlm-zoom-in,
+.pannellum-root .pnlm-controls .pnlm-zoom-out {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+}
+
+.pannellum-root .pnlm-controls .pnlm-zoom-in:hover,
+.pannellum-root .pnlm-controls .pnlm-zoom-out:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Hide the default fullscreen button (optional — remove if you want it) */
+.pannellum-root .pnlm-fullscreen-toggle-button {
+  display: none;
+}
+
+/* ── Custom bottom navbar ── */
+.pannellum-navbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px 16px;
+
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.pannellum-navbar__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.pannellum-navbar__btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pannellum-navbar__btn:active {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pannellum-navbar__btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Active state for the info button when panel is open */
+.pannellum-navbar__btn--active {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+/* ── Custom info panel (same glass aesthetic as panorama.css) ── */
+.pannellum-info-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  background: transparent;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.pannellum-info-backdrop--visible {
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: auto;
+}
+
+.pannellum-info-panel {
+  position: absolute;
+  bottom: 56px; /* above the navbar */
+  left: 8px;
+  right: 8px;
+  max-height: 50vh;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.4);
+
+  transform: translateY(calc(100% + 80px));
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.pannellum-info-panel--open {
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Drag handle */
+.pannellum-info-panel__handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 10px 0 6px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.pannellum-info-panel__handle:active {
+  cursor: grabbing;
+}
+
+.pannellum-info-panel__handle-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.2s;
+}
+
+.pannellum-info-panel__handle:hover .pannellum-info-panel__handle-bar {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Scrollable body */
+.pannellum-info-panel__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 20px 24px;
+  color: rgba(255, 255, 255, 0.9);
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.pannellum-info-panel__body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pannellum-info-panel__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pannellum-info-panel__body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+}
+
+/* ── Header gradient overlay ── */
+.pannellum-header-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 16px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6), transparent);
+  color: #fff;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ── Hotspot custom styles ── */
+.pannellum-custom-hotspot {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pannellum-pulse-marker {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pannellum-pulse-marker__ping {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #22c55e;
+  opacity: 0.75;
+  animation: pannellum-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pannellum-pulse-marker__dot {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #16a34a;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes pannellum-ping {
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* ── Generated pin hotspot ── */
+.pannellum-pin-hotspot {
+  width: 32px;
+  height: 32px;
+  background-image: url("https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-red.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  cursor: pointer;
+}
+
+.pannellum-pin-hotspot--blue {
+  background-image: url("https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-blue.png");
+}

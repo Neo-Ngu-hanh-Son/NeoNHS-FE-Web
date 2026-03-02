@@ -18,9 +18,9 @@ export function AdminLayout() {
     { label: "Dashboard", path: "/admin/dashboard", icon: "dashboard" },
     { label: "Destination", path: "/admin/destinations", icon: "map" },
     { label: "Users", path: "/admin/users", icon: "group" },
-    { 
-      label: "Vendors", 
-      path: "", 
+    {
+      label: "Vendors",
+      path: "vendors-composite",
       icon: "storefront",
       children: [
         { label: "Vendors Management", path: "/admin/vendors", icon: "storefront" },
@@ -35,7 +35,7 @@ export function AdminLayout() {
     { label: "Workshop Tags", path: "/admin/workshop-tags", icon: "sell" },
     {
       label: "Manage blogs",
-      path: "",
+      path: "blogs-composite",
       icon: "dynamic_feed",
       children: [
         { label: "Blog Categories", path: "/admin/blog-categories", icon: "category" },

@@ -36,7 +36,6 @@ function BlogCreationPageInner() {
   const [loading, setLoading] = useState(false);
   const editorRef = useRef<BlogEditorRef>(null);
   const navigate = useNavigate();
-  const { submitting } = useBlogForm();
   const handleSaveEditorState = async (content: EditorSaveResult) => {
     console.log("Saving editor state: " + content);
     if (content.charCount < 30) {
@@ -52,6 +51,7 @@ function BlogCreationPageInner() {
     };
 
     try {
+      setLoading(true);
       const res = await blogService.createBlog(payload);
       if (res.success || res.data) {
         message.success("Blog created successfully!");
@@ -62,6 +62,8 @@ function BlogCreationPageInner() {
     } catch (error) {
       console.error(error);
       message.error((error as Error).message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +78,7 @@ function BlogCreationPageInner() {
 
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
-      <BlogFormHeaderSection form={form} onSubmit={submitHandler} submitting={submitting} />
+      <BlogFormHeaderSection form={form} onSubmit={submitHandler} submitting={loading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content (Left Column) */}

@@ -1,8 +1,21 @@
 import React, { useCallback, useRef, useState, useEffect } from "react";
 
+export interface InfoPanelContent {
+  /** Panel heading */
+  title: string;
+  /** Sub-heading (e.g. address) */
+  subtitle?: string;
+  /** Body text / description */
+  description: string;
+  /** Optional image shown above the description */
+  imageUrl?: string;
+}
+
 interface InfoPanelProps {
   isOpen: boolean;
   onClose: () => void;
+  /** Dynamic content to display. Falls back to a placeholder when omitted. */
+  content?: InfoPanelContent;
 }
 
 /**
@@ -11,7 +24,7 @@ interface InfoPanelProps {
  * - Tap the backdrop to dismiss
  * - Renders React components for content
  */
-export default function InfoPanel({ isOpen, onClose }: InfoPanelProps) {
+export default function InfoPanel({ isOpen, onClose, content }: InfoPanelProps) {
   const [translateY, setTranslateY] = useState(0);
   const isDragging = useRef(false);
   const startY = useRef(0);
@@ -57,7 +70,7 @@ export default function InfoPanel({ isOpen, onClose }: InfoPanelProps) {
     <>
       {/* ── Backdrop: tap outside to close ── */}
       <div
-        className={`pano-info-backdrop ${isOpen ? "pano-info-backdrop--visible" : ""}`}
+        className={`pano-info-backdrop ${isOpen ? "pano-info-backdrop--visible" : "hidden"}`}
         onClick={onClose}
       />
 
@@ -81,83 +94,34 @@ export default function InfoPanel({ isOpen, onClose }: InfoPanelProps) {
           <div className="pano-info-panel__handle-bar" />
         </div>
 
-        {/* Scrollable body — static content for now */}
+        {/* Scrollable body */}
         <div className="pano-info-panel__body">
-          {/* Location header */}
+          {/* Header */}
           <div className="flex items-start gap-3 mb-4">
             <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-lg">
               📍
             </div>
             <div>
-              <h2 className="text-white text-lg font-bold leading-tight">Alte Nationalgalerie</h2>
-              <p className="text-white/50 text-sm">Bodestraße 1-3, 10178 Berlin, Germany</p>
+              <h2 className="text-white text-lg font-bold leading-tight">
+                {content?.title ?? "Unknown Place"}
+              </h2>
+              {content?.subtitle && <p className="text-white/50 text-sm">{content.subtitle}</p>}
             </div>
           </div>
 
-          {/* Quick stats */}
-          <div className="grid grid-cols-3 gap-2 mb-5">
-            <div className="bg-white/10 rounded-xl p-3 text-center">
-              <p className="text-white/40 text-[11px] uppercase tracking-wide">Built</p>
-              <p className="text-white font-semibold mt-0.5">1876</p>
-            </div>
-            <div className="bg-white/10 rounded-xl p-3 text-center">
-              <p className="text-white/40 text-[11px] uppercase tracking-wide">Style</p>
-              <p className="text-white font-semibold text-sm mt-0.5">Neoclassical</p>
-            </div>
-            <div className="bg-white/10 rounded-xl p-3 text-center">
-              <p className="text-white/40 text-[11px] uppercase tracking-wide">Rating</p>
-              <p className="text-white font-semibold mt-0.5">4.7 ⭐</p>
-            </div>
-          </div>
+          {/* Optional image */}
+          {content?.imageUrl && (
+            <img
+              src={content.imageUrl}
+              alt={content.title}
+              className="w-full h-40 object-cover rounded-lg mb-4"
+            />
+          )}
 
-          {/* About */}
-          <div className="mb-5">
-            <h3 className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-1.5">
-              About
-            </h3>
-            <p className="text-white/75 text-sm leading-relaxed">
-              The Alte Nationalgalerie (Old National Gallery) is a gallery on Museum Island in
-              Berlin showing a collection of Neoclassical, Romantic, Biedermeier, Impressionist and
-              early Modernist artwork. The building was designed by Friedrich August Stüler and
-              constructed between 1862 and 1876.
-            </p>
-          </div>
-
-          {/* Opening hours */}
-          <div className="mb-5">
-            <h3 className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
-              Opening Hours
-            </h3>
-            <div className="space-y-1.5">
-              {[
-                { day: "Mon", hours: "Closed" },
-                { day: "Tue – Fri", hours: "10:00 – 18:00" },
-                { day: "Thu", hours: "10:00 – 20:00" },
-                { day: "Sat – Sun", hours: "11:00 – 18:00" },
-              ].map((row) => (
-                <div key={row.day} className="flex justify-between text-sm">
-                  <span className="text-white/50">{row.day}</span>
-                  <span className={row.hours === "Closed" ? "text-red-400/80" : "text-white"}>
-                    {row.hours}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Admission */}
-          <div className="mb-2">
-            <h3 className="text-white/70 text-xs font-semibold uppercase tracking-wide mb-2">
-              Admission
-            </h3>
-            <div className="flex items-baseline gap-1">
-              <span className="text-white text-xl font-bold">€12</span>
-              <span className="text-white/40 text-sm">/ adult</span>
-            </div>
-            <p className="text-white/50 text-xs mt-1">
-              Free for visitors under 18. Reduced rates available.
-            </p>
-          </div>
+          {/* Description */}
+          <p className="text-white/75 text-sm leading-relaxed">
+            {content?.description ?? "No description available."}
+          </p>
         </div>
       </div>
     </>
