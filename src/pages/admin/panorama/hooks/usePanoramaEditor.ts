@@ -26,10 +26,11 @@ export function usePanoramaEditor() {
         ? await adminPanoramaService.getCheckinPointPanorama(targetId)
         : await adminPanoramaService.getPointPanorama(targetId);
       setPanorama(data);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 400) {
+    } catch (error: Error | any) {
+      if (error?.status === 400) {
         setPanorama(null);
       } else {
+        console.log("[usePanoramaEditor] Error fetching panorama: ", error);
         message.error("Failed to load panorama");
         setError("An error occurred while fetching panorama data, please try again");
       }

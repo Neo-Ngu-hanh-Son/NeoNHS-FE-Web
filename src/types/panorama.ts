@@ -13,10 +13,10 @@ export interface PanoramaHotSpotResponse {
 
 export interface PointPanoramaResponse {
   id: string;
-  name: string;
-  address: string;
-  description: string;
-  panoramaImageUrl: string;
+  name: string | null;
+  address: string | null;
+  description: string | null;
+  panoramaImageUrl: string | null;
   thumbnailUrl: string | null;
   defaultYaw: number;
   defaultPitch: number;

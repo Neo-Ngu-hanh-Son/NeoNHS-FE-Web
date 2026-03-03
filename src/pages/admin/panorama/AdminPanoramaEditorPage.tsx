@@ -29,16 +29,6 @@ export default function AdminPanoramaEditorPage() {
     );
   }
 
-  if (form.error) {
-    return (
-      <div className="p-6 max-w-[1200px] mx-auto">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-sm text-destructive">Error: {form.error}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-6 max-w-[1200px] mx-auto space-y-6">
       <PanoramaEditorHeader
