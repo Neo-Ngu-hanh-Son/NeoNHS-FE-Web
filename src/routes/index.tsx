@@ -29,6 +29,7 @@ import AdminEventsPage from "@/pages/admin/events";
 import EventCreatePage from "@/pages/admin/events/create";
 import EventDetailPage from "@/pages/admin/events/detail";
 import EventEditPage from "@/pages/admin/events/edit";
+import RevenuePage from "@/pages/admin/revenue/RevenuePage";
 
 // Vendor specific pages
 import WorkshopTemplatesPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage";
@@ -114,6 +115,7 @@ export const router = createBrowserRouter([
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
           { path: "reports", element: <AdminReportsPage /> },
+          { path: "revenue", element: <RevenuePage /> },
           { path: "events", element: <AdminEventsPage /> },
           { path: "event-tags", element: <EventTagPage /> },
           { path: "workshop-tags", element: <WorkshopTagPage /> },

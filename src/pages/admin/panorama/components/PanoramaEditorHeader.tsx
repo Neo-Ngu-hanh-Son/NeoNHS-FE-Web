@@ -43,10 +43,11 @@ export default function PanoramaEditorHeader({
           Back
         </Button>
         <div>
-          <h1 className="text-xl font-bold">{panorama ? "Edit" : "Create"} Panorama</h1>
+          <h1 className="text-xl font-bold">
+            {panorama ? "Edit" : "Create"} Panorama for: {panorama?.name && `${panorama.name}`}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {entityLabel} · {targetId}
-            {panorama?.name && ` · ${panorama.name}`}
           </p>
         </div>
       </div>

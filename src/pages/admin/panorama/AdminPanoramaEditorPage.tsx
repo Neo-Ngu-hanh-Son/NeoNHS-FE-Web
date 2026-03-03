@@ -8,6 +8,7 @@ import CameraDefaultsForm from "./components/CameraDefaultsForm";
 import HotSpotManager from "./components/HotSpotManager";
 import PanoramaPreview from "./components/PanoramaPreview";
 import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminPanoramaEditorPage() {
   const form = usePanoramaForm();
@@ -66,7 +67,6 @@ export default function AdminPanoramaEditorPage() {
           </Card>
 
           <Card className="p-5 space-y-5">
-            <h2 className="text-base font-semibold">Default Starting View</h2>
             <CameraDefaultsForm
               hasCustomView={form.hasCustomView}
               hasImage={!!form.panoramaImageUrl}

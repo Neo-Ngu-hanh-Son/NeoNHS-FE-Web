@@ -45,26 +45,34 @@ export default function PanoramaScreen() {
   const viewerRef = useRef<Viewer | null>(null);
 
   const isMobile = navigator.userAgent.includes("NeoNHS-Mobile");
-  console.log("Is mobile:", isMobile);
 
-  // ─── Fetch place data ───
+  // ─── Fetch panorama data (With pre-data might be sent from the mobile) ───
   useEffect(() => {
-    if (!placeId) {
-      setError("No place ID provided");
+    if (!placeId) return;
+
+    // 1. Check if React Native already injected the data
+    const injectedData = (window as any).preLoadedPanoramaData;
+
+    if (injectedData) {
+      console.log("Using injected data from Native side ", injectedData);
+      setPlace(injectedData);
       setIsLoading(false);
+
+      // Clean up the global variable so it doesn't persist weirdly
+      delete (window as any).preLoadedPanoramaData;
       return;
     }
 
+    // 2. Fallback to normal fetching if no injected data exists
     let cancelled = false;
-
     (async () => {
       try {
         setIsLoading(true);
-        setError(null);
+        console.log("Fetching panorama data for placeId:", placeId);
         const data = await panoramaService.getPointPanorama(placeId);
         if (!cancelled) setPlace(data);
       } catch (err: any) {
-        if (!cancelled) setError(err.message ?? "Failed to load place");
+        if (!cancelled) setError(err.message);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
