@@ -27,7 +27,7 @@ export default function WorkshopTemplateEditPage() {
 
   const fetchTemplate = async () => {
     if (!id) return
-    
+
     try {
       setLoading(true)
       const data = await WorkshopTemplateService.getTemplateById(id)
@@ -87,12 +87,14 @@ export default function WorkshopTemplateEditPage() {
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardContent className="pt-6">
             <p className="font-medium">
-              ⚠️ This template is currently <TemplateStatusBadge status={template.status} size="sm" /> and cannot be edited.
+              ⚠️ This template is currently <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" /> and cannot be edited.
             </p>
             <p className="text-sm mt-2 text-muted-foreground">
               {template.status === WorkshopStatus.PENDING
                 ? "The template is under admin review. Please wait for approval or rejection."
-                : "This template is active and published. Contact admin to make changes."
+                : template.isPublished
+                  ? "This template is active and published. Contact admin to make changes."
+                  : "This template is approved. Contact admin to make changes."
               }
             </p>
             <Button
@@ -127,12 +129,12 @@ export default function WorkshopTemplateEditPage() {
     try {
       setSubmitting(true)
       const updatedTemplate = await WorkshopTemplateService.updateTemplate(id, updateRequest)
-      
+
       notification.success({
         message: 'Template Updated',
         description: `Template "${updatedTemplate.name}" has been updated successfully.`
       })
-      
+
       // Navigate to detail page
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
@@ -152,15 +154,15 @@ export default function WorkshopTemplateEditPage() {
 
   const handleSubmitForApproval = async () => {
     if (!id) return
-    
+
     try {
       await WorkshopTemplateService.submitForApproval(id)
-      
+
       notification.success({
         message: 'Submitted for Approval',
         description: 'Template has been submitted for admin review.'
       })
-      
+
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
       console.error('Submit failed:', error)
@@ -186,7 +188,7 @@ export default function WorkshopTemplateEditPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold">Edit Workshop Template</h1>
-              <TemplateStatusBadge status={template.status} size="sm" />
+              <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" />
             </div>
             <p className="text-muted-foreground">{template.name}</p>
           </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined, StarFilled, StarOutlined } from "@ant-design/icons"
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined, StarFilled, StarOutlined, GlobalOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -31,7 +31,7 @@ export default function WorkshopTemplateDetailPage() {
 
   const fetchTemplate = async () => {
     if (!id) return
-    
+
     try {
       setLoading(true)
       const data = await WorkshopTemplateService.getTemplateById(id)
@@ -75,15 +75,15 @@ export default function WorkshopTemplateDetailPage() {
 
   const handleDelete = async () => {
     if (!template) return
-    
+
     try {
       await WorkshopTemplateService.deleteTemplate(template.id)
-      
+
       notification.success({
         message: 'Template Deleted',
         description: `Template "${template.name}" has been deleted successfully.`
       })
-      
+
       navigate("/vendor/workshop-templates")
     } catch (error: any) {
       console.error('Delete failed:', error)
@@ -96,15 +96,15 @@ export default function WorkshopTemplateDetailPage() {
 
   const handleSubmit = async () => {
     if (!template) return
-    
+
     try {
       await WorkshopTemplateService.submitForApproval(template.id)
-      
+
       notification.success({
         message: 'Submitted for Approval',
         description: `Template "${template.name}" has been submitted for admin review.`
       })
-      
+
       // Refresh the template to show updated status
       await fetchTemplate()
     } catch (error: any) {
@@ -112,6 +112,30 @@ export default function WorkshopTemplateDetailPage() {
       notification.error({
         message: 'Submission Failed',
         description: error.message || 'Failed to submit template. Please try again.',
+      })
+    }
+  }
+
+  const handleTogglePublish = async () => {
+    if (!template) return
+
+    try {
+      await WorkshopTemplateService.togglePublish(template.id)
+
+      notification.success({
+        message: template.isPublished ? 'Template Unpublished' : 'Template Published',
+        description: template.isPublished
+          ? `Template "${template.name}" has been unpublished and is now hidden from the public catalog.`
+          : `Template "${template.name}" is now published and visible to tourists!`
+      })
+
+      // Refresh the template to show updated status
+      await fetchTemplate()
+    } catch (error: any) {
+      console.error('Toggle publish failed:', error)
+      notification.error({
+        message: 'Toggle Publish Failed',
+        description: error.message || 'Failed to toggle publish status. Please try again.',
       })
     }
   }
@@ -131,7 +155,7 @@ export default function WorkshopTemplateDetailPage() {
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-2xl font-bold">{template.name}</h1>
-              <TemplateStatusBadge status={template.status} />
+              <TemplateStatusBadge status={template.status} isPublished={template.isPublished} />
             </div>
             <p className="text-muted-foreground">{template.shortDescription}</p>
           </div>
@@ -151,6 +175,19 @@ export default function WorkshopTemplateDetailPage() {
               Submit for Approval
             </Button>
           )}
+          {template.status === WorkshopStatus.ACTIVE && (
+            <Button
+              onClick={handleTogglePublish}
+              variant={template.isPublished ? "outline" : "default"}
+              className="gap-2"
+            >
+              {template.isPublished ? (
+                <><EyeInvisibleOutlined /> Unpublish</>
+              ) : (
+                <><GlobalOutlined /> Publish</>
+              )}
+            </Button>
+          )}
           {canDelete && (
             <Button onClick={() => setDeleteDialog(true)} variant="destructive" className="gap-2">
               <DeleteOutlined />
@@ -166,13 +203,27 @@ export default function WorkshopTemplateDetailPage() {
       )}
 
       {/* Locked Message for PENDING/ACTIVE */}
-      {(template.status === WorkshopStatus.PENDING || template.status === WorkshopStatus.ACTIVE) && (
-        <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+      {template.status === WorkshopStatus.PENDING && (
+        <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardContent className="pt-6">
             <p className="text-sm font-medium">
-              {template.status === WorkshopStatus.PENDING
-                ? "⏳ This template is currently under review and cannot be edited."
-                : "✅ This template is active and published. Contact admin to make changes."
+              ⏳ This template is currently under review and cannot be edited.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Published / Unpublished banner for ACTIVE */}
+      {template.status === WorkshopStatus.ACTIVE && (
+        <Card className={template.isPublished
+          ? "border-green-200 bg-green-50 dark:bg-green-950/20"
+          : "border-blue-200 bg-blue-50 dark:bg-blue-950/20"
+        }>
+          <CardContent className="pt-6">
+            <p className="text-sm font-medium">
+              {template.isPublished
+                ? "🟢 This template is published and visible to tourists in the public catalog."
+                : "ℹ️ This template is approved but not yet published. Click 'Publish' to make it visible to tourists."
               }
             </p>
           </CardContent>

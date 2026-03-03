@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TemplateStatusBadge } from "./template-status-badge"
-import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled, StarOutlined } from "@ant-design/icons"
+import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled, StarOutlined, GlobalOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
 import { formatDuration, formatPrice, formatDate } from "../utils/formatters"
 
 interface WorkshopTemplateCardProps {
@@ -12,6 +12,7 @@ interface WorkshopTemplateCardProps {
   onDelete?: () => void
   onSubmit?: () => void
   onView?: () => void
+  onTogglePublish?: () => void
 }
 
 export function WorkshopTemplateCard({
@@ -20,6 +21,7 @@ export function WorkshopTemplateCard({
   onDelete,
   onSubmit,
   onView,
+  onTogglePublish,
 }: WorkshopTemplateCardProps) {
   const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
 
@@ -40,7 +42,7 @@ export function WorkshopTemplateCard({
             }}
           />
           <div className="absolute top-3 right-3">
-            <TemplateStatusBadge status={template.status} size="sm" />
+            <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" />
           </div>
         </div>
       )}
@@ -149,6 +151,20 @@ export function WorkshopTemplateCard({
               <Button size="sm" variant="outline" onClick={onView} className="flex-1 gap-1">
                 <EyeOutlined />
                 View
+              </Button>
+            )}
+            {onTogglePublish && (
+              <Button
+                size="sm"
+                variant={template.isPublished ? "outline" : "default"}
+                onClick={onTogglePublish}
+                className="flex-1 gap-1"
+              >
+                {template.isPublished ? (
+                  <><EyeInvisibleOutlined /> Unpublish</>
+                ) : (
+                  <><GlobalOutlined /> Publish</>
+                )}
               </Button>
             )}
             {template.averageRating != null && (

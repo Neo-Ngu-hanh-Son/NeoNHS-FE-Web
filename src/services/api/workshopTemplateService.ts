@@ -32,7 +32,7 @@ export const WorkshopTemplateService = {
 
       const endpoint = `/workshops/templates/my${queryParams.toString() ? `?${queryParams}` : ''}`;
       const res = await apiClient.get<ApiResponse<PageResponse<WorkshopTemplateResponse>>>(endpoint);
-      
+
       // Handle both response formats
       const data = (res?.data ?? res) as PageResponse<WorkshopTemplateResponse>;
       console.log('getMyTemplates response:', data);
@@ -89,6 +89,23 @@ export const WorkshopTemplateService = {
       return updated;
     } catch (error) {
       console.error('updateTemplate error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Toggle publish status (ACTIVE templates only)
+   * POST /api/workshops/templates/{id}/toggle-publish
+   */
+  async togglePublish(id: string): Promise<WorkshopTemplateResponse> {
+    try {
+      const res = await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(
+        `/workshops/templates/${id}/toggle-publish`, {}
+      );
+      const data = (res?.data ?? res) as WorkshopTemplateResponse;
+      return data;
+    } catch (error) {
+      console.error('togglePublish error:', error);
       throw error;
     }
   },

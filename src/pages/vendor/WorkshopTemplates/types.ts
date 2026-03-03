@@ -35,6 +35,7 @@ export interface WorkshopTemplateResponse {
   minParticipants: number
   maxParticipants: number
   status: WorkshopStatus
+  isPublished: boolean
   averageRating: number | null
   totalReview: number
   vendorId: string // UUID
