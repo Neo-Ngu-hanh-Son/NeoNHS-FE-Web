@@ -32,7 +32,7 @@ export default function PanoramaScreen() {
     // When toggling via the ℹ button, show place-level info
     setPanelContent({
       title: place?.name ?? "",
-      subtitle: place?.address,
+      subtitle: place?.address ?? undefined,
       description: place?.description ?? "",
     });
     setIsPanelOpen((prev) => !prev);
@@ -140,7 +140,7 @@ export default function PanoramaScreen() {
         marker.domElement.classList.add("scale-125");
         setPanelContent({
           title: data.title,
-          subtitle: place.name,
+          subtitle: place.name ? `At ${place.name}` : undefined,
           description: data.description,
           imageUrl: data.imageUrl ? data.imageUrl : undefined,
         });

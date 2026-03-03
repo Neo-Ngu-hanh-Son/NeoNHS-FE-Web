@@ -21,20 +21,22 @@ export function usePanoramaForm() {
   // ─── Hydrate form when panorama data arrives ───
   useEffect(() => {
     if (panorama) {
-      setPanoramaImageUrl(panorama.panoramaImageUrl);
+      setPanoramaImageUrl(panorama.panoramaImageUrl ?? "");
       setDefaultYaw(panorama.defaultYaw);
       setDefaultPitch(panorama.defaultPitch);
-      setHotSpots(
-        panorama.hotSpots.map((hs) => ({
-          yaw: hs.yaw,
-          pitch: hs.pitch,
-          tooltip: hs.tooltip,
-          title: hs.title,
-          description: hs.description,
-          imageUrl: hs.imageUrl ?? "",
-          orderIndex: hs.orderIndex,
-        })),
-      );
+      if (panorama.hotSpots && panorama.hotSpots.length > 0) {
+        setHotSpots(
+          panorama.hotSpots.map((hs) => ({
+            yaw: hs.yaw,
+            pitch: hs.pitch,
+            tooltip: hs.tooltip,
+            title: hs.title,
+            description: hs.description,
+            imageUrl: hs.imageUrl ?? "",
+            orderIndex: hs.orderIndex,
+          })),
+        );
+      }
       setHasCustomView(
         panorama.defaultYaw !== 0 || panorama.defaultPitch !== 0,
       );

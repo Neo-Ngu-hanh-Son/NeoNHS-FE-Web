@@ -51,6 +51,7 @@ import EventTagPage from "@/pages/admin/tags/EventTagPage";
 import WorkshopTagPage from "@/pages/admin/tags/WorkshopTagPage";
 import PanoramaScreen from "@/pages/Panorama/screens/PanoramaScreen";
 import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorPage";
+import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 
 export const router = createBrowserRouter([
   {
@@ -66,6 +67,15 @@ export const router = createBrowserRouter([
           { path: "/new-password", element: <NewPassword /> },
           { path: "/simple-map", element: <SimpleMapView /> },
           { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
+          {
+            path: "/places/:pointId/checkin-points/:checkinPointId/panorama",
+            element: <PanoramaScreen />,
+          },
+          { path: "/places/panorama/mobile", element: <PanoramaScreenMobile /> },
+          {
+            path: "/places/checkin-points/panorama/mobile",
+            element: <PanoramaScreenMobile />,
+          },
         ],
       },
       {
