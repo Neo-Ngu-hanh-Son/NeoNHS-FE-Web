@@ -8,6 +8,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    dedupe: ["three"],
   },
   //Just for development, will be removed in production
   server: {
@@ -18,6 +19,7 @@ export default defineConfig({
         secure: false,
       },
     },
+    allowedHosts: ['.ngrok-free.app', '.devtunnels.ms'],
   },
 })
 

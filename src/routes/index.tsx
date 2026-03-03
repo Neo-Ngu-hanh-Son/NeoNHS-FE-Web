@@ -47,9 +47,11 @@ import ManageBlogPage from "@/pages/admin/blog/ManageBlogPage";
 import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
 import AdminBlogDetailPage from "@/pages/admin/blog/AdminBlogDetailPage";
 import BlogEditPage from "@/pages/admin/blog/BlogEditPage";
-import BlogDetailsPage from "@/pages/blog/BlogDetailsPage";
+import BlogDetailsPage from "@/pages/Blog/BlogDetailsPage";
 import EventTagPage from "@/pages/admin/tags/EventTagPage";
 import WorkshopTagPage from "@/pages/admin/tags/WorkshopTagPage";
+import PanoramaScreen from "@/pages/Panorama/screens/PanoramaScreen";
+import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorPage";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +66,7 @@ export const router = createBrowserRouter([
           { path: "/verify-otp", element: <VerifyOTP /> },
           { path: "/new-password", element: <NewPassword /> },
           { path: "/simple-map", element: <SimpleMapView /> },
+          { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
         ],
       },
       {
@@ -126,6 +129,11 @@ export const router = createBrowserRouter([
           { path: "blog/create", element: <BlogCreationPage /> },
           { path: "blog/:id", element: <AdminBlogDetailPage /> },
           { path: "blog/:id/edit", element: <BlogEditPage /> },
+          { path: "places/:pointId/panorama/edit", element: <AdminPanoramaEditorPage /> },
+          {
+            path: "places/:pointId/checkin-points/:checkinPointId/panorama/edit",
+            element: <AdminPanoramaEditorPage />,
+          },
         ],
       },
     ],

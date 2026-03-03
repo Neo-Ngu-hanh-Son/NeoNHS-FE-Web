@@ -1,0 +1,1 @@
+export const PANORAMA_BACKGROUND_IMAGE_URL = "/panorama/loadingImagePanorama.jpg";
