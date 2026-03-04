@@ -23,7 +23,10 @@ import AdminDestinationsPage from "@/pages/admin/destinations/AdminDestinationsP
 import AdminVendorsPage from "@/pages/admin/vendors/AdminVendorsPage";
 import AdminVendorTemplatesPage from "@/pages/admin/vendorTemplate/AdminVendorTemplatesPage";
 import AdminTicketsPage from "@/pages/admin/tickets/AdminTicketsPage";
-import AdminVouchersPage from "@/pages/admin/vouchers/AdminVouchersPage";
+import AdminVouchersPage from "@/pages/admin/vouchers";
+import VoucherCreatePage from "@/pages/admin/vouchers/create";
+import VoucherDetailPage from "@/pages/admin/vouchers/detail";
+import VoucherEditPage from "@/pages/admin/vouchers/edit";
 import AdminReportsPage from "@/pages/admin/reports/AdminReportsPage";
 import AdminReportDetailPage from "@/pages/admin/reports/AdminReportDetailPage";
 import AdminEventsPage from "@/pages/admin/events";
@@ -125,6 +128,9 @@ export const router = createBrowserRouter([
           { path: "vendors/templates", element: <AdminVendorTemplatesPage /> },
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
+          { path: "vouchers/create", element: <VoucherCreatePage /> },
+          { path: "vouchers/:id", element: <VoucherDetailPage /> },
+          { path: "vouchers/:id/edit", element: <VoucherEditPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "reports/:id", element: <AdminReportDetailPage /> },
           { path: "revenue", element: <RevenuePage /> },
