@@ -38,8 +38,15 @@ export function AdminLayout() {
     { label: "Tickets", path: "/admin/tickets", icon: "confirmation_number" },
     { label: "Vouchers", path: "/admin/vouchers", icon: "loyalty" },
     { label: "Reports", path: "/admin/reports", icon: "analytics" },
-    { label: "Events", path: "/admin/events", icon: "event" },
-    { label: "Event Tags", path: "/admin/event-tags", icon: "label" },
+    {
+      label: "Manage Events",
+      path: "events-composite",
+      icon: "event",
+      children: [
+        { label: "Events", path: "/admin/events", icon: "event" },
+        { label: "Event Tags", path: "/admin/event-tags", icon: "label" },
+      ],
+    },
     { label: "Workshop Tags", path: "/admin/workshop-tags", icon: "sell" },
     {
       label: "Manage blogs",
