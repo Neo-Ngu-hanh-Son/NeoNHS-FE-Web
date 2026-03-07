@@ -75,5 +75,6 @@ export * from './tag';
 export * from './ticketCatalog';
 export * from './event';
 export * from './panorama';
+export * from './historyAudio';
 
 // Add more global types as needed

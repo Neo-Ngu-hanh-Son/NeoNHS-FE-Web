@@ -10,7 +10,7 @@
     "host": "vite --host"
   },
   "devDependencies": {
-    "@types/node": "^25.0.9",
+    "@types/node": "^25.3.3",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "@types/three": "^0.183.1",
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
+    "@elevenlabs/elevenlabs-js": "^2.37.0",
     "@fontsource/roboto": "^5.2.9",
     "@hookform/resolvers": "^5.2.2",
     "@lexical/clipboard": "^0.40.0",

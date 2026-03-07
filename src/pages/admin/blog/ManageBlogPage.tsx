@@ -42,7 +42,7 @@ export default function ManageBlogPage() {
   };
 
   return (
-    <div className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-2xl shadow-lg border border-border overflow-hidden px-6 py-4">
+    <div className="mx-auto max-w-[1100px] space-y-5 bg-card rounded-md shadow-md overflow-hidden px-6 py-4">
       <BlogToolbar
         onSearchApply={applySearch}
         statusFilter={statusFilter}

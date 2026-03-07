@@ -20,8 +20,6 @@ export interface PointRequest {
     name: string;
     description?: string;
     thumbnailUrl?: string;
-    history?: string;
-    historyAudioUrl?: string;
     latitude: number;
     longitude: number;
     orderIndex: number;
@@ -35,12 +33,11 @@ export interface PointResponse {
     name: string;
     description?: string;
     thumbnailUrl?: string;
-    history?: string;
-    historyAudioUrl?: string;
     latitude: number;
     longitude: number;
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
+    historyAudioCount: number;
 }

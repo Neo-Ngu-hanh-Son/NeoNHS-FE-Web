@@ -53,8 +53,6 @@ export function PointFormModal({
   const [formData, setFormData] = useState<Partial<PointRequest>>({
     name: "",
     description: "",
-    history: "",
-    historyAudioUrl: "",
     latitude: 0,
     longitude: 0,
     type: "GENERAL" as PointType,
@@ -78,8 +76,6 @@ export function PointFormModal({
       setFormData({
         name: editingPoint.name,
         description: editingPoint.description,
-        history: editingPoint.history,
-        historyAudioUrl: editingPoint.historyAudioUrl,
         latitude: editingPoint.latitude,
         longitude: editingPoint.longitude,
         type: editingPoint.type,
@@ -91,8 +87,6 @@ export function PointFormModal({
       setFormData({
         name: "",
         description: "",
-        history: "",
-        historyAudioUrl: "",
         latitude: 0,
         longitude: 0,
         type: "GENERAL" as PointType,
@@ -160,48 +154,30 @@ export function PointFormModal({
             </div>
 
             <div className="col-span-2 space-y-2">
-              <Label htmlFor="history">Historical Context</Label>
-              <Textarea
-                id="history"
-                value={formData.history}
-                onChange={(e) => handleChange("history", e.target.value)}
-                placeholder="Rich history and background information"
-                rows={4}
-              />
-            </div>
-
-            <div className="col-span-2 space-y-2">
-              <Label htmlFor="historyAudioUrl">Audio History</Label>
-              <div className="flex flex-col gap-3 p-3 border rounded-lg bg-muted/20">
-                <div className="flex items-center gap-2">
-                  <label className="flex items-center gap-2 px-4 py-2 bg-white border rounded-md cursor-pointer hover:bg-gray-50 transition-colors text-sm font-medium">
-                    {uploading["historyAudioUrl"] ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                    ) : (
-                      <AudioLines className="w-4 h-4 text-primary" />
-                    )}
-                    <span>{uploading["historyAudioUrl"] ? "Uploading..." : "Choose Audio"}</span>
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) onFileUpload(file, "historyAudioUrl", "video", setFieldValue);
-                      }}
-                      disabled={uploading["historyAudioUrl"]}
-                    />
-                  </label>
-                </div>
-                <Input
-                  id="historyAudioUrl"
-                  value={formData.historyAudioUrl}
-                  onChange={(e) => handleChange("historyAudioUrl", e.target.value)}
-                  placeholder="Or enter Audio URL"
-                />
-                {formData.historyAudioUrl && (
-                  <audio controls className="w-full mt-2 h-8">
-                    <source src={formData.historyAudioUrl} />
-                  </audio>
+              <Label htmlFor="historyAudioUrl">
+                History & Audios ({editingPoint?.historyAudioCount || 0})
+              </Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  disabled={!editingPoint}
+                  onClick={() => {
+                    if (!editingPoint) return;
+                    navigate(`/admin/destinations/${editingPoint.id}/audioHistory`, {
+                      state: { pointName: formData.name },
+                    });
+                  }}
+                >
+                  <AudioLines className="w-4 h-4" />
+                  Manage History Audios
+                </Button>
+                {!editingPoint && (
+                  <p className="text-xs text-muted-foreground">
+                    Save this point first to manage history audio.
+                  </p>
                 )}
               </div>
             </div>
@@ -351,10 +327,7 @@ export function PointFormModal({
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={uploading["thumbnailUrl"] || uploading["historyAudioUrl"]}
-            >
+            <Button type="submit" disabled={uploading["thumbnailUrl"]}>
               {editingPoint ? "Save Changes" : "Add Point"}
             </Button>
           </DialogFooter>

@@ -7,6 +7,7 @@ interface UseBlogDetailReturn {
   blog: BlogResponse | null;
   loading: boolean;
   error: string | null;
+  incrementBlogView: (id: string) => void;
 }
 
 export function useBlogDetail(id: string | undefined): UseBlogDetailReturn {
@@ -48,13 +49,19 @@ export function useBlogDetail(id: string | undefined): UseBlogDetailReturn {
         }
       }
     };
-
     fetchBlog();
-
     return () => {
       cancelled = true;
     };
   }, [id]);
 
-  return { blog, loading, error };
+  const incrementBlogView = async (id: string) => {
+    try {
+      await publicBlogService.incrementBlogView(id);
+    } catch (error) {
+      console.error("Failed to track view", error);
+    }
+  };
+
+  return { blog, loading, error, incrementBlogView };
 }
