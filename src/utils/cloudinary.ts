@@ -6,6 +6,7 @@ export const CLOUDINARY_CONFIG = {
     FOLDER_NAME: "NeoNHS",
     API_URL: `https://api.cloudinary.com/v1_1/dsrxsfr0q/image/upload`,
     VIDEO_API_URL: `https://api.cloudinary.com/v1_1/dsrxsfr0q/video/upload`,
+    AUDIO_API_URL: `https://api.cloudinary.com/v1_1/dsrxsfr0q/audio/upload`,
 };
 
 /**
@@ -66,6 +67,36 @@ export const uploadVideoToCloudinary = async (file: File | Blob): Promise<string
         return response.data.secure_url;
     } catch (error) {
         console.error("Upload video failed:", error);
+        return null;
+    }
+};
+
+export const uploadAudioToCloudinary = async (
+    file: File | Blob
+): Promise<string | null> => {
+    const {
+        PRESET_NAME,
+        FOLDER_NAME,
+        AUDIO_API_URL
+    } = CLOUDINARY_CONFIG;
+
+    const formData = new FormData();
+    formData.append("upload_preset", PRESET_NAME);
+    formData.append("folder", FOLDER_NAME);
+    formData.append("file", file);
+
+    try {
+        const response = await axios.post(AUDIO_API_URL, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            },
+        });
+
+        console.log("Uploaded audio to Cloudinary:", response.data.secure_url);
+        return response.data.secure_url;
+
+    } catch (error) {
+        console.error("Upload audio failed:", error);
         return null;
     }
 };

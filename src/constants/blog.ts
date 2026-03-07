@@ -3,7 +3,7 @@
  */
 import type { BlogStatus } from "@/types/blog";
 
-export const BLOG_PAGE_SIZE = 10;
+export const BLOG_PAGE_SIZE = 6;
 
 export const BLOG_STATUS_OPTIONS: { label: string; value: BlogStatus | "" }[] = [
   { label: "All", value: "" },

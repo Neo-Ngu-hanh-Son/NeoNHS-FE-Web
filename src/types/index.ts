@@ -76,5 +76,6 @@ export * from './ticketCatalog';
 export * from './event';
 export * from './panorama';
 export * from './voucher';
+export * from './historyAudio';
 
 // Add more global types as needed

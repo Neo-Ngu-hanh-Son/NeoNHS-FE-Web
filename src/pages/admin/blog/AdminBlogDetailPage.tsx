@@ -1,8 +1,3 @@
-/**
- * BlogDetailPage
- * Shows a read-only view of a single blog post for admin.
- */
-
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { message } from "antd";
@@ -96,10 +91,13 @@ export default function AdminBlogDetailPage() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight">{blog.title}</h1>
               <p className="text-sm text-muted-foreground">{blog.slug}</p>
+              <Badge
+                variant="secondary"
+                className={`${statusCfg.className} rounded-full px-3 py-1`}
+              >
+                {statusCfg.label}
+              </Badge>
             </div>
-            <Badge variant="secondary" className={`${statusCfg.className} rounded-full px-3 py-1`}>
-              {statusCfg.label}
-            </Badge>
           </div>
         </div>
         <div className="flex items-center gap-2">

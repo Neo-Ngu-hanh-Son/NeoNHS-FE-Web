@@ -1,6 +1,6 @@
 import { useRef, useState, useCallback, type DragEvent, type ChangeEvent } from "react";
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
-import { Loader2, Upload, ImageIcon, RefreshCw, X } from "lucide-react";
+import { Upload, ImageIcon, RefreshCw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "../ui/spinner";
 

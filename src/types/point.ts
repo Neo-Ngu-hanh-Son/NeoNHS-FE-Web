@@ -20,8 +20,6 @@ export interface PointRequest {
     name: string;
     description?: string;
     thumbnailUrl?: string;
-    history?: string;
-    historyAudioUrl?: string;
     latitude: number;
     longitude: number;
     orderIndex: number;
@@ -36,8 +34,6 @@ export interface PointResponse {
     name: string;
     description?: string;
     thumbnailUrl?: string;
-    history?: string;
-    historyAudioUrl?: string;
     latitude: number;
     longitude: number;
     orderIndex: number;
@@ -45,4 +41,5 @@ export interface PointResponse {
     attractionId?: string;
     type: PointType;
     googlePlaceId?: string
+    historyAudioCount: number;
 }
