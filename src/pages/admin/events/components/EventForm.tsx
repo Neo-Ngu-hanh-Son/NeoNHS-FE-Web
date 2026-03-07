@@ -146,18 +146,38 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     };
 
     const validate = (): boolean => {
-        const newErrors: Partial<Record<keyof FormData, string>> = {};
-        if (!form.name.trim()) newErrors.name = 'Event name is required';
-        if (!form.startTime) newErrors.startTime = 'Start time is required';
-        if (!form.endTime) newErrors.endTime = 'End time is required';
+        const e: Partial<Record<keyof FormData, string>> = {};
+        const now = new Date();
+
+        if (!form.name.trim()) e.name = 'Event name is required';
+        else if (form.name.length > 255) e.name = 'Max 255 characters';
+
+        if (form.shortDescription.length > 255) e.shortDescription = 'Max 255 characters';
+        if (form.locationName.length > 255) e.locationName = 'Max 255 characters';
+
+        if (!form.startTime) e.startTime = 'Start time is required';
+        else if (mode === 'create' && new Date(form.startTime) < now) e.startTime = 'Must be present or future';
+
+        if (!form.endTime) e.endTime = 'End time is required';
+        else if (mode === 'create' && new Date(form.endTime) <= now) e.endTime = 'Must be in the future';
+
         if (form.startTime && form.endTime && new Date(form.endTime) <= new Date(form.startTime)) {
-            newErrors.endTime = 'End time must be after start time';
+            e.endTime = 'End time must be after start time';
         }
+
         if (mode === 'create' && !form.thumbnailUrl.trim()) {
-            newErrors.thumbnailUrl = 'Thumbnail is required';
+            e.thumbnailUrl = 'Thumbnail is required';
         }
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        if (form.thumbnailUrl && form.thumbnailUrl.length > 255) e.thumbnailUrl = 'Max 255 characters';
+
+        if (form.price && Number(form.price) < 0) e.price = 'Must be ≥ 0';
+        if (form.maxParticipants) {
+            const mp = Number(form.maxParticipants);
+            if (mp <= 0 || !Number.isInteger(mp)) e.maxParticipants = 'Must be a positive integer';
+        }
+
+        setErrors(e);
+        return Object.keys(e).length === 0;
     };
 
     const handleSubmit = async () => {
@@ -200,12 +220,13 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                     <CardContent className="space-y-4">
                         <div>
                             <Label htmlFor="name">Event Name *</Label>
-                            <Input id="name" value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Enter event name" />
+                            <Input id="name" value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="Enter event name" maxLength={255} />
                             {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                         </div>
                         <div>
-                            <Label htmlFor="shortDescription">Short Description</Label>
-                            <Input id="shortDescription" value={form.shortDescription} onChange={(e) => handleChange('shortDescription', e.target.value)} placeholder="Brief description for card display" />
+                            <Label htmlFor="shortDescription">Short Description <span className="text-muted-foreground font-normal">({form.shortDescription.length}/255)</span></Label>
+                            <Input id="shortDescription" value={form.shortDescription} onChange={(e) => handleChange('shortDescription', e.target.value)} placeholder="Brief description for card display" maxLength={255} />
+                            {errors.shortDescription && <p className="text-xs text-destructive mt-1">{errors.shortDescription}</p>}
                         </div>
                         <div>
                             <Label htmlFor="fullDescription">Full Description</Label>
@@ -234,7 +255,8 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                         {/* Location */}
                         <div>
                             <Label htmlFor="locationName">Location Name</Label>
-                            <Input id="locationName" value={form.locationName} onChange={(e) => handleChange('locationName', e.target.value)} placeholder="e.g. Ngu Hanh Son District" />
+                            <Input id="locationName" value={form.locationName} onChange={(e) => handleChange('locationName', e.target.value)} placeholder="e.g. Ngu Hanh Son District" maxLength={255} />
+                            {errors.locationName && <p className="text-xs text-destructive mt-1">{errors.locationName}</p>}
                         </div>
 
                         {/* Map Picker */}
@@ -308,17 +330,20 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                                 <div>
                                     <Label htmlFor="price">Price (VND)</Label>
                                     <Input id="price" type="number" min={0} value={form.price} onChange={(e) => handleChange('price', e.target.value)} placeholder="50000" />
+                                    {errors.price && <p className="text-xs text-destructive mt-1">{errors.price}</p>}
                                 </div>
                                 <div>
                                     <Label htmlFor="maxParticipants">Max Participants</Label>
-                                    <Input id="maxParticipants" type="number" min={0} value={form.maxParticipants} onChange={(e) => handleChange('maxParticipants', e.target.value)} placeholder="100" />
+                                    <Input id="maxParticipants" type="number" min={1} value={form.maxParticipants} onChange={(e) => handleChange('maxParticipants', e.target.value)} placeholder="100" />
+                                    {errors.maxParticipants && <p className="text-xs text-destructive mt-1">{errors.maxParticipants}</p>}
                                 </div>
                             </div>
                         )}
                         {!form.isTicketRequired && (
                             <div>
                                 <Label htmlFor="maxParticipants">Max Participants</Label>
-                                <Input id="maxParticipants" type="number" min={0} value={form.maxParticipants} onChange={(e) => handleChange('maxParticipants', e.target.value)} placeholder="100" />
+                                <Input id="maxParticipants" type="number" min={1} value={form.maxParticipants} onChange={(e) => handleChange('maxParticipants', e.target.value)} placeholder="100" />
+                                {errors.maxParticipants && <p className="text-xs text-destructive mt-1">{errors.maxParticipants}</p>}
                             </div>
                         )}
                     </CardContent>

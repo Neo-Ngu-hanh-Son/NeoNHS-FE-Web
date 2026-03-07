@@ -23,7 +23,10 @@ import AdminDestinationsPage from "@/pages/admin/destinations/AdminDestinationsP
 import AdminVendorsPage from "@/pages/admin/vendors/AdminVendorsPage";
 import AdminVendorTemplatesPage from "@/pages/admin/vendorTemplate/AdminVendorTemplatesPage";
 import AdminTicketsPage from "@/pages/admin/tickets/AdminTicketsPage";
-import AdminVouchersPage from "@/pages/admin/vouchers/AdminVouchersPage";
+import AdminVouchersPage from "@/pages/admin/vouchers";
+import VoucherCreatePage from "@/pages/admin/vouchers/create";
+import VoucherDetailPage from "@/pages/admin/vouchers/detail";
+import VoucherEditPage from "@/pages/admin/vouchers/edit";
 import AdminReportsPage from "@/pages/admin/reports/AdminReportsPage";
 import AdminReportDetailPage from "@/pages/admin/reports/AdminReportDetailPage";
 import AdminEventsPage from "@/pages/admin/events";
@@ -47,9 +50,12 @@ import ManageBlogPage from "@/pages/admin/blog/ManageBlogPage";
 import BlogCreationPage from "@/pages/admin/blog/BlogCreationPage";
 import AdminBlogDetailPage from "@/pages/admin/blog/AdminBlogDetailPage";
 import BlogEditPage from "@/pages/admin/blog/BlogEditPage";
-import BlogDetailsPage from "@/pages/blog/BlogDetailsPage";
+import BlogDetailsPage from "@/pages/Blog/BlogDetailsPage";
 import EventTagPage from "@/pages/admin/tags/EventTagPage";
 import WorkshopTagPage from "@/pages/admin/tags/WorkshopTagPage";
+import PanoramaScreen from "@/pages/Panorama/screens/PanoramaScreen";
+import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorPage";
+import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +70,16 @@ export const router = createBrowserRouter([
           { path: "/verify-otp", element: <VerifyOTP /> },
           { path: "/new-password", element: <NewPassword /> },
           { path: "/simple-map", element: <SimpleMapView /> },
+          { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
+          {
+            path: "/places/:pointId/checkin-points/:checkinPointId/panorama",
+            element: <PanoramaScreen />,
+          },
+          { path: "/places/panorama/mobile", element: <PanoramaScreenMobile /> },
+          {
+            path: "/places/checkin-points/panorama/mobile",
+            element: <PanoramaScreenMobile />,
+          },
         ],
       },
       {
@@ -112,6 +128,9 @@ export const router = createBrowserRouter([
           { path: "vendors/templates", element: <AdminVendorTemplatesPage /> },
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
+          { path: "vouchers/create", element: <VoucherCreatePage /> },
+          { path: "vouchers/:id", element: <VoucherDetailPage /> },
+          { path: "vouchers/:id/edit", element: <VoucherEditPage /> },
           { path: "reports", element: <AdminReportsPage /> },
           { path: "reports/:id", element: <AdminReportDetailPage /> },
           { path: "revenue", element: <RevenuePage /> },
@@ -126,6 +145,11 @@ export const router = createBrowserRouter([
           { path: "blog/create", element: <BlogCreationPage /> },
           { path: "blog/:id", element: <AdminBlogDetailPage /> },
           { path: "blog/:id/edit", element: <BlogEditPage /> },
+          { path: "places/:pointId/panorama/edit", element: <AdminPanoramaEditorPage /> },
+          {
+            path: "places/:pointId/checkin-points/:checkinPointId/panorama/edit",
+            element: <AdminPanoramaEditorPage />,
+          },
         ],
       },
     ],

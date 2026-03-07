@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/ui/card";
 import {
   EnvironmentOutlined,
   PhoneOutlined,
@@ -8,11 +8,11 @@ import {
   CameraOutlined,
   TeamOutlined,
   SafetyCertificateOutlined,
-} from "@ant-design/icons"
+} from "@ant-design/icons";
 
-import hero from "@/assets/images/hero.jpg"
-import googlePlayBtn from "@/assets/button/ggplaylight.png"
-import appStoreBtn from "@/assets/button/appstorelight.png"
+import hero from "@/assets/images/hero.jpg";
+import googlePlayBtn from "@/assets/button/ggplaylight.png";
+import appStoreBtn from "@/assets/button/appstorelight.png";
 const landmarks = [
   {
     id: 1,
@@ -34,18 +34,20 @@ const landmarks = [
     name: "Huyen Khong Cave",
     image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
   },
-]
+];
 
 const features = [
   {
     icon: <CompassOutlined className="text-2xl" />,
     title: "Guided Tours",
-    description: "AI-powered tour planning tailored to your interests and schedule for the perfect cultural journey.Expert local guides for an authentic experience",
+    description:
+      "AI-powered tour planning tailored to your interests and schedule for the perfect cultural journey.Expert local guides for an authentic experience",
   },
   {
     icon: <CameraOutlined className="text-2xl" />,
     title: "Authentic Workshops",
-    description: "Hands-on experiences with master craftsmen in traditional stone carving and local arts.",
+    description:
+      "Hands-on experiences with master craftsmen in traditional stone carving and local arts.",
   },
   {
     icon: <TeamOutlined className="text-2xl" />,
@@ -55,9 +57,10 @@ const features = [
   {
     icon: <SafetyCertificateOutlined className="text-2xl" />,
     title: "Local Connection",
-    description: "Direct support to local artisans and communities through our integrated commerce platform.",
+    description:
+      "Direct support to local artisans and communities through our integrated commerce platform.",
   },
-]
+];
 
 export function HomePage() {
   return (
@@ -74,7 +77,8 @@ export function HomePage() {
             Start your journey in Ngu Hanh Son, explore beautiful place!
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mb-8 text-white/90">
-            Guided tours of tourist attractions with smart itineraries, and participation in workshops at traditional craft villages.
+            Guided tours of tourist attractions with smart itineraries, and participation in
+            workshops at traditional craft villages.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="#" className="transition-transform hover:scale-105">
@@ -112,9 +116,7 @@ export function HomePage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="text-white font-semibold text-lg">
-                      {landmark.name}
-                    </h3>
+                    <h3 className="text-white font-semibold text-lg">{landmark.name}</h3>
                   </div>
                 </div>
               </Card>
@@ -143,9 +145,8 @@ export function HomePage() {
                 Why Visit Ngu Hanh Son?
               </h2>
               <p className="text-muted-foreground text-lg mb-8">
-                Experience authentic cultural heritage through our integrated
-                platform connecting tourists with local artisans and traditional
-                craft villages.
+                Experience authentic cultural heritage through our integrated platform connecting
+                tourists with local artisans and traditional craft villages.
               </p>
               <div className="space-y-6">
                 {features.map((feature, index) => (
@@ -155,9 +156,7 @@ export function HomePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg mb-1">{feature.title}</h3>
-                      <p className="text-muted-foreground text-sm">
-                        {feature.description}
-                      </p>
+                      <p className="text-muted-foreground text-sm">{feature.description}</p>
                     </div>
                   </div>
                 ))}
@@ -171,9 +170,7 @@ export function HomePage() {
       <section className="py-20 px-4 md:px-8 lg:px-20 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Find Us Here
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Find Us Here</h2>
             <p className="text-muted-foreground text-lg">
               Located in the heart of Da Nang, Vietnam
             </p>
@@ -214,9 +211,7 @@ export function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Phone</h3>
-                  <p className="text-muted-foreground text-sm">
-                    +84 236 123 4567
-                  </p>
+                  <p className="text-muted-foreground text-sm">+84 236 123 4567</p>
                 </div>
               </div>
             </Card>
@@ -227,9 +222,7 @@ export function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
-                  <p className="text-muted-foreground text-sm">
-                    info@nguhanhson.vn
-                  </p>
+                  <p className="text-muted-foreground text-sm">info@nguhanhson.vn</p>
                 </div>
               </div>
             </Card>
@@ -240,16 +233,13 @@ export function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Opening Hours</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Daily: 7:00 AM - 5:30 PM
-                  </p>
+                  <p className="text-muted-foreground text-sm">Daily: 7:00 AM - 5:30 PM</p>
                 </div>
               </div>
             </Card>
           </div>
         </div>
       </section>
-
     </div>
-  )
+  );
 }

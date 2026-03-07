@@ -1,18 +1,21 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Loader, Loader2, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BlogStatus } from "@/types/blog";
 import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { UseFormReturn } from "react-hook-form";
 import { message } from "antd";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function BlogFormHeaderSection({
   form,
   onSubmit,
+  submitting,
 }: {
   form: UseFormReturn<z.infer<typeof formSchema>>;
   onSubmit: (data: z.infer<typeof formSchema>) => void;
+  submitting: boolean;
 }) {
   const navigate = useNavigate();
   const handlePublish = form.handleSubmit(
@@ -40,9 +43,12 @@ export default function BlogFormHeaderSection({
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <Button onClick={handlePublish} disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? (
-            "Saving..."
+        <Button onClick={handlePublish} disabled={form.formState.isSubmitting || submitting}>
+          {form.formState.isSubmitting || submitting ? (
+            <>
+              <Spinner className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />

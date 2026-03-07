@@ -13,7 +13,7 @@ import { message } from "antd";
 import { ArrowLeft, Save, Loader2 } from "lucide-react";
 import { useRef } from "react";
 
-import { BlogFormProvider } from "@/contexts/Blog/BlogFormContext";
+import { BlogFormProvider, useBlogForm } from "@/contexts/Blog/BlogFormContext";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import BlogDetailsSection from "@/components/blog/creationForm/BlogDetailsSection";
@@ -28,6 +28,7 @@ import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 import { BlogStatus } from "@/types/blog";
 import type { BlogResponse } from "@/types/blog";
 import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
+import { Spinner } from "@/components/ui/spinner";
 
 function BlogEditPageInner() {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +37,7 @@ function BlogEditPageInner() {
 
   const [blog, setBlog] = useState<BlogResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -104,6 +106,8 @@ function BlogEditPageInner() {
       return;
     }
 
+    setSubmitting(true);
+
     const formData = form.getValues();
     const payload = {
       ...formData,
@@ -122,6 +126,8 @@ function BlogEditPageInner() {
       }
     } catch (err: unknown) {
       message.error(getApiErrorMessage(err, "An error occurred while updating the blog"));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -180,10 +186,10 @@ function BlogEditPageInner() {
           </div>
         </div>
         <div className="flex items-center space-x-2">
-          <Button onClick={handlePublish} disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? (
+          <Button onClick={handlePublish} disabled={submitting}>
+            {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Spinner className="h-4 w-4 animate-spin mr-2" />
                 Saving...
               </>
             ) : (

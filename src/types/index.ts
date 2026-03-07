@@ -74,5 +74,7 @@ export interface PaginatedResponse<T> {
 export * from './tag';
 export * from './ticketCatalog';
 export * from './event';
+export * from './panorama';
+export * from './voucher';
 
 // Add more global types as needed

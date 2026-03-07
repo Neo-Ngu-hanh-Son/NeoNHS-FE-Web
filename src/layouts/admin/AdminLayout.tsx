@@ -28,7 +28,7 @@ export function AdminLayout() {
     { label: "Users", path: "/admin/users", icon: "group" },
     {
       label: "Vendors",
-      path: "",
+      path: "vendors-composite",
       icon: "storefront",
       children: [
         { label: "Vendors Management", path: "/admin/vendors", icon: "storefront" },
@@ -38,12 +38,19 @@ export function AdminLayout() {
     { label: "Tickets", path: "/admin/tickets", icon: "confirmation_number" },
     { label: "Vouchers", path: "/admin/vouchers", icon: "loyalty" },
     { label: "Reports", path: "/admin/reports", icon: "analytics" },
-    { label: "Events", path: "/admin/events", icon: "event" },
-    { label: "Event Tags", path: "/admin/event-tags", icon: "label" },
+    {
+      label: "Manage Events",
+      path: "events-composite",
+      icon: "event",
+      children: [
+        { label: "Events", path: "/admin/events", icon: "event" },
+        { label: "Event Tags", path: "/admin/event-tags", icon: "label" },
+      ],
+    },
     { label: "Workshop Tags", path: "/admin/workshop-tags", icon: "sell" },
     {
       label: "Manage blogs",
-      path: "",
+      path: "blogs-composite",
       icon: "dynamic_feed",
       children: [
         { label: "Blog Categories", path: "/admin/blog-categories", icon: "category" },
@@ -77,8 +84,9 @@ export function AdminLayout() {
     <div className="flex h-screen overflow-hidden font-display">
       {/* Sidebar */}
       <aside
-        className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${isCollapsed ? "w-20" : "w-64"
-          }`}
+        className={`bg-sidebar-bg flex flex-col justify-between py-6 shrink-0 border-r border-white/10 transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-20" : "w-64"
+        }`}
       >
         <div className={`flex flex-col gap-8 ${isCollapsed ? "items-center px-2" : "px-6"}`}>
           {/* Brand */}
@@ -108,7 +116,8 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ""}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? "justify-center" : ""
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${
+                      isCollapsed ? "justify-center" : ""
                     } ${isActive ? "bg-white/10 text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`
                   }
                 >
@@ -129,8 +138,9 @@ export function AdminLayout() {
         >
           <div
             onClick={handleLogout}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${isCollapsed ? "justify-center" : ""
-              }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${
+              isCollapsed ? "justify-center" : ""
+            }`}
             title={isCollapsed ? "Logout" : ""}
           >
             <span className="material-symbols-outlined shrink-0">logout</span>
@@ -160,7 +170,9 @@ export function AdminLayout() {
                 {hierarchy.map((label, index) => (
                   <React.Fragment key={index}>
                     <span>/</span>
-                    <span className={index === hierarchy.length - 1 ? "text-primary font-medium" : ""}>
+                    <span
+                      className={index === hierarchy.length - 1 ? "text-primary font-medium" : ""}
+                    >
                       {label}
                     </span>
                   </React.Fragment>

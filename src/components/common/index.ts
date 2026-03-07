@@ -4,4 +4,5 @@
  */
 
 export { Button, buttonVariants } from './Button';
+export { default as DragImageUploader } from './DragImageUploader';
 // Add more common components here
