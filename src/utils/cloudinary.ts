@@ -13,7 +13,7 @@ export const CLOUDINARY_CONFIG = {
  * @param file - File object or Blob to upload
  * @returns Secure URL of uploaded image or null if failed
  */
-export const uploadImageToCloudinary = async (file: File | Blob): Promise<string | null> => {
+export const uploadImageToCloudinary = async (file: File | Blob | string): Promise<string | null> => {
     const {
         PRESET_NAME,
         FOLDER_NAME,

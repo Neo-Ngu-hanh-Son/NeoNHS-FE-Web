@@ -28,6 +28,7 @@ export interface PointRequest {
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
+    googlePlaceId?: string
 }
 
 export interface PointResponse {
@@ -43,4 +44,5 @@ export interface PointResponse {
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
+    googlePlaceId?: string
 }
