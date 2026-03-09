@@ -81,14 +81,21 @@ export function TemplateReviewCard({
           }}
         />
         <div className="absolute top-2 right-2">{getStatusBadge()}</div>
-        {!template.vendorVerified && (
+        {template.vendorVerified === true ? (
+          <div className="absolute top-2 left-2">
+            <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Verified
+            </Badge>
+          </div>
+        ) : template.vendorVerified === false ? (
           <div className="absolute top-2 left-2">
             <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
               <AlertCircle className="w-3 h-3 mr-1" />
               Unverified Vendor
             </Badge>
           </div>
-        )}
+        ) : null}
       </div>
 
       <CardContent className="p-5 space-y-4">
@@ -105,7 +112,7 @@ export function TemplateReviewCard({
           <div className="flex items-center gap-2 text-sm">
             <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
             <span className="font-medium">{template.vendorName}</span>
-            {template.vendorVerified && (
+            {template.vendorVerified === true && (
               <CheckCircle className="w-3.5 h-3.5 text-green-600" />
             )}
           </div>
@@ -178,13 +185,13 @@ export function TemplateReviewCard({
         )}
 
         {/* Rejection Reason */}
-        {template.status === WorkshopStatus.REJECTED && template.rejectReason && (
+        {template.status === WorkshopStatus.REJECTED && template.adminNote && (
           <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
             <p className="text-xs font-medium text-red-800 dark:text-red-200 mb-1">
               Rejection Reason:
             </p>
             <p className="text-xs text-red-700 dark:text-red-300 line-clamp-3">
-              {template.rejectReason}
+              {template.adminNote}
             </p>
           </div>
         )}

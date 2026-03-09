@@ -11,7 +11,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
-import { AdminWorkshopTemplateResponse } from "./types"
+import type { AdminWorkshopTemplateResponse } from "./types"
 import { CheckCircle, XCircle } from "lucide-react"
 
 // Approve Template Dialog
@@ -19,7 +19,7 @@ interface ApproveTemplateDialogProps {
   template: AdminWorkshopTemplateResponse | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onConfirm: (notes: string) => void
+  onConfirm: (adminNote?: string) => void
 }
 
 export function ApproveTemplateDialog({
@@ -28,11 +28,11 @@ export function ApproveTemplateDialog({
   onOpenChange,
   onConfirm,
 }: ApproveTemplateDialogProps) {
-  const [notes, setNotes] = useState("")
+  const [adminNote, setAdminNote] = useState("")
 
   const handleConfirm = () => {
-    onConfirm(notes)
-    setNotes("") // Reset notes after confirmation
+    onConfirm(adminNote.trim() || undefined)
+    setAdminNote("")
   }
 
   if (!template) return null
@@ -97,23 +97,22 @@ export function ApproveTemplateDialog({
         </AlertDialogHeader>
 
         <div className="space-y-2 py-4">
-          <Label htmlFor="approve-notes">Admin Notes (Optional)</Label>
+          <Label htmlFor="approve-notes">Admin Note (Optional)</Label>
           <Textarea
             id="approve-notes"
-            placeholder="Add any internal notes about this approval (visible to other admins only)..."
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add any notes about this approval..."
+            value={adminNote}
+            onChange={(e) => setAdminNote(e.target.value)}
             rows={3}
             className="resize-none"
           />
           <p className="text-xs text-muted-foreground">
-            These notes are for internal record-keeping and will not be shared with the
-            vendor.
+            This note is optional and for record-keeping purposes.
           </p>
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setNotes("")}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => setAdminNote("")}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-green-600 hover:bg-green-700"

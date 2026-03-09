@@ -4,22 +4,15 @@ import { WorkshopStatus, WorkshopTemplateResponse } from "@/pages/vendor/Worksho
 // Admin-specific template review types
 export interface AdminTemplateReview {
   templateId: string
-  reviewedBy: string | null // Admin ID
+  reviewedBy: string | null
   reviewedAt: string | null
   status: WorkshopStatus
-  rejectReason: string | null
-}
-
-// Approve Template Request
-export interface ApproveTemplateRequest {
-  templateId: string
-  notes?: string // Optional admin notes
+  adminNote: string | null
 }
 
 // Reject Template Request
 export interface RejectTemplateRequest {
-  templateId: string
-  reason: string // Required rejection reason
+  adminNote: string
 }
 
 // Extended template with vendor info for admin view
@@ -51,16 +44,11 @@ export interface AdminTemplateStats {
   draft: number
 }
 
-// Zod validation schemas
-export const approveTemplateSchema = z.object({
-  notes: z.string().optional(),
-})
-
+// Zod validation schema
 export const rejectTemplateSchema = z.object({
-  reason: z.string().min(10, "Please provide a detailed reason (minimum 10 characters)"),
+  adminNote: z.string().min(10, "Please provide a detailed reason (minimum 10 characters)"),
 })
 
-export type ApproveTemplateFormData = z.infer<typeof approveTemplateSchema>
 export type RejectTemplateFormData = z.infer<typeof rejectTemplateSchema>
 
 // Re-export WorkshopStatus for convenience
