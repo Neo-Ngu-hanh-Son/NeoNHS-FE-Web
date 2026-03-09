@@ -121,3 +121,40 @@ body,
 #root {
   height: 100%;
 }
+
+/* Add this to your CSS file */
+
+.psv-container {
+  /* Main Colors */
+  --psv-background: hsl(var(--background));
+  --psv-text-color: hsl(var(--foreground));
+  --psv-primary-color: hsl(var(--primary));
+
+  /* Navbar / Buttons */
+  --psv-navbar-background: hsla(var(--card), 0.8);
+  --psv-navbar-text: hsl(var(--foreground));
+  --psv-buttons-color: hsl(var(--foreground));
+  --psv-buttons-hover-background: hsla(var(--primary), 0.2);
+  --psv-buttons-hover-color: hsl(var(--primary));
+
+  /* Panels & Modals (Settings, Info, etc.) */
+  --psv-panel-background: hsl(var(--card));
+  --psv-panel-text: hsl(var(--foreground));
+  --psv-panel-border: hsl(var(--border));
+
+  /* Tooltips & Markers */
+  --psv-tooltip-background: hsl(var(--popover));
+  --psv-tooltip-text: hsl(var(--popover-foreground));
+  --psv-tooltip-border-radius: var(--radius);
+
+  /* UI Shapes */
+  --psv-border-radius: var(--radius);
+
+  /* Force Navbar text and icons to white for the dark glass effect */
+  --psv-navbar-text: #ffffff;
+  --psv-buttons-color: #ffffff;
+
+  /* Force Panel text to white */
+  --psv-panel-text: #ffffff;
+  --psv-panel-border: rgba(255, 255, 255, 0.1);
+}

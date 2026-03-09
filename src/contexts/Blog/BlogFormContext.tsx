@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+  useRef,
+} from "react";
 import { BlogStatus, BlogCategoryResponse } from "@/types/blog";
 import blogCategoryService from "@/services/api/blogCategoryService";
 import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
@@ -30,7 +38,6 @@ interface BlogFormContextType {
   setErrors: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   setSubmitting: (val: boolean) => void;
 
-  handleInputChange: (field: keyof BlogFormState, value: any) => void;
   validate: () => boolean;
 
   // Specific setters for common use cases
@@ -50,7 +57,6 @@ export const useBlogForm = () => {
   }
   return context;
 };
-
 
 export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
   const [formData, setFormData] = useState<BlogFormState>({
@@ -93,20 +99,6 @@ export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
     fetchCategories();
   }, []);
 
-
-  const handleInputChange = useCallback((field: keyof BlogFormState, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field
-    // if (errors[field]) {
-    //   setErrors((prev) => {
-    //     const newErrors = { ...prev };
-    //     delete newErrors[field];
-    //     return newErrors;
-    //   });
-    // }
-  }, []);
-
-
   const updateContent = useCallback((json: string, html: string) => {
     setFormData((prev) => ({ ...prev, contentJSON: json, contentHTML: html }));
   }, []);
@@ -138,53 +130,55 @@ export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
     } catch {
       return false;
     }
-  }
+  };
 
   const triggerSave = () => {
     editorRef.current?.save();
   };
 
-
-  const submitBlog = useCallback(async (content: EditorSaveResult) => {
-    if (!validate()) {
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const blogData = {
-        ...formData,
-        contentJSON: content.lexicalJSON,
-        contentHTML: content.html,
-      };
-
-      const payload = {
-        title: blogData.title,
-        slug: blogData.slug,
-        summary: blogData.summary,
-        contentJSON: content.lexicalJSON,
-        contentHTML: content.html,
-        thumbnailUrl: blogData.thumbnailUrl,
-        bannerUrl: blogData.bannerUrl,
-        isFeatured: blogData.isFeatured,
-        status: blogData.status,
-        tags: blogData.tags,
-        blogCategoryId: blogData.categoryId
-      };
-
-      const res = await blogService.createBlog(payload);
-      if (res.success || res.data) {
-        navigate("/admin/blog");
-      } else {
-        // Basic error handling
-        console.error(res.message);
+  const submitBlog = useCallback(
+    async (content: EditorSaveResult) => {
+      if (!validate()) {
+        return;
       }
-    } catch (error) {
-      console.error("Failed to submit blog", error);
-    } finally {
-      setSubmitting(false);
-    }
-  }, [formData, validate, navigate]);
+
+      setSubmitting(true);
+      try {
+        const blogData = {
+          ...formData,
+          contentJSON: content.lexicalJSON,
+          contentHTML: content.html,
+        };
+
+        const payload = {
+          title: blogData.title,
+          slug: blogData.slug,
+          summary: blogData.summary,
+          contentJSON: content.lexicalJSON,
+          contentHTML: content.html,
+          thumbnailUrl: blogData.thumbnailUrl,
+          bannerUrl: blogData.bannerUrl,
+          isFeatured: blogData.isFeatured,
+          status: blogData.status,
+          tags: blogData.tags,
+          blogCategoryId: blogData.categoryId,
+        };
+
+        const res = await blogService.createBlog(payload);
+        if (res.success || res.data) {
+          navigate("/admin/blog");
+        } else {
+          // Basic error handling
+          console.error(res.message);
+        }
+      } catch (error) {
+        console.error("Failed to submit blog", error);
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [formData, validate, navigate],
+  );
 
   return (
     <BlogFormContext.Provider
@@ -197,15 +191,16 @@ export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
         setFormData,
         setErrors,
         setSubmitting,
-        handleInputChange,
         validate,
         updateContent,
         editorRef,
         triggerSave,
-        submitBlog
+        submitBlog,
       }}
     >
       {children}
     </BlogFormContext.Provider>
   );
 };
+
+

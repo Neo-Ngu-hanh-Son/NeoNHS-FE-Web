@@ -48,3 +48,37 @@ export interface RecentActivity {
     targetName: string;
     time: string;
 }
+
+export interface RevenueKPIs {
+    totalRevenue: number;
+    netRevenue: number;
+    totalTransactions: number;
+    avgOrderValue: number;
+    revenueGrowth: number;
+    netRevenueGrowth: number;
+    avgOrderValueGrowth: number;
+}
+
+export interface RevenueByVendor {
+    vendorName: string;
+    totalRevenue: number;
+    percentage: number;
+}
+
+export interface Transaction {
+    date: string;
+    transactionId: string;
+    vendorName: string;
+    itemName: string;
+    grossAmount: number;
+    fee: number;
+    netAmount: number;
+    status: 'COMPLETED' | 'PENDING' | 'REFUNDED';
+}
+
+export interface RevenueReport {
+    kpis: RevenueKPIs;
+    revenueTrends: RevenueTrendPoint[];
+    revenueByVendor: RevenueByVendor[];
+    transactions: Transaction[];
+}
