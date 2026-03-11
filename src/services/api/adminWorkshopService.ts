@@ -88,7 +88,9 @@ export const adminWorkshopService = {
       `${BASE_URL}/${id}/approve`,
       payload,
     )
+    console.log("[approveTemplate] raw res:", JSON.stringify(res))
     const data = (res?.data ?? res) as WorkshopTemplateResponse
+    console.log("[approveTemplate] extracted data:", JSON.stringify(data))
     return data
   },
 
