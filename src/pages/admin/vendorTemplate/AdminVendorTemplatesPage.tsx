@@ -5,7 +5,6 @@ import {
   AdminTemplateStats,
   WorkshopStatus,
 } from "./components/templates/types"
-import { calculateAdminTemplateStats } from "./components/templates/data"
 import { TemplateStatsCards } from "./components/TemplateStatsCards"
 import {
   TemplateFiltersToolbar,
@@ -119,10 +118,6 @@ export default function AdminVendorTemplatesPage() {
     })
   }, [rawTemplates, vendors])
 
-  const stats = useMemo<AdminTemplateStats>(
-    () => calculateAdminTemplateStats(templates),
-    [templates],
-  )
 
   const filteredTemplates = useMemo(() => {
     let filtered = templates
@@ -205,12 +200,13 @@ export default function AdminVendorTemplatesPage() {
 
     try {
       setApproveDialog({ open: false, template: null })
-      await adminWorkshopService.approveTemplate(templateId, adminNote)
+      const approvedTemplate = await adminWorkshopService.approveTemplate(templateId, adminNote)
+      console.log("[approveTemplate] Response from BE:", approvedTemplate)
 
       setRawTemplates((prev) =>
         prev.map((t) =>
           t.id === templateId
-            ? { ...t, status: "ACTIVE" as WorkshopStatus, adminNote: null }
+            ? { ...t, status: "ACTIVE" as WorkshopStatus, adminNote: adminNote ?? null }
             : t,
         ),
       )
@@ -284,9 +280,6 @@ export default function AdminVendorTemplatesPage() {
           </p>
         </div>
       </div>
-
-      {/* Stats */}
-      <TemplateStatsCards stats={stats} />
 
       {/* Filters */}
       <TemplateFiltersToolbar

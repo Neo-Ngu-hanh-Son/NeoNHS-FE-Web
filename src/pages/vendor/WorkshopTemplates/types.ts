@@ -1,12 +1,14 @@
 import { z } from "zod"
 
 // Workshop Template Status
-export enum WorkshopStatus {
-  DRAFT = "DRAFT",       // Created but not submitted
-  PENDING = "PENDING",   // Submitted, awaiting approval
-  ACTIVE = "ACTIVE",     // Approved and published
-  REJECTED = "REJECTED"  // Rejected by admin
-}
+export const WorkshopStatus = {
+  DRAFT: "DRAFT",       // Created but not submitted
+  PENDING: "PENDING",   // Submitted, awaiting approval
+  ACTIVE: "ACTIVE",     // Approved and published
+  REJECTED: "REJECTED", // Rejected by admin
+} as const
+
+export type WorkshopStatus = typeof WorkshopStatus[keyof typeof WorkshopStatus]
 
 // Workshop Tag
 export interface WTagResponse {

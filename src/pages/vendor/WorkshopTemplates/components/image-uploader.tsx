@@ -55,7 +55,7 @@ export function ImageUploader({
     // 2. Upload to Cloudinary
     setUploading(true)
     messageApi.loading({
-      content: 'Uploading image to Cloudinary...',
+      content: 'Uploading image ...',
       key: 'upload',
       duration: 0, // Keep showing until we dismiss it
     })
