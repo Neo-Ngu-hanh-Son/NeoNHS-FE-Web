@@ -40,6 +40,47 @@ export interface PointResponse {
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
-    googlePlaceId?: string
+    googlePlaceId?: string;
+    panoramaImageUrl?: string | null;
+    defaultYaw?: number | null;
+    defaultPitch?: number | null;
+    checkinPoints?: unknown[] | null;
     historyAudioCount: number;
+}
+
+export interface PointQueryParams {
+    page?: number;
+    size?: number;
+    sortBy?: string;
+    sortDir?: 'asc' | 'desc';
+    search?: string;
+}
+
+export interface SpringSortInfo {
+    empty: boolean;
+    sorted: boolean;
+    unsorted: boolean;
+}
+
+export interface SpringPageableInfo {
+    offset: number;
+    pageNumber: number;
+    pageSize: number;
+    paged: boolean;
+    unpaged: boolean;
+    sort: SpringSortInfo;
+}
+
+export interface PagedPointResponse {
+    content: PointResponse[];
+    empty: boolean;
+    first: boolean;
+    last: boolean;
+    number: number;
+    numberOfElements: number;
+    pageable: SpringPageableInfo;
+    size: number;
+    sort: SpringSortInfo;
+    totalElements: number;
+    totalPages: number;
 }
