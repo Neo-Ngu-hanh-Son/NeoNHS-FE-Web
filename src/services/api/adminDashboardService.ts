@@ -1,29 +1,29 @@
 import apiClient from './apiClient';
 import {
     AdminKPIs,
-    RevenueTrendPoint,
     ActivityStatus,
     SalesByType,
     TopActivity,
-    RegistrationTrendPoint,
     RecentActivity,
-    RevenueReport
+    RevenueReport,
+    RevenueTrendResponse,
+    RegistrationTrendResponse
 } from '@/types/adminDashboard';
 import { ApiResponse } from '@/types';
 
 const adminDashboardService = {
     getKPIs: async (): Promise<AdminKPIs> => {
         const response = await apiClient.get<ApiResponse<AdminKPIs>>('/admin/dashboard/kpi');
-        return response.data;
+        return (response as any)?.data ?? response;
     },
 
     getRevenueReport: async (startDate: string, endDate: string): Promise<RevenueReport> => {
         const response = await apiClient.get<ApiResponse<RevenueReport>>(`/admin/revenue/revenue-report?startDate=${startDate}&endDate=${endDate}`);
-        return response.data;
+        return (response as any)?.data ?? response;
     },
 
-    getRevenueTrends: async (periodType: 'MONTHLY' | 'WEEKLY' = 'MONTHLY', limit: number = 6): Promise<RevenueTrendPoint[]> => {
-        const response = await apiClient.get<ApiResponse<RevenueTrendPoint[]>>(`/admin/dashboard/revenue-trends?periodType=${periodType}&limit=${limit}`);
+    getRevenueTrends: async (periodType: 'MONTHLY' | 'WEEKLY' = 'MONTHLY', limit: number = 6): Promise<RevenueTrendResponse> => {
+        const response = await apiClient.get<ApiResponse<RevenueTrendResponse>>(`/admin/dashboard/revenue-trends?periodType=${periodType}&limit=${limit}`);
         return response.data;
     },
 
@@ -42,8 +42,8 @@ const adminDashboardService = {
         return response.data;
     },
 
-    getRegistrations: async (type: 'USER' | 'VENDOR' = 'USER', periodType: 'MONTHLY' | 'WEEKLY' = 'MONTHLY', limit: number = 6): Promise<RegistrationTrendPoint[]> => {
-        const response = await apiClient.get<ApiResponse<RegistrationTrendPoint[]>>(`/admin/dashboard/registrations?type=${type}&periodType=${periodType}&limit=${limit}`);
+    getRegistrations: async (type: 'USER' | 'VENDOR' = 'USER', periodType: 'MONTHLY' | 'WEEKLY' = 'MONTHLY', limit: number = 6): Promise<RegistrationTrendResponse> => {
+        const response = await apiClient.get<ApiResponse<RegistrationTrendResponse>>(`/admin/dashboard/registrations?type=${type}&periodType=${periodType}&limit=${limit}`);
         return response.data;
     },
 
