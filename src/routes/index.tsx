@@ -57,6 +57,7 @@ import PanoramaScreen from "@/pages/Panorama/screens/PanoramaScreen";
 import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorPage";
 import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 import ManageHistoryAudioPage from "@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx";
+import AdminCheckinPointsPage from "@/pages/admin/checkin-points/AdminCheckinPointsPage";
 
 export const router = createBrowserRouter([
   {
@@ -124,6 +125,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "destinations", element: <AdminDestinationsPage /> },
+          { path: "checkin-points", element: <AdminCheckinPointsPage /> },
           { path: "destinations/:id/audioHistory", element: <ManageHistoryAudioPage /> },
           { path: "users", element: <AdminUsersPage /> },
           { path: "vendors", element: <AdminVendorsPage /> },

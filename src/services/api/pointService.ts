@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { PointRequest, PointResponse } from '../../types/point';
+import { PagedPointResponse, PointQueryParams, PointRequest, PointResponse } from '../../types/point';
 import { ApiResponse } from '../../types';
 
 export const pointService = {
@@ -7,13 +7,10 @@ export const pointService = {
         return apiClient.get<ApiResponse<PointResponse[]>>(`/admin/points/attraction/${attractionId}`);
     },
 
-    getPointsWithPagination: async (attractionId: string, params: {
-        page?: number;
-        size?: number;
-        sortBy?: string;
-        sortDir?: string;
-        search?: string;
-    }): Promise<ApiResponse<any>> => {
+    getPointsWithPagination: async (
+        attractionId: string,
+        params: PointQueryParams,
+    ): Promise<ApiResponse<PagedPointResponse>> => {
         const query = new URLSearchParams();
         if (params.page !== undefined) query.append('page', params.page.toString());
         if (params.size !== undefined) query.append('size', params.size.toString());
@@ -21,16 +18,14 @@ export const pointService = {
         if (params.sortDir) query.append('sortDir', params.sortDir);
         if (params.search) query.append('search', params.search);
 
-        return apiClient.get<ApiResponse<any>>(`/admin/points/attraction/${attractionId}?${query.toString()}`);
+        return apiClient.get<ApiResponse<PagedPointResponse>>(
+            `/admin/points/attraction/${attractionId}?${query.toString()}`,
+        );
     },
 
-    getAllPointsWithPagination: async (params: {
-        page?: number;
-        size?: number;
-        sortBy?: string;
-        sortDir?: string;
-        search?: string;
-    }): Promise<ApiResponse<any>> => {
+    getAllPointsWithPagination: async (
+        params: PointQueryParams,
+    ): Promise<ApiResponse<PagedPointResponse>> => {
         const query = new URLSearchParams();
         if (params.page !== undefined) query.append('page', params.page.toString());
         if (params.size !== undefined) query.append('size', params.size.toString());
@@ -38,7 +33,7 @@ export const pointService = {
         if (params.sortDir) query.append('sortDir', params.sortDir);
         if (params.search) query.append('search', params.search);
 
-        return apiClient.get<ApiResponse<any>>(`/admin/points/all?${query.toString()}`);
+        return apiClient.get<ApiResponse<PagedPointResponse>>(`/admin/points/all?${query.toString()}`);
     },
 
     getPointById: async (id: string): Promise<ApiResponse<PointResponse>> => {
