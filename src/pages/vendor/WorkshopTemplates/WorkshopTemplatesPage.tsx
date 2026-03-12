@@ -16,13 +16,13 @@ const PAGE_SIZE = 9
 
 export default function WorkshopTemplatesPage() {
   const navigate = useNavigate()
-  
+
   // Data state
   const [templates, setTemplates] = useState<WorkshopTemplateResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [totalElements, setTotalElements] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
-  
+
   // Filter states
   const [keyword, setKeyword] = useState('')
   const [debouncedKeyword, setDebouncedKeyword] = useState('')
@@ -64,20 +64,20 @@ export default function WorkshopTemplatesPage() {
   const fetchTemplates = async () => {
     try {
       setLoading(true)
-      
+
       // Determine sort direction based on sortBy
       const sortDirection: 'ASC' | 'DESC' = sortBy === 'name' ? 'ASC' : 'DESC'
-      
+
       const response = await WorkshopTemplateService.getMyTemplates({
         page: currentPage,
         size: PAGE_SIZE,
         sortBy,
         sortDirection,
       })
-      
+
       // Apply filters on the fetched data
       let filtered = response.content || []
-      
+
       // Apply keyword filter
       if (debouncedKeyword.trim()) {
         const query = debouncedKeyword.toLowerCase()
@@ -86,12 +86,12 @@ export default function WorkshopTemplatesPage() {
           (t.shortDescription && t.shortDescription.toLowerCase().includes(query))
         )
       }
-      
+
       // Apply status filter
       if (statusFilter && statusFilter !== 'all') {
         filtered = filtered.filter(t => t.status === statusFilter)
       }
-      
+
       setTemplates(filtered)
       setTotalElements(response.totalElements)
       setTotalPages(response.totalPages)
@@ -132,13 +132,13 @@ export default function WorkshopTemplatesPage() {
     if (deleteDialog.template) {
       try {
         await WorkshopTemplateService.deleteTemplate(deleteDialog.template.id)
-        
+
         setDeleteDialog({ open: false, template: null })
         notification.success({
           message: 'Template Deleted',
           description: `Template "${deleteDialog.template.name}" has been deleted.`
         })
-        
+
         // Refresh the list
         fetchTemplates()
       } catch (error: any) {
@@ -159,13 +159,13 @@ export default function WorkshopTemplatesPage() {
     if (submitDialog.template) {
       try {
         await WorkshopTemplateService.submitForApproval(submitDialog.template.id)
-        
+
         setSubmitDialog({ open: false, template: null })
         notification.success({
           message: 'Template Submitted',
           description: `Template "${submitDialog.template.name}" has been submitted for approval.`
         })
-        
+
         // Refresh the list
         fetchTemplates()
       } catch (error: any) {
@@ -175,6 +175,28 @@ export default function WorkshopTemplatesPage() {
           description: error.message || 'Failed to submit template for approval. Please try again.',
         })
       }
+    }
+  }
+
+  const handleTogglePublish = async (template: WorkshopTemplateResponse) => {
+    try {
+      await WorkshopTemplateService.togglePublish(template.id)
+
+      notification.success({
+        message: template.isPublished ? 'Template Unpublished' : 'Template Published',
+        description: template.isPublished
+          ? `Template "${template.name}" is now hidden from the public catalog.`
+          : `Template "${template.name}" is now visible to tourists!`
+      })
+
+      // Refresh the list
+      fetchTemplates()
+    } catch (error: any) {
+      console.error('Toggle publish failed:', error)
+      notification.error({
+        message: 'Toggle Publish Failed',
+        description: error.message || 'Failed to toggle publish status. Please try again.',
+      })
     }
   }
 
@@ -188,7 +210,7 @@ export default function WorkshopTemplatesPage() {
   const pageNumbers = useMemo(() => {
     const pages: (number | 'ellipsis')[] = []
     const maxVisible = 5
-    
+
     if (totalPages <= maxVisible) {
       // Show all pages if total is small
       for (let i = 0; i < totalPages; i++) {
@@ -197,40 +219,40 @@ export default function WorkshopTemplatesPage() {
     } else {
       // Always show first page
       pages.push(0)
-      
+
       // Calculate range around current page
       let start = Math.max(1, currentPage - 1)
       let end = Math.min(totalPages - 2, currentPage + 1)
-      
+
       // Adjust if we're near the start
       if (currentPage <= 2) {
         end = 3
       }
-      
+
       // Adjust if we're near the end
       if (currentPage >= totalPages - 3) {
         start = totalPages - 4
       }
-      
+
       // Add ellipsis after first page if needed
       if (start > 1) {
         pages.push('ellipsis')
       }
-      
+
       // Add middle pages
       for (let i = start; i <= end; i++) {
         pages.push(i)
       }
-      
+
       // Add ellipsis before last page if needed
       if (end < totalPages - 2) {
         pages.push('ellipsis')
       }
-      
+
       // Always show last page
       pages.push(totalPages - 1)
     }
-    
+
     return pages
   }, [currentPage, totalPages])
 
@@ -350,6 +372,11 @@ export default function WorkshopTemplatesPage() {
                   ? () => handleSubmitClick(template)
                   : undefined
               }
+              onTogglePublish={
+                template.status === WorkshopStatus.ACTIVE
+                  ? () => handleTogglePublish(template)
+                  : undefined
+              }
             />
           ))}
         </div>
@@ -381,7 +408,7 @@ export default function WorkshopTemplatesPage() {
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
+              <PaginationPrevious
                 href="#"
                 onClick={(e) => {
                   e.preventDefault()
@@ -390,7 +417,7 @@ export default function WorkshopTemplatesPage() {
                 className={currentPage === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />
             </PaginationItem>
-            
+
             {pageNumbers.map((pageNum, idx) => (
               pageNum === 'ellipsis' ? (
                 <PaginationItem key={`ellipsis-${idx}`}>
@@ -412,7 +439,7 @@ export default function WorkshopTemplatesPage() {
                 </PaginationItem>
               )
             ))}
-            
+
             <PaginationItem>
               <PaginationNext
                 href="#"

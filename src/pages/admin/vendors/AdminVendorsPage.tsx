@@ -1,23 +1,38 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent } from '@/components/ui/card'
-import { Search, PlusCircle, Users, CheckCircle2, Ban as BanIcon, UserCheck } from 'lucide-react'
-import { notification } from 'antd'
-import { mockVendors, mockVendorStats } from './data'
-import { VendorProfileResponse, VendorStats } from './types'
+import { Search, PlusCircle, Users, CheckCircle2, Ban as BanIcon, UserCheck, Loader2 } from 'lucide-react'
+import { notification, Pagination } from 'antd'
+import adminVendorService from '@/services/api/adminVendorService'
+import { VendorProfileResponse, VendorStats, VendorFilterOptions } from './types'
 import { VendorCard } from './components/vendor-card'
 import { BanVendorDialog, UnbanVendorDialog } from './components/ban-vendor-dialog'
 import { VendorDetailDialog } from './components/vendor-detail-dialog'
+import { CreateVendorDialog } from './components/create-vendor-dialog'
+import { ArrowUp, ArrowDown } from 'lucide-react'
 
 export default function AdminVendorsPage() {
-  const [vendors] = useState<VendorProfileResponse[]>(mockVendors)
-  const [stats] = useState<VendorStats>(mockVendorStats)
+  const [vendors, setVendors] = useState<VendorProfileResponse[]>([])
+  const [stats, setStats] = useState<VendorStats>({
+    total: 0,
+    active: 0,
+    banned: 0,
+    pendingVerification: 0,
+    verified: 0,
+  })
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [verificationFilter, setVerificationFilter] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('createdAt')
+  const [sortDirection, setSortDirection] = useState<'ASC' | 'DESC'>('DESC')
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [totalElements, setTotalElements] = useState(0)
 
   const [banDialog, setBanDialog] = useState<{ open: boolean; vendor: VendorProfileResponse | null }>({
     open: false,
@@ -34,57 +49,68 @@ export default function AdminVendorsPage() {
     vendor: null,
   })
 
-  // Filter and sort vendors
-  const filteredVendors = useMemo(() => {
-    let filtered = vendors
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(v =>
-        v.fullname.toLowerCase().includes(query) ||
-        v.businessName.toLowerCase().includes(query) ||
-        v.email.toLowerCase().includes(query)
-      )
+  const fetchVendors = useCallback(async () => {
+    setLoading(true)
+    try {
+      const options: VendorFilterOptions = {
+        page: currentPage,
+        size: pageSize,
+        sortBy,
+        sortDirection,
+        keyword: searchQuery || undefined,
+      }
+
+      // Add specialized filters if not 'all'
+      if (statusFilter === 'active') options.isActive = true
+      if (statusFilter === 'inactive') options.isActive = false
+      if (statusFilter === 'banned') options.isBanned = true
+      if (verificationFilter === 'verified') options.isVerified = true
+      if (verificationFilter === 'unverified') options.isVerified = false
+
+      const response = await adminVendorService.getAllVendors(options)
+      setVendors(response.content)
+      setTotalElements(response.totalElements)
+
+      // Update local stats from content if needed, 
+      // or ideally fetch from a stats endpoint
+      // For now, let's use the totals from the pagination if available
+      // or fetch separate stats if we implement that.
+    } catch (error) {
+      console.error('Failed to fetch vendors:', error)
+      notification.error({
+        message: 'Error',
+        description: 'Failed to load vendors list.',
+      })
+    } finally {
+      setLoading(false)
     }
+  }, [currentPage, pageSize, sortBy, sortDirection, searchQuery, statusFilter, verificationFilter])
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      if (statusFilter === 'active') {
-        filtered = filtered.filter(v => v.isActive && !v.isBanned)
-      } else if (statusFilter === 'banned') {
-        filtered = filtered.filter(v => v.isBanned)
-      } else if (statusFilter === 'inactive') {
-        filtered = filtered.filter(v => !v.isActive && !v.isBanned)
+  useEffect(() => {
+    fetchVendors()
+  }, [fetchVendors])
+
+  // Fetch stats separately
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const statsData = await adminVendorService.getVendorStats()
+        setStats(statsData)
+      } catch (error) {
+        console.error('Failed to fetch vendor stats:', error)
+        // Fallback to basic total if endpoint fails
       }
     }
+    fetchStats()
+  }, [])
 
-    // Verification filter
-    if (verificationFilter !== 'all') {
-      if (verificationFilter === 'verified') {
-        filtered = filtered.filter(v => v.isVerifiedVendor)
-      } else if (verificationFilter === 'unverified') {
-        filtered = filtered.filter(v => !v.isVerifiedVendor)
-      }
-    }
-
-    // Sort
-    filtered = [...filtered].sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.fullname.localeCompare(b.fullname)
-        case 'businessName':
-          return a.businessName.localeCompare(b.businessName)
-        case 'createdAt':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        case 'updatedAt':
-        default:
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      }
-    })
-
-    return filtered
-  }, [vendors, searchQuery, statusFilter, verificationFilter, sortBy])
+  // Debounced search could be added here for better performance
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page on search
+  }
 
   const handleView = (id: string) => {
     const vendor = vendors.find(v => v.id === id)
@@ -106,15 +132,22 @@ export default function AdminVendorsPage() {
     setBanDialog({ open: true, vendor })
   }
 
-  const handleBanConfirm = (reason: string) => {
+  const handleBanConfirm = async (reason: string) => {
     if (banDialog.vendor) {
-      // TODO: Call API to ban vendor
-      console.log('Banning vendor:', banDialog.vendor.id, 'Reason:', reason)
-      setBanDialog({ open: false, vendor: null })
-      notification.warning({
-        message: 'Vendor Banned',
-        description: `${banDialog.vendor.businessName} has been banned.`,
-      })
+      try {
+        await adminVendorService.banVendor(banDialog.vendor.id, { reason })
+        setBanDialog({ open: false, vendor: null })
+        notification.warning({
+          message: 'Vendor Banned',
+          description: `${banDialog.vendor.businessName} has been banned.`,
+        })
+        fetchVendors()
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: 'Failed to ban vendor.',
+        })
+      }
     }
   }
 
@@ -122,33 +155,64 @@ export default function AdminVendorsPage() {
     setUnbanDialog({ open: true, vendor })
   }
 
-  const handleUnbanConfirm = () => {
+  const handleUnbanConfirm = async () => {
     if (unbanDialog.vendor) {
-      // TODO: Call API to unban vendor
-      console.log('Unbanning vendor:', unbanDialog.vendor.id)
-      setUnbanDialog({ open: false, vendor: null })
+      try {
+        await adminVendorService.unbanVendor(unbanDialog.vendor.id)
+        setUnbanDialog({ open: false, vendor: null })
+        notification.success({
+          message: 'Vendor Unbanned',
+          description: `${unbanDialog.vendor.businessName} has been unbanned.`,
+        })
+        fetchVendors()
+      } catch (error) {
+        notification.error({
+          message: 'Error',
+          description: 'Failed to unban vendor.',
+        })
+      }
+    }
+  }
+
+  const handleVerify = async (vendor: VendorProfileResponse) => {
+    try {
+      await adminVendorService.verifyVendor(vendor.id)
       notification.success({
-        message: 'Vendor Unbanned',
-        description: `${unbanDialog.vendor.businessName} has been unbanned.`,
+        message: 'Vendor Verified',
+        description: `${vendor.businessName} has been verified.`,
+      })
+      fetchVendors()
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: 'Failed to verify vendor.',
       })
     }
   }
 
-  const handleVerify = (vendor: VendorProfileResponse) => {
-    // TODO: Call API to verify vendor
-    console.log('Verifying vendor:', vendor.id)
-    notification.success({
-      message: 'Vendor Verified',
-      description: `${vendor.businessName} has been verified.`,
-    })
+  const handleCreateVendor = () => {
+    setCreateDialogOpen(true)
   }
 
-  const handleCreateVendor = () => {
-    // TODO: Open create vendor modal
-    notification.info({
-      message: 'Create Vendor',
-      description: 'Create vendor form will be implemented',
-    })
+  const handleCreateSuccess = async (data: any) => {
+    try {
+      await adminVendorService.createVendor(data)
+      notification.success({
+        message: 'Success',
+        description: 'Vendor account created successfully.',
+      })
+      fetchVendors()
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: 'Failed to create vendor account.',
+      })
+      throw error // Re-throw to keep dialog open/handle in component
+    }
+  }
+
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === 'ASC' ? 'DESC' : 'ASC')
   }
 
   return (
@@ -228,7 +292,7 @@ export default function AdminVendorsPage() {
           <Input
             placeholder="Search by name, business, or email..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={handleSearch}
             className="pl-10"
           />
         </div>
@@ -259,23 +323,33 @@ export default function AdminVendorsPage() {
         </Select>
 
         {/* Sort */}
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="updatedAt">Recently Updated</SelectItem>
-            <SelectItem value="createdAt">Recently Created</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
-            <SelectItem value="businessName">Business Name</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="updatedAt">Recently Updated</SelectItem>
+              <SelectItem value="createdAt">Recently Created</SelectItem>
+              <SelectItem value="name">Name</SelectItem>
+              <SelectItem value="businessName">Business Name</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={toggleSortDirection}
+            title={sortDirection === 'ASC' ? 'Ascending' : 'Descending'}
+          >
+            {sortDirection === 'ASC' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+          </Button>
+        </div>
       </div>
 
       {/* Results Count */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing <strong>{filteredVendors.length}</strong> of <strong>{vendors.length}</strong> vendors
+          Showing <strong>{vendors.length}</strong> of <strong>{totalElements}</strong> vendors
         </p>
         {(searchQuery || statusFilter !== 'all' || verificationFilter !== 'all') && (
           <Button
@@ -293,19 +367,40 @@ export default function AdminVendorsPage() {
       </div>
 
       {/* Vendors Grid */}
-      {filteredVendors.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredVendors.map((vendor) => (
-            <VendorCard
-              key={vendor.id}
-              vendor={vendor}
-              onView={handleView}
-              onEdit={handleEdit}
-              onBan={handleBanClick}
-              onUnban={handleUnbanClick}
-              onVerify={handleVerify}
+      {loading ? (
+        <div className="flex items-center justify-center p-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : vendors.length > 0 ? (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {vendors.map((vendor) => (
+              <VendorCard
+                key={vendor.id}
+                vendor={vendor}
+                onView={handleView}
+                onEdit={handleEdit}
+                onBan={handleBanClick}
+                onUnban={handleUnbanClick}
+                onVerify={handleVerify}
+              />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          <div className="flex justify-center py-4 bg-white dark:bg-zinc-900 rounded-xl border p-4 shadow-sm">
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={totalElements}
+              onChange={(page, size) => {
+                setCurrentPage(page)
+                setPageSize(size)
+              }}
+              showSizeChanger
+              showTotal={(total) => `Total ${total} vendors`}
             />
-          ))}
+          </div>
         </div>
       ) : (
         // Empty State
@@ -351,6 +446,12 @@ export default function AdminVendorsPage() {
         onBan={handleBanClick}
         onUnban={handleUnbanClick}
         onVerify={handleVerify}
+      />
+
+      <CreateVendorDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleCreateSuccess}
       />
     </div>
   )

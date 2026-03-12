@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search } from "lucide-react"
 import { WorkshopStatus } from "./templates/types"
+import type { AdminVendorSummary } from "@/services/api/adminWorkshopService"
 
 export type TemplatesSortBy = "createdAt" | "updatedAt" | "name" | "vendorName"
 export type TemplatesSortDirection = "ASC" | "DESC"
@@ -11,6 +12,7 @@ interface TemplateFiltersToolbarProps {
   onSearchChange: (value: string) => void
   vendorIdFilter: string
   onVendorIdFilterChange: (value: string) => void
+  vendors: AdminVendorSummary[]
   statusFilter: string
   onStatusFilterChange: (value: string) => void
   verificationFilter: string
@@ -26,6 +28,7 @@ export function TemplateFiltersToolbar({
   onSearchChange,
   vendorIdFilter,
   onVendorIdFilterChange,
+  vendors,
   statusFilter,
   onStatusFilterChange,
   verificationFilter,
@@ -36,28 +39,33 @@ export function TemplateFiltersToolbar({
   onSortDirectionChange,
 }: TemplateFiltersToolbarProps) {
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by template name, vendor, or email..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="relative w-[490px]">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Filter by Vendor ID (optional)"
-          value={vendorIdFilter}
-          onChange={(e) => onVendorIdFilterChange(e.target.value.trim())}
-          className="w-full lg:w-[240px]"
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-8 h-9"
         />
       </div>
 
+      <Select value={vendorIdFilter} onValueChange={onVendorIdFilterChange}>
+        <SelectTrigger className="w-[150px] h-9">
+          <SelectValue placeholder="All Vendors" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Vendors</SelectItem>
+          {vendors.map((v) => (
+            <SelectItem key={v.id} value={v.id}>
+              {v.businessName || v.fullname}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-        <SelectTrigger className="w-full sm:w-[180px]">
+        <SelectTrigger className="w-[150px] h-9">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -65,18 +73,17 @@ export function TemplateFiltersToolbar({
           <SelectItem value={WorkshopStatus.PENDING}>Pending</SelectItem>
           <SelectItem value={WorkshopStatus.ACTIVE}>Approved</SelectItem>
           <SelectItem value={WorkshopStatus.REJECTED}>Rejected</SelectItem>
-          <SelectItem value={WorkshopStatus.DRAFT}>Draft</SelectItem>
         </SelectContent>
       </Select>
 
       <Select value={verificationFilter} onValueChange={onVerificationFilterChange}>
-        <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Vendor Verification" />
+        <SelectTrigger className="w-[150px] h-9">
+          <SelectValue placeholder="Verification" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Vendors</SelectItem>
-          <SelectItem value="verified">Verified Vendors</SelectItem>
-          <SelectItem value="unverified">Unverified Vendors</SelectItem>
+          <SelectItem value="all">All Verification</SelectItem>
+          <SelectItem value="verified">Verified</SelectItem>
+          <SelectItem value="unverified">Unverified</SelectItem>
         </SelectContent>
       </Select>
 
@@ -84,7 +91,7 @@ export function TemplateFiltersToolbar({
         value={sortBy}
         onValueChange={(value) => onSortByChange(value as TemplatesSortBy)}
       >
-        <SelectTrigger className="w-full sm:w-[180px]">
+        <SelectTrigger className="w-[150px] h-9">
           <SelectValue placeholder="Sort by" />
         </SelectTrigger>
         <SelectContent>
@@ -99,7 +106,7 @@ export function TemplateFiltersToolbar({
         value={sortDirection}
         onValueChange={(value) => onSortDirectionChange(value as TemplatesSortDirection)}
       >
-        <SelectTrigger className="w-full sm:w-[150px]">
+        <SelectTrigger className="w-[150px] h-9">
           <SelectValue placeholder="Order" />
         </SelectTrigger>
         <SelectContent>
@@ -109,5 +116,4 @@ export function TemplateFiltersToolbar({
       </Select>
     </div>
   )
-
 }

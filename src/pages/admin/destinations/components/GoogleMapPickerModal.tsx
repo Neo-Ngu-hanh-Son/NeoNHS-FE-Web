@@ -153,7 +153,7 @@ export function GoogleMapPickerModal({
 
     const handleLocationSelection = (lat: number, lng: number, placeId?: string) => {
         if (!isPointInBoundary(lat, lng)) {
-            setError("Vị trí này nằm ngoài ranh giới Ngũ Hành Sơn.");
+            setError("This location is outside the boundary of Ngũ Hành Sơn.");
             return;
         }
 

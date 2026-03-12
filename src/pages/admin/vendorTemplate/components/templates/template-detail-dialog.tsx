@@ -11,10 +11,15 @@ import {
   AlertCircle,
   Building2,
   Calendar,
+  CheckCircle,
   Clock,
   DollarSign,
+  Loader2,
   Mail,
+  MapPin,
   Phone,
+  ShieldCheck,
+  ShieldX,
   Star,
   Users,
 } from "lucide-react"
@@ -22,7 +27,9 @@ import { useEffect, useState } from "react"
 import { AdminWorkshopTemplateResponse, WorkshopStatus } from "./types"
 import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
 import WorkshopTemplateService from "@/services/api/workshopTemplateService"
+import { adminWorkshopService } from "@/services/api/adminWorkshopService"
 import type { WorkshopTemplateResponse } from "@/pages/vendor/WorkshopTemplates/types"
+import type { VendorProfileResponse } from "@/pages/admin/vendors/types"
 
 interface TemplateDetailDialogProps {
   template: AdminWorkshopTemplateResponse | null
@@ -68,6 +75,7 @@ export function TemplateDetailDialog({
   onOpenChange,
 }: TemplateDetailDialogProps) {
   const [detail, setDetail] = useState<WorkshopTemplateResponse | null>(null)
+  const [vendorProfile, setVendorProfile] = useState<VendorProfileResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,16 +86,30 @@ export function TemplateDetailDialog({
 
     let cancelled = false
 
-    const fetchDetail = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
         setError(null)
-        const data = await WorkshopTemplateService.getTemplateById(template.id)
+
+        const [templateData, vendorData] = await Promise.allSettled([
+          WorkshopTemplateService.getTemplateById(template.id),
+          template.vendorId
+            ? adminWorkshopService.getVendorById(template.vendorId)
+            : Promise.reject("no vendorId"),
+        ])
+
         if (!cancelled) {
-          setDetail(data)
+          if (templateData.status === "fulfilled") {
+            setDetail(templateData.value)
+          }
+          if (vendorData.status === "fulfilled") {
+            setVendorProfile(vendorData.value)
+          } else {
+            setVendorProfile(null)
+          }
         }
       } catch (e) {
-        console.error("Failed to load workshop template detail", e)
+        console.error("Failed to load template/vendor detail", e)
         if (!cancelled) {
           setError("Failed to load template detail")
         }
@@ -98,12 +120,12 @@ export function TemplateDetailDialog({
       }
     }
 
-    fetchDetail()
+    fetchData()
 
     return () => {
       cancelled = true
     }
-  }, [open, template?.id])
+  }, [open, template?.id, template?.vendorId])
 
   if (!template) return null
 
@@ -125,6 +147,17 @@ export function TemplateDetailDialog({
   const maxParticipants = detail?.maxParticipants ?? template.maxParticipants
   const createdAt = detail?.createdAt ?? template.createdAt
   const updatedAt = detail?.updatedAt ?? template.updatedAt
+
+  // Vendor info: prefer vendorProfile (fresh from API), fallback to template fields
+  const isVendorVerified = vendorProfile?.isVerifiedVendor ?? template.vendorVerified ?? false
+  const vendorName = vendorProfile?.businessName || template.vendorName
+  const vendorEmail = vendorProfile?.email || template.vendorEmail
+  const vendorPhone = vendorProfile?.phoneNumber || template.vendorPhone
+  const vendorAddress = vendorProfile?.address
+  const vendorDescription = vendorProfile?.description
+  const vendorAvatar = vendorProfile?.avatarUrl
+  const vendorIsActive = vendorProfile?.isActive
+  const vendorIsBanned = vendorProfile?.isBanned
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,12 +184,20 @@ export function TemplateDetailDialog({
             </div>
             <div className="flex flex-col items-end gap-2">
               {getStatusBadge(template.status)}
-              {template.vendorVerified === false && (
+              {isVendorVerified ? (
+                <Badge
+                  variant="outline"
+                  className="text-xs bg-green-50 text-green-700 border-green-300 flex items-center gap-1"
+                >
+                  <ShieldCheck className="w-3 h-3" />
+                  Verified Vendor
+                </Badge>
+              ) : (
                 <Badge
                   variant="outline"
                   className="text-xs bg-amber-50 text-amber-700 border-amber-300 flex items-center gap-1"
                 >
-                  <AlertCircle className="w-3 h-3" />
+                  <ShieldX className="w-3 h-3" />
                   Unverified Vendor
                 </Badge>
               )}
@@ -211,7 +252,7 @@ export function TemplateDetailDialog({
 
               {/* Rejection reason */}
               {template.status === WorkshopStatus.REJECTED &&
-                template.rejectReason && (
+                template.adminNote && (
                   <Card className="border-red-200 bg-red-50/60 dark:border-red-800 dark:bg-red-950/20">
                     <CardContent className="p-4 space-y-2">
                       <h3 className="font-semibold text-sm text-red-700 flex items-center gap-2">
@@ -219,7 +260,7 @@ export function TemplateDetailDialog({
                         Rejection Reason
                       </h3>
                       <p className="text-xs text-red-700 leading-relaxed whitespace-pre-line">
-                        {template.rejectReason}
+                        {template.adminNote}
                       </p>
                     </CardContent>
                   </Card>
@@ -304,34 +345,81 @@ export function TemplateDetailDialog({
                   <h3 className="font-semibold text-sm text-muted-foreground">
                     Vendor Info
                   </h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-start gap-2">
-                      <Building2 className="w-4 h-4 text-muted-foreground mt-0.5" />
-                      <div>
-                        <p className="font-medium">{template.vendorName}</p>
-                        {template.vendorVerified && (
-                          <p className="text-xs text-green-700 flex items-center gap-1">
-                            <Star className="w-3 h-3 text-green-600 fill-green-600" />
-                            Verified Vendor
-                          </p>
-                        )}
-                      </div>
+                  {loading && !vendorProfile ? (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading vendor info...
                     </div>
-                    {template.vendorEmail && (
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-muted-foreground" />
-                        <span className="truncate">
-                          {template.vendorEmail}
-                        </span>
+                  ) : (
+                    <div className="space-y-2.5 text-sm">
+                      <div className="flex items-start gap-2">
+                        {vendorAvatar ? (
+                          <img
+                            src={vendorAvatar}
+                            alt={vendorName}
+                            className="w-10 h-10 rounded-full object-cover shrink-0"
+                            onError={(e) => { e.currentTarget.style.display = "none" }}
+                          />
+                        ) : (
+                          <Building2 className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-medium">{vendorName}</p>
+                          {isVendorVerified ? (
+                            <p className="text-xs text-green-700 flex items-center gap-1">
+                              <CheckCircle className="w-3 h-3 text-green-600" />
+                              Verified Vendor
+                            </p>
+                          ) : (
+                            <p className="text-xs text-amber-600 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              Unverified
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    )}
-                    {template.vendorPhone && (
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-muted-foreground" />
-                        <span>{template.vendorPhone}</span>
-                      </div>
-                    )}
-                  </div>
+
+                      {vendorEmail && (
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span className="truncate">{vendorEmail}</span>
+                        </div>
+                      )}
+                      {vendorPhone && (
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
+                          <span>{vendorPhone}</span>
+                        </div>
+                      )}
+                      {vendorAddress && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+                          <span className="text-muted-foreground">{vendorAddress}</span>
+                        </div>
+                      )}
+                      {vendorDescription && (
+                        <p className="text-xs text-muted-foreground pt-1 border-t line-clamp-3">
+                          {vendorDescription}
+                        </p>
+                      )}
+
+                      {/* Vendor status badges */}
+                      {vendorProfile && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {vendorIsActive === false && (
+                            <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-300">
+                              Inactive
+                            </Badge>
+                          )}
+                          {vendorIsBanned && (
+                            <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-300">
+                              Banned
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -363,9 +451,7 @@ export function TemplateDetailDialog({
               )}
 
               {/* Review meta */}
-              {(template.submittedAt ||
-                template.reviewedAt ||
-                template.approvedAt) && (
+              {(template.submittedAt || template.reviewedAt) && (
                 <Card>
                   <CardContent className="p-4 space-y-1.5 text-xs text-muted-foreground">
                     <h3 className="font-semibold text-sm text-foreground mb-1">
@@ -386,14 +472,6 @@ export function TemplateDetailDialog({
                           {formatDate(template.reviewedAt)}
                           {template.reviewedBy &&
                             ` by Admin ${template.reviewedBy.slice(0, 8)}`}
-                        </span>
-                      </p>
-                    )}
-                    {template.approvedAt && (
-                      <p>
-                        Approved:{" "}
-                        <span className="font-medium">
-                          {formatDate(template.approvedAt)}
                         </span>
                       </p>
                     )}

@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import adminDashboardService from '@/services/api/adminDashboardService';
 import {
     AdminKPIs,
-    RevenueTrendPoint,
     ActivityStatus,
     SalesByType,
     TopActivity,
-    RegistrationTrendPoint,
-    RecentActivity
+    RecentActivity,
+    RevenueTrendResponse,
+    RegistrationTrendResponse
 } from '@/types/adminDashboard';
 
 // Modular Components
@@ -23,11 +23,11 @@ import { RecentActivitiesTimeline } from './components/RecentActivitiesTimeline'
 export function AdminDashboardPage() {
     const [loading, setLoading] = useState(true);
     const [kpis, setKpis] = useState<AdminKPIs | null>(null);
-    const [revenueTrends, setRevenueTrends] = useState<RevenueTrendPoint[]>([]);
+    const [revenueTrendsData, setRevenueTrendsData] = useState<RevenueTrendResponse | null>(null);
     const [activityStatus, setActivityStatus] = useState<ActivityStatus | null>(null);
     const [salesByType, setSalesByType] = useState<SalesByType | null>(null);
     const [topActivities, setTopActivities] = useState<TopActivity[]>([]);
-    const [registrations, setRegistrations] = useState<RegistrationTrendPoint[]>([]);
+    const [registrationsData, setRegistrationsData] = useState<RegistrationTrendResponse | null>(null);
     const [recentActivities, setRecentActivities] = useState<RecentActivity[]>([]);
 
     // Filters
@@ -46,17 +46,17 @@ export function AdminDashboardPage() {
                 adminDashboardService.getRevenueTrends(revenuePeriod),
                 adminDashboardService.getActivityStatus(),
                 adminDashboardService.getSalesByType(),
-                adminDashboardService.getTopActivities('WORKSHOP', 5),
+                adminDashboardService.getTopActivities('EVENT', 5),
                 adminDashboardService.getRegistrations(regType),
                 adminDashboardService.getRecentActivities(10)
             ]);
 
             setKpis(kpiData);
-            setRevenueTrends(revData);
+            setRevenueTrendsData(revData);
             setActivityStatus(actData);
             setSalesByType(salesData);
             setTopActivities(topData);
-            setRegistrations(regData);
+            setRegistrationsData(regData);
             setRecentActivities(recentData);
         } catch (error) {
             console.error('Failed to load dashboard data:', error);
@@ -70,7 +70,7 @@ export function AdminDashboardPage() {
         const reloadRevenue = async () => {
             try {
                 const data = await adminDashboardService.getRevenueTrends(revenuePeriod);
-                setRevenueTrends(data);
+                setRevenueTrendsData(data);
             } catch (error) {
                 console.error('Error reloading revenue:', error);
             }
@@ -83,7 +83,7 @@ export function AdminDashboardPage() {
         const reloadReg = async () => {
             try {
                 const data = await adminDashboardService.getRegistrations(regType);
-                setRegistrations(data);
+                setRegistrationsData(data);
             } catch (error) {
                 console.error('Error reloading registrations:', error);
             }
@@ -103,19 +103,29 @@ export function AdminDashboardPage() {
         );
     }
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.1
+                staggerChildren: 0.15,
+                delayChildren: 0.2
             }
         }
     };
 
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
+    const itemVariants: Variants = {
+        hidden: { y: 30, opacity: 0, scale: 0.98 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 20
+            }
+        }
     };
 
     return (
@@ -140,21 +150,25 @@ export function AdminDashboardPage() {
             </div>
 
             {/* KPI Stats Grid */}
-            <KPIStats kpis={kpis} />
+            <motion.div variants={itemVariants}>
+                <KPIStats kpis={kpis} />
+            </motion.div>
 
             {/* Charts & Analytical Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <motion.div variants={itemVariants}>
+                <motion.div variants={itemVariants} className="h-full flex flex-col">
                     <RevenueTrendsChart
-                        revenueTrends={revenueTrends}
+                        revenueTrends={revenueTrendsData?.trends ?? []}
+                        summary={revenueTrendsData?.summary}
                         revenuePeriod={revenuePeriod}
                         setRevenuePeriod={setRevenuePeriod}
                     />
                 </motion.div>
 
-                <motion.div variants={itemVariants}>
+                <motion.div variants={itemVariants} className="h-full flex flex-col">
                     <RegistrationTrendsChart
-                        registrations={registrations}
+                        registrations={registrationsData?.trends ?? []}
+                        summary={registrationsData?.summary}
                         regType={regType}
                         setRegType={setRegType}
                     />

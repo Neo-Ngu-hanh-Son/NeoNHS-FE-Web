@@ -145,6 +145,22 @@ export function PointFormModal({
       console.error("Boundary validation error:", error);
       // If validation fails due to data error, we log it but don't block the user
     }
+    // Validate boundary
+    try {
+      if (
+        formData.latitude &&
+        formData.longitude &&
+        !isPointInBoundary(formData.latitude, formData.longitude)
+      ) {
+        message.error(
+          "This location is outside the boundary of Ngũ Hành Sơn.Please check the coordinates again.",
+        );
+        return;
+      }
+    } catch (error) {
+      console.error("Boundary validation error:", error);
+      // If validation fails due to data error, we log it but don't block the user
+    }
 
     onSave(safeFormData as PointRequest);
   };
