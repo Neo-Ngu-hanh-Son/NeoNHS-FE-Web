@@ -6,8 +6,28 @@ export interface AdminKPIs {
 }
 
 export interface RevenueTrendPoint {
+    periodKey: string;
     period: string;
     revenue: number;
+    previousRevenue: number;
+    transactionCount: number;
+}
+
+export interface RevenueTrendResponse {
+    summary: {
+        currentTotal: number;
+        previousTotal: number;
+        growthRate: number;
+        averageValue: number;
+        peakValue: number;
+        peakPeriod: string;
+    };
+    trends: RevenueTrendPoint[];
+    metadata: {
+        currency: string;
+        periodType: string;
+        pointCount: number;
+    };
 }
 
 export interface ActivityStatus {
@@ -37,8 +57,24 @@ export interface TopActivity {
 }
 
 export interface RegistrationTrendPoint {
+    periodKey: string;
     period: string;
     count: number;
+    previousCount: number;
+    breakdown: {
+        individual: number;
+        organization: number;
+    };
+}
+
+export interface RegistrationTrendResponse {
+    summary: {
+        totalJoined: number;
+        previousTotal: number;
+        growthRate: number;
+        activePercentage: number;
+    };
+    trends: RegistrationTrendPoint[];
 }
 
 export interface RecentActivity {
@@ -50,35 +86,36 @@ export interface RecentActivity {
 }
 
 export interface RevenueKPIs {
-    totalRevenue: number;
-    netRevenue: number;
+    adminEarnings: number;
+    totalGross: number;
     totalTransactions: number;
-    avgOrderValue: number;
-    revenueGrowth: number;
-    netRevenueGrowth: number;
-    avgOrderValueGrowth: number;
+    vendorPayouts: number;
+    // Optional since not in current report response
+    revenueGrowth?: number;
+    netRevenueGrowth?: number;
+    avgOrderValueGrowth?: number;
 }
 
 export interface RevenueByVendor {
     vendorName: string;
-    totalRevenue: number;
-    percentage: number;
+    amount: number;
+    percentage?: number; // Calculated on frontend if missing
 }
 
 export interface Transaction {
     date: string;
-    transactionId: string;
-    vendorName: string;
-    itemName: string;
-    grossAmount: number;
     fee: number;
-    netAmount: number;
-    status: 'COMPLETED' | 'PENDING' | 'REFUNDED';
+    gross: number;
+    id: string;
+    item: string;
+    net: number;
+    status: 'SUCCESS' | 'COMPLETED' | 'PENDING' | 'REFUNDED';
+    vendor: string;
 }
 
 export interface RevenueReport {
-    kpis: RevenueKPIs;
+    summary: RevenueKPIs;
     revenueTrends: RevenueTrendPoint[];
-    revenueByVendor: RevenueByVendor[];
+    vendorBreakdown: RevenueByVendor[];
     transactions: Transaction[];
 }

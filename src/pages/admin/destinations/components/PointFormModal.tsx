@@ -135,7 +135,7 @@ export function PointFormModal({
         // Validate boundary
         try {
             if (formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude)) {
-                message.error('Vị trí này nằm ngoài ranh giới Ngũ Hành Sơn. Vui lòng kiểm tra lại tọa độ.');
+                message.error('This location is outside the boundary of Ngũ Hành Sơn.Please check the coordinates again.');
                 return;
             }
         } catch (error) {
