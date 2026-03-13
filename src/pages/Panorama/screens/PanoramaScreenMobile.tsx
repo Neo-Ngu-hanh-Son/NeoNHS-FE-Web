@@ -45,11 +45,12 @@ export default function PanoramaScreenMobile() {
         console.error("Error parsing message data:", err);
       }
     };
-
+    window.addEventListener("message", handleMessage);
     document.addEventListener("message", handleMessage as any);
 
     return () => {
       document.removeEventListener("message", handleMessage as any);
+      window.removeEventListener("message", handleMessage);
     };
   }, []);
 
