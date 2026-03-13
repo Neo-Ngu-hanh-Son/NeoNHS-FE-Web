@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TemplateStatusBadge } from "./template-status-badge"
-import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled } from "@ant-design/icons"
+import { EditOutlined, EyeOutlined, DeleteOutlined, SendOutlined, ClockCircleOutlined, TeamOutlined, StarFilled, StarOutlined, GlobalOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
 import { formatDuration, formatPrice, formatDate } from "../utils/formatters"
 
 interface WorkshopTemplateCardProps {
@@ -12,6 +12,7 @@ interface WorkshopTemplateCardProps {
   onDelete?: () => void
   onSubmit?: () => void
   onView?: () => void
+  onTogglePublish?: () => void
 }
 
 export function WorkshopTemplateCard({
@@ -20,6 +21,7 @@ export function WorkshopTemplateCard({
   onDelete,
   onSubmit,
   onView,
+  onTogglePublish,
 }: WorkshopTemplateCardProps) {
   const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
 
@@ -40,7 +42,7 @@ export function WorkshopTemplateCard({
             }}
           />
           <div className="absolute top-3 right-3">
-            <TemplateStatusBadge status={template.status} size="sm" />
+            <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" />
           </div>
         </div>
       )}
@@ -151,11 +153,41 @@ export function WorkshopTemplateCard({
                 View
               </Button>
             )}
-            {template.averageRating && (
-              <div className="flex items-center gap-1 text-sm">
-                <StarFilled className="text-yellow-500" />
-                <span className="font-semibold">{template.averageRating.toFixed(1)}</span>
-                <span className="text-muted-foreground">({template.totalReview})</span>
+            {onTogglePublish && (
+              <Button
+                size="sm"
+                variant={template.isPublished ? "outline" : "default"}
+                onClick={onTogglePublish}
+                className="flex-1 gap-1"
+              >
+                {template.isPublished ? (
+                  <><EyeInvisibleOutlined /> Unpublish</>
+                ) : (
+                  <><GlobalOutlined /> Publish</>
+                )}
+              </Button>
+            )}
+            {template.averageRating != null && (
+              <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-full px-2.5 py-1">
+                <div className="flex items-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className="text-xs">
+                      {template.averageRating! >= star ? (
+                        <StarFilled className="text-amber-500" />
+                      ) : template.averageRating! >= star - 0.5 ? (
+                        <StarFilled className="text-amber-300" />
+                      ) : (
+                        <StarOutlined className="text-gray-300 dark:text-gray-600" />
+                      )}
+                    </span>
+                  ))}
+                </div>
+                <span className="average-rating font-bold text-sm text-amber-700 dark:text-amber-400">
+                  {template.averageRating.toFixed(1)}
+                </span>
+                <span className="total-review text-xs text-muted-foreground">
+                  ({template.totalReview})
+                </span>
               </div>
             )}
           </>

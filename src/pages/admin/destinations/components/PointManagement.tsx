@@ -1,181 +1,338 @@
-import { Plus, Pin, Upload, Eye, MapPin, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import { Destination, Point } from '../types';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+  Plus,
+  Pin,
+  Upload,
+  MapPin,
+  Edit,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Destination, Point } from "../types";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PointManagementProps {
-    currentDestination: Destination | null;
-    loading: boolean;
-    onAddPoint: () => void;
-    onEditPoint: (point: Point) => void;
-    onDeletePoint: (id: string) => void;
-    onFocus: (lat: number, lng: number) => void;
-    onViewPoint: (point: Point) => void;
-    onImportPoints: (file: File) => void;
+  currentDestination: Destination | null;
+  allPoints: Point[];
+  loading: boolean;
+  onAddPoint: () => void;
+  onEditPoint: (point: Point) => void;
+  onDeletePoint: (id: string) => void;
+  onFocus: (lat: number, lng: number) => void;
+  onImportPoints: (file: File) => void;
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    totalElements: number;
+    onPageChange: (page: number) => void;
+    onPageSizeChange: (size: number) => void;
+  };
+  searchText: string;
+  onSearchChange: (text: string) => void;
+  destinations: Destination[];
+  onDestinationChange: (dest: Destination | null) => void;
 }
 
 export function PointManagement({
-    currentDestination,
-    loading,
-    onAddPoint,
-    onEditPoint,
-    onDeletePoint,
-    onFocus,
-    onViewPoint,
-    onImportPoints,
+  currentDestination,
+  allPoints,
+  loading,
+  onAddPoint,
+  onEditPoint,
+  onDeletePoint,
+  onFocus,
+  onImportPoints,
+  pagination,
+  searchText,
+  onSearchChange,
+  destinations,
+  onDestinationChange,
 }: PointManagementProps) {
-    if (!currentDestination) {
-        return (
-            <Card className="shadow-sm border-none bg-emerald-50/10 h-full flex flex-col items-center justify-center py-20 text-center space-y-4">
-                <div className="p-4 bg-muted rounded-full">
-                    <Pin className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <div className="space-y-1">
-                    <p className="text-sm font-medium">Select a Destination</p>
-                    <p className="text-xs text-muted-foreground max-w-[200px]">
-                        Click the <span className="font-bold text-indigo-500">Points</span> button on a destination to manage its points of interest
-                    </p>
-                </div>
-            </Card>
-        );
-    }
+  const totalPages = Math.ceil(pagination.totalElements / pagination.pageSize);
 
-    return (
-        <Card className="shadow-sm border-none bg-emerald-50/20 h-full">
-            <CardHeader className="pb-3 px-4">
-                <CardTitle className="text-lg flex items-center gap-2">
-                    <Pin className="w-5 h-5 text-emerald-600" />
-                    POI Management
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 pb-4">
-                <div className="bg-white p-4 rounded-xl border border-emerald-100 border-l-4 border-l-emerald-500 shadow-sm mb-4">
-                    <h3 className="font-bold text-base text-gray-800 leading-tight">{currentDestination.name}</h3>
-                    <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-1 truncate">
-                        <MapPin className="w-3 h-3" />
-                        {currentDestination.address}
-                    </p>
+  return (
+    <Card className="shadow-lg border-none bg-white/80 backdrop-blur-sm h-full flex flex-col overflow-hidden ring-1 ring-black/5">
+      <CardHeader className="pb-3 px-6 pt-6 shrink-0 bg-gray-50/50 border-b">
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            <CardTitle className="text-xl font-bold flex items-center gap-3 text-gray-800">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Pin className="w-5 h-5 text-primary" />
+              </div>
+              Management POIs
+            </CardTitle>
+            <div className="flex items-center gap-3">
+              <label className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-50 hover:border-primary/30 cursor-pointer text-sm font-semibold transition-all">
+                <Upload className="w-4 h-4 text-primary" />
+                <span>Import</span>
+                <input
+                  type="file"
+                  accept=".xlsx, .xls"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) onImportPoints(file);
+                  }}
+                />
+              </label>
+              <Button className="shadow-md shadow-primary/20 font-bold" onClick={onAddPoint}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Point
+              </Button>
+            </div>
+          </div>
 
-                    <Separator className="my-3 opacity-50" />
-
-                    <div className="flex justify-between items-center">
-                        <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 text-[10px] uppercase font-bold tracking-wider border-none">
-                            {currentDestination.points?.length || 0} POIs
-                        </Badge>
-                        <div className="flex items-center gap-2">
-                            <label className="flex items-center gap-1.5 px-2 py-1 bg-white border rounded hover:bg-gray-50 cursor-pointer text-[11px] font-medium transition-colors">
-                                <Upload className="w-3.5 h-3.5" />
-                                <span>Import</span>
-                                <input
-                                    type="file"
-                                    accept=".xlsx, .xls"
-                                    className="hidden"
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) onImportPoints(file);
-                                    }}
-                                />
-                            </label>
-                            <Button size="sm" variant="outline" className="h-7 text-[11px] bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100" onClick={onAddPoint}>
-                                <Plus className="w-3.5 h-3.5 mr-1" />
-                                Add Point
-                            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search by name or description..."
+                value={searchText}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-10 bg-white"
+              />
+            </div>
+            <Select
+              value={currentDestination?.id || "all"}
+              onValueChange={(val) => {
+                if (val === "all") onDestinationChange(null);
+                else {
+                  const dest = destinations.find((d) => d.id === val);
+                  if (dest) onDestinationChange(dest);
+                }
+              }}
+            >
+              <SelectTrigger className="bg-white">
+                <SelectValue placeholder="All Destinations" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Destinations</SelectItem>
+                {destinations.map((d) => (
+                  <SelectItem key={d.id} value={d.id}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="px-6 py-6 flex-1 overflow-hidden flex flex-col">
+        <div className="rounded-xl border bg-white flex-1 overflow-hidden flex flex-col shadow-sm">
+          <div className="overflow-y-auto custom-scrollbar flex-1">
+            <Table className="text-sm">
+              <TableHeader className="bg-gray-50/50 sticky top-0 z-10">
+                <TableRow className="hover:bg-transparent">
+                  <TableHead className="w-[60px] text-center font-bold">#</TableHead>
+                  <TableHead className="min-w-[150px] font-bold">Point Name</TableHead>
+                  <TableHead className="font-bold">Destination</TableHead>
+                  <TableHead className="font-bold">Category</TableHead>
+                  <TableHead className="w-[80px] text-center font-bold">Time</TableHead>
+                  <TableHead className="w-[140px] text-right font-bold pr-6">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-40 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+                        <p className="text-muted-foreground font-medium">Synchronizing points...</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : allPoints.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-60 text-center">
+                      <div className="flex flex-col items-center justify-center space-y-3 py-10 opacity-60">
+                        <div className="p-4 bg-gray-100 rounded-full">
+                          <Pin className="w-10 h-10 text-gray-400" />
                         </div>
-                    </div>
-                </div>
-
-                <div className="rounded-lg border bg-white/50 overflow-hidden">
-                    <Table className="text-xs">
-                        <TableHeader className="bg-muted/30">
-                            <TableRow>
-                                <TableHead className="w-[40px] px-2 text-center">#</TableHead>
-                                <TableHead className="px-2">Name</TableHead>
-                                <TableHead className="w-[60px] px-2 text-center">Time</TableHead>
-                                <TableHead className="w-[100px] px-2 text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center">Loading points...</TableCell>
-                                </TableRow>
-                            ) : !currentDestination.points || currentDestination.points.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground italic">No points added yet</TableCell>
-                                </TableRow>
+                        <div className="space-y-1">
+                          <p className="text-base font-semibold text-gray-600">
+                            No points discovered yet
+                          </p>
+                          <p className="text-sm text-gray-400">
+                            Add your first point of interest to start managing.
+                          </p>
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  allPoints.map((p, idx) => (
+                    <TableRow
+                      key={p.id}
+                      className="hover:bg-primary/5 transition-colors duration-200 group"
+                    >
+                      <TableCell className="text-center font-bold text-gray-400 group-hover:text-primary transition-colors">
+                        {pagination.currentPage * pagination.pageSize + idx + 1}
+                      </TableCell>
+                      <TableCell className="font-bold text-gray-800">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg overflow-hidden border bg-gray-100 shrink-0">
+                            {p.thumbnailUrl ? (
+                              <img
+                                src={p.thumbnailUrl}
+                                className="w-full h-full object-cover"
+                                alt=""
+                              />
                             ) : (
-                                currentDestination.points.map((p) => (
-                                    <TableRow key={p.id} className="hover:bg-emerald-50/50">
-                                        <TableCell className="text-center font-bold text-muted-foreground px-2">{p.orderIndex}</TableCell>
-                                        <TableCell className="font-medium px-2">
-                                            <div className="truncate max-w-[120px]" title={p.name}>{p.name}</div>
-                                        </TableCell>
-                                        <TableCell className="text-center px-2">{p.estTimeSpent ? `${p.estTimeSpent}m` : '-'}</TableCell>
-                                        <TableCell className="text-right px-2">
-                                            <div className="flex items-center justify-end">
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onViewPoint(p)}>
-                                                                <Eye className="h-3.5 h-3.5 text-blue-500" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="text-[10px]">View</TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onFocus(p.latitude, p.longitude)}>
-                                                                <MapPin className="h-3.5 h-3.5 text-emerald-500" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="text-[10px]">Focus</TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEditPoint(p)}>
-                                                                <Edit className="h-3.5 h-3.5 text-amber-500" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="text-[10px]">Edit</TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onDeletePoint(p.id)}>
-                                                                <Trash2 className="h-3.5 h-3.5 text-destructive" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent className="text-[10px]">Delete</TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Pin className="w-4 h-4 text-gray-300" />
+                              </div>
                             )}
-                        </TableBody>
-                    </Table>
-                </div>
-            </CardContent>
-        </Card>
-    );
+                          </div>
+                          <div className="truncate max-w-[180px]" title={p.name}>
+                            {p.name}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium text-muted-foreground italic">
+                        {(p as any).destinationName || (p as any).attractionName || "Unassigned"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="bg-gray-100 text-gray-600 border-none font-medium px-2 py-0"
+                        >
+                          {p.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="font-mono text-gray-500">
+                          {p.estTimeSpent ? `${p.estTimeSpent}m` : "-"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right pr-6">
+                        <div className="flex items-center justify-end gap-1">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 hover:bg-emerald-50 hover:text-emerald-600 rounded-full"
+                                  onClick={() => onFocus(p.latitude, p.longitude)}
+                                >
+                                  <MapPin className="h-4.5 w-4.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Locate</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 hover:bg-amber-50 hover:text-amber-600 rounded-full"
+                                  onClick={() => onEditPoint(p)}
+                                >
+                                  <Edit className="h-4.5 w-4.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Edit</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-9 w-9 hover:bg-destructive/10 hover:text-destructive rounded-full"
+                                  onClick={() => onDeletePoint(p.id)}
+                                >
+                                  <Trash2 className="h-4.5 w-4.5" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Remove</TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          {/* Pagination Controls */}
+          <div className="bg-gray-50/50 border-t px-6 py-3 flex items-center justify-between">
+            <div className="text-xs text-slate-500 font-medium">
+              Showing <span className="font-bold text-slate-700">{allPoints.length}</span> of{" "}
+              <span className="font-bold text-slate-700">{pagination.totalElements}</span> results
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={pagination.currentPage === 0}
+                onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  // Simple logic for showing pages near current
+                  let pageNum = i;
+                  if (totalPages > 5 && pagination.currentPage > 2) {
+                    pageNum = pagination.currentPage - 2 + i;
+                    if (pageNum >= totalPages) pageNum = totalPages - 5 + i;
+                  }
+                  if (pageNum < 0) return null;
+
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={pagination.currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => pagination.onPageChange(pageNum)}
+                      className="h-8 w-8 p-0 text-xs font-bold"
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={pagination.currentPage === totalPages - 1 || totalPages === 0}
+                onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
+                className="h-8 w-8 p-0"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }

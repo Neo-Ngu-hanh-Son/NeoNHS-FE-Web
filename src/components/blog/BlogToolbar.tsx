@@ -2,7 +2,13 @@ import { Search, Plus, Download } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { BlogStatus } from "@/types/blog";
 import { BLOG_STATUS_OPTIONS, BLOG_SORT_OPTIONS } from "@/constants/blog";
@@ -19,7 +25,6 @@ interface BlogToolbarProps {
 }
 
 export function BlogToolbar({
-  onSearchApply,
   statusFilter,
   onStatusChange,
   sortIndex,

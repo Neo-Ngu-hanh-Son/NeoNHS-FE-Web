@@ -24,7 +24,16 @@ export function AdminLayout() {
         { label: "Revenue", path: "/admin/revenue", icon: "architecture" },
       ],
     },
-    { label: "Destination", path: "/admin/destinations", icon: "map" },
+    {
+      label: "Destination",
+      path: "destinations-composite",
+      icon: "map",
+      children: [
+        { label: "Manage Destinations", path: "/admin/destinations", icon: "map" },
+        { label: "Checkin Points", path: "/admin/checkin-points", icon: "place_item" },
+      ],
+    },
+
     { label: "Users", path: "/admin/users", icon: "group" },
     {
       label: "Vendors",
