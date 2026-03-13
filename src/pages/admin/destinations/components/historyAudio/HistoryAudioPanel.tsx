@@ -13,8 +13,10 @@ import { useAudioWordTracking } from "@/pages/admin/historyAudio/hooks/useAudioW
 import { useHistoryAudios } from "../../../../../hooks/historyAudio/useHistoryAudios";
 import type { CreateHistoryAudioRequest } from "@/types/historyAudio";
 import HistoryAudioDeleteDialog from "../../../historyAudio/components/HistoryAudioDeleteDialog.tsx";
-import HistoryAudiosTable from "./HistoryAudiosTable.tsx";
-import HistoryTextSection from "./HistoryTextSection";
+// import HistoryAudiosTable from "./HistoryAudiosTable.tsx";
+// import HistoryTextSection from "./HistoryTextSection";
+import HistoryAudiosTable from "@/pages/admin/historyAudio/components/HistoryAudiosTable.tsx";
+import HistoryTextSection from "@/pages/admin/historyAudio/components/HistoryTextSection.tsx";
 import AudioSourceSection from "../../../historyAudio/components/AudioSourceSection.tsx";
 import TimingSection from "./TimingSection";
 import { useNavigate } from "react-router-dom";

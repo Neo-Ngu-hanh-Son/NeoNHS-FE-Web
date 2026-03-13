@@ -6,7 +6,11 @@ import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 
-export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogDetailsSection({
+  form,
+}: {
+  form: UseFormReturn<z.infer<typeof formSchema>>;
+}) {
   return (
     <Card>
       <CardHeader>
@@ -17,7 +21,7 @@ export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.inf
           <Controller
             name={"title"}
             control={form.control}
-            render={({ field, fieldState, formState }) => {
+            render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="title">Title</FieldLabel>
@@ -41,7 +45,7 @@ export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.inf
           <Controller
             name={"summary"}
             control={form.control}
-            render={({ field, fieldState, formState }) => {
+            render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="summary">Summary</FieldLabel>
