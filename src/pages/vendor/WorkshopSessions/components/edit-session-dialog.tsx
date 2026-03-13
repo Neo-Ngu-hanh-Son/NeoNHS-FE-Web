@@ -10,8 +10,10 @@ import { WorkshopSessionFormData, UpdateWorkshopSessionRequest, WorkshopSessionR
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertTriangle } from "lucide-react"
 import { WorkshopSessionService } from "@/services/api/workshopSessionService"
+import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { WorkshopTemplateResponse } from "../../WorkshopTemplates/types"
 import { notification } from "antd"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface EditSessionDialogProps {
   open: boolean
@@ -27,7 +29,15 @@ export function EditSessionDialog({
   onSuccess,
 }: EditSessionDialogProps) {
   const [submitting, setSubmitting] = useState(false)
-  
+  const [template, setTemplate] = useState<WorkshopTemplateResponse | undefined>()
+
+  useEffect(() => {
+    if (!session) return
+    WorkshopTemplateService.getTemplateById(session.workshopTemplate.id)
+      .then(setTemplate)
+      .catch(() => setTemplate(undefined))
+  }, [session?.workshopTemplate.id])
+
   if (!session) return null
 
   // Can only edit SCHEDULED sessions
@@ -96,6 +106,7 @@ export function EditSessionDialog({
             onCancel={handleCancel}
             isEditing={true}
             submitting={submitting}
+            template={template}
           />
         )}
       </DialogContent>

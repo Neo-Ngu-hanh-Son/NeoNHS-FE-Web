@@ -1,0 +1,251 @@
+import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, RotateCcw, Ban, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+    Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import {
+    AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+    AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { useVouchers } from '@/hooks/voucher';
+import { adminVoucherService } from '@/services/api/voucherService';
+import type { AdminVoucherQueryParams } from '@/services/api/voucherService';
+import type { VoucherResponse } from '@/types/voucher';
+import { message } from 'antd';
+import {
+    voucherStatusBadgeStyles, voucherStatusLabels,
+    voucherTypeBadgeStyles, voucherTypeLabels,
+} from './constants';
+
+function formatDate(dateStr: string) {
+    try {
+        return new Date(dateStr).toLocaleDateString('vi-VN');
+    } catch {
+        return dateStr;
+    }
+}
+
+function formatDateTime(dateStr: string | null | undefined) {
+    if (!dateStr) return '—';
+    try {
+        return new Date(dateStr).toLocaleString('vi-VN');
+    } catch {
+        return dateStr;
+    }
+}
+
+export default function DeletedVouchersPage() {
+    const navigate = useNavigate();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+
+    const [restoreTarget, setRestoreTarget] = useState<VoucherResponse | null>(null);
+    const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<VoucherResponse | null>(null);
+    const [processing, setProcessing] = useState(false);
+
+    const queryParams = useMemo<AdminVoucherQueryParams>(() => ({
+        page: currentPage - 1,
+        size: pageSize,
+        deleted: true,
+    }), [currentPage, pageSize]);
+
+    const { vouchers, loading, totalElements, fetchVouchers } = useVouchers(queryParams);
+    const totalPages = Math.ceil(totalElements / pageSize) || 1;
+
+    const handleRestore = async () => {
+        if (!restoreTarget) return;
+        setProcessing(true);
+        try {
+            const response = await adminVoucherService.restore(restoreTarget.id);
+            if (response.success) {
+                message.success('Voucher restored successfully');
+                fetchVouchers();
+            } else {
+                message.error(response.message || 'Failed to restore voucher');
+            }
+        } catch (error: any) {
+            message.error(error?.response?.data?.message || 'Failed to restore voucher');
+        } finally {
+            setProcessing(false);
+            setRestoreTarget(null);
+        }
+    };
+
+    const handlePermanentDelete = async () => {
+        if (!permanentDeleteTarget) return;
+        setProcessing(true);
+        try {
+            const response = await adminVoucherService.permanentDelete(permanentDeleteTarget.id);
+            if (response.success) {
+                message.success('Voucher permanently deleted');
+                fetchVouchers();
+            } else {
+                message.error(response.message || 'Failed to permanently delete voucher');
+            }
+        } catch (error: any) {
+            message.error(error?.response?.data?.message || 'Failed to permanently delete voucher');
+        } finally {
+            setProcessing(false);
+            setPermanentDeleteTarget(null);
+        }
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+                    <div className="flex items-center gap-3">
+                        <Button variant="ghost" size="icon" onClick={() => navigate('/admin/vouchers')}>
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <div>
+                            <CardTitle className="text-xl">Deleted Vouchers</CardTitle>
+                            <CardDescription>Manage soft-deleted vouchers — restore or permanently remove them</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="flex items-center justify-center py-20">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+                        </div>
+                    ) : vouchers.length === 0 ? (
+                        <div className="text-center py-20 text-muted-foreground">
+                            <p className="text-lg font-medium">No deleted vouchers</p>
+                            <p className="text-sm mt-1">All vouchers are active. Nothing in the trash.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Code</TableHead>
+                                            <TableHead>Type</TableHead>
+                                            <TableHead>Status</TableHead>
+                                            <TableHead>Period</TableHead>
+                                            <TableHead>Deleted At</TableHead>
+                                            <TableHead className="text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {vouchers.map((v) => (
+                                            <TableRow key={v.id}>
+                                                <TableCell>
+                                                    <span className="font-mono font-semibold">{v.code}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className={voucherTypeBadgeStyles[v.voucherType]}>
+                                                        {voucherTypeLabels[v.voucherType]}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Badge variant="outline" className={voucherStatusBadgeStyles[v.status]}>
+                                                        {voucherStatusLabels[v.status]}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
+                                                    <div>{formatDate(v.startDate)}</div>
+                                                    <div>{formatDate(v.endDate)}</div>
+                                                </TableCell>
+                                                <TableCell className="text-xs text-muted-foreground">
+                                                    {formatDateTime(v.deletedAt)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Restore" onClick={() => setRestoreTarget(v)}>
+                                                            <RotateCcw className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Permanent Delete" onClick={() => setPermanentDeleteTarget(v)}>
+                                                            <Ban className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <span>Rows per page</span>
+                                    <Select value={String(pageSize)} onValueChange={(val) => { setPageSize(Number(val)); setCurrentPage(1); }}>
+                                        <SelectTrigger className="h-8 w-[70px]">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {[5, 10, 20, 50].map(s => (
+                                                <SelectItem key={s} value={String(s)}>{s}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <span>Total: {totalElements}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                                        Previous
+                                    </Button>
+                                    <span className="text-sm">Page {currentPage} / {totalPages}</span>
+                                    <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* Restore Dialog */}
+            <AlertDialog open={!!restoreTarget} onOpenChange={(open) => !open && setRestoreTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Restore Voucher</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Are you sure you want to restore voucher "<strong className="font-mono">{restoreTarget?.code}</strong>"? It will be set back to ACTIVE status.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRestore} disabled={processing}>
+                            {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+                            Restore
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Permanent Delete Dialog */}
+            <AlertDialog open={!!permanentDeleteTarget} onOpenChange={(open) => !open && setPermanentDeleteTarget(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Permanently Delete Voucher</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This will <strong>permanently</strong> delete voucher "<strong className="font-mono">{permanentDeleteTarget?.code}</strong>". This action <strong>cannot be undone</strong>.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handlePermanentDelete}
+                            disabled={processing}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            Permanently Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </div>
+    );
+}

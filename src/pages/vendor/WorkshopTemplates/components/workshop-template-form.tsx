@@ -161,7 +161,7 @@ export function WorkshopTemplateForm({
                       type="number" 
                       step="1000"
                       min="1000"
-                      placeholder="450000" 
+                      placeholder="1000" 
                       {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
                     />

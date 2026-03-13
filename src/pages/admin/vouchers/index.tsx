@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2, Tag, Clock, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
@@ -11,7 +11,7 @@ import { VoucherFilters, type VoucherFiltersState } from './components/VoucherFi
 import { VoucherTable } from './components/VoucherTable';
 import { useVouchers } from '@/hooks/voucher';
 import type { AdminVoucherQueryParams } from '@/services/api/voucherService';
-import type { VoucherResponse } from '@/types/voucher';
+import type { VoucherResponse, VoucherScope } from '@/types/voucher';
 
 const initialFilters: VoucherFiltersState = {
     searchCode: '',
@@ -19,12 +19,15 @@ const initialFilters: VoucherFiltersState = {
     filterStatus: undefined,
     filterScope: undefined,
     filterProduct: undefined,
-    deleteFilter: 'active',
     startDate: '',
     endDate: '',
 };
 
-export default function AdminVouchersPage() {
+interface AdminVouchersPageProps {
+    scope?: VoucherScope;
+}
+
+export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -43,21 +46,18 @@ export default function AdminVouchersPage() {
         if (appliedFilters.searchCode.trim()) params.code = appliedFilters.searchCode.trim();
         if (appliedFilters.filterType) params.voucherType = appliedFilters.filterType;
         if (appliedFilters.filterStatus) params.status = appliedFilters.filterStatus;
-        if (appliedFilters.filterScope) params.scope = appliedFilters.filterScope;
+        
+        // Scope priority: Prop scope > Filter scope
+        const finalScope = scope || appliedFilters.filterScope;
+        if (finalScope) params.scope = finalScope;
+        
         if (appliedFilters.filterProduct) params.applicableProduct = appliedFilters.filterProduct;
         if (appliedFilters.startDate) params.startDate = appliedFilters.startDate;
         if (appliedFilters.endDate) params.endDate = appliedFilters.endDate;
-
-        if (appliedFilters.deleteFilter === 'active') {
-            params.deleted = false;
-        } else if (appliedFilters.deleteFilter === 'deleted') {
-            params.deleted = true;
-        } else {
-            params.includeDeleted = true;
-        }
+        params.deleted = false;
 
         return params;
-    }, [currentPage, pageSize, sortBy, sortDir, appliedFilters]);
+    }, [currentPage, pageSize, sortBy, sortDir, appliedFilters, scope]);
 
     const { vouchers, loading, totalElements, fetchVouchers, deleteVoucher } = useVouchers(queryParams);
 
@@ -88,18 +88,80 @@ export default function AdminVouchersPage() {
         setDeleteTarget(null);
     };
 
+    // Calculate quick stats (simplified)
+    const stats = useMemo(() => {
+        return {
+            total: totalElements,
+            active: vouchers.filter(v => v.status === 'ACTIVE').length,
+            used: vouchers.reduce((acc, v) => acc + (v.usageCount || 0), 0)
+        };
+    }, [vouchers, totalElements]);
+
     return (
-        <div className="max-w-7xl mx-auto">
-            <Card>
+        <div className="max-w-7xl mx-auto space-y-6">
+            {/* Quick Stats Header */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Total Vouchers</p>
+                                <h3 className="text-2xl font-bold">{stats.total}</h3>
+                            </div>
+                            <Tag className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Active Usage</p>
+                                <h3 className="text-2xl font-bold">{stats.used}</h3>
+                            </div>
+                            <Clock className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
+                    <CardContent className="pt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
+                                <h3 className="text-2xl font-bold">
+                                    {stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%
+                                </h3>
+                            </div>
+                            <BarChart2 className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <Card className={`overflow-hidden border-t-4 ${scope === 'PLATFORM' ? 'border-t-accent-gold' : 'border-t-primary'}`}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                     <div>
-                        <CardTitle className="text-xl">Voucher Management</CardTitle>
-                        <CardDescription>Manage all vouchers in the system</CardDescription>
+                        <CardTitle className="text-xl">
+                            {scope === 'PLATFORM' ? 'Platform Voucher Management' : 
+                             scope === 'VENDOR' ? 'Vendor Voucher Management' : 
+                             'Voucher Management'}
+                        </CardTitle>
+                        <CardDescription>
+                            {scope === 'PLATFORM' ? 'Manage official vouchers from Ngũ Hành Sơn' : 
+                             scope === 'VENDOR' ? 'Manage vouchers from partners and vendors' : 
+                             'Manage all vouchers in the system'}
+                        </CardDescription>
                     </div>
-                    <Button onClick={() => navigate('/admin/vouchers/create')}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Create Voucher
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Button variant="outline" onClick={() => navigate('/admin/vouchers/deleted')}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Deleted Vouchers
+                        </Button>
+                        <Button onClick={() => navigate('/admin/vouchers/create')}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Create Voucher
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <VoucherFilters
@@ -109,6 +171,7 @@ export default function AdminVouchersPage() {
                         onRefresh={fetchVouchers}
                         onClearFilters={handleClearFilters}
                         loading={loading}
+                        hideScope={!!scope}
                     />
 
                     <VoucherTable
@@ -121,6 +184,7 @@ export default function AdminVouchersPage() {
                         onPageChange={setCurrentPage}
                         onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
                         onDelete={(v) => setDeleteTarget(v)}
+                        scope={scope}
                     />
                 </CardContent>
             </Card>
@@ -142,6 +206,7 @@ export default function AdminVouchersPage() {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined, StarFilled, StarOutlined, GlobalOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
+import { ArrowLeftOutlined, EditOutlined, DeleteOutlined, SendOutlined, CalendarOutlined, UserOutlined, StarFilled, StarOutlined, GlobalOutlined, EyeInvisibleOutlined, PictureOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,7 +12,7 @@ import { DeleteTemplateDialog } from "./components/delete-template-dialog"
 import { SubmitApprovalDialog } from "./components/submit-approval-dialog"
 import { formatPrice, formatDuration, formatDate, formatDateTime } from "./utils/formatters"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
-import { notification } from "antd"
+import { Image as AntImage, notification, Tag } from "antd"
 
 export default function WorkshopTemplateDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -22,6 +22,11 @@ export default function WorkshopTemplateDetailPage() {
 
   const [deleteDialog, setDeleteDialog] = useState(false)
   const [submitDialog, setSubmitDialog] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | undefined>(undefined)
+
+  const displayImage = selectedImage
+    ?? template?.images.find(img => img.isThumbnail)?.imageUrl
+    ?? template?.images[0]?.imageUrl
 
   useEffect(() => {
     if (id) {
@@ -71,7 +76,6 @@ export default function WorkshopTemplateDetailPage() {
   const canEdit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
   const canDelete = template.status !== WorkshopStatus.ACTIVE
   const canSubmit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
-  const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
 
   const handleDelete = async () => {
     if (!template) return
@@ -237,29 +241,46 @@ export default function WorkshopTemplateDetailPage() {
           {/* Image Gallery */}
           {template.images.length > 0 && (
             <Card className="rounded-2xl border-[#d3e4da] dark:border-white/10 shadow-sm overflow-hidden">
-              <div className="relative">
-                <img
-                  src={thumbnail}
-                  alt={template.name}
-                  className="w-full h-[400px] object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "https://via.placeholder.com/800x400?text=No+Image"
-                  }}
-                />
-              </div>
+              <AntImage.PreviewGroup items={template.images.map(img => img.imageUrl)}>
+                <div className="relative [&>.ant-image]:w-full">
+                  <AntImage
+                    src={displayImage}
+                    alt={template.name}
+                    className="!w-full !h-[400px] object-cover"
+                    fallback="https://via.placeholder.com/800x400?text=No+Image"
+                  />
+                </div>
+              </AntImage.PreviewGroup>
               {template.images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2 p-4">
                   {template.images.map((img, idx) => (
-                    <img
+                    <div
                       key={img.id}
-                      src={img.imageUrl}
-                      alt={`Workshop image ${idx + 1}`}
-                      className={`w-full h-20 object-cover rounded-md cursor-pointer ${img.isThumbnail ? "ring-2 ring-primary" : ""
+                      className="relative cursor-pointer group"
+                      onClick={() => setSelectedImage(img.imageUrl)}
+                    >
+                      <img
+                        src={img.imageUrl}
+                        alt={`Workshop image ${idx + 1}`}
+                        className={`w-full h-20 object-cover rounded-md transition-all ${
+                          displayImage === img.imageUrl
+                            ? "ring-2 ring-primary opacity-100"
+                            : "opacity-70 group-hover:opacity-100"
                         }`}
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/200x200?text=Image"
-                      }}
-                    />
+                        onError={(e) => {
+                          e.currentTarget.src = "https://via.placeholder.com/200x200?text=Image"
+                        }}
+                      />
+                      {img.isThumbnail && (
+                        <Tag
+                          color="blue"
+                          className="!absolute top-1 left-1 !m-0 !text-[10px] !px-1 !leading-4"
+                          icon={<PictureOutlined />}
+                        >
+                          Thumbnail
+                        </Tag>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}

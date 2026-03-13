@@ -52,6 +52,7 @@ export interface VoucherResponse {
     vendorName: string | null;
     createdAt: string;
     updatedAt: string;
+    deletedAt: string | null;
 }
 
 export interface UserVoucherResponse {

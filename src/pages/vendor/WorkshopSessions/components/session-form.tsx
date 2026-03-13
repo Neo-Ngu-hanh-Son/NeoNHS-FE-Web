@@ -12,7 +12,7 @@ import { DateTimePicker } from "./date-time-picker"
 import { formatDuration } from "../../WorkshopTemplates/utils/formatters"
 import { formatPrice } from "../utils/formatters"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Info } from "lucide-react"
+import { Info, TriangleAlert } from "lucide-react"
 
 interface SessionFormProps {
   defaultValues?: WorkshopSessionResponse
@@ -21,6 +21,7 @@ interface SessionFormProps {
   onCancel: () => void
   isEditing?: boolean
   submitting?: boolean
+  template?: WorkshopTemplateResponse
 }
 
 export function SessionForm({
@@ -30,6 +31,7 @@ export function SessionForm({
   onCancel,
   isEditing = false,
   submitting = false,
+  template: externalTemplate,
 }: SessionFormProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<WorkshopTemplateResponse | undefined>()
   
@@ -84,6 +86,16 @@ export function SessionForm({
 
   const currentEnrollments = defaultValues?.currentEnrollments || 0
   const minDate = new Date() // Future dates only
+
+  const watchedPrice = form.watch("price")
+  const watchedMaxParticipants = form.watch("maxParticipants")
+
+  const activeTemplate = selectedTemplate ?? externalTemplate
+
+  const priceExceedsTemplate =
+    activeTemplate && watchedPrice != null && watchedPrice > activeTemplate.defaultPrice
+  const participantsExceedsTemplate =
+    activeTemplate && watchedMaxParticipants != null && watchedMaxParticipants > activeTemplate.maxParticipants
 
   return (
     <Form {...form}>
@@ -163,7 +175,7 @@ export function SessionForm({
                     />
                   </FormControl>
                   <FormDescription>
-                    {selectedTemplate && `Recommended: ${formatDuration(selectedTemplate.estimatedDuration)}`}
+                    {activeTemplate && `Recommended: ${formatDuration(activeTemplate.estimatedDuration)}`}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -189,15 +201,21 @@ export function SessionForm({
                       type="number"
                       step="1000"
                       min="1000"
-                      placeholder="450000"
+                      placeholder="1000"
                       {...field}
                       value={field.value || ''}
                       onChange={e => field.onChange(parseFloat(e.target.value) || undefined)}
                     />
                   </FormControl>
                   <FormDescription>
-                    {selectedTemplate && `Default: ${formatPrice(selectedTemplate.defaultPrice)}`}
+                    {activeTemplate && `Default: ${formatPrice(activeTemplate.defaultPrice)}`}
                   </FormDescription>
+                  {priceExceedsTemplate && (
+                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                      <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+                      Price exceeds template default ({formatPrice(activeTemplate!.defaultPrice)})
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -214,16 +232,22 @@ export function SessionForm({
                     <Input
                       type="number"
                       min={isEditing ? currentEnrollments : 1}
-                      placeholder="20"
+                      placeholder="1"
                       {...field}
                       value={field.value || ''}
                       onChange={e => field.onChange(parseInt(e.target.value) || undefined)}
                     />
                   </FormControl>
                   <FormDescription>
-                    {selectedTemplate && `Default: ${selectedTemplate.maxParticipants}`}
+                    {activeTemplate && `Default: ${activeTemplate.maxParticipants}`}
                     {isEditing && currentEnrollments > 0 && ` | Current enrollments: ${currentEnrollments}`}
                   </FormDescription>
+                  {participantsExceedsTemplate && (
+                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                      <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+                      Exceeds template max ({activeTemplate!.maxParticipants} participants)
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -247,7 +271,7 @@ export function SessionForm({
           <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
             Cancel
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting || priceExceedsTemplate || participantsExceedsTemplate}>
             {submitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
