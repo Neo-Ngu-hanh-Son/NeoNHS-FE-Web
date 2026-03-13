@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     Button, Table, Tag, Space, Card, Input, Select, Modal, Form,
     InputNumber, DatePicker, message, Upload,
@@ -57,6 +58,7 @@ function getDiscountDisplay(v: VoucherResponse): string {
 }
 
 export default function VouchersPage() {
+    const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
 
@@ -91,6 +93,7 @@ export default function VouchersPage() {
         if (appliedCode.trim()) params.code = appliedCode.trim();
         if (appliedType) params.voucherType = appliedType;
         if (appliedStatus) params.status = appliedStatus;
+        params.deleted = false;
         return params;
     }, [currentPage, pageSize, appliedCode, appliedType, appliedStatus]);
 
@@ -312,9 +315,9 @@ export default function VouchersPage() {
             title: 'Actions',
             key: 'action',
             render: (_: any, record: VoucherResponse) => (
-                <Space size="middle">
-                    <Button type="text" icon={<EditOutlined />} onClick={() => openEdit(record)} />
-                    <Button type="text" icon={<DeleteOutlined />} danger onClick={() => setDeleteTarget(record)} />
+                <Space size="small">
+                    <Button type="text" icon={<EditOutlined />} title="Edit" onClick={() => openEdit(record)} />
+                    <Button type="text" icon={<DeleteOutlined />} title="Delete" danger onClick={() => setDeleteTarget(record)} />
                 </Space>
             ),
         },
@@ -328,14 +331,22 @@ export default function VouchersPage() {
                     <h1 className="text-2xl font-bold">Vouchers Management</h1>
                     <p className="text-[#588d70]">Create discount codes to attract more customers</p>
                 </div>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    className="bg-primary border-0 h-11 px-6 font-medium"
-                    onClick={() => setCreateOpen(true)}
-                >
-                    Create Voucher
-                </Button>
+                <Space>
+                    <Button
+                        icon={<DeleteOutlined />}
+                        onClick={() => navigate('/vendor/vouchers/deleted')}
+                    >
+                        Deleted Vouchers
+                    </Button>
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        className="bg-primary border-0 h-11 px-6 font-medium"
+                        onClick={() => setCreateOpen(true)}
+                    >
+                        Create Voucher
+                    </Button>
+                </Space>
             </div>
 
             {/* Filters */}

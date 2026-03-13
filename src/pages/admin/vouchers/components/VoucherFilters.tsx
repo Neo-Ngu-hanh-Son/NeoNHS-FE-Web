@@ -22,7 +22,6 @@ export interface VoucherFiltersState {
     filterStatus: VoucherStatus | undefined;
     filterScope: VoucherScope | undefined;
     filterProduct: ApplicableProduct | undefined;
-    deleteFilter: 'active' | 'deleted' | 'all';
     startDate: string;
     endDate: string;
 }
@@ -34,9 +33,10 @@ interface VoucherFiltersProps {
     onRefresh: () => void;
     onClearFilters: () => void;
     loading: boolean;
+    hideScope?: boolean;
 }
 
-export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, onClearFilters, loading }: VoucherFiltersProps) {
+export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, onClearFilters, loading, hideScope }: VoucherFiltersProps) {
     const update = (partial: Partial<VoucherFiltersState>) => {
         onFiltersChange({ ...filters, ...partial });
     };
@@ -82,20 +82,22 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     </SelectContent>
                 </Select>
 
-                <Select
-                    value={filters.filterScope || '_all'}
-                    onValueChange={(val) => update({ filterScope: val === '_all' ? undefined : val as VoucherScope })}
-                >
-                    <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Scope" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="_all">All Scopes</SelectItem>
-                        {VOUCHER_SCOPE_OPTIONS.map(opt => (
-                            <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                {!hideScope && (
+                    <Select
+                        value={filters.filterScope || '_all'}
+                        onValueChange={(val) => update({ filterScope: val === '_all' ? undefined : val as VoucherScope })}
+                    >
+                        <SelectTrigger className="w-[140px]">
+                            <SelectValue placeholder="Scope" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="_all">All Scopes</SelectItem>
+                            {VOUCHER_SCOPE_OPTIONS.map(opt => (
+                                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
 
                 <Select
                     value={filters.filterProduct || '_all'}
@@ -112,19 +114,6 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     </SelectContent>
                 </Select>
 
-                <Select
-                    value={filters.deleteFilter}
-                    onValueChange={(val) => update({ deleteFilter: val as 'active' | 'deleted' | 'all' })}
-                >
-                    <SelectTrigger className="w-[130px]">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="active">Active Only</SelectItem>
-                        <SelectItem value="deleted">Deleted Only</SelectItem>
-                        <SelectItem value="all">All</SelectItem>
-                    </SelectContent>
-                </Select>
             </div>
 
             {/* Row 2: Date range + actions */}

@@ -80,14 +80,14 @@ export const DISCOUNT_TYPE_OPTIONS: { value: DiscountType; label: string }[] = [
 // --- Applicable Product ---
 
 export const applicableProductLabels: Record<ApplicableProduct, string> = {
-    ALL: 'All Products',
+    ALL: 'Universal',
     TICKET: 'Tickets',
     WORKSHOP: 'Workshops',
     EVENT_TICKET: 'Event Tickets',
 };
 
 export const APPLICABLE_PRODUCT_OPTIONS: { value: ApplicableProduct; label: string }[] = [
-    { value: 'ALL', label: 'All Products' },
+    { value: 'ALL', label: 'Universal' },
     { value: 'TICKET', label: 'Tickets' },
     { value: 'WORKSHOP', label: 'Workshops' },
     { value: 'EVENT_TICKET', label: 'Event Tickets' },
