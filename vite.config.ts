@@ -8,6 +8,18 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    dedupe: ["three"],
+  },
+  //Just for development, will be removed in production
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+    allowedHosts: ['.ngrok-free.app', '.devtunnels.ms'],
   },
 })
 

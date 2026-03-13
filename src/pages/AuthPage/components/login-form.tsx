@@ -1,83 +1,289 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { GoogleOutlined, EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons"
-import { useState } from "react"
-import { Link } from "react-router-dom"
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  LoadingOutlined,
+  UserOutlined,
+  LockOutlined,
+  MailOutlined,
+} from "@ant-design/icons";
+import { notification } from "antd";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { LoginCredentials } from "@/services/api/authService";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { useAuth } from "@/contexts/AuthContext";
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
-  const [showPassword, setShowPassword] = useState(false)
+export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
+  // Navigation is now handled by the parent LoginPage
+  const { login, loginGoogle } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [api, contextHolder] = notification.useNotification();
+
+  const [formData, setFormData] = useState<LoginCredentials>({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+    setError(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Use context login instead of direct service call
+      await login(formData);
+
+      // Delay to keep the spinner active during the "load a bit" period
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Show success notification
+      api.success({
+        message: "Login Successful",
+        description: "Welcome back! You have logged in successfully.",
+        placement: "topRight",
+        duration: 3,
+      });
+
+      // Redirection handled by LoginPage via AuthContext
+
+      // The redirection is now handled by the parent LoginPage
+      // via AuthContext's isAuthenticated state for better consistency.
+    } catch (err: any) {
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
+
+      // Show error notification
+      api.error({
+        message: "Login Failed",
+        description: errorMessage,
+        placement: "topRight",
+        duration: 4,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    setError(null);
+
+    const idToken = credentialResponse.credential;
+
+    if (!idToken) {
+      const errorMessage = "Cannot retrieve Google ID Token.";
+      setError(errorMessage);
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Use context loginGoogle
+      await loginGoogle({ idToken });
+
+      // Delay to keep the spinner active during the "load a bit" period
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Show success notification
+      api.success({
+        message: "Login Successful",
+        description: "Welcome! You have logged in with Google successfully.",
+        placement: "topRight",
+        duration: 3,
+      });
+
+      // Redirection handled by LoginPage via AuthContext
+    } catch (err: any) {
+      console.error("Backend Google Login Error:", err);
+      const errorMessage =
+        err.response?.data?.message || err.message || "Google login failed on server.";
+      setError(errorMessage);
+
+      // Show error notification
+      api.error({
+        message: "Google Login Failed",
+        description: errorMessage,
+        placement: "topRight",
+        duration: 4,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    const errorMessage = "Google Login failed connection.";
+    setError(errorMessage);
+
+    // Show error notification
+    api.error({
+      message: "Google Login Failed",
+      description: errorMessage,
+      placement: "topRight",
+      duration: 4,
+    });
+  };
+
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
-      <FieldGroup>
-        <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login</h1>
-          <h1 className="text-2xl font-bold">Welcome to Ngu Hanh Son, Da Nang</h1>
-          <p className="text-muted-foreground text-balance">
-            Start your journey now
+    <>
+      {contextHolder}
+      <div className={cn("w-full max-w-md mx-auto", className)}>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
+            <UserOutlined className="text-2xl text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-gray-500">
+            Sign in to explore <span className="text-emerald-600 font-semibold">Ngu Hanh Son</span>
           </p>
         </div>
-        <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
-          <Input id="email" type="email" placeholder="User name or email" required />
-        </Field>
-        <Field>
-          <div className="flex items-center">
-            <FieldLabel htmlFor="password">Password</FieldLabel>
-          </div>
-          <div className="relative">
-            <Input
-              id="password"
-              type={showPassword ? "text" : "password"}
-              required
-              placeholder="Password"
-              className="pr-10"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-            >
-              {showPassword ? <EyeOutlined /> : <EyeInvisibleOutlined />}
-            </button>
-          </div>
-          <div className="flex items-end">
-            <Link
-              to="/forgot-password"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
-        </Field>
-        <Field>
-          <Button type="submit">Login</Button>
-        </Field>
-        <FieldSeparator>Or continue with</FieldSeparator>
-        <Field>
-          <Button variant="outline" type="button">
-            <GoogleOutlined className="text-sm" />
-            Login with Google
-          </Button>
 
-          <FieldDescription className="text-center">
+        {/* Error Alert */}
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-start gap-3">
+            <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5">
+              <span className="text-red-600 text-xs font-bold">!</span>
+            </div>
+            <p className="text-sm text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} {...props}>
+          <div className="space-y-5">
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label
+                htmlFor="email"
+                className="text-sm font-medium text-gray-700 flex items-center gap-2"
+              >
+                <MailOutlined className="text-gray-400" />
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={formData.email}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="h-12 px-4 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+              />
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="text-sm font-medium text-gray-700 flex items-center gap-2"
+                >
+                  <LockOutlined className="text-gray-400" />
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                  className="h-12 px-4 pr-12 rounded-xl border-gray-200 focus:border-emerald-500 focus:ring-emerald-500/20 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                  disabled={isLoading}
+                >
+                  {showPassword ? (
+                    <EyeOutlined className="text-lg" />
+                  ) : (
+                    <EyeInvisibleOutlined className="text-lg" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Login Button */}
+            <div className="flex justify-center">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <LoadingOutlined className="animate-spin" />
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-gray-500">or continue with</span>
+            </div>
+          </div>
+
+          {/* Google Login */}
+          <div className="flex justify-center w-full">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+              theme="outline"
+              size="large"
+              shape="pill"
+              width="100%"
+              text="signin_with"
+            />
+          </div>
+
+          {/* Sign Up Link */}
+          <p className="mt-8 text-center text-gray-600">
             Don&apos;t have an account?{" "}
-            <a href="#" className="underline underline-offset-4">
-              Sign up
-            </a>
-          </FieldDescription>
-        </Field>
-      </FieldGroup>
-    </form>
-  )
+            <Link
+              to="/register"
+              className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+            >
+              Create account
+            </Link>
+          </p>
+        </form>
+      </div>
+    </>
+  );
 }

@@ -1,51 +1,105 @@
+@import "leaflet/dist/leaflet.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Backgrounds */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 9%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 189 50% 51%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 189 50% 51%;
-    --radius: 0.5rem;
+    --popover-foreground: 0 0% 9%;
+
+    /* Primary – Green #1f6f43 */
+    --primary: 145 56% 28%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary & Muted */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 9%;
+
+    /* Borders & Inputs – #d9d9d9 */
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+
+    /* Others */
+    --destructive: 0 88% 59%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 138 68% 45%;
+    --radius: 0.65rem;
+
+    /* Charts */
+    --chart-1: 142 72% 29%;
+    --chart-2: 164 71% 45%;
+    --chart-3: 30 79% 54%;
+    --chart-4: 271 91% 65%;
+    --chart-5: 340 82% 52%;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 0 0% 9%;
+    --sidebar-primary: 140 70% 33%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 96%;
+    --sidebar-accent-foreground: 0 0% 9%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 138 68% 45%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 189 50% 51%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 189 50% 51%;
+    /* Backgrounds */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary – Green #23c05a */
+    --primary: 140 69% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary & Muted */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Borders & Inputs – #333333 */
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+
+    /* Others */
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --ring: 140 69% 45%;
+    --radius: 0.65rem;
+
+    /* Charts */
+    --chart-1: 143 68% 50%;
+    --chart-2: 160 60% 50%;
+    --chart-3: 33 85% 59%;
+    --chart-4: 267 100% 70%;
+    --chart-5: 346 85% 60%;
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 7%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 140 73% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 140 69% 45%;
   }
 
   * {
@@ -53,7 +107,7 @@
   }
 
   html {
-    font-family: theme('fontFamily.sans');
+    font-family: theme("fontFamily.sans");
   }
 
   body {
@@ -66,4 +120,41 @@ html,
 body,
 #root {
   height: 100%;
+}
+
+/* Add this to your CSS file */
+
+.psv-container {
+  /* Main Colors */
+  --psv-background: hsl(var(--background));
+  --psv-text-color: hsl(var(--foreground));
+  --psv-primary-color: hsl(var(--primary));
+
+  /* Navbar / Buttons */
+  --psv-navbar-background: hsla(var(--card), 0.8);
+  --psv-navbar-text: hsl(var(--foreground));
+  --psv-buttons-color: hsl(var(--foreground));
+  --psv-buttons-hover-background: hsla(var(--primary), 0.2);
+  --psv-buttons-hover-color: hsl(var(--primary));
+
+  /* Panels & Modals (Settings, Info, etc.) */
+  --psv-panel-background: hsl(var(--card));
+  --psv-panel-text: hsl(var(--foreground));
+  --psv-panel-border: hsl(var(--border));
+
+  /* Tooltips & Markers */
+  --psv-tooltip-background: hsl(var(--popover));
+  --psv-tooltip-text: hsl(var(--popover-foreground));
+  --psv-tooltip-border-radius: var(--radius);
+
+  /* UI Shapes */
+  --psv-border-radius: var(--radius);
+
+  /* Force Navbar text and icons to white for the dark glass effect */
+  --psv-navbar-text: #ffffff;
+  --psv-buttons-color: #ffffff;
+
+  /* Force Panel text to white */
+  --psv-panel-text: #ffffff;
+  --psv-panel-border: rgba(255, 255, 255, 0.1);
 }
