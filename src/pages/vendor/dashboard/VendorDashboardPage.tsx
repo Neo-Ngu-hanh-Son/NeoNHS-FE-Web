@@ -702,5 +702,3 @@ export default function VendorDashboardPage() {
         </div>
     );
 }
-
-//ALO
