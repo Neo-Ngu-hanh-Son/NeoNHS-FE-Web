@@ -47,6 +47,8 @@ export interface VendorVoucherQueryParams {
     code?: string;
     startDate?: string;
     endDate?: string;
+    deleted?: boolean;
+    includeDeleted?: boolean;
 }
 
 export interface TouristVoucherQueryParams {
@@ -100,6 +102,14 @@ export const adminVoucherService = {
     delete: async (id: string): Promise<ApiResponse<void>> => {
         return apiClient.delete<ApiResponse<void>>(`/admin/vouchers/${id}`);
     },
+
+    permanentDelete: async (id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/admin/vouchers/${id}/permanent`);
+    },
+
+    restore: async (id: string): Promise<ApiResponse<VoucherResponse>> => {
+        return apiClient.patch<ApiResponse<VoucherResponse>>(`/admin/vouchers/${id}/restore`);
+    },
 };
 
 // --- Vendor Voucher Service ---
@@ -120,6 +130,14 @@ export const vendorVoucherService = {
 
     delete: async (id: string): Promise<ApiResponse<void>> => {
         return apiClient.delete<ApiResponse<void>>(`/vendor/vouchers/${id}`);
+    },
+
+    permanentDelete: async (id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/vendor/vouchers/${id}/permanent`);
+    },
+
+    restore: async (id: string): Promise<ApiResponse<VoucherResponse>> => {
+        return apiClient.patch<ApiResponse<VoucherResponse>>(`/vendor/vouchers/${id}/restore`);
     },
 };
 

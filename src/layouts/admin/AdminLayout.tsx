@@ -36,7 +36,15 @@ export function AdminLayout() {
       ],
     },
     { label: "Tickets", path: "/admin/tickets", icon: "confirmation_number" },
-    { label: "Vouchers", path: "/admin/vouchers", icon: "loyalty" },
+    {
+      label: "Vouchers",
+      path: "vouchers-composite",
+      icon: "loyalty",
+      children: [
+        { label: "Platform Vouchers", path: "/admin/vouchers/platform", icon: "loyalty" },
+        { label: "Vendor Vouchers", path: "/admin/vouchers/vendor", icon: "loyalty" },
+      ],
+    },
     { label: "Reports", path: "/admin/reports", icon: "analytics" },
     {
       label: "Manage Events",

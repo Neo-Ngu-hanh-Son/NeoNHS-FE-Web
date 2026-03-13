@@ -24,9 +24,12 @@ import AdminVendorsPage from "@/pages/admin/vendors/AdminVendorsPage";
 import AdminVendorTemplatesPage from "@/pages/admin/vendorTemplate/AdminVendorTemplatesPage";
 import AdminTicketsPage from "@/pages/admin/tickets/AdminTicketsPage";
 import AdminVouchersPage from "@/pages/admin/vouchers";
+import PlatformVouchersPage from "@/pages/admin/vouchers/PlatformVouchers";
+import VendorVouchersPage from "@/pages/admin/vouchers/VendorVouchers";
 import VoucherCreatePage from "@/pages/admin/vouchers/create";
 import VoucherDetailPage from "@/pages/admin/vouchers/detail";
 import VoucherEditPage from "@/pages/admin/vouchers/edit";
+import AdminDeletedVouchersPage from "@/pages/admin/vouchers/deleted";
 import AdminReportsPage from "@/pages/admin/reports/AdminReportsPage";
 import AdminReportDetailPage from "@/pages/admin/reports/AdminReportDetailPage";
 import AdminEventsPage from "@/pages/admin/events";
@@ -44,6 +47,7 @@ import WorkshopSessionsPage from "@/pages/vendor/WorkshopSessions/WorkshopSessio
 import WorkshopCalendarPage from "@/pages/vendor/WorkshopCalendar/CalendarPage.tsx";
 import TicketVerificationPage from "@/pages/vendor/Tickets/TicketVerificationPage";
 import VouchersPage from "@/pages/vendor/Vouchers/VouchersPage";
+import VendorDeletedVouchersPage from "@/pages/vendor/Vouchers/DeletedVouchersPage";
 import BlogCategoryPage from "@/pages/admin/blog-categories/BlogCategoryPage";
 import SimpleMapView from "@/pages/SimpleMapView";
 import ManageBlogPage from "@/pages/admin/blog/ManageBlogPage";
@@ -115,6 +119,7 @@ export const router = createBrowserRouter([
           { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
           { path: "ticket-verification", element: <TicketVerificationPage /> },
           { path: "vouchers", element: <VouchersPage /> },
+          { path: "vouchers/deleted", element: <VendorDeletedVouchersPage /> },
         ],
       },
       {
@@ -128,7 +133,10 @@ export const router = createBrowserRouter([
           { path: "vendors/templates", element: <AdminVendorTemplatesPage /> },
           { path: "tickets", element: <AdminTicketsPage /> },
           { path: "vouchers", element: <AdminVouchersPage /> },
+          { path: "vouchers/platform", element: <PlatformVouchersPage /> },
+          { path: "vouchers/vendor", element: <VendorVouchersPage /> },
           { path: "vouchers/create", element: <VoucherCreatePage /> },
+          { path: "vouchers/deleted", element: <AdminDeletedVouchersPage /> },
           { path: "vouchers/:id", element: <VoucherDetailPage /> },
           { path: "vouchers/:id/edit", element: <VoucherEditPage /> },
           { path: "reports", element: <AdminReportsPage /> },

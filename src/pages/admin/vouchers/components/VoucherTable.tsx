@@ -29,6 +29,7 @@ interface VoucherTableProps {
     onPageChange: (page: number) => void;
     onPageSizeChange: (size: number) => void;
     onDelete: (voucher: VoucherResponse) => void;
+    scope?: string;
 }
 
 function formatDate(dateStr: string) {
@@ -69,7 +70,7 @@ function SortHeader({ field, label, sortBy, sortDir, onSort }: {
 
 export function VoucherTable({
     vouchers, loading, pagination, sortBy, sortDir,
-    onSort, onPageChange, onPageSizeChange, onDelete,
+    onSort, onPageChange, onPageSizeChange, onDelete, scope,
 }: VoucherTableProps) {
     const navigate = useNavigate();
     const totalPages = Math.ceil(pagination.total / pagination.pageSize) || 1;
@@ -103,6 +104,7 @@ export function VoucherTable({
                             <TableHead>Usage</TableHead>
                             <SortHeader field="startDate" label="Period" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                             <TableHead>Status</TableHead>
+                            {scope !== 'PLATFORM' && <TableHead>Vendor</TableHead>}
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -137,15 +139,20 @@ export function VoucherTable({
                                         {voucherStatusLabels[v.status]}
                                     </Badge>
                                 </TableCell>
-                                <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                                    {scope !== 'PLATFORM' && (
+                                        <TableCell className="font-medium text-primary">
+                                            {v.vendorName || 'N/A'}
+                                        </TableCell>
+                                    )}
+                                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                                     <div className="flex items-center justify-end gap-1">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/vouchers/${v.id}`)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="View" onClick={() => navigate(`/admin/vouchers/${v.id}`)}>
                                             <Eye className="h-4 w-4" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(`/admin/vouchers/${v.id}/edit`)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => navigate(`/admin/vouchers/${v.id}/edit`)}>
                                             <Pencil className="h-4 w-4" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => onDelete(v)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Delete" onClick={() => onDelete(v)}>
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
