@@ -22,7 +22,7 @@ export interface WorkshopSessionResponse {
   status: SessionStatus
   createdAt: string
   updatedAt: string
-  
+
   // Template details (embedded)
   workshopTemplate: {
     id: string
@@ -36,7 +36,7 @@ export interface WorkshopSessionResponse {
     images: WorkshopImageResponse[]
     tags: WTagResponse[]
   }
-  
+
   // Vendor details
   vendor: {
     id: string
@@ -113,19 +113,19 @@ export interface ApiResponse<T> {
 export const workshopSessionSchema = z.object({
   workshopTemplateId: z.string()
     .min(1, "Please select a workshop template"),
-  
+
   startTime: z.date({
-    required_error: "Start time is required",
+    error: "Start time is required",
   }),
-  
+
   endTime: z.date({
-    required_error: "End time is required",
+    error: "End time is required",
   }),
-  
+
   price: z.number()
     .positive("Price must be greater than 0")
     .optional(),
-  
+
   maxParticipants: z.number()
     .positive("Must be at least 1")
     .int("Must be a whole number")

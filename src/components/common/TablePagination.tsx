@@ -1,14 +1,18 @@
-import React from 'react'
-import { Button } from '../ui/button'
+import { Button } from "../ui/button";
 
 type Props = {
   currentPage: number;
   totalElements: number;
   pageSize: number;
   onPageChange: (page: number) => void;
-}
+};
 
-export default function TablePagination({ currentPage, totalElements, pageSize, onPageChange }: Props) {
+export default function TablePagination({
+  currentPage,
+  totalElements,
+  pageSize,
+  onPageChange,
+}: Props) {
   const totalPages = Math.ceil(totalElements / pageSize);
   const rangeStart = currentPage * pageSize + 1;
   const rangeEnd = Math.min((currentPage + 1) * pageSize, totalElements);
@@ -30,14 +34,10 @@ export default function TablePagination({ currentPage, totalElements, pageSize, 
         {Array.from({ length: totalPages }).map((_, i) => (
           <Button
             key={i}
-            variant={i === currentPage ? 'default' : 'outline'}
+            variant={i === currentPage ? "default" : "outline"}
             size="sm"
             onClick={() => onPageChange(i)}
-            className={
-              i === currentPage
-                ? 'h-8 w-8 p-0 text-xs'
-                : 'h-8 w-8 p-0 text-xs'
-            }
+            className={i === currentPage ? "h-8 w-8 p-0 text-xs" : "h-8 w-8 p-0 text-xs"}
           >
             {i + 1}
           </Button>
@@ -53,5 +53,5 @@ export default function TablePagination({ currentPage, totalElements, pageSize, 
         </Button>
       </div>
     </div>
-  )
+  );
 }

@@ -76,7 +76,7 @@ function EditorPlaceholder() {
 import CharacterCountPlugin from "./editor/CharacterCountPlugin";
 
 const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
-  ({ onSave, onImageUpload, initialEditorState, onChange }, ref) => {
+  ({ onSave, onImageUpload, initialEditorState }, ref) => {
     const editorRef = useRef<LexicalEditor | null>(null);
     const [open, setOpen] = useState(false);
     const initialConfig = {

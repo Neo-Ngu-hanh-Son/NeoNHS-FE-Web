@@ -4,8 +4,7 @@ import { uploadImageToCloudinary } from "@/utils/cloudinary";
 import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
 import { Ref } from "react";
 import { message, notification } from "antd";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "@/components/blog/type";
 
@@ -16,8 +15,12 @@ interface BlogEditorSectionProps {
   editorPrestateJSON?: string;
 }
 
-export default function BlogEditorSection({ editorRef, handleSave, form, editorPrestateJSON }: BlogEditorSectionProps) {
-  const [api, contextHolder] = notification.useNotification();
+export default function BlogEditorSection({
+  editorRef,
+  handleSave,
+  editorPrestateJSON,
+}: BlogEditorSectionProps) {
+  const [contextHolder] = notification.useNotification();
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {

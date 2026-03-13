@@ -21,8 +21,8 @@ export interface AdminWorkshopTemplateResponse extends WorkshopTemplateResponse 
   vendorPhone?: string
   vendorVerified?: boolean
   submittedAt?: string
-  reviewedBy?: string
-  reviewedAt?: string
+  reviewedBy: string
+  reviewedAt: string
 }
 
 // Filter options for admin template list
