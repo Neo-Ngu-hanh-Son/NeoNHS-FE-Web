@@ -24,7 +24,9 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    /** Consistent casing in file names (blog != Blog) */
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src"]
 }
