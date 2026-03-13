@@ -25,7 +25,6 @@ import {
 } from "@lexical/table";
 import { calculateZoomLevel, mergeRegister } from "@lexical/utils";
 import { $getNearestNodeFromDOMNode, isHTMLElement, SKIP_SCROLL_INTO_VIEW_TAG } from "lexical";
-import * as React from "react";
 import {
   CSSProperties,
   PointerEventHandler,

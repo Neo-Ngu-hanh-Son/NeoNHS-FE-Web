@@ -4,14 +4,13 @@ import type {
   DOMExportOutput,
   EditorConfig,
   LexicalEditor,
-  LexicalNode,
   NodeKey,
   SerializedLexicalNode,
   Spread,
 } from "lexical";
 
-import { $applyNodeReplacement, $getNodeByKey, DecoratorNode } from "lexical";
-import React, { Suspense, useCallback, useRef, useState } from "react";
+import { $applyNodeReplacement, DecoratorNode } from "lexical";
+import React from "react";
 import ImageComponent from "./ImageComponent";
 // --- Serialized shape ---
 export type SerializedImageNode = Spread<
@@ -45,7 +44,6 @@ export class ImageNode extends DecoratorNode<React.JSX.Element> {
   __maxWidth: number;
   __style?: React.CSSProperties;
 
-
   static getType(): string {
     return "image";
   }
@@ -63,7 +61,15 @@ export class ImageNode extends DecoratorNode<React.JSX.Element> {
   }
 
   static clone(node: ImageNode): ImageNode {
-    return new ImageNode(node.__src, node.__altText, node.__maxWidth, node.__width, node.__height, node.__style, node.getKey());
+    return new ImageNode(
+      node.__src,
+      node.__altText,
+      node.__maxWidth,
+      node.__width,
+      node.__height,
+      node.__style,
+      node.getKey(),
+    );
   }
 
   static importDOM(): DOMConversionMap | null {
@@ -159,7 +165,6 @@ export class ImageNode extends DecoratorNode<React.JSX.Element> {
     const writable = this.getWritable();
     writable.__style = style;
   }
-
 
   decorate(_editor: LexicalEditor): React.JSX.Element {
     return (

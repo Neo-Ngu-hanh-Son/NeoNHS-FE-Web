@@ -8,11 +8,9 @@ import {
   CAN_UNDO_COMMAND,
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
-  REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
-  UNDO_COMMAND,
 } from "lexical";
-import { $isHeadingNode, $createHeadingNode, HeadingTagType } from "@lexical/rich-text";
+import { $isHeadingNode, $createHeadingNode } from "@lexical/rich-text";
 import {
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
@@ -40,15 +38,12 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  Code,
   ImagePlus,
   Italic,
   Link,
-  Redo,
   Strikethrough,
   Table,
   Underline,
-  Undo,
 } from "lucide-react";
 
 // --- Main Toolbar Plugin ---
@@ -60,17 +55,17 @@ type ToolbarPluginProps = {
 
 export default function ToolbarPlugin({
   onImageUpload,
-  modalOpen,
+  // modalOpen,
   setModalOpen,
 }: ToolbarPluginProps) {
   const [editor] = useLexicalComposerContext();
-  const [canUndo, setCanUndo] = useState(false);
-  const [canRedo, setCanRedo] = useState(false);
+  const [, setCanUndo] = useState(false);
+  const [, setCanRedo] = useState(false);
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
-  const [isCode, setIsCode] = useState(false);
+  const [, setIsCode] = useState(false);
   const [blockType, setBlockType] = useState<BlockType>("paragraph");
   const [align, setAlign] = useState<"left" | "center" | "right" | "justify">("left");
 
@@ -103,9 +98,9 @@ export default function ToolbarPlugin({
         anchorNode.getKey() === "root"
           ? anchorNode
           : $findMatchingParent(anchorNode, (e) => {
-            const parent = e.getParent();
-            return parent !== null && parent.getKey() === "root";
-          });
+              const parent = e.getParent();
+              return parent !== null && parent.getKey() === "root";
+            });
 
       if (element === null) {
         element = anchorNode.getTopLevelElementOrThrow();

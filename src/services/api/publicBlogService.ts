@@ -37,6 +37,14 @@ export const publicBlogService = {
     const url = queryString ? `${BASE}?${queryString}` : BASE;
     return await apiClient.get<ApiResponse<BlogPageResponse>>(url);
   },
-};
+
+  async incrementBlogView(id: string): Promise<void> {
+    try {
+      await apiClient.post<null>(`${BASE}/${id}/view`, {});
+    } catch (error) {
+      console.error("Failed to track blog view", error);
+    }
+  },
+}
 
 export default publicBlogService;

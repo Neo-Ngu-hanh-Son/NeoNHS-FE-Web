@@ -218,7 +218,7 @@ export function useAdminDestinations() {
                         const pointData: PointRequest = {
                             name: row.name || row.Name,
                             description: row.description || row.Description,
-                            history: row.history || row.History || '',
+                            // history: row.history || row.History || '',
                             latitude: Number(Number(row.latitude || row.Latitude).toFixed(6)),
                             longitude: Number(Number(row.longitude || row.Longitude).toFixed(6)),
                             orderIndex: Number(row.orderIndex || row.OrderIndex || row.order || 1),

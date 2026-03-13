@@ -1,10 +1,3 @@
-/**
- * BlogDetailsPage (Visitor / Public)
- *
- * Route: /blog/:id
- * Displays a single published blog post for public visitors.
- */
-
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useBlogDetail } from "@/hooks/blog/useBlogDetail";
 import BlogHeader from "@/components/blog/visitor/BlogHeader";
 import BlogContent from "@/components/blog/visitor/BlogContent";
+import { useEffect } from "react";
 
 /* ---------- Skeleton loading state ---------- */
 function BlogDetailSkeleton() {
@@ -60,7 +54,17 @@ function BlogDetailError({ message, onBack }: { message: string; onBack: () => v
 export default function BlogDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { blog, loading, error } = useBlogDetail(id);
+  const { blog, loading, error, incrementBlogView } = useBlogDetail(id);
+
+  useEffect(() => {
+    if (!id) return;
+    const timer = setTimeout(() => {
+      incrementBlogView(id);
+      console.log(`[BlogDetailsPage] Incremented view count for blog ID: ${id}`);
+    }, 30000);
+
+    return () => clearTimeout(timer);
+  }, [id]);
 
   const goBack = () => navigate("/blog");
 

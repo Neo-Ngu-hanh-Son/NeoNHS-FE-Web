@@ -62,7 +62,6 @@ export function BlogTable({
   onView,
   onEdit,
   onDelete,
-  currentStatusFilter,
 }: BlogTableProps) {
   const totalPages = Math.ceil(totalElements / pageSize);
   const rangeStart = currentPage * pageSize + 1;
