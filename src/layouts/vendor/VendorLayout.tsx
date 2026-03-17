@@ -30,7 +30,7 @@ export function VendorLayout() {
         { label: 'Profile', path: '/vendor/profile', icon: 'person' },
         { label: 'Workshop Templates', path: '/vendor/workshop-templates', icon: 'architecture' },
         { label: 'Workshop Sessions', path: '/vendor/workshop-sessions', icon: 'event_repeat' },
-        { label: 'Workshop Calendar', path: '/vendor/workshop-calendar', icon: 'calendar_month' },
+        // { label: 'Workshop Calendar', path: '/vendor/workshop-calendar', icon: 'calendar_month' },
         { label: 'Ticket Verification', path: '/vendor/ticket-verification', icon: 'qr_code_scanner' },
         { label: 'Vouchers', path: '/vendor/vouchers', icon: 'loyalty' },
     ];
