@@ -19,7 +19,7 @@ export default defineConfig({
         secure: false,
       },
     },
-    allowedHosts: ['.ngrok-free.app', '.devtunnels.ms'],
+    allowedHosts: ['.ngrok-free.app', '.ngrok-free.dev', '.devtunnels.ms'],
   },
 })
 

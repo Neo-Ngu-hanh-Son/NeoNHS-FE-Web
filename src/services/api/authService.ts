@@ -78,6 +78,10 @@ export const authService = {
     return await apiClient.post('/auth/reset-password', { email, newPassword, confirmPassword });
   },
 
+  setPassword: async (email: string, token: string, password: string) => {
+    return await apiClient.post('/auth/set-password', { email, token, newPassword: password, confirmPassword: password });
+  },
+
   // Registration OTP methods
   verifyRegistrationOTP: async (email: string, otp: string) => {
     return await apiClient.post('/auth/verify', { email, otp });
