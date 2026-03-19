@@ -8,6 +8,7 @@ import Forgot from "@/pages/AuthPage/Forgot";
 import Register from "@/pages/AuthPage/Register";
 import VerifyOTP from "@/pages/AuthPage/VerifyOTP";
 import NewPassword from "@/pages/AuthPage/NewPassword";
+import SetPasswordPage from "@/pages/AuthPage/SetPasswordPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import UserProfilePage from "@/pages/ProfilePage/UserProfilePage";
@@ -75,6 +76,7 @@ export const router = createBrowserRouter([
           { path: "/register", element: <Register /> },
           { path: "/verify-otp", element: <VerifyOTP /> },
           { path: "/new-password", element: <NewPassword /> },
+          { path: "/set-password", element: <SetPasswordPage /> },
           { path: "/simple-map", element: <SimpleMapView /> },
           { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
           {

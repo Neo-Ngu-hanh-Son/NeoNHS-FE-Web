@@ -11,6 +11,7 @@ import { VendorCard } from './components/vendor-card'
 import { BanVendorDialog, UnbanVendorDialog } from './components/ban-vendor-dialog'
 import { VendorDetailDialog } from './components/vendor-detail-dialog'
 import { CreateVendorDialog } from './components/create-vendor-dialog'
+import { EditVendorDialog } from './components/edit-vendor-dialog'
 import { ArrowUp, ArrowDown } from 'lucide-react'
 
 export default function AdminVendorsPage() {
@@ -50,6 +51,10 @@ export default function AdminVendorsPage() {
   })
 
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialog, setEditDialog] = useState<{ open: boolean; vendor: VendorProfileResponse | null }>({
+    open: false,
+    vendor: null,
+  })
 
   const fetchVendors = useCallback(async () => {
     setLoading(true)
@@ -93,18 +98,19 @@ export default function AdminVendorsPage() {
   }, [fetchVendors])
 
   // Fetch stats separately
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const statsData = await adminVendorService.getVendorStats()
-        setStats(statsData)
-      } catch (error) {
-        console.error('Failed to fetch vendor stats:', error)
-        // Fallback to basic total if endpoint fails
-      }
+  const fetchStats = useCallback(async () => {
+    try {
+      const statsData = await adminVendorService.getVendorStats()
+      setStats(statsData)
+    } catch (error) {
+      console.error('Failed to fetch vendor stats:', error)
+      // Fallback to basic total if endpoint fails
     }
-    fetchStats()
   }, [])
+
+  useEffect(() => {
+    fetchStats()
+  }, [fetchStats])
 
   // Debounced search could be added here for better performance
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,12 +126,33 @@ export default function AdminVendorsPage() {
   }
 
   const handleEdit = (id: string) => {
-    // TODO: Open edit vendor modal
-    console.log('Edit vendor:', id)
-    notification.info({
-      message: 'Edit Vendor',
-      description: 'Vendor edit form will be implemented',
-    })
+    const vendor = vendors.find(v => v.id === id)
+    if (vendor) {
+      setEditDialog({ open: true, vendor })
+    }
+  }
+
+  const handleEditSuccess = async (id: string, data: any) => {
+    try {
+      await adminVendorService.updateVendor(id, data)
+      notification.success({
+        message: 'Success',
+        description: 'Vendor account updated successfully.',
+      })
+      fetchVendors()
+      fetchStats()
+
+      // Update detail dialog vendor if it's open
+      if (detailDialog.open && detailDialog.vendor && detailDialog.vendor.id === id) {
+        setDetailDialog(prev => ({ ...prev, vendor: { ...prev.vendor!, ...data } }))
+      }
+    } catch (error) {
+      notification.error({
+        message: 'Error',
+        description: 'Failed to update vendor account.',
+      })
+      throw error // Re-throw to keep dialog open/handle in component
+    }
   }
 
   const handleBanClick = (vendor: VendorProfileResponse) => {
@@ -142,6 +169,7 @@ export default function AdminVendorsPage() {
           description: `${banDialog.vendor.businessName} has been banned.`,
         })
         fetchVendors()
+        fetchStats()
       } catch (error) {
         notification.error({
           message: 'Error',
@@ -165,6 +193,7 @@ export default function AdminVendorsPage() {
           description: `${unbanDialog.vendor.businessName} has been unbanned.`,
         })
         fetchVendors()
+        fetchStats()
       } catch (error) {
         notification.error({
           message: 'Error',
@@ -182,6 +211,7 @@ export default function AdminVendorsPage() {
         description: `${vendor.businessName} has been verified.`,
       })
       fetchVendors()
+      fetchStats()
     } catch (error) {
       notification.error({
         message: 'Error',
@@ -202,6 +232,7 @@ export default function AdminVendorsPage() {
         description: 'Vendor account created successfully.',
       })
       fetchVendors()
+      fetchStats()
     } catch (error) {
       notification.error({
         message: 'Error',
@@ -452,6 +483,13 @@ export default function AdminVendorsPage() {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
         onSuccess={handleCreateSuccess}
+      />
+
+      <EditVendorDialog
+        open={editDialog.open}
+        onOpenChange={(open) => setEditDialog(prev => ({ ...prev, open }))}
+        vendor={editDialog.vendor}
+        onSuccess={handleEditSuccess}
       />
     </div>
   )
