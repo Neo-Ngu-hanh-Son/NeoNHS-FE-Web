@@ -26,6 +26,7 @@
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "@ant-design/charts": "^2.6.7",
     "@ant-design/icons": "^6.1.0",
     "@elevenlabs/elevenlabs-js": "^2.37.0",
     "@fontsource/roboto": "^5.2.9",
