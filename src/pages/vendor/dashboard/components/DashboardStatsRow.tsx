@@ -1,17 +1,35 @@
-import { Col } from 'antd'; // Import Col từ antd
+import { Col } from 'antd';
 import { Briefcase, CalendarCheck, DollarSign, Ticket } from 'lucide-react';
 import { StatCard } from './StatCard';
+import type { DashboardStats } from '../types';
 
-export function DashboardStatsRow() {
+interface DashboardStatsRowProps {
+    stats: DashboardStats | null;
+}
+
+export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
+    const revenue = stats?.revenue;
+    const workshops = stats?.workshops;
+    const bookings = stats?.bookings;
+    const vouchers = stats?.vouchers;
+
+    const formatCurrency = (value?: number, currency?: string) => {
+        if (value == null) return '--';
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currency ?? 'USD',
+            maximumFractionDigits: 0,
+        }).format(value);
+    };
+
     return (
         <>
-            {/* Mỗi thẻ chiếm 6/24 (tương đương 1/4 chiều rộng) trên màn hình lớn */}
             <Col xs={24} sm={12} md={6}>
                 <StatCard
                     title="Revenue"
-                    value="$45,280"
+                    value={formatCurrency(revenue?.value, revenue?.currency)}
                     icon={DollarSign}
-                    trend={{ value: 12.5, isPositive: true }}
+                    trend={revenue ? { value: revenue.trendPercent, isPositive: revenue.trendDirection === 'up' } : undefined}
                     iconBg="bg-gradient-to-br from-emerald-500 to-green-600"
                 />
             </Col>
@@ -19,9 +37,9 @@ export function DashboardStatsRow() {
             <Col xs={24} sm={12} md={6}>
                 <StatCard
                     title="Workshops"
-                    value="28"
+                    value={workshops?.value?.toString() ?? '--'}
                     icon={Briefcase}
-                    trend={{ value: 4.2, isPositive: true }}
+                    trend={workshops ? { value: workshops.trendPercent, isPositive: workshops.trendDirection === 'up' } : undefined}
                     iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
                 />
             </Col>
@@ -29,9 +47,9 @@ export function DashboardStatsRow() {
             <Col xs={24} sm={12} md={6}>
                 <StatCard
                     title="Bookings"
-                    value="156"
+                    value={bookings?.value?.toString() ?? '--'}
                     icon={CalendarCheck}
-                    trend={{ value: 8.1, isPositive: true }}
+                    trend={bookings ? { value: bookings.trendPercent, isPositive: bookings.trendDirection === 'up' } : undefined}
                     iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
                 />
             </Col>
@@ -39,9 +57,9 @@ export function DashboardStatsRow() {
             <Col xs={24} sm={12} md={6}>
                 <StatCard
                     title="Vouchers"
-                    value="42"
+                    value={vouchers?.value?.toString() ?? '--'}
                     icon={Ticket}
-                    trend={{ value: 2.3, isPositive: false }}
+                    trend={vouchers ? { value: vouchers.trendPercent, isPositive: vouchers.trendDirection === 'up' } : undefined}
                     iconBg="bg-gradient-to-br from-purple-500 to-violet-600"
                 />
             </Col>
