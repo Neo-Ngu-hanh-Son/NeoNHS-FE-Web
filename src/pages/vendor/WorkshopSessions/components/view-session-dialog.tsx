@@ -4,12 +4,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { WorkshopSessionResponse } from "../types"
+import { Button } from "@/components/ui/button"
+import { WorkshopSessionResponse, SessionStatus } from "../types"
 import { SessionStatusBadge } from "./session-status-badge"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
-import { Calendar, Clock, Users, DollarSign, User, Mail } from "lucide-react"
+import { Calendar, Clock, Users, DollarSign, User, Mail, Play, CheckCircle, XCircle } from "lucide-react"
 import { 
   formatFullDateTime, 
   formatTimeRange, 
@@ -24,12 +25,18 @@ interface ViewSessionDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   session: WorkshopSessionResponse | null
+  onStart?: (session: WorkshopSessionResponse) => void
+  onComplete?: (session: WorkshopSessionResponse) => void
+  onCancel?: (session: WorkshopSessionResponse) => void
 }
 
 export function ViewSessionDialog({
   open,
   onOpenChange,
   session,
+  onStart,
+  onComplete,
+  onCancel,
 }: ViewSessionDialogProps) {
   
   if (!session) return null
@@ -204,6 +211,42 @@ export function ViewSessionDialog({
                     ({session.workshopTemplate.totalReview} reviews)
                   </span>
                 </div>
+              </div>
+            </>
+          )}
+
+          {/* Status Action Buttons */}
+          {(session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING) && (
+            <>
+              <Separator />
+              <div className="flex gap-3 justify-end">
+                {session.status === SessionStatus.SCHEDULED && onStart && (
+                  <Button
+                    onClick={() => { onStart(session); onOpenChange(false) }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Start Session
+                  </Button>
+                )}
+                {session.status === SessionStatus.ONGOING && onComplete && (
+                  <Button
+                    onClick={() => { onComplete(session); onOpenChange(false) }}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Complete Session
+                  </Button>
+                )}
+                {onCancel && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => { onCancel(session); onOpenChange(false) }}
+                  >
+                    <XCircle className="w-4 h-4 mr-2" />
+                    Cancel Session
+                  </Button>
+                )}
               </div>
             </>
           )}

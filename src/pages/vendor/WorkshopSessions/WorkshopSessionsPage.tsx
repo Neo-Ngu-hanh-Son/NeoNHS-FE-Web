@@ -150,6 +150,42 @@ export default function WorkshopSessionsPage() {
     }
   }
 
+  const handleStartSession = async (session: WorkshopSessionResponse) => {
+    try {
+      await WorkshopSessionService.updateSessionStatus(session.id, 'ONGOING')
+      setSessions(prev => prev.map(s =>
+        s.id === session.id ? { ...s, status: SessionStatus.ONGOING } : s
+      ))
+      notification.success({
+        message: 'Session Started',
+        description: `"${session.workshopTemplate.name}" is now ongoing.`,
+      })
+    } catch (error: any) {
+      notification.error({
+        message: 'Failed to Start Session',
+        description: error.message || 'Please try again.',
+      })
+    }
+  }
+
+  const handleCompleteSession = async (session: WorkshopSessionResponse) => {
+    try {
+      await WorkshopSessionService.updateSessionStatus(session.id, 'COMPLETED')
+      setSessions(prev => prev.map(s =>
+        s.id === session.id ? { ...s, status: SessionStatus.COMPLETED } : s
+      ))
+      notification.success({
+        message: 'Session Completed',
+        description: `"${session.workshopTemplate.name}" has been marked as completed.`,
+      })
+    } catch (error: any) {
+      notification.error({
+        message: 'Failed to Complete Session',
+        description: error.message || 'Please try again.',
+      })
+    }
+  }
+
   const handleCreateSession = (date?: Date) => {
     setPreselectedDate(date)
     setCreateDialog(true)
@@ -278,8 +314,18 @@ export default function WorkshopSessionsPage() {
                           : undefined
                       }
                       onCancel={
-                        session.status === SessionStatus.SCHEDULED && session.currentEnrollments > 0
+                        session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING
                           ? () => handleCancelClick(session)
+                          : undefined
+                      }
+                      onStart={
+                        session.status === SessionStatus.SCHEDULED
+                          ? () => handleStartSession(session)
+                          : undefined
+                      }
+                      onComplete={
+                        session.status === SessionStatus.ONGOING
+                          ? () => handleCompleteSession(session)
                           : undefined
                       }
                     />
@@ -341,6 +387,9 @@ export default function WorkshopSessionsPage() {
         open={viewDialog.open}
         onOpenChange={(open) => setViewDialog({ open, session: null })}
         session={viewDialog.session}
+        onStart={handleStartSession}
+        onComplete={handleCompleteSession}
+        onCancel={handleCancelClick}
       />
 
       <CancelSessionDialog

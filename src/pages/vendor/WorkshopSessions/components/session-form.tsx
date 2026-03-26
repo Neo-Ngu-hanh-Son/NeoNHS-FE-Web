@@ -45,13 +45,17 @@ export function SessionForm({
           price: defaultValues.price,
           maxParticipants: defaultValues.maxParticipants,
         }
-      : {
-          workshopTemplateId: "",
-          startTime: preselectedDate || new Date(),
-          endTime: preselectedDate ? new Date(preselectedDate.getTime() + 60 * 60 * 1000) : new Date(), // +1 hour default
-          price: undefined,
-          maxParticipants: undefined,
-        },
+      : (() => {
+          const start = preselectedDate || new Date(Date.now() + 60 * 60 * 1000);
+          const end = new Date(start.getTime() + 60 * 60 * 1000);
+          return {
+            workshopTemplateId: "",
+            startTime: start,
+            endTime: end,
+            price: undefined,
+            maxParticipants: undefined,
+          };
+        })(),
   })
 
   // Auto-calculate end time when template is selected or start time changes
