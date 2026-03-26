@@ -80,9 +80,9 @@ export default function WorkshopSessionsPage() {
       filtered = filtered.filter(s => s.status === statusFilter)
     }
 
-    // Sort by start time (upcoming first)
-    filtered = [...filtered].sort((a, b) => 
-      new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+    // Sort by start time (newest first)
+    filtered = [...filtered].sort((a, b) =>
+      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
     )
 
     return filtered
