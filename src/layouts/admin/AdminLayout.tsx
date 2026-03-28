@@ -74,6 +74,7 @@ export function AdminLayout() {
         { label: "Blog", path: "/admin/blog", icon: "post" },
       ],
     },
+    { label: "Messages", path: "/admin/messages", icon: "chat" },
   ];
 
   // Helper to get breadcrumb from path
