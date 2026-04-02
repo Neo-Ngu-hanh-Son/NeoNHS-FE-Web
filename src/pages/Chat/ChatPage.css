@@ -1,0 +1,38 @@
+/* Chat page specific custom styles that go beyond utility classes */
+
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(16, 25, 20, 0.1);
+  border-radius: 10px;
+}
+
+.dark .chat-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(16, 25, 20, 0.2);
+}
+
+.dark .chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Subtle background pattern for chat area mimicking standard messaging apps */
+.chat-bg {
+  background-color: rgba(246, 248, 247, 0.5);
+  background-image: radial-gradient(rgba(88, 141, 112, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .chat-bg {
+  background-color: rgba(0, 0, 0, 0.2);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}

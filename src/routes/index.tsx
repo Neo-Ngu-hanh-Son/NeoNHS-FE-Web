@@ -63,6 +63,7 @@ import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorP
 import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 import ManageHistoryAudioPage from "@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx";
 import AdminCheckinPointsPage from "@/pages/admin/checkin-points/AdminCheckinPointsPage";
+import ChatPage from "@/pages/Chat/ChatPage";
 
 export const router = createBrowserRouter([
   {
@@ -121,6 +122,7 @@ export const router = createBrowserRouter([
           { path: "workshop-templates/:id/edit", element: <WorkshopTemplateEditPage /> },
           { path: "workshop-sessions", element: <WorkshopSessionsPage /> },
           { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
+          { path: "messages", element: <ChatPage /> },
           { path: "ticket-verification", element: <TicketVerificationPage /> },
           { path: "vouchers", element: <VouchersPage /> },
           { path: "vouchers/deleted", element: <VendorDeletedVouchersPage /> },
@@ -164,6 +166,7 @@ export const router = createBrowserRouter([
             path: "places/:pointId/checkin-points/:checkinPointId/panorama/edit",
             element: <AdminPanoramaEditorPage />,
           },
+          { path: "messages", element: <ChatPage /> },
         ],
       },
     ],
