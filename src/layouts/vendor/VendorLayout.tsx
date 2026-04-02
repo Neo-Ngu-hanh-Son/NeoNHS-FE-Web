@@ -30,7 +30,7 @@ export function VendorLayout() {
         { label: 'Profile', path: '/vendor/profile', icon: 'person' },
         { label: 'Workshop Templates', path: '/vendor/workshop-templates', icon: 'architecture' },
         { label: 'Workshop Sessions', path: '/vendor/workshop-sessions', icon: 'event_repeat' },
-        { label: 'Workshop Calendar', path: '/vendor/workshop-calendar', icon: 'calendar_month' },
+        { label: "Messages", path: "/vendor/messages", icon: "chat" },
         { label: 'Ticket Verification', path: '/vendor/ticket-verification', icon: 'qr_code_scanner' },
         { label: 'Vouchers', path: '/vendor/vouchers', icon: 'loyalty' },
     ];
@@ -41,7 +41,7 @@ export function VendorLayout() {
     // Helper to get breadcrumb from path
     const getBreadcrumb = () => {
         const path = location.pathname;
-        
+
         // Workshop Templates routes
         if (path.startsWith('/vendor/workshop-templates')) {
             if (path === '/vendor/workshop-templates') {
@@ -53,7 +53,7 @@ export function VendorLayout() {
                     title: 'Workshop Templates'
                 };
             }
-            
+
             if (path === '/vendor/workshop-templates/new') {
                 return {
                     items: [
@@ -64,13 +64,13 @@ export function VendorLayout() {
                     title: 'Create New Template'
                 };
             }
-            
+
             // Detail or Edit page - get template name
             const templateId = params.id;
             if (templateId) {
                 const template = mockWorkshopTemplates.find(t => t.id === templateId);
                 const templateName = template ? template.name : 'Template Details';
-                
+
                 if (path.includes('/edit')) {
                     return {
                         items: [
@@ -82,7 +82,7 @@ export function VendorLayout() {
                         title: `Edit ${templateName}`
                     };
                 }
-                
+
                 return {
                     items: [
                         { label: 'Vendor', path: '/vendor/dashboard' },
@@ -93,7 +93,7 @@ export function VendorLayout() {
                 };
             }
         }
-        
+
         // Default navigation items
         const item = navItems.find(i => i.path === path);
         if (item) {
@@ -105,7 +105,7 @@ export function VendorLayout() {
                 title: item.label
             };
         }
-        
+
         return {
             items: [
                 { label: 'Vendor', path: '/vendor/dashboard' },

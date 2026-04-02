@@ -104,12 +104,6 @@ const RevenuePage: React.FC = () => {
 
     const columns: ColumnsType<Transaction> = [
         {
-            title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
-            render: (text) => <span className="font-medium text-xs truncate max-w-[120px] inline-block">{new Date(text).toLocaleString()}</span>,
-        },
-        {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
@@ -164,6 +158,12 @@ const RevenuePage: React.FC = () => {
                 );
             },
         },
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
+            render: (text) => <span className="font-medium text-xs truncate max-w-[120px] inline-block">{new Date(text).toLocaleString()}</span>,
+        }
     ];
 
     if (loading && !data) {

@@ -12,21 +12,23 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { createVendorSchema, CreateVendorFormData } from "../types"
-import { useState } from "react"
+import { updateVendorSchema, UpdateVendorFormData, VendorProfileResponse } from "../types"
+import { useState, useEffect } from "react"
 import { Loader2 } from "lucide-react"
 
-interface CreateVendorDialogProps {
+interface EditVendorDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    onSuccess: (data: CreateVendorFormData) => Promise<void>
+    vendor: VendorProfileResponse | null
+    onSuccess: (id: string, data: UpdateVendorFormData) => Promise<void>
 }
 
-export function CreateVendorDialog({
+export function EditVendorDialog({
     open,
     onOpenChange,
+    vendor,
     onSuccess,
-}: CreateVendorDialogProps) {
+}: EditVendorDialogProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const {
@@ -34,20 +36,42 @@ export function CreateVendorDialog({
         handleSubmit,
         reset,
         formState: { errors },
-    } = useForm<CreateVendorFormData>({
-        resolver: zodResolver(createVendorSchema),
+    } = useForm<UpdateVendorFormData>({
+        resolver: zodResolver(updateVendorSchema),
         defaultValues: {
-            email: "",
             fullname: "",
+            phoneNumber: "",
             businessName: "",
+            description: "",
+            address: "",
+            taxCode: "",
+            bankName: "",
+            bankAccountNumber: "",
+            bankAccountName: "",
         }
     })
 
-    const onSubmit = async (data: CreateVendorFormData) => {
+    useEffect(() => {
+        if (vendor && open) {
+            reset({
+                fullname: vendor.fullname || "",
+                phoneNumber: vendor.phoneNumber || "",
+                businessName: vendor.businessName || "",
+                description: vendor.description || "",
+                address: vendor.address || "",
+                taxCode: vendor.taxCode || "",
+                bankName: vendor.bankName || "",
+                bankAccountNumber: vendor.bankAccountNumber || "",
+                bankAccountName: vendor.bankAccountName || "",
+            })
+        }
+    }, [vendor, open, reset])
+
+    const onSubmit = async (data: UpdateVendorFormData) => {
+        if (!vendor) return
         setIsSubmitting(true)
         try {
-            await onSuccess(data)
-            reset()
+            await onSuccess(vendor.id, data)
             onOpenChange(false)
         } finally {
             setIsSubmitting(false)
@@ -58,9 +82,9 @@ export function CreateVendorDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Create New Vendor Account</DialogTitle>
+                    <DialogTitle>Edit Vendor Profile</DialogTitle>
                     <DialogDescription>
-                        Register a new vendor and their business profile. A secure setup link will be sent to their email to set their password.
+                        Update existing vendor and their business profile.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -68,24 +92,12 @@ export function CreateVendorDialog({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Account Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Account Information</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Vendor Contact</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="edit-fullname">Vendor Full Name <span className="text-red-500">*</span></Label>
                                 <Input
-                                    id="email"
-                                    type="email"
-                                    placeholder="vendor@example.com"
-                                    {...register("email")}
-                                    className={errors.email ? "border-red-500" : ""}
-                                />
-                                {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="fullname">Vendor Full Name <span className="text-red-500">*</span></Label>
-                                <Input
-                                    id="fullname"
+                                    id="edit-fullname"
                                     placeholder="e.g. John Doe"
                                     {...register("fullname")}
                                     className={errors.fullname ? "border-red-500" : ""}
@@ -94,9 +106,9 @@ export function CreateVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="phoneNumber">Phone Number</Label>
+                                <Label htmlFor="edit-phoneNumber">Phone Number</Label>
                                 <Input
-                                    id="phoneNumber"
+                                    id="edit-phoneNumber"
                                     placeholder="e.g. 0905123456"
                                     {...register("phoneNumber")}
                                 />
@@ -108,9 +120,9 @@ export function CreateVendorDialog({
                             <h3 className="font-semibold text-sm border-b pb-1">Business Profile</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="businessName">Business Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="edit-businessName">Business Name <span className="text-red-500">*</span></Label>
                                 <Input
-                                    id="businessName"
+                                    id="edit-businessName"
                                     placeholder="e.g. NeoNHS Pottery Studio"
                                     {...register("businessName")}
                                     className={errors.businessName ? "border-red-500" : ""}
@@ -119,27 +131,27 @@ export function CreateVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="taxCode">Tax Code</Label>
+                                <Label htmlFor="edit-taxCode">Tax Code</Label>
                                 <Input
-                                    id="taxCode"
+                                    id="edit-taxCode"
                                     placeholder="Optional"
                                     {...register("taxCode")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="address">Business Address</Label>
+                                <Label htmlFor="edit-address">Business Address</Label>
                                 <Input
-                                    id="address"
+                                    id="edit-address"
                                     placeholder="e.g. 123 Marble Mt, Da Nang"
                                     {...register("address")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="bankName">Bank Name</Label>
+                                <Label htmlFor="edit-bankName">Bank Name</Label>
                                 <Input
-                                    id="bankName"
+                                    id="edit-bankName"
                                     placeholder="e.g. Vietcombank"
                                     {...register("bankName")}
                                 />
@@ -148,9 +160,9 @@ export function CreateVendorDialog({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">Business Description</Label>
+                        <Label htmlFor="edit-description">Business Description</Label>
                         <Textarea
-                            id="description"
+                            id="edit-description"
                             placeholder="Briefly describe the vendor's products or services..."
                             {...register("description")}
                             rows={3}
@@ -159,17 +171,17 @@ export function CreateVendorDialog({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="bankAccountNumber">Bank Account Number</Label>
+                            <Label htmlFor="edit-bankAccountNumber">Bank Account Number</Label>
                             <Input
-                                id="bankAccountNumber"
+                                id="edit-bankAccountNumber"
                                 placeholder="Account digits"
                                 {...register("bankAccountNumber")}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="bankAccountName">Bank Account Holder Name</Label>
+                            <Label htmlFor="edit-bankAccountName">Bank Account Holder Name</Label>
                             <Input
-                                id="bankAccountName"
+                                id="edit-bankAccountName"
                                 placeholder="In ALL CAPS"
                                 {...register("bankAccountName")}
                             />
@@ -189,10 +201,10 @@ export function CreateVendorDialog({
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Creating...
+                                    Saving...
                                 </>
                             ) : (
-                                "Create Vendor"
+                                "Save Changes"
                             )}
                         </Button>
                     </DialogFooter>

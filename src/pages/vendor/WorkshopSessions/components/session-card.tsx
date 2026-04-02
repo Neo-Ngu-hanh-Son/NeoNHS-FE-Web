@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { SessionStatusBadge } from "./session-status-badge"
-import { Calendar, Users, Eye, Edit, XCircle } from "lucide-react"
+import { Calendar, Users, Eye, Edit, XCircle, Play, CheckCircle } from "lucide-react"
 import { formatDate, formatTimeRange, formatPrice, getEnrollmentPercentage } from "../utils/formatters"
 
 interface SessionCardProps {
@@ -12,14 +12,18 @@ interface SessionCardProps {
   onView?: () => void
   onEdit?: () => void
   onCancel?: () => void
+  onStart?: () => void
+  onComplete?: () => void
 }
 
-export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardProps) {
+export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComplete }: SessionCardProps) {
   const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
     || session.workshopTemplate?.images?.[0]?.imageUrl
 
   const canEdit = session.status === SessionStatus.SCHEDULED
-  const canCancel = session.status === SessionStatus.SCHEDULED && session.currentEnrollments > 0
+  const canCancel = session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING
+  const canStart = session.status === SessionStatus.SCHEDULED
+  const canComplete = session.status === SessionStatus.ONGOING
   const enrollmentPercentage = getEnrollmentPercentage(session.currentEnrollments, session.maxParticipants)
 
   return (
@@ -107,23 +111,41 @@ export function SessionCard({ session, onView, onEdit, onCancel }: SessionCardPr
         )}
       </CardContent>
 
-      <CardFooter className="flex gap-2 pt-4 border-t">
-        {onView && (
-          <Button size="sm" variant="outline" onClick={onView} className="flex-1">
-            <Eye className="w-3.5 h-3.5 mr-1" />
-            View
-          </Button>
-        )}
-        {canEdit && onEdit && (
-          <Button size="sm" variant="outline" onClick={onEdit} className="flex-1">
-            <Edit className="w-3.5 h-3.5 mr-1" />
-            Edit
-          </Button>
-        )}
-        {canCancel && onCancel && (
-          <Button size="sm" variant="destructive" onClick={onCancel}>
-            <XCircle className="w-3.5 h-3.5" />
-          </Button>
+      <CardFooter className="flex flex-col gap-2 pt-4 border-t">
+        <div className="flex gap-2 w-full">
+          {onView && (
+            <Button size="sm" variant="outline" onClick={onView} className="flex-1">
+              <Eye className="w-3.5 h-3.5 mr-1" />
+              View
+            </Button>
+          )}
+          {canEdit && onEdit && (
+            <Button size="sm" variant="outline" onClick={onEdit} className="flex-1">
+              <Edit className="w-3.5 h-3.5 mr-1" />
+              Edit
+            </Button>
+          )}
+          {canCancel && onCancel && (
+            <Button size="sm" variant="destructive" onClick={onCancel}>
+              <XCircle className="w-3.5 h-3.5" />
+            </Button>
+          )}
+        </div>
+        {(canStart || canComplete) && (
+          <div className="flex gap-2 w-full">
+            {canStart && onStart && (
+              <Button size="sm" onClick={onStart} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+                <Play className="w-3.5 h-3.5 mr-1" />
+                Start Session
+              </Button>
+            )}
+            {canComplete && onComplete && (
+              <Button size="sm" onClick={onComplete} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
+                <CheckCircle className="w-3.5 h-3.5 mr-1" />
+                Complete
+              </Button>
+            )}
+          </div>
         )}
       </CardFooter>
     </Card>

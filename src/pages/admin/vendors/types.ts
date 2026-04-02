@@ -9,7 +9,7 @@ export interface VendorProfileResponse {
   phoneNumber: string
   avatarUrl: string | null
   role: string // "VENDOR"
-  
+
   // Vendor-specific fields
   userId: string // UUID - reference to User entity
   businessName: string
@@ -24,25 +24,23 @@ export interface VendorProfileResponse {
   isVerifiedVendor: boolean
   isActive: boolean
   isBanned: boolean
-  
+
   // Metadata
   createdAt: string // ISO DateTime
   updatedAt: string // ISO DateTime
-  
+
   // Additional stats
   totalTemplates?: number
   activeTemplates?: number
   totalSessions?: number
 }
 
-// Create Vendor Request
 export interface CreateVendorRequest {
   // User credentials
   email: string // Valid email format
-  password: string // Min 8 chars, must contain letter and number
   fullname: string // Required
   phoneNumber?: string
-  
+
   // Vendor profile
   businessName: string // Required
   description?: string
@@ -138,10 +136,6 @@ export interface VendorStats {
 // Zod Validation Schemas
 export const createVendorSchema = z.object({
   email: z.string().email("Invalid email format"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[a-zA-Z]/, "Password must contain at least one letter")
-    .regex(/\d/, "Password must contain at least one number"),
   fullname: z.string().min(1, "Full name is required"),
   phoneNumber: z.string().optional(),
   businessName: z.string().min(1, "Business name is required"),

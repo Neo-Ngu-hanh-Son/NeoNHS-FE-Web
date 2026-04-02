@@ -1,14 +1,20 @@
 // Date Formatting
-export const formatDate = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString('vi-VN', {
+export const formatDate = (isoDate?: string | null) => {
+  if (!isoDate) return 'Not provided'
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return 'Not provided'
+  return date.toLocaleDateString('vi-VN', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
   })
 }
 
-export const formatDateTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleString('vi-VN', {
+export const formatDateTime = (isoDate?: string | null) => {
+  if (!isoDate) return 'Not provided'
+  const date = new Date(isoDate)
+  if (isNaN(date.getTime())) return 'Not provided'
+  return date.toLocaleString('vi-VN', {
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -19,8 +25,8 @@ export const formatDateTime = (isoDate: string) => {
 }
 
 // Phone Number Formatting
-export const formatPhoneNumber = (phone: string | null) => {
-  if (!phone) return 'N/A'
+export const formatPhoneNumber = (phone?: string | null) => {
+  if (!phone) return 'Not provided'
   return phone
 }
 

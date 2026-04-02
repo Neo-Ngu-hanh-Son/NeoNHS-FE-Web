@@ -8,6 +8,7 @@ import Forgot from "@/pages/AuthPage/Forgot";
 import Register from "@/pages/AuthPage/Register";
 import VerifyOTP from "@/pages/AuthPage/VerifyOTP";
 import NewPassword from "@/pages/AuthPage/NewPassword";
+import SetPasswordPage from "@/pages/AuthPage/SetPasswordPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import UserProfilePage from "@/pages/ProfilePage/UserProfilePage";
@@ -62,6 +63,7 @@ import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorP
 import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 import ManageHistoryAudioPage from "@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx";
 import AdminCheckinPointsPage from "@/pages/admin/checkin-points/AdminCheckinPointsPage";
+import ChatPage from "@/pages/Chat/ChatPage";
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +77,7 @@ export const router = createBrowserRouter([
           { path: "/register", element: <Register /> },
           { path: "/verify-otp", element: <VerifyOTP /> },
           { path: "/new-password", element: <NewPassword /> },
+          { path: "/set-password", element: <SetPasswordPage /> },
           { path: "/simple-map", element: <SimpleMapView /> },
           { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
           {
@@ -119,6 +122,7 @@ export const router = createBrowserRouter([
           { path: "workshop-templates/:id/edit", element: <WorkshopTemplateEditPage /> },
           { path: "workshop-sessions", element: <WorkshopSessionsPage /> },
           { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
+          { path: "messages", element: <ChatPage /> },
           { path: "ticket-verification", element: <TicketVerificationPage /> },
           { path: "vouchers", element: <VouchersPage /> },
           { path: "vouchers/deleted", element: <VendorDeletedVouchersPage /> },
@@ -162,6 +166,7 @@ export const router = createBrowserRouter([
             path: "places/:pointId/checkin-points/:checkinPointId/panorama/edit",
             element: <AdminPanoramaEditorPage />,
           },
+          { path: "messages", element: <ChatPage /> },
         ],
       },
     ],
