@@ -1,0 +1,70 @@
+/**
+ * Event Timeline Service
+ * API calls for Event Timeline management
+ */
+
+import { apiClient } from './apiClient';
+import type { ApiResponse } from '@/types';
+import type {
+    EventTimelineResponse,
+    CreateEventTimelineRequest,
+    UpdateEventTimelineRequest,
+} from '@/types/eventTimeline';
+
+export const eventTimelineService = {
+    /**
+     * Get all timelines for an event
+     */
+    getByEventId: async (eventId: string): Promise<ApiResponse<EventTimelineResponse[]>> => {
+        return apiClient.get<ApiResponse<EventTimelineResponse[]>>(
+            `/admin/events/${eventId}/timelines`
+        );
+    },
+
+    /**
+     * Get a single timeline by ID
+     */
+    getById: async (eventId: string, id: string): Promise<ApiResponse<EventTimelineResponse>> => {
+        return apiClient.get<ApiResponse<EventTimelineResponse>>(
+            `/admin/events/${eventId}/timelines/${id}`
+        );
+    },
+
+    /**
+     * Create a new timeline entry
+     */
+    create: async (
+        eventId: string,
+        data: CreateEventTimelineRequest
+    ): Promise<ApiResponse<EventTimelineResponse>> => {
+        return apiClient.post<ApiResponse<EventTimelineResponse>>(
+            `/admin/events/${eventId}/timelines`,
+            data
+        );
+    },
+
+    /**
+     * Update an existing timeline entry
+     */
+    update: async (
+        eventId: string,
+        id: string,
+        data: UpdateEventTimelineRequest
+    ): Promise<ApiResponse<EventTimelineResponse>> => {
+        return apiClient.put<ApiResponse<EventTimelineResponse>>(
+            `/admin/events/${eventId}/timelines/${id}`,
+            data
+        );
+    },
+
+    /**
+     * Delete a timeline entry
+     */
+    delete: async (eventId: string, id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(
+            `/admin/events/${eventId}/timelines/${id}`
+        );
+    },
+};
+
+export default eventTimelineService;
