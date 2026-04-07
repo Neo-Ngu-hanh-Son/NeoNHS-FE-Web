@@ -22,7 +22,7 @@ export default function WorkshopTemplateCreatePage() {
       defaultPrice: data.defaultPrice,
       minParticipants: data.minParticipants,
       maxParticipants: data.maxParticipants,
-      imageUrls: data.imageUrls,
+      imageUrls: data.imageUrls as string[],
       thumbnailIndex: data.thumbnailIndex,
       tagIds: data.tagIds,
     }
@@ -30,12 +30,12 @@ export default function WorkshopTemplateCreatePage() {
     try {
       setSubmitting(true)
       const newTemplate = await WorkshopTemplateService.createTemplate(createRequest)
-      
+
       notification.success({
         message: 'Template Created',
         description: `Template "${newTemplate.name}" has been created as DRAFT.`
       })
-      
+
       // Navigate to the new template's detail page
       navigate(`/vendor/workshop-templates/${newTemplate.id}`)
     } catch (error: any) {

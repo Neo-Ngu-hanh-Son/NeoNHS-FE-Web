@@ -26,11 +26,11 @@ export function WorkshopTemplateCard({
   const thumbnail = template.images.find(img => img.isThumbnail)?.imageUrl || template.images[0]?.imageUrl
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
+    <Card className="flex h-full w-full flex-col overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
       {/* Thumbnail Image */}
       {thumbnail && (
         <div
-          className="relative h-48 overflow-hidden cursor-pointer"
+          className="relative h-48 shrink-0 overflow-hidden cursor-pointer"
           onClick={onView}
         >
           <img
@@ -47,7 +47,7 @@ export function WorkshopTemplateCard({
         </div>
       )}
 
-      <CardHeader className="pb-3">
+      <CardHeader className="shrink-0 pb-3">
         <div className="flex items-start justify-between gap-2">
           <h3 className="font-semibold text-lg line-clamp-2 leading-tight">
             {template.name}
@@ -58,7 +58,7 @@ export function WorkshopTemplateCard({
         </p>
       </CardHeader>
 
-      <CardContent className="space-y-3">
+      <CardContent className="flex flex-1 flex-col space-y-3">
         {/* Price and Duration */}
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-1 text-primary font-semibold">
@@ -107,7 +107,7 @@ export function WorkshopTemplateCard({
         </p>
       </CardContent>
 
-      <CardFooter className="flex gap-2 pt-4 border-t">
+      <CardFooter className="mt-auto flex shrink-0 flex-wrap gap-2 border-t pt-4">
         {/* Status-based action buttons */}
         {template.status === WorkshopStatus.DRAFT && (
           <>

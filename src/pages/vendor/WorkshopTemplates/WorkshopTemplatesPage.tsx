@@ -1,16 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination'
-import { PlusCircleOutlined, SearchOutlined } from '@ant-design/icons'
 import { notification } from 'antd'
 import { WorkshopTemplateResponse, WorkshopStatus } from './types'
 import { DeleteTemplateDialog } from './components/delete-template-dialog'
 import { SubmitApprovalDialog } from './components/submit-approval-dialog'
-import { WorkshopTemplateCard } from './components/workshop-template-card'
 import { WorkshopTemplateService } from '@/services/api/workshopTemplateService'
+
+import { TemplateHeader } from './ListPage/TemplateHeader'
+import { TemplateFilters } from './ListPage/TemplateFilters'
+import { TemplateGrid } from './ListPage/TemplateGrid'
+import { TemplatePagination } from './ListPage/TemplatePagination'
 
 const PAGE_SIZE = 9
 
@@ -258,68 +257,18 @@ export default function WorkshopTemplatesPage() {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Workshop Templates</h1>
-          <p className="text-muted-foreground">Create and manage your workshop definitions</p>
-        </div>
-        <Button
-          size="lg"
-          onClick={() => navigate('/vendor/workshop-templates/new')}
-          className="gap-2"
-        >
-          <PlusCircleOutlined className="text-lg" />
-          Create New Template
-        </Button>
-      </div>
+      <TemplateHeader />
 
-      {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Search */}
-        <div className="relative flex-1">
-          <SearchOutlined className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search templates by name or description..."
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            className="pl-10"
-            disabled={loading}
-          />
-          {keyword !== debouncedKeyword && (
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-            </div>
-          )}
-        </div>
-
-        {/* Status Filter */}
-        <Select value={statusFilter} onValueChange={setStatusFilter} disabled={loading}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All Statuses" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value={WorkshopStatus.DRAFT}>Draft</SelectItem>
-            <SelectItem value={WorkshopStatus.PENDING}>Pending</SelectItem>
-            <SelectItem value={WorkshopStatus.ACTIVE}>Active</SelectItem>
-            <SelectItem value={WorkshopStatus.REJECTED}>Rejected</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {/* Sort By */}
-        <Select value={sortBy} onValueChange={setSortBy} disabled={loading}>
-          <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="updatedAt">Recently Updated</SelectItem>
-            <SelectItem value="createdAt">Recently Created</SelectItem>
-            <SelectItem value="name">Name (A-Z)</SelectItem>
-            <SelectItem value="defaultPrice">Price</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+      <TemplateFilters
+        keyword={keyword}
+        setKeyword={setKeyword}
+        debouncedKeyword={debouncedKeyword}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        loading={loading}
+      />
 
       {/* Results count */}
       {!loading && (
@@ -342,116 +291,25 @@ export default function WorkshopTemplatesPage() {
         </div>
       )}
 
-      {/* Templates Grid */}
-      {loading ? (
-        <div className="flex items-center justify-center p-12">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading templates...</p>
-          </div>
-        </div>
-      ) : templates.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {templates.map((template) => (
-            <WorkshopTemplateCard
-              key={template.id}
-              template={template}
-              onView={() => handleView(template.id)}
-              onEdit={
-                (template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED)
-                  ? () => handleEdit(template.id)
-                  : undefined
-              }
-              onDelete={
-                template.status !== WorkshopStatus.ACTIVE
-                  ? () => handleDeleteClick(template)
-                  : undefined
-              }
-              onSubmit={
-                (template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED)
-                  ? () => handleSubmitClick(template)
-                  : undefined
-              }
-              onTogglePublish={
-                template.status === WorkshopStatus.ACTIVE
-                  ? () => handleTogglePublish(template)
-                  : undefined
-              }
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <div className="mb-4">
-            <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
-              <SearchOutlined className="text-3xl text-muted-foreground" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-            <p className="text-muted-foreground mb-4">
-              {keyword || statusFilter !== 'all'
-                ? "No templates match your current filters. Try adjusting your search criteria."
-                : "Get started by creating your first workshop template to offer sessions to customers."
-              }
-            </p>
-          </div>
-          {!keyword && statusFilter === 'all' && (
-            <Button onClick={() => navigate('/vendor/workshop-templates/new')} size="lg">
-              <PlusCircleOutlined className="mr-2" />
-              Create Your First Template
-            </Button>
-          )}
-        </div>
-      )}
+      <TemplateGrid
+        loading={loading}
+        templates={templates}
+        handleView={handleView}
+        handleEdit={handleEdit}
+        handleDeleteClick={handleDeleteClick}
+        handleSubmitClick={handleSubmitClick}
+        handleTogglePublish={handleTogglePublish}
+        keyword={keyword}
+        statusFilter={statusFilter}
+      />
 
-      {/* Pagination */}
-      {!loading && totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage > 0) handlePageChange(currentPage - 1)
-                }}
-                className={currentPage === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
-            </PaginationItem>
-
-            {pageNumbers.map((pageNum, idx) => (
-              pageNum === 'ellipsis' ? (
-                <PaginationItem key={`ellipsis-${idx}`}>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              ) : (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handlePageChange(pageNum)
-                    }}
-                    isActive={currentPage === pageNum}
-                    className="cursor-pointer"
-                  >
-                    {pageNum + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )
-            ))}
-
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (currentPage < totalPages - 1) handlePageChange(currentPage + 1)
-                }}
-                className={currentPage === totalPages - 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+      {!loading && (
+        <TemplatePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+          pageNumbers={pageNumbers}
+        />
       )}
 
       {/* Delete Confirmation Dialog */}
