@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
     ArrowLeft, Pencil, Trash2, RotateCcw, MapPin, Calendar, Users,
-    DollarSign, Ticket, EyeOff, Image as ImageIcon, Info,
+    DollarSign, Ticket, EyeOff, Image as ImageIcon, Info, CalendarDays,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
@@ -19,6 +19,7 @@ import { statusBadgeStyles, statusLabels } from './constants';
 import { formatEventDate, formatEventPrice } from './utils';
 import { ImageGallery } from './components/ImageGallery';
 import { TicketCatalogList } from './components/TicketCatalogList';
+import { EventTimelineList } from './components/EventTimelineList';
 import { useState } from 'react';
 
 export default function EventDetailPage() {
@@ -161,6 +162,10 @@ export default function EventDetailPage() {
                             </Badge>
                         )}
                     </TabsTrigger>
+                    <TabsTrigger value="timeline" className="gap-1.5">
+                        <CalendarDays className="h-4 w-4" />
+                        Timeline
+                    </TabsTrigger>
                     <TabsTrigger value="tickets" className="gap-1.5">
                         <Ticket className="h-4 w-4" />
                         Tickets
@@ -243,6 +248,18 @@ export default function EventDetailPage() {
                         <CardHeader><CardTitle>Image Gallery</CardTitle></CardHeader>
                         <CardContent>
                             <ImageGallery images={event.images || []} />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Timeline Tab */}
+                <TabsContent value="timeline">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Event Timeline</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <EventTimelineList eventId={id!} />
                         </CardContent>
                     </Card>
                 </TabsContent>
