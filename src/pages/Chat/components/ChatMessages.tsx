@@ -1,4 +1,5 @@
 import { RefObject } from 'react';
+import { Image as AntImage } from 'antd';
 import { ChatMessage } from '@/services/api/chatService';
 
 interface ChatMessagesProps {
@@ -8,6 +9,7 @@ interface ChatMessagesProps {
   partnerAvatar: string;
   partnerName?: string;
   formatTime: (isoString?: string | null) => string;
+  formatDateTime: (isoString?: string | null) => string;
   messagesEndRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -18,6 +20,7 @@ export default function ChatMessages({
   partnerAvatar,
   partnerName,
   formatTime,
+  formatDateTime,
   messagesEndRef
 }: ChatMessagesProps) {
   return (
@@ -71,7 +74,7 @@ export default function ChatMessages({
               {showTimestampHeader && (
                 <div className="flex justify-center mb-4 mt-2">
                   <span className="text-xs text-muted-foreground font-medium bg-muted/50 px-3 py-1 rounded-full">
-                    {formatTime(msg.timestamp)}
+                    {formatDateTime(msg.timestamp)}
                   </span>
                 </div>
               )}
@@ -92,12 +95,41 @@ export default function ChatMessages({
 
                 <div className={`flex flex-col max-w-[70%] ${isSender ? 'items-end' : 'items-start'}`}>
                   <div
-                    className={`px-4 py-2.5 rounded-2xl shadow-sm break-words text-[15px] leading-relaxed w-full ${isSender
-                        ? `bg-primary text-primary-foreground ${showAvatar ? 'rounded-br-sm' : ''}`
-                        : `bg-[#f0f2f5] dark:bg-[#2a2d31] text-[#1c1e21] dark:text-white border border-black/5 dark:border-white/5 ${showAvatar ? 'rounded-bl-sm' : ''}`
+                    className={`${msg.messageType === 'IMAGE' ? 'p-1 bg-transparent border-0 shadow-none' : 'px-4 py-2.5'} rounded-2xl shadow-sm break-words text-[15px] leading-relaxed w-full ${isSender
+                      ? `${msg.messageType === 'IMAGE' ? '' : 'bg-primary text-primary-foreground'} ${showAvatar ? 'rounded-br-sm' : ''}`
+                      : `${msg.messageType === 'IMAGE' ? '' : 'bg-[#f0f2f5] dark:bg-[#2a2d31] text-[#1c1e21] dark:text-white border border-black/5 dark:border-white/5'} ${showAvatar ? 'rounded-bl-sm' : ''}`
                       }`}
                   >
-                    {msg.content}
+                    {msg.messageType === 'IMAGE' && msg.mediaUrl ? (
+                      <AntImage.PreviewGroup items={[msg.mediaUrl]}>
+                        <div className="rounded-xl overflow-hidden shadow-sm flex">
+                          <AntImage
+                            src={msg.mediaUrl}
+                            alt="Sent image"
+                            rootClassName="max-w-[200px] max-h-[300px]"
+                            className="object-cover"
+                          />
+                        </div>
+                      </AntImage.PreviewGroup>
+                    ) : msg.messageType === 'PRODUCT_SNIPPET' && msg.metadata ? (
+                      <div className="flex flex-col gap-2">
+                        <span>{msg.content}</span>
+                        <div
+                          className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition ${isSender ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 shadow-sm border border-border'}`}
+                          onClick={() => window.open(`/vendor/workshop-templates/${msg.metadata?.workshopId}`, '_blank')}
+                        >
+                          {msg.metadata.thumbnailUrl && (
+                            <img src={msg.metadata.thumbnailUrl} alt="Thumbnail" className="w-12 h-12 rounded object-cover" />
+                          )}
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-sm line-clamp-1">{msg.metadata.title}</span>
+                            <span className="text-xs opacity-80">{msg.metadata.price?.toLocaleString()} ₫</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
 

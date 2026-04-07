@@ -72,8 +72,8 @@ export default function ChatSidebar({
                 key={room.id}
                 onClick={() => onSelectRoom(room.id)}
                 className={`flex items-start gap-3 p-4 transition-colors text-left border-b border-white/5 last:border-0 ${activeRoomId === room.id
-                    ? 'bg-primary/5 border-l-4 border-l-primary'
-                    : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'
+                  ? 'bg-primary/5 border-l-4 border-l-primary'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 border-l-4 border-l-transparent'
                   }`}
               >
                 <div className="relative shrink-0">
@@ -96,7 +96,11 @@ export default function ChatSidebar({
                   </div>
                   <p className={`text-sm truncate w-[190px] ${(room.unreadCount && room.unreadCount > 0) ? 'text-[#101914] dark:text-white font-medium' : 'text-muted-foreground'}`}>
                     {room.lastMessageSenderId === currentUserId ? 'You: ' : ''}
-                    {room.lastMessagePreview || 'No messages yet'}
+                    {room.lastMessagePreview
+                      ? room.lastMessagePreview
+                      : room.lastMessageAt
+                        ? "📷 Image"
+                        : "No messages yet"}
                   </p>
                 </div>
               </button>
