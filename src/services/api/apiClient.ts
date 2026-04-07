@@ -64,11 +64,11 @@ axiosInstance.interceptors.response.use(
 );
 
 export const apiClient = {
-  get: <T = any>(endpoint: string) => axiosInstance.get<T, T>(endpoint),
-  post: <T = any>(endpoint: string, data: any) => axiosInstance.post<T, T>(endpoint, data),
-  put: <T = any>(endpoint: string, data: any) => axiosInstance.put<T, T>(endpoint, data),
-  patch: <T = any>(endpoint: string, data?: any) => axiosInstance.patch<T, T>(endpoint, data ?? {}),
-  delete: <T = any>(endpoint: string) => axiosInstance.delete<T, T>(endpoint),
+  get: <T = any>(endpoint: string, config?: any) => axiosInstance.get<T, T>(endpoint, config),
+  post: <T = any>(endpoint: string, data: any, config?: any) => axiosInstance.post<T, T>(endpoint, data, config),
+  put: <T = any>(endpoint: string, data: any, config?: any) => axiosInstance.put<T, T>(endpoint, data, config),
+  patch: <T = any>(endpoint: string, data?: any, config?: any) => axiosInstance.patch<T, T>(endpoint, data ?? {}, config),
+  delete: <T = any>(endpoint: string, config?: any) => axiosInstance.delete<T, T>(endpoint, config),
 };
 
 export default apiClient;

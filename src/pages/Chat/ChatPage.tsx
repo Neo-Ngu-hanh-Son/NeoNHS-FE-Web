@@ -6,7 +6,7 @@ import ChatWindowHeader from './components/ChatWindowHeader';
 import ChatMessages from './components/ChatMessages';
 import ChatComposer from './components/ChatComposer';
 import ChatEmptyState from './components/ChatEmptyState';
-import { formatDate, formatTime } from './components/chatFormatters';
+import { formatDate, formatTime, formatDateTime } from './components/chatFormatters';
 import './ChatPage.css';
 
 const createFallbackUser = (userId: string): ChatUserDTO => ({
@@ -57,6 +57,7 @@ export default function ChatPage() {
 
   const [isConnected, setIsConnected] = useState(false);
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeRoomIdRef = useRef<string | null>(null);
@@ -178,6 +179,20 @@ export default function ChatPage() {
     setNewMessage('');
   };
 
+  const handleImageSelect = async (file: File) => {
+    if (!activeRoomId || !wsServiceRef.current) return;
+
+    setIsUploadingImage(true);
+    try {
+      const response = await ChatRestService.uploadMedia(file);
+      wsServiceRef.current.sendMessage(activeRoomId, '', 'IMAGE', response.mediaUrl);
+    } catch (error) {
+      console.error('Failed to upload and send image:', error);
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const filteredRooms = rooms.filter(room =>
     room.otherUser?.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -215,6 +230,7 @@ export default function ChatPage() {
               partnerAvatar={partnerAvatar}
               partnerName={activeRoom.otherUser?.fullname}
               formatTime={formatTime}
+              formatDateTime={formatDateTime}
               messagesEndRef={messagesEndRef}
             />
 
@@ -222,7 +238,9 @@ export default function ChatPage() {
               newMessage={newMessage}
               onChange={setNewMessage}
               onSend={handleSendMessage}
+              onImageSelect={handleImageSelect}
               isConnected={isConnected}
+              isUploadingImage={isUploadingImage}
             />
           </>
         ) : (
