@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined
 } from '@ant-design/icons';
-import { mockWorkshopTemplates } from '@/pages/vendor/WorkshopTemplates/data';
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -38,9 +37,9 @@ export function VendorLayout() {
     const location = useLocation();
     const params = useParams();
 
-    // Helper to get breadcrumb from path
-    const getBreadcrumb = () => {
+    const breadcrumb = useMemo(() => {
         const path = location.pathname;
+        const templateName = 'Template Details';
 
         // Workshop Templates routes
         if (path.startsWith('/vendor/workshop-templates')) {
@@ -65,12 +64,8 @@ export function VendorLayout() {
                 };
             }
 
-            // Detail or Edit page - get template name
             const templateId = params.id;
             if (templateId) {
-                const template = mockWorkshopTemplates.find(t => t.id === templateId);
-                const templateName = template ? template.name : 'Template Details';
-
                 if (path.includes('/edit')) {
                     return {
                         items: [
@@ -94,7 +89,6 @@ export function VendorLayout() {
             }
         }
 
-        // Default navigation items
         const item = navItems.find(i => i.path === path);
         if (item) {
             return {
@@ -113,9 +107,7 @@ export function VendorLayout() {
             ],
             title: 'Vendor Portal'
         };
-    };
-
-    const breadcrumb = getBreadcrumb();
+    }, [location.pathname, params.id]);
 
     return (
         <div className="flex h-screen overflow-hidden font-display">

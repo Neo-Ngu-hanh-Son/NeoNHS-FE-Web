@@ -422,7 +422,7 @@ export function WorkshopTemplateForm({
               {(isUploading || submitting) && (
                 <p className="font-medium text-blue-600 dark:text-blue-500 flex items-center gap-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-500"></div>
-                  Please do not close this window. {isUploading ? "Uploading images to Cloudinary..." : "Storing template data..."}
+                  Please do not close this window. {isUploading ? "Uploading images ..." : "Storing template data..."}
                 </p>
               )}
             </AlertDialogDescription>
