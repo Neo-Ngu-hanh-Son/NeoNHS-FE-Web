@@ -1,16 +1,18 @@
-import { FunctionComponent, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FunctionComponent, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   MenuOutlined,
   CloseOutlined,
   UserOutlined,
   LogoutOutlined,
   ProfileOutlined,
-} from "@ant-design/icons";
-import { Dropdown, Avatar } from "antd";
-import type { MenuProps } from "antd";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/auth/useAuth";
+  DashboardFilled,
+} from '@ant-design/icons';
+import { Dropdown, Avatar } from 'antd';
+import type { MenuProps } from 'antd';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/auth/useAuth';
+import { LayoutDashboard, SquareChartGantt, User } from 'lucide-react';
 
 const Header: FunctionComponent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,22 +22,28 @@ const Header: FunctionComponent = () => {
 
   const handleLogout = async () => {
     await logout();
-    navigate("/login");
+    navigate('/login');
   };
 
-  const userMenuItems: MenuProps["items"] = [
+  const userMenuItems: MenuProps['items'] = [
     {
-      key: "profile",
-      label: "Profile",
-      icon: <ProfileOutlined />,
-      onClick: () => navigate("/account"),
+      key: 'dashboard',
+      label: 'Admin Dashboard',
+      icon: <LayoutDashboard className="w-4 h-4" />,
+      onClick: () => navigate('admin/dashboard'),
     },
     {
-      type: "divider",
+      key: 'profile',
+      label: 'Profile',
+      icon: <User className="w-4 h-4" />,
+      onClick: () => navigate('/account'),
     },
     {
-      key: "logout",
-      label: "Logout",
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      label: 'Logout',
       icon: <LogoutOutlined />,
       onClick: handleLogout,
       danger: true,
@@ -43,17 +51,17 @@ const Header: FunctionComponent = () => {
   ];
 
   const navLinks = [
-    { label: "Landing Page", href: "/" },
-    { label: "About Us", href: "/about-us" },
-    { label: "Contact Us", href: "/contact-us" },
+    { label: 'Landing Page', href: '/' },
+    { label: 'About Us', href: '/about-us' },
+    { label: 'Contact Us', href: '/contact-us' },
   ];
 
   const isActiveLink = (href: string) => {
     return location.pathname === href;
   };
 
-  console.log("Header render - user:", user);
-  console.log("Header render - isAuthenticated:", isAuthenticated);
+  console.log('Header render - user:', user);
+  console.log('Header render - isAuthenticated:', isAuthenticated);
 
   return (
     <header className="w-full bg-white text-gray-900 font-[Poppins] sticky top-0 z-50">
@@ -77,8 +85,8 @@ const Header: FunctionComponent = () => {
                     to={link.href}
                     className={`text-base transition-colors duration-300 ${
                       isActiveLink(link.href)
-                        ? "text-emerald-400 font-semibold"
-                        : "text-gray-900 hover:text-emerald-400"
+                        ? 'text-emerald-400 font-semibold'
+                        : 'text-gray-900 hover:text-emerald-400'
                     }`}
                   >
                     {link.label}
@@ -90,11 +98,7 @@ const Header: FunctionComponent = () => {
             {/* Auth Buttons / User Avatar */}
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
-                <Dropdown
-                  menu={{ items: userMenuItems }}
-                  placement="bottomRight"
-                  trigger={["click"]}
-                >
+                <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                     <Avatar
                       size={40}
@@ -130,11 +134,7 @@ const Header: FunctionComponent = () => {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? (
-              <CloseOutlined className="text-xl" />
-            ) : (
-              <MenuOutlined className="text-xl" />
-            )}
+            {isMobileMenuOpen ? <CloseOutlined className="text-xl" /> : <MenuOutlined className="text-xl" />}
           </button>
         </div>
 
@@ -148,8 +148,8 @@ const Header: FunctionComponent = () => {
                     to={link.href}
                     className={`block text-base transition-colors duration-300 ${
                       isActiveLink(link.href)
-                        ? "text-emerald-400 font-semibold"
-                        : "text-gray-300 hover:text-emerald-400"
+                        ? 'text-emerald-400 font-semibold'
+                        : 'text-gray-300 hover:text-emerald-400'
                     }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -170,7 +170,7 @@ const Header: FunctionComponent = () => {
                       icon={!user?.avatarUrl && <UserOutlined />}
                       className="bg-emerald-500"
                     />
-                    <span className="text-gray-900 font-medium">{user?.fullname || "User"}</span>
+                    <span className="text-gray-900 font-medium">{user?.fullname || 'User'}</span>
                   </div>
                   <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button

@@ -45,6 +45,14 @@ export const blogService = {
     return await apiClient.delete<ApiResponse<void>>(`${BASE}/${id}`);
   },
 
+  async deleteBlogHard(id: string): Promise<ApiResponse<void>> {
+    return await apiClient.delete<ApiResponse<void>>(`${BASE}/${id}/hard`);
+  },
+
+  async emptyAllDeletedBlogs(): Promise<ApiResponse<void>> {
+    return await apiClient.delete<ApiResponse<void>>(`${BASE}/empty-deleted`);
+  },
+
   async getBlogById(id: string): Promise<ApiResponse<BlogResponse>> {
     return await apiClient.get<ApiResponse<BlogResponse>>(`${BASE}/${id}`);
   },

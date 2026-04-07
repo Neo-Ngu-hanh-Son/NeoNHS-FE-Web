@@ -17,6 +17,8 @@ import blogService from "@/services/api/blogService";
 import { useNavigate } from "react-router-dom";
 
 function BlogCreationPageInner() {
+  const [messageApi, contextHolder] = message.useMessage();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,7 +41,7 @@ function BlogCreationPageInner() {
   const handleSaveEditorState = async (content: EditorSaveResult) => {
     console.log("Saving editor state: " + content);
     if (content.charCount < 30) {
-      message.warning("Blog content must be at least 30 characters");
+      messageApi.warning("Blog content must be at least 30 characters");
       return;
     }
     const formData = form.getValues();
@@ -54,14 +56,14 @@ function BlogCreationPageInner() {
       setLoading(true);
       const res = await blogService.createBlog(payload);
       if (res.success || res.data) {
-        message.success("Blog created successfully!");
+        messageApi.success("Blog created successfully!");
         navigate("/admin/blog");
       } else {
-        message.error(res.message || "Failed to create blog");
+        messageApi.error(res.message || "Failed to create blog");
       }
     } catch (error) {
       console.error(error);
-      message.error((error as Error).message);
+      messageApi.error((error as Error).message);
     } finally {
       setLoading(false);
     }
@@ -78,6 +80,7 @@ function BlogCreationPageInner() {
 
   return (
     <div className="container mx-auto py-6 space-y-6 max-w-7xl">
+      {contextHolder}
       <BlogFormHeaderSection form={form} onSubmit={submitHandler} submitting={loading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

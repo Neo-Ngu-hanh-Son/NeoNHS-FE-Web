@@ -4,21 +4,14 @@
  * Uses shadcn/ui Table, Badge, Button, Tooltip, Skeleton + Lucide icons.
  */
 
-import { Eye, Pencil, Trash2, FileText, AlertTriangle, Star } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import type { BlogResponse, BlogStatus } from "@/types/blog";
-import { truncateText, formatShortDate } from "@/utils/helpers";
-import BlogTableSkeleton from "./BlogTableSkeleton";
+import { Eye, Pencil, Trash2, FileText, AlertTriangle, Star, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { BlogResponse, BlogStatus } from '@/types/blog';
+import { truncateText, formatShortDate } from '@/utils/helpers';
+import BlogTableSkeleton from './BlogTableSkeleton';
 
 interface BlogTableProps {
   blogs: BlogResponse[];
@@ -32,21 +25,24 @@ interface BlogTableProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (blog: BlogResponse) => void;
-  currentStatusFilter?: BlogStatus | "";
+  onDeletePermanently?: (blog: BlogResponse) => void;
+  onEmptyArchived?: () => void;
+  emptyingArchived?: boolean;
+  currentStatusFilter?: BlogStatus | '';
 }
 
 const STATUS_STYLES: Record<BlogStatus, { label: string; className: string }> = {
   DRAFT: {
-    label: "Draft",
-    className: "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200 rounded-full",
+    label: 'Draft',
+    className: 'bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200 rounded-full',
   },
   PUBLISHED: {
-    label: "Published",
-    className: "bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full",
+    label: 'Published',
+    className: 'bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full',
   },
   ARCHIVED: {
-    label: "Archived",
-    className: "bg-secondary text-muted-foreground hover:bg-secondary border-border rounded-full",
+    label: 'Archived',
+    className: 'bg-secondary text-muted-foreground hover:bg-secondary border-border rounded-full',
   },
 };
 
@@ -62,10 +58,15 @@ export function BlogTable({
   onView,
   onEdit,
   onDelete,
+  onDeletePermanently,
+  onEmptyArchived,
+  emptyingArchived = false,
+  currentStatusFilter,
 }: BlogTableProps) {
   const totalPages = Math.ceil(totalElements / pageSize);
   const rangeStart = currentPage * pageSize + 1;
   const rangeEnd = Math.min((currentPage + 1) * pageSize, totalElements);
+  const isArchivedFilter = currentStatusFilter === 'ARCHIVED';
 
   // Error state
   if (!loading && error) {
@@ -75,11 +76,7 @@ export function BlogTable({
           <AlertTriangle className="h-7 w-7 text-red-500" />
         </div>
         <p className="text-sm font-medium text-gray-700 mb-4">{error}</p>
-        <Button
-          size="sm"
-          onClick={onRetry}
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-        >
+        <Button size="sm" onClick={onRetry} className="bg-primary text-primary-foreground hover:bg-primary/90">
           Try Again
         </Button>
       </div>
@@ -106,6 +103,20 @@ export function BlogTable({
 
   return (
     <div className="space-y-3">
+      {isArchivedFilter && (
+        <div className="flex flex-col flex-wrap items-start justify-start gap-3 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={onEmptyArchived}
+            disabled={emptyingArchived || totalElements === 0}
+          >
+            {emptyingArchived ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            Empty All Archived Blogs
+          </Button>
+        </div>
+      )}
+
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <Table>
           <TableHeader>
@@ -113,13 +124,9 @@ export function BlogTable({
               <TableHead className="font-semibold text-gray-600">Blog</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[120px]">Category</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[100px]">Status</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[80px] text-center">
-                Views
-              </TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[80px] text-center">Views</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[130px]">Created</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">
-                Actions
-              </TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -146,9 +153,7 @@ export function BlogTable({
                           <span className="text-sm font-semibold text-gray-800 truncate max-w-[280px]">
                             {blog.title}
                           </span>
-                          {blog.isFeatured && (
-                            <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500 shrink-0" />
-                          )}
+                          {blog.isFeatured && <Star className="h-3.5 w-3.5 text-amber-500 fill-amber-500 shrink-0" />}
                         </div>
                         {blog.summary && (
                           <p className="text-xs text-muted-foreground truncate max-w-[300px]">
@@ -185,7 +190,7 @@ export function BlogTable({
                   {/* Created date */}
                   <TableCell>
                     <span className="text-sm text-gray-500">
-                      {blog.createdAt ? formatShortDate(blog.createdAt) : "—"}
+                      {blog.createdAt ? formatShortDate(blog.createdAt) : '—'}
                     </span>
                   </TableCell>
 
@@ -221,7 +226,7 @@ export function BlogTable({
                           <TooltipContent>Edit blog</TooltipContent>
                         </Tooltip>
 
-                        {blog.status !== "ARCHIVED" && (
+                        {!isArchivedFilter && blog.status !== 'ARCHIVED' && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
@@ -234,6 +239,22 @@ export function BlogTable({
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>Archive blog</TooltipContent>
+                          </Tooltip>
+                        )}
+
+                        {isArchivedFilter && blog.status === 'ARCHIVED' && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => onDeletePermanently?.(blog)}
+                                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete permanently</TooltipContent>
                           </Tooltip>
                         )}
                       </div>
@@ -265,7 +286,7 @@ export function BlogTable({
             {Array.from({ length: totalPages }).map((_, i) => (
               <Button
                 key={i}
-                variant={i === currentPage ? "default" : "outline"}
+                variant={i === currentPage ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => onPageChange(i)}
                 className="h-8 w-8 p-0 text-xs"
