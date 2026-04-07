@@ -112,6 +112,9 @@ export default function WorkshopTemplateEditPage() {
   const handleSubmit = async (data: WorkshopTemplateFormData) => {
     if (!id) return
 
+    // Keep only persisted image URLs for update payload
+    const imageUrls = data.imageUrls.filter((url): url is string => typeof url === "string")
+
     // Transform form data to API request format
     const updateRequest: UpdateWorkshopTemplateRequest = {
       name: data.name,
@@ -121,7 +124,7 @@ export default function WorkshopTemplateEditPage() {
       defaultPrice: data.defaultPrice,
       minParticipants: data.minParticipants,
       maxParticipants: data.maxParticipants,
-      imageUrls: data.imageUrls,
+      imageUrls,
       thumbnailIndex: data.thumbnailIndex,
       tagIds: data.tagIds,
     }

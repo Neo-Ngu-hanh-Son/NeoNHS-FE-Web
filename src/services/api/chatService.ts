@@ -10,6 +10,14 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
   status: 'SENT' | 'DELIVERED' | 'READ';
+  messageType?: 'TEXT' | 'IMAGE' | 'PRODUCT_SNIPPET';
+  mediaUrl?: string;
+  metadata?: {
+    workshopId?: string;
+    title?: string;
+    price?: number;
+    thumbnailUrl?: string;
+  };
 }
 
 export interface ChatRoom {
@@ -64,6 +72,16 @@ export const ChatRestService = {
 
   getChatUserInfo: async (userId: string): Promise<ChatUserDTO> => {
     return apiClient.get(`/chat/users/${userId}`);
+  },
+
+  uploadMedia: async (file: File): Promise<{ mediaUrl: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post('/chat/media', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 };
 
@@ -118,11 +136,11 @@ export class ChatWebSocketService {
     this.stompClient.activate();
   }
 
-  sendMessage(chatRoomId: string, content: string) {
+  sendMessage(chatRoomId: string, content: string, messageType: string = 'TEXT', mediaUrl?: string, metadata?: any) {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.publish({
         destination: '/app/chat.send',
-        body: JSON.stringify({ chatRoomId, content })
+        body: JSON.stringify({ chatRoomId, content, messageType, mediaUrl, metadata })
       });
     } else {
       console.error('Cannot send message: STOMP client is not connected');

@@ -74,6 +74,7 @@ export interface PaginatedResponse<T> {
 export * from './tag';
 export * from './ticketCatalog';
 export * from './event';
+export * from './eventTimeline';
 export * from './panorama';
 export * from './voucher';
 export * from './historyAudio';

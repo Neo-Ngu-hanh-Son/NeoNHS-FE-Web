@@ -7,3 +7,4 @@ export { useCreateEvent } from './useCreateEvent';
 export { useUpdateEvent } from './useUpdateEvent';
 export { useTags } from './useTags';
 export { useTicketCatalogs } from './useTicketCatalogs';
+export { useEventTimelines } from './useEventTimelines';
