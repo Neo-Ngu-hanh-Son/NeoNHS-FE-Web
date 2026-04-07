@@ -17,10 +17,20 @@ import { WTagSelector } from "./wtag-selector"
 import { ImageUploader } from "./image-uploader"
 import { formatDuration } from "../utils/formatters"
 import { useEffect, useState } from "react"
+import { uploadImageToCloudinary } from "@/utils/cloudinary"
+import { message } from "antd"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface WorkshopTemplateFormProps {
   defaultValues?: WorkshopTemplateResponse
-  onSubmit: (data: WorkshopTemplateFormData) => void
+  onSubmit: (data: WorkshopTemplateFormData) => Promise<void> | void
   onCancel: () => void
   isEditing?: boolean
   submitting?: boolean
@@ -34,34 +44,37 @@ export function WorkshopTemplateForm({
   submitting = false,
 }: WorkshopTemplateFormProps) {
   const [durationDisplay, setDurationDisplay] = useState("")
+  const [isUploading, setIsUploading] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [pendingData, setPendingData] = useState<WorkshopTemplateFormData | null>(null)
 
   const form = useForm<WorkshopTemplateFormData>({
     resolver: zodResolver(workshopTemplateSchema),
     defaultValues: defaultValues
       ? {
-          name: defaultValues.name,
-          shortDescription: defaultValues.shortDescription || "",
-          fullDescription: defaultValues.fullDescription || "",
-          estimatedDuration: defaultValues.estimatedDuration,
-          defaultPrice: defaultValues.defaultPrice,
-          minParticipants: defaultValues.minParticipants,
-          maxParticipants: defaultValues.maxParticipants,
-          imageUrls: defaultValues.images.map(img => img.imageUrl),
-          thumbnailIndex: defaultValues.images.findIndex(img => img.isThumbnail) || 0,
-          tagIds: defaultValues.tags.map(tag => tag.id),
-        }
+        name: defaultValues.name,
+        shortDescription: defaultValues.shortDescription || "",
+        fullDescription: defaultValues.fullDescription || "",
+        estimatedDuration: defaultValues.estimatedDuration,
+        defaultPrice: defaultValues.defaultPrice,
+        minParticipants: defaultValues.minParticipants,
+        maxParticipants: defaultValues.maxParticipants,
+        imageUrls: defaultValues.images.map(img => img.imageUrl),
+        thumbnailIndex: defaultValues.images.findIndex(img => img.isThumbnail) || 0,
+        tagIds: defaultValues.tags.map(tag => tag.id),
+      }
       : {
-          name: "",
-          shortDescription: "",
-          fullDescription: "",
-          estimatedDuration: 60,
-          defaultPrice: 0,
-          minParticipants: 1,
-          maxParticipants: 10,
-          imageUrls: [],
-          thumbnailIndex: 0,
-          tagIds: [],
-        },
+        name: "",
+        shortDescription: "",
+        fullDescription: "",
+        estimatedDuration: 60,
+        defaultPrice: 0,
+        minParticipants: 1,
+        maxParticipants: 10,
+        imageUrls: [],
+        thumbnailIndex: 0,
+        tagIds: [],
+      },
   })
 
   // Watch duration field to show formatted display
@@ -74,9 +87,57 @@ export function WorkshopTemplateForm({
     }
   }, [watchedDuration])
 
+  const handleFormSubmit = (data: WorkshopTemplateFormData) => {
+    setPendingData(data)
+    setShowConfirmModal(true)
+  }
+
+  const handleConfirmUploadAndSubmit = async () => {
+    if (!pendingData) return
+
+    const data = { ...pendingData }
+    const hasFiles = data.imageUrls.some(u => u instanceof File)
+
+    if (hasFiles) {
+      setIsUploading(true)
+      const hideMsg = message.loading("Uploading images...", 0)
+      try {
+        const finalUrls: string[] = []
+        for (let i = 0; i < data.imageUrls.length; i++) {
+          const item = data.imageUrls[i]
+          if (item instanceof File) {
+            const url = await uploadImageToCloudinary(item)
+            if (url) finalUrls.push(url)
+          } else {
+            finalUrls.push(item as string)
+          }
+        }
+        data.imageUrls = finalUrls
+      } catch (error: any) {
+        hideMsg()
+        message.error("Failed to upload images: " + error.message)
+        setIsUploading(false)
+        setShowConfirmModal(false)
+        return // Stop the submission
+      }
+      hideMsg()
+      setIsUploading(false)
+    }
+
+    try {
+      await onSubmit(data)
+    } catch (error) {
+      // Parent should handle error, but we catch to ensure we close modal safely if needed
+    }
+
+    if (!submitting) {
+      setShowConfirmModal(false)
+    }
+  }
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-8">
         {/* Section A: Basic Information */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold border-b pb-2">Basic Information</h3>
@@ -89,9 +150,9 @@ export function WorkshopTemplateForm({
                 <FormItem>
                   <FormLabel>Workshop Name *</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="e.g., Traditional Pottery Workshop" 
-                      {...field} 
+                    <Input
+                      placeholder="e.g., Traditional Pottery Workshop"
+                      {...field}
                       maxLength={255}
                     />
                   </FormControl>
@@ -157,13 +218,14 @@ export function WorkshopTemplateForm({
                 <FormItem>
                   <FormLabel>Default Price (VND) *</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      step="1000"
-                      min="1000"
-                      placeholder="1000" 
-                      {...field}
-                      onChange={e => field.onChange(parseFloat(e.target.value) || 0)}
+                    <Input
+                      type="text"
+                      placeholder="1,000"
+                      value={field.value || field.value === 0 ? (field.value === 0 ? '' : new Intl.NumberFormat('en-US').format(field.value)) : ''}
+                      onChange={e => {
+                        const rawValue = e.target.value.replace(/\D/g, '');
+                        field.onChange(rawValue ? parseInt(rawValue, 10) : 0);
+                      }}
                     />
                   </FormControl>
                   <FormDescription>Minimum 1,000 VND</FormDescription>
@@ -180,10 +242,10 @@ export function WorkshopTemplateForm({
                 <FormItem>
                   <FormLabel>Estimated Duration (minutes) *</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       min="1"
-                      placeholder="90" 
+                      placeholder="90"
                       {...field}
                       onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                     />
@@ -210,10 +272,10 @@ export function WorkshopTemplateForm({
                 <FormItem>
                   <FormLabel>Minimum Participants *</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      min="1" 
-                      placeholder="5" 
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="5"
                       {...field}
                       onChange={e => field.onChange(parseInt(e.target.value) || 1)}
                     />
@@ -231,10 +293,10 @@ export function WorkshopTemplateForm({
                 <FormItem>
                   <FormLabel>Maximum Participants *</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      min="1" 
-                      placeholder="20" 
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="20"
                       {...field}
                       onChange={e => field.onChange(parseInt(e.target.value) || 1)}
                     />
@@ -307,21 +369,21 @@ export function WorkshopTemplateForm({
 
         {/* Form Actions */}
         <div className="flex justify-end gap-4 pt-6 border-t">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onCancel} 
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
             size="lg"
             disabled={submitting}
           >
             Cancel
           </Button>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="lg"
-            disabled={submitting}
+            disabled={submitting || isUploading}
           >
-            {submitting ? (
+            {(submitting || isUploading) ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                 {isEditing ? "Saving..." : "Creating..."}
@@ -332,6 +394,66 @@ export function WorkshopTemplateForm({
           </Button>
         </div>
       </form>
+
+      {/* Confirmation Modal */}
+      <AlertDialog
+        open={showConfirmModal}
+        onOpenChange={(open) => {
+          if (!isUploading && !submitting) {
+            setShowConfirmModal(open)
+          }
+        }}
+      >
+        <AlertDialogContent
+          onEscapeKeyDown={(e) => {
+            if (isUploading || submitting) e.preventDefault()
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isEditing ? "Save Changes?" : "Create Workshop Template?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                {isEditing
+                  ? "Are you sure you want to save these changes to the template?"
+                  : "Are you sure you want to create this workshop template?"}
+              </p>
+              {(isUploading || submitting) && (
+                <p className="font-medium text-blue-600 dark:text-blue-500 flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-500"></div>
+                  Please do not close this window. {isUploading ? "Uploading images to Cloudinary..." : "Storing template data..."}
+                </p>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+              disabled={isUploading || submitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmUploadAndSubmit}
+              disabled={isUploading || submitting}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {(isUploading || submitting) ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {isUploading ? "Uploading..." : "Saving..."}
+                </>
+              ) : (
+                "Confirm"
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Form>
   )
 }

@@ -262,11 +262,10 @@ export default function WorkshopTemplateDetailPage() {
                       <img
                         src={img.imageUrl}
                         alt={`Workshop image ${idx + 1}`}
-                        className={`w-full h-20 object-cover rounded-md transition-all ${
-                          displayImage === img.imageUrl
-                            ? "ring-2 ring-primary opacity-100"
-                            : "opacity-70 group-hover:opacity-100"
-                        }`}
+                        className={`w-full h-20 object-cover rounded-md transition-all ${displayImage === img.imageUrl
+                          ? "ring-2 ring-primary opacity-100"
+                          : "opacity-70 group-hover:opacity-100"
+                          }`}
                         onError={(e) => {
                           e.currentTarget.src = "https://via.placeholder.com/200x200?text=Image"
                         }}

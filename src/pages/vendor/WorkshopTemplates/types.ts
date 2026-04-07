@@ -128,8 +128,13 @@ export const workshopTemplateSchema = z.object({
     .positive("Must be at least 1")
     .int("Must be a whole number"),
   
-  imageUrls: z.array(z.string().url("Must be a valid URL"))
-    .min(1, "At least one image is required"),
+  imageUrls: z.array(
+    z.union([
+      z.string().url("Must be a valid URL"),
+      // Allow File objects for deferred loading
+      z.custom<File>((val) => val instanceof File, "Must be a file")
+    ])
+  ).min(1, "At least one image is required"),
   
   thumbnailIndex: z.number()
     .min(0, "Invalid thumbnail index"),
