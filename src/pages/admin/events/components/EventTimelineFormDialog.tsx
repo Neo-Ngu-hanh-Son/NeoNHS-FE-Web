@@ -7,6 +7,7 @@ import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import { Loader2 } from 'lucide-react';
+import dayjs from 'dayjs';
 import type {
     EventTimelineResponse,
     CreateEventTimelineRequest,
@@ -20,6 +21,8 @@ interface EventTimelineFormDialogProps {
     onSubmit: (data: CreateEventTimelineRequest | UpdateEventTimelineRequest) => Promise<boolean>;
     /** Optional: pre-fill date when creating from a specific date tab */
     defaultDate?: string;
+    eventStartDate?: string;
+    eventEndDate?: string;
 }
 
 interface FormData {
@@ -42,7 +45,7 @@ const emptyForm: FormData = {
     location: '',
 };
 
-export function EventTimelineFormDialog({ open, onOpenChange, timeline, onSubmit, defaultDate }: EventTimelineFormDialogProps) {
+export function EventTimelineFormDialog({ open, onOpenChange, timeline, onSubmit, defaultDate, eventStartDate, eventEndDate }: EventTimelineFormDialogProps) {
     const [form, setForm] = useState<FormData>(emptyForm);
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [loading, setLoading] = useState(false);
@@ -82,6 +85,33 @@ export function EventTimelineFormDialog({ open, onOpenChange, timeline, onSubmit
         if (form.startTime && form.endTime && form.startTime >= form.endTime) {
             newErrors.endTime = 'End time must be after start time';
         }
+
+        if (eventStartDate && form.date && form.startTime) {
+            const eventStartDT = dayjs(eventStartDate);
+            const minDate = eventStartDT.format('YYYY-MM-DD');
+            if (form.date < minDate) {
+                newErrors.date = `Date must be at or after ${minDate}`;
+            } else if (form.date === minDate) {
+                const minTime = eventStartDT.format('HH:mm');
+                if (form.startTime < minTime) {
+                    newErrors.startTime = `Must be at or after ${minTime} on the start date`;
+                }
+            }
+        }
+
+        if (eventEndDate && form.date) {
+            const eventEndDT = dayjs(eventEndDate);
+            const maxDate = eventEndDT.format('YYYY-MM-DD');
+            if (form.date > maxDate) {
+                newErrors.date = `Date must be at or before ${maxDate}`;
+            } else if (form.date === maxDate && form.endTime) {
+                const maxTime = eventEndDT.format('HH:mm');
+                if (form.endTime > maxTime) {
+                    newErrors.endTime = `Must be at or before ${maxTime} on the end date`;
+                }
+            }
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -132,6 +162,8 @@ export function EventTimelineFormDialog({ open, onOpenChange, timeline, onSubmit
                             id="tl-date"
                             type="date"
                             value={form.date}
+                            min={eventStartDate ? dayjs(eventStartDate).format('YYYY-MM-DD') : undefined}
+                            max={eventEndDate ? dayjs(eventEndDate).format('YYYY-MM-DD') : undefined}
                             onChange={(e) => handleChange('date', e.target.value)}
                         />
                         {errors.date && <p className="text-xs text-destructive mt-1">{errors.date}</p>}
