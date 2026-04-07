@@ -17,6 +17,7 @@ export default function BlogFormHeaderSection({
   onSubmit: (data: z.infer<typeof formSchema>) => void;
   submitting: boolean;
 }) {
+  const [messageApi, contextHolder] = message.useMessage();
   const navigate = useNavigate();
   const handlePublish = form.handleSubmit(
     (data) => {
@@ -24,7 +25,7 @@ export default function BlogFormHeaderSection({
       onSubmit(data);
     },
     (errors) => {
-      message.error("There are errors in the form. Please fix them before submitting.");
+      messageApi.error("There are errors in the form. Please fix them before submitting.");
       console.log("Blog form error: ", errors);
     },
   );

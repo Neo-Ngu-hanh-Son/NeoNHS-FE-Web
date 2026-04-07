@@ -292,12 +292,31 @@ export function PointFormModal({
                     <AudioLines className="w-4 h-4" />
                     Manage History Audios
                   </Button>
+
                   {!editingPoint && (
                     <p className="text-xs text-muted-foreground">
                       Save this point first to manage history audio.
                     </p>
                   )}
                 </div>
+              </div>
+
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="historyAudioUrl">Manage Panorama</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  disabled={!editingPoint}
+                  onClick={() => {
+                    if (!editingPoint) return;
+                    navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
+                  }}
+                >
+                  <MapPin className="w-4 h-4" />
+                  Edit Panorama
+                </Button>
               </div>
 
               <div className="space-y-2">

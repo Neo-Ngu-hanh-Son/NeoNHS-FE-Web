@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { blogCategoryService } from "@/services/api/blogCategoryService";
-import type { BlogCategoryResponse, BlogCategoryStatus, BlogCategoryListParams } from "@/types/blog";
+import type { BlogCategoryResponse, BlogCategoryStatus, BlogCategoryListParams, BlogCategoryPageResponse } from "@/types/blog";
 import type { BlogCategoryModalMode } from "@/components/blog-categories/BlogCategoryModal";
 import { BLOG_CATEGORY_PAGE_SIZE, BLOG_CATEGORY_SORT_OPTIONS } from "@/constants/blogCategory";
 
@@ -35,6 +35,7 @@ export interface UseBlogCategoriesReturn {
   openModal: (mode: NonNullable<BlogCategoryModalMode>, category?: BlogCategoryResponse) => void;
   closeModal: () => void;
   handleModalSuccess: () => void;
+  fetchAllCategories: () => Promise<BlogCategoryPageResponse | void>;
 }
 
 export function useBlogCategories(): UseBlogCategoriesReturn {
@@ -134,6 +135,24 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     fetchCategories();
   }, [fetchCategories]);
 
+  const fetchAllCategories = useCallback(async (): Promise<BlogCategoryPageResponse | void> => {
+    try {
+      const params: BlogCategoryListParams = {
+        page: 0,
+        size: totalElements || 1000, // if we have totalElements, use it to fetch all; otherwise default to 1000
+      };
+      const response = await blogCategoryService.getCategories(params);
+      const page = response.data;
+      setCategories(page.content);
+      setTotalElements(page.totalElements);
+      setTotalPages(page.totalPages);
+      return page;
+    } catch (error) {
+      setError("Unable to load blog categories. Please try again later.");
+      setCategories([]);
+    }
+  }, []);
+
   return {
     categories,
     loading,
@@ -154,5 +173,6 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
     closeModal,
     handleModalSuccess,
     retryLastSearch,
+    fetchAllCategories,
   };
 }
