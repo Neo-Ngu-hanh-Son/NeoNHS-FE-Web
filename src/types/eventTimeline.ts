@@ -11,6 +11,7 @@ export interface EventTimelineResponse {
     endTime: string;       // "09:30" (LocalTime)
     organizer?: string;
     location?: string;
+    lunarDate?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -21,7 +22,7 @@ export interface CreateEventTimelineRequest {
     date: string;
     startTime: string;
     endTime: string;
-    organizer?: string;
+    organizer?: string; 
     location?: string;
 }
 
