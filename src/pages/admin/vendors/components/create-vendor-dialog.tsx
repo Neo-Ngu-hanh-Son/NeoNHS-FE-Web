@@ -47,8 +47,12 @@ export function CreateVendorDialog({
         setIsSubmitting(true)
         try {
             await onSuccess(data)
+            // Chỉ reset và đóng dialog khi tạo thành công
             reset()
             onOpenChange(false)
+        } catch {
+            // Giữ dialog mở để người dùng có thể xem/sửa thông tin
+            // Lỗi đã được hiển thị từ handleCreateSuccess trong AdminVendorsPage
         } finally {
             setIsSubmitting(false)
         }

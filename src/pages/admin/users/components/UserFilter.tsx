@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Search, RotateCcw } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,21 +29,62 @@ export function UserFilter({
     onStatusFilterChange,
     onReset,
 }: UserFilterProps) {
+    const [inputValue, setInputValue] = useState(searchText);
+
+    useEffect(() => {
+        setInputValue(searchText);
+    }, [searchText]);
+
+    const triggerSearch = () => {
+        onSearchChange(inputValue);
+    };
+
+    const handleReset = () => {
+        setInputValue("");
+        onReset();
+    };
+
     return (
-        <div className="bg-toolbar-light dark:bg-slate-800/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700 mb-6 shadow-sm">
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-950/30 backdrop-blur p-5 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-4">
+                <div>
+                    <p className="text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                        Filters
+                    </p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Search and narrow down users quickly.
+                    </p>
+                </div>
+                <Button
+                    variant="outline"
+                    onClick={handleReset}
+                    className="hidden md:inline-flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary rounded-lg text-sm font-bold transition-colors h-10 px-4 border-none"
+                >
+                    <RotateCcw className="size-4" />
+                    Reset
+                </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                <div className="relative lg:col-span-2">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 size-5" />
+                <div className="relative lg:col-span-2 flex items-center">
                     <Input
-                        className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary transition-all"
-                        placeholder="Search name or email..."
-                        value={searchText}
-                        onChange={(e) => onSearchChange(e.target.value)}
+                        className="w-full pl-4 pr-10 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm focus:ring-primary focus:border-primary transition-all"
+                        placeholder="Search name or email... (Press Enter)"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && triggerSearch()}
                     />
+                    <div
+                        className="absolute right-2 p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-400 hover:text-primary transition-colors"
+                        onClick={triggerSearch}
+                        title="Click to search"
+                    >
+                        <Search className="size-4" />
+                    </div>
                 </div>
 
                 <Select value={roleFilter} onValueChange={onRoleFilterChange}>
-                    <SelectTrigger className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm h-10 px-3 focus:ring-primary focus:border-primary">
+                    <SelectTrigger className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm h-10 px-3 focus:ring-primary focus:border-primary">
                         <SelectValue placeholder="All Roles" />
                     </SelectTrigger>
                     <SelectContent>
@@ -54,7 +96,7 @@ export function UserFilter({
                 </Select>
 
                 <Select value={statusFilter} onValueChange={onStatusFilterChange}>
-                    <SelectTrigger className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm h-10 px-3 focus:ring-primary focus:border-primary">
+                    <SelectTrigger className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg text-sm h-10 px-3 focus:ring-primary focus:border-primary">
                         <SelectValue placeholder="All Statuses" />
                     </SelectTrigger>
                     <SelectContent>
@@ -67,7 +109,7 @@ export function UserFilter({
                 <Button
                     variant="outline"
                     onClick={onReset}
-                    className="flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary rounded-lg text-sm font-bold transition-colors h-10 px-4 border-none"
+                    className="md:hidden flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary rounded-lg text-sm font-bold transition-colors h-10 px-4 border-none"
                 >
                     <RotateCcw className="size-4" />
                     Reset Filters

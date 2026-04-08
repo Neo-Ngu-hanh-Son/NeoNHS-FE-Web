@@ -41,19 +41,19 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
     };
 
     return (
-        <Card className="shadow-lg border-gray-100 h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-r from-gray-50/50 to-white border-b border-gray-100/50">
+        <Card className="shadow-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 h-full flex flex-col overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-4 bg-gradient-to-r from-slate-50/60 to-white dark:from-white/5 dark:to-transparent border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+                    <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
                         <BarChartOutlined className="text-xl" />
                     </div>
                     <div>
-                        <CardTitle className="text-lg font-bold text-gray-800">Registration Growth</CardTitle>
-                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60">System Growth Metrics</CardDescription>
+                        <CardTitle className="text-lg font-black text-slate-900 dark:text-white">Registration Growth</CardTitle>
+                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60 text-slate-500 dark:text-slate-400">System Growth Metrics</CardDescription>
                     </div>
                 </div>
                 <Select value={regType} onValueChange={(v: any) => setRegType(v)}>
-                    <SelectTrigger className="w-40 bg-white border-gray-200 shadow-sm hover:border-indigo-400 transition-colors">
+                    <SelectTrigger className="w-40 bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 shadow-sm hover:border-indigo-400 transition-colors">
                         <SelectValue placeholder="Select type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -65,26 +65,26 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
             <CardContent className="pt-8 flex-grow pb-10">
                 {summary && (
                     <div className="grid grid-cols-3 gap-4 mb-10">
-                        <div className="bg-indigo-50/40 p-3.5 rounded-2xl border border-indigo-100/30 group hover:bg-indigo-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-indigo-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <UserOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Total Joined</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Total Joined</p>
                             </div>
-                            <p className="text-2xl font-black text-gray-900 leading-none tabular-nums truncate">{summary.totalJoined}</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate">{summary.totalJoined}</p>
                         </div>
-                        <div className="bg-emerald-50/40 p-3.5 rounded-2xl border border-emerald-100/30 group hover:bg-emerald-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-emerald-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <TeamOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Growth</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Growth</p>
                             </div>
-                            <p className="text-2xl font-black text-emerald-900 leading-none tabular-nums truncate">+{summary.growthRate}%</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-emerald-600 leading-none truncate">+{summary.growthRate}%</p>
                         </div>
-                        <div className="bg-amber-50/40 p-3.5 rounded-2xl border border-amber-100/30 group hover:bg-amber-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-amber-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <SafetyCertificateOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Active Rate</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Active Rate</p>
                             </div>
-                            <p className="text-2xl font-black text-amber-900 leading-none tabular-nums truncate">{summary.activePercentage}%</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate">{summary.activePercentage}%</p>
                         </div>
                     </div>
                 )}

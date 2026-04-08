@@ -22,6 +22,14 @@ export interface SpringPage<T> {
     number: number;
 }
 
+export interface UserStats {
+    total: number;
+    active: number;
+    banned: number;
+    unverified: number;
+    inactive: number;
+}
+
 export const adminUserService = {
     /**
      * Get all users for admin management
@@ -41,6 +49,19 @@ export const adminUserService = {
             return res; // res chính là data
         } catch (error) {
             console.error('getAllUsers error:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get user statistics
+     */
+    async getUserStats(): Promise<ApiResponse<UserStats>> {
+        try {
+            const res = await apiClient.get<ApiResponse<UserStats>>('/admin/users/stats');
+            return res;
+        } catch (error) {
+            console.error('getUserStats error:', error);
             throw error;
         }
     },

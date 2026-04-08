@@ -158,3 +158,49 @@ body,
   --psv-panel-text: #ffffff;
   --psv-panel-border: rgba(255, 255, 255, 0.1);
 }
+
+@layer components {
+  .revenue-table .ant-table {
+    @apply bg-transparent;
+  }
+
+  .revenue-table .ant-table-container {
+    @apply border-0;
+  }
+
+  .revenue-table .ant-table-thead > tr > th {
+    @apply bg-transparent text-[11px] font-black uppercase tracking-wider text-slate-500 border-0;
+  }
+
+  .dark .revenue-table .ant-table-thead > tr > th {
+    @apply text-slate-400;
+  }
+
+  .revenue-table .ant-table-tbody > tr > td {
+    @apply border-0 border-b border-slate-100;
+  }
+
+  .dark .revenue-table .ant-table-tbody > tr > td {
+    @apply border-slate-900;
+  }
+
+  .revenue-table .ant-table-tbody > tr.ant-table-row:hover > td {
+    @apply bg-primary/5;
+  }
+
+  .revenue-table .ant-pagination {
+    @apply py-4;
+  }
+
+  .revenue-table .ant-pagination-item,
+  .revenue-table .ant-pagination-prev,
+  .revenue-table .ant-pagination-next {
+    @apply rounded-lg border-slate-200;
+  }
+
+  .dark .revenue-table .ant-pagination-item,
+  .dark .revenue-table .ant-pagination-prev,
+  .dark .revenue-table .ant-pagination-next {
+    @apply border-slate-800;
+  }
+}

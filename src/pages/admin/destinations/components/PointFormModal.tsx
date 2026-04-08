@@ -182,8 +182,8 @@ export function PointFormModal({
               className={`p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? "text-red-500" : "text-primary"}`}
             >
               {formData.latitude &&
-              formData.longitude &&
-              !isPointInBoundary(formData.latitude, formData.longitude) ? (
+                formData.longitude &&
+                !isPointInBoundary(formData.latitude, formData.longitude) ? (
                 <AlertTriangle className="w-5 h-5" />
               ) : (
                 <MapPin className="w-5 h-5" />
@@ -194,8 +194,8 @@ export function PointFormModal({
                 className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? "text-red-500" : "text-cyan-500"}`}
               >
                 {formData.latitude &&
-                formData.longitude &&
-                !isPointInBoundary(formData.latitude, formData.longitude)
+                  formData.longitude &&
+                  !isPointInBoundary(formData.latitude, formData.longitude)
                   ? "Boundary Violation"
                   : "Geocoded Metadata"}
               </h4>
@@ -206,8 +206,8 @@ export function PointFormModal({
               </p>
               <p className="text-[11px] text-slate-400 font-medium truncate max-w-[400px]">
                 {formData.latitude &&
-                formData.longitude &&
-                !isPointInBoundary(formData.latitude, formData.longitude)
+                  formData.longitude &&
+                  !isPointInBoundary(formData.latitude, formData.longitude)
                   ? "WARNING: This location is outside the district boundary!"
                   : editingPoint?.googlePlaceId
                     ? `Linked to Google Place ID: ${editingPoint.googlePlaceId}`
@@ -218,6 +218,19 @@ export function PointFormModal({
 
           <form id="point-form" onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
+
+              <div className="col-span-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11 border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 group transition-all"
+                  onClick={onOpenMapPicker}
+                >
+                  <MapPin className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
+                  Locate on Interactive Map
+                </Button>
+              </div>
+
               <div className="col-span-2 space-y-2">
                 <Label
                   htmlFor="attractionId"
@@ -243,6 +256,8 @@ export function PointFormModal({
                   </SelectContent>
                 </Select>
               </div>
+
+
 
               <div className="col-span-2 space-y-2">
                 <Label htmlFor="name" className="text-sm font-semibold">
@@ -320,48 +335,6 @@ export function PointFormModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="latitude" className="text-sm font-semibold">
-                  Latitude
-                </Label>
-                <Input
-                  id="latitude"
-                  type="number"
-                  step="0.000001"
-                  className="h-11"
-                  value={formData.latitude}
-                  onChange={(e) => handleChange("latitude", parseFloat(e.target.value))}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="longitude" className="text-sm font-semibold">
-                  Longitude
-                </Label>
-                <Input
-                  id="longitude"
-                  type="number"
-                  step="0.000001"
-                  className="h-11"
-                  value={formData.longitude}
-                  onChange={(e) => handleChange("longitude", parseFloat(e.target.value))}
-                  required
-                />
-              </div>
-
-              <div className="col-span-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full h-11 border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 group transition-all"
-                  onClick={onOpenMapPicker}
-                >
-                  <MapPin className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
-                  Locate on Interactive Map
-                </Button>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="type" className="text-sm font-semibold">
                   Point Category
                 </Label>
@@ -382,34 +355,18 @@ export function PointFormModal({
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="orderIndex" className="text-sm font-semibold">
-                    Sequence order
-                  </Label>
-                  <Input
-                    id="orderIndex"
-                    type="number"
-                    min={1}
-                    className="h-11"
-                    value={formData.orderIndex}
-                    onChange={(e) => handleChange("orderIndex", parseInt(e.target.value))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="estTimeSpent" className="text-sm font-semibold">
-                    Est. Visit (Min)
-                  </Label>
-                  <Input
-                    id="estTimeSpent"
-                    type="number"
-                    min={5}
-                    className="h-11"
-                    value={formData.estTimeSpent}
-                    onChange={(e) => handleChange("estTimeSpent", parseInt(e.target.value))}
-                  />
-                </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="estTimeSpent" className="text-sm font-semibold">
+                  Est. Visit (Min)
+                </Label>
+                <Input
+                  id="estTimeSpent"
+                  type="number"
+                  min={5}
+                  className="h-11 w-full lg:w-1/2"
+                  value={formData.estTimeSpent}
+                  onChange={(e) => handleChange("estTimeSpent", parseInt(e.target.value))}
+                />
               </div>
 
               <div className="col-span-2 space-y-2">
@@ -484,9 +441,9 @@ export function PointFormModal({
             type="submit"
             form="point-form"
             className="px-8 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20"
-            disabled={uploading["thumbnailUrl"] || uploading["historyAudioUrl"]}
+            disabled={uploading["thumbnailUrl"] || uploading["historyAudioUrl"] || !safeFormData.attractionId}
           >
-            {editingPoint ? "Update Point" : "Create Point"}
+            {editingPoint?.id ? "Update Point" : "Create Point"}
           </Button>
         </DialogFooter>
       </DialogContent>

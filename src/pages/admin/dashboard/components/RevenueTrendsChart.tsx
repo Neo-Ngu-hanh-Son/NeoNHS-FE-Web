@@ -21,9 +21,16 @@ interface RevenueTrendsChartProps {
 export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setRevenuePeriod }: RevenueTrendsChartProps) {
     const maxRevenue = Math.max(...revenueTrends.map(x => x.revenue), 1);
 
+    const formatCompactNumber = (number: number) => {
+        if (number >= 1000000000) return `${(number / 1000000000).toFixed(1)}B`;
+        if (number >= 1000000) return `${(number / 1000000).toFixed(1)}M`;
+        if (number >= 1000) return `${(number / 1000).toFixed(1)}k`;
+        return number.toString();
+    };
+
     const yAxisLevels = [1, 0.66, 0.33, 0];
     const yAxisLabels = yAxisLevels.map(p => ({
-        label: p === 0 ? "0" : (maxRevenue * p >= 1000000 ? `${(maxRevenue * p / 1000000).toFixed(1)}M` : `${Math.round(maxRevenue * p / 1000)}k`),
+        label: p === 0 ? "0" : formatCompactNumber(maxRevenue * p),
         y: 200 - (p * 170)
     }));
 
@@ -43,19 +50,19 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
     };
 
     return (
-        <Card className="shadow-lg border-gray-100 h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 bg-gradient-to-r from-gray-50/50 to-white border-b border-gray-100/50">
+        <Card className="shadow-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 h-full flex flex-col overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between pb-4 bg-gradient-to-r from-slate-50/60 to-white dark:from-white/5 dark:to-transparent border-b border-slate-100 dark:border-white/10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                    <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                         <LineChartOutlined className="text-xl" />
                     </div>
                     <div>
-                        <CardTitle className="text-lg font-bold text-gray-800">Revenue Trends</CardTitle>
-                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60">Financial Performance Analytics</CardDescription>
+                        <CardTitle className="text-lg font-black text-slate-900 dark:text-white">Revenue Trends</CardTitle>
+                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60 text-slate-500 dark:text-slate-400">Financial Performance Analytics</CardDescription>
                     </div>
                 </div>
                 <Select value={revenuePeriod} onValueChange={(v: any) => setRevenuePeriod(v)}>
-                    <SelectTrigger className="w-40 bg-white border-gray-200 shadow-sm hover:border-blue-400 transition-colors">
+                    <SelectTrigger className="w-40 bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 shadow-sm hover:border-primary transition-colors">
                         <SelectValue placeholder="Select period" />
                     </SelectTrigger>
                     <SelectContent>
@@ -67,35 +74,39 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
             <CardContent className="pt-8 flex-grow pb-10">
                 {summary && (
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                        <div className="bg-blue-50/40 p-3.5 rounded-2xl border border-blue-100/30 group hover:bg-blue-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-blue-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <DollarOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Current Total</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Current Total</p>
                             </div>
-                            <p className="text-xl font-black text-gray-900 leading-none mb-1 truncate px-1">
-                                {summary.currentTotal.toLocaleString()}
+                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white mb-1 truncate px-1" title={summary.currentTotal.toLocaleString()}>
+                                {formatCompactNumber(summary.currentTotal)}
                             </p>
                         </div>
-                        <div className="bg-emerald-50/40 p-3.5 rounded-2xl border border-emerald-100/30 group hover:bg-emerald-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-emerald-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <RiseOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Growth Rate</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Growth Rate</p>
                             </div>
-                            <p className="text-xl font-black text-emerald-900 leading-none">+{summary.growthRate}%</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-emerald-600 leading-none">+{summary.growthRate}%</p>
                         </div>
-                        <div className="bg-purple-50/40 p-3.5 rounded-2xl border border-purple-100/30 group hover:bg-purple-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-purple-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <TransactionOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Peak Revenue</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Peak Revenue</p>
                             </div>
-                            <p className="text-xl font-black text-gray-900 leading-none truncate px-1">{summary.peakValue.toLocaleString()}</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate px-1" title={summary.peakValue.toLocaleString()}>
+                                {formatCompactNumber(summary.peakValue)}
+                            </p>
                         </div>
-                        <div className="bg-orange-50/40 p-3.5 rounded-2xl border border-orange-100/30 group hover:bg-orange-50/60 transition-colors text-center overflow-hidden">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-orange-600">
+                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
+                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
                                 <LineChartOutlined className="text-lg" />
-                                <p className="text-[10px] uppercase tracking-widest font-bold opacity-70">Average</p>
+                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Average</p>
                             </div>
-                            <p className="text-xl font-black text-gray-900 leading-none truncate px-1">{Math.round(summary.averageValue).toLocaleString()}</p>
+                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate px-1" title={Math.round(summary.averageValue).toLocaleString()}>
+                                {formatCompactNumber(Math.round(summary.averageValue))}
+                            </p>
                         </div>
                     </div>
                 )}

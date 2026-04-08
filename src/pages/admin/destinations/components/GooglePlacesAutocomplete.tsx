@@ -39,6 +39,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
 
     const autocompleteSuggestion = useRef<any>(null);
     const sessionToken = useRef<any>(null);
+    const debounceTimeout = useRef<any>(null);
 
     useEffect(() => {
         const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -62,28 +63,36 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
         });
     }, []);
 
-    const handleInputChange = async (value: string) => {
+    const handleInputChange = (value: string) => {
         setInputValue(value);
+
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
         if (!value || value.length < 2 || !autocompleteSuggestion.current) {
             setPredictions([]);
             return;
         }
 
         setLoading(true);
-        try {
-            const { suggestions } = await autocompleteSuggestion.current.fetchAutocompleteSuggestions({
-                input: value,
-                sessionToken: sessionToken.current,
-                locationBias: { lat: 15.9986, lng: 108.2618 }, // Ngu Hanh Son area
-            });
-            // Map the new suggestion format back to a predictable structure for the UI
-            setPredictions(suggestions.map((s: any) => s.placePrediction));
-        } catch (err) {
-            console.error("Autocomplete fetch failed:", err);
-            setPredictions([]);
-        } finally {
-            setLoading(false);
-        }
+
+        debounceTimeout.current = setTimeout(async () => {
+            try {
+                const { suggestions } = await autocompleteSuggestion.current.fetchAutocompleteSuggestions({
+                    input: value,
+                    sessionToken: sessionToken.current,
+                    locationBias: { lat: 15.9986, lng: 108.2618 }, // Ngu Hanh Son area
+                });
+                // Map the new suggestion format back to a predictable structure for the UI
+                setPredictions(suggestions.map((s: any) => s.placePrediction));
+            } catch (err) {
+                console.error("Autocomplete fetch failed:", err);
+                setPredictions([]);
+            } finally {
+                setLoading(false);
+            }
+        }, 800); // 800ms debounce to save API cost
     };
 
     const handleSelect = async (prediction: any) => {
@@ -99,13 +108,24 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                 fields: ['displayName', 'formattedAddress', 'location', 'id', 'photos']
             });
 
+            const lat = typeof place.location?.lat === 'function' ? place.location.lat() : (place.location as any)?.lat || 0;
+            const lng = typeof place.location?.lng === 'function' ? place.location.lng() : (place.location as any)?.lng || 0;
+
+            const photoUrl = place.photos?.[0]
+                ? (typeof (place.photos[0] as any).getURI === 'function'
+                    ? (place.photos[0] as any).getURI({ maxWidth: 800 })
+                    : (typeof (place.photos[0] as any).getUrl === 'function'
+                        ? (place.photos[0] as any).getUrl({ maxWidth: 800 })
+                        : null))
+                : null;
+
             onPlaceSelect({
                 name: place.displayName || '',
                 address: place.formattedAddress || '',
-                latitude: place.location?.lat() || 0,
-                longitude: place.location?.lng() || 0,
+                latitude: lat,
+                longitude: lng,
                 googlePlaceId: place.id || '',
-                photoUrl: place.photos?.[0]?.getUrl({ maxWidth: 800 })
+                photoUrl: photoUrl || undefined
             });
 
             // Refresh session token for next search if library available

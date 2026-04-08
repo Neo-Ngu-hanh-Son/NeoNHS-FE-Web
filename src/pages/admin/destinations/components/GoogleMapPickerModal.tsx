@@ -103,6 +103,16 @@ export function GoogleMapPickerModal({
     const initMap = () => {
         if (!mapRef.current) return;
 
+        // Reset stale refs from previous modal openings
+        if (marker.current) {
+            marker.current.map = null;
+            marker.current = null;
+        }
+        if (boundaryPolygon.current) {
+            boundaryPolygon.current.setMap(null);
+            boundaryPolygon.current = null;
+        }
+
         const center = initialCoord ? { lat: initialCoord[0], lng: initialCoord[1] } : { lat: MAP_CENTER[0], lng: MAP_CENTER[1] };
 
         const mapOptions: google.maps.MapOptions = {
@@ -190,8 +200,8 @@ export function GoogleMapPickerModal({
             marker.current.position = { lat, lng };
         }
 
+        googleMap.current.setCenter({ lat, lng });
         googleMap.current.setZoom(19);
-        googleMap.current.panTo({ lat, lng });
     };
 
     const fetchPlaceDetails = (placeId: string, lat: number, lng: number) => {
@@ -203,13 +213,16 @@ export function GoogleMapPickerModal({
         }, (place, status) => {
             setGeocoding(false);
             if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+                const pLat = typeof place.geometry?.location?.lat === 'function' ? place.geometry.location.lat() : (place.geometry?.location as any)?.lat || lat;
+                const pLng = typeof place.geometry?.location?.lng === 'function' ? place.geometry.location.lng() : (place.geometry?.location as any)?.lng || lng;
+
                 setSelectedPoint({
-                    lat: place.geometry?.location?.lat() || lat,
-                    lng: place.geometry?.location?.lng() || lng,
+                    lat: pLat,
+                    lng: pLng,
                     name: place.name,
                     address: place.formatted_address,
                     placeId: placeId,
-                    photoUrl: place.photos?.[0]?.getUrl({ maxWidth: 400 }), // Shorter URL
+                    photoUrl: place.photos?.[0]?.getUrl({ maxWidth: 400 }),
                     types: place.types
                 });
             } else {
@@ -244,20 +257,24 @@ export function GoogleMapPickerModal({
     };
 
     const handlePlaceSearchSelect = (place: DiscoveryResult) => {
-        if (isPointInBoundary(place.latitude, place.longitude)) {
+        const lat = place.latitude;
+        const lng = place.longitude;
+
+        if (isPointInBoundary(lat, lng)) {
             setError(null);
             setSelectedPoint({
-                lat: place.latitude,
-                lng: place.longitude,
+                lat: lat,
+                lng: lng,
                 name: place.name,
                 address: place.address,
                 placeId: place.googlePlaceId,
                 photoUrl: place.photoUrl
             });
-            updateMarker(place.latitude, place.longitude);
-            googleMap.current?.setZoom(19);
+            updateMarker(lat, lng);
         } else {
             setError("Vị trí đã tìm thấy nằm ngoài ranh giới Ngũ Hành Sơn.");
+            // Still move the map there so user sees where it is, but show error
+            updateMarker(lat, lng);
         }
     };
 
