@@ -76,7 +76,10 @@ const toTimeInputValue = (time: string): string => {
   return time.length >= 5 ? time.slice(0, 5) : time;
 };
 
-const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eventPoint'] | undefined => {
+const buildEventPointPayload = (
+  form: FormData,
+  existingTagId?: string,
+): CreateEventTimelineRequest['eventPoint'] | undefined => {
   const name = form.destinationName.trim();
   const latitudeRaw = form.destinationLatitude.trim();
   const longitudeRaw = form.destinationLongitude.trim();
@@ -102,6 +105,11 @@ const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eve
 
   const imageUrl = form.destinationImageUrl.trim();
   if (imageUrl) payload.imageUrl = imageUrl;
+
+  if (existingTagId) {
+    payload.eventPointTagId = existingTagId;
+    return payload;
+  }
 
   const markerIconUrl = form.destinationMarkerIconUrl.trim();
   const tagColor = form.destinationTagColor.trim();
@@ -241,7 +249,7 @@ export function EventTimelineFormDialog({
     if (!validate('submit')) return;
     setLoading(true);
 
-    const eventPoint = buildEventPointPayload(form);
+    const eventPoint = buildEventPointPayload(form, timeline?.eventPoint?.eventPointTag?.id);
 
     const data: CreateEventTimelineRequest = {
       name: form.name.trim(),

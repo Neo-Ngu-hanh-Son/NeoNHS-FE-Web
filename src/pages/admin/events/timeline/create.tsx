@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { message } from 'antd';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -182,7 +183,12 @@ export default function EventTimelineCreatePage() {
   };
 
   const handleSubmit = async () => {
-    if (!validate('submit')) return;
+    if (!validate('submit')) {
+      if (!form.destinationMarkerIconUrl.trim()) {
+        message.warning('Please generate and confirm a marker tag before creating this timeline entry.');
+      }
+      return;
+    }
 
     setLoading(true);
     const eventPoint = buildEventPointPayload(form);

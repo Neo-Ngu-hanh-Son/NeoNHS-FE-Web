@@ -31,22 +31,42 @@ type VisualIconOption = {
 };
 
 const DEFAULT_TAG_COLOR = '#0f766e';
+const MARKER_GENERATE_COOLDOWN_MS = 4000;
 
 const QUICK_SWATCHES = ['#0f766e', '#0d9488', '#2563eb', '#db2777', '#ea580c', '#7c3aed'];
 
-const NHS_CULTURAL_ICONS: VisualIconOption[] = [
-  { key: 'pagoda', label: 'Pagoda', iconName: 'mdi:temple-buddhist' },
-  { key: 'incense', label: 'Ritual', iconName: 'mdi:fire' },
-  { key: 'mountain', label: 'Mountain', iconName: 'mdi:mountain' },
-  { key: 'water', label: 'Water', iconName: 'mdi:waves' },
-  { key: 'stone', label: 'Marble', iconName: 'mdi:diamond-stone' },
-  { key: 'tree', label: 'Nature', iconName: 'mdi:pine-tree' },
-  { key: 'history', label: 'History', iconName: 'mdi:scroll' },
-  { key: 'art', label: 'Craft', iconName: 'mdi:brush' },
-  { key: 'view', label: 'Viewpoint', iconName: 'mdi:binoculars' },
+export const NHS_CULTURAL_ICONS: VisualIconOption[] = [
+  { key: 'marker', label: 'Location', iconName: 'mdi:map-marker' },
+  { key: 'navigation', label: 'Navigation', iconName: 'mdi:compass' },
+  { key: 'viewpoint', label: 'Viewpoint', iconName: 'mdi:binoculars' },
   { key: 'trail', label: 'Trail', iconName: 'mdi:foot-print' },
-  { key: 'culture', label: 'Experience', iconName: 'mdi:account' },
-  { key: 'marker', label: 'Marker', iconName: 'mdi:map-marker' },
+  { key: 'info', label: 'Information', iconName: 'mdi:information' },
+  { key: 'parking', label: 'Parking', iconName: 'mdi:parking' },
+  { key: 'wc', label: 'Restroom', iconName: 'mdi:toilet' },
+  { key: 'food', label: 'Food', iconName: 'mdi:food' },
+  { key: 'drink', label: 'Drink', iconName: 'mdi:cup-water' },
+  { key: 'ticket', label: 'Ticket', iconName: 'mdi:ticket' },
+  { key: 'pagoda', label: 'Pagoda', iconName: 'mdi:temple-buddhist' },
+  { key: 'shrine', label: 'Shrine', iconName: 'mdi:home-variant' },
+  { key: 'incense', label: 'Ritual', iconName: 'mdi:fire' },
+  { key: 'statue', label: 'Statue', iconName: 'mdi:human-male-height' },
+  { key: 'history', label: 'History', iconName: 'mdi:scroll' },
+  { key: 'mountain', label: 'Mountain', iconName: 'mdi:mountain' },
+  { key: 'cave', label: 'Cave', iconName: 'roentgen:cave' },
+  { key: 'water', label: 'Water', iconName: 'mdi:waves' },
+  { key: 'tree', label: 'Nature', iconName: 'mdi:pine-tree' },
+  { key: 'stone', label: 'Marble', iconName: 'mdi:diamond-stone' },
+  { key: 'craft', label: 'Craft', iconName: 'mdi:brush' },
+  { key: 'photo', label: 'Photo Spot', iconName: 'mdi:camera' },
+  { key: 'guide', label: 'Guide', iconName: 'mdi:account-tie' },
+  { key: 'shopping', label: 'Souvenir', iconName: 'mdi:shopping' },
+  { key: 'festival', label: 'Festival', iconName: 'mdi:party-popper' },
+  { key: 'music', label: 'Music', iconName: 'mdi:music' },
+  { key: 'live-music', label: 'Live Music', iconName: 'mdi:microphone' },
+  { key: 'dance', label: 'Performance', iconName: 'mdi:human-female-dance' },
+  { key: 'fireworks', label: 'Fireworks', iconName: 'mdi:firework' },
+  { key: 'stage', label: 'Stage Event', iconName: 'mdi:theater' },
+  { key: 'lantern', label: 'Lantern', iconName: 'mingcute:lantern-fill' },
 ];
 
 export default function EventPointTagTab({ form, errors, handleChange }: Props) {
@@ -58,6 +78,7 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
   const [generatedIconUrl, setGeneratedIconUrl] = useState(form.destinationMarkerIconUrl || '');
   const [customUploadUrl, setCustomUploadUrl] = useState<string | null>(null);
   const [tagColor, setTagColor] = useState(form.destinationTagColor || DEFAULT_TAG_COLOR);
+  const [lastGenerateAt, setLastGenerateAt] = useState(0);
 
   const [selectedIcon, setSelectedIcon] = useState<VisualIconOption>(NHS_CULTURAL_ICONS[0]);
 
@@ -131,6 +152,20 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
   };
 
   const handleReviewCreate = async () => {
+    if (isProcessing) {
+      message.warning('Marker generation is in progress. Please wait.');
+      return;
+    }
+
+    const now = Date.now();
+    const elapsed = now - lastGenerateAt;
+    if (elapsed < MARKER_GENERATE_COOLDOWN_MS) {
+      const remaining = Math.ceil((MARKER_GENERATE_COOLDOWN_MS - elapsed) / 1000);
+      message.warning(`Please wait ${remaining}s before generating again to avoid duplicate uploads.`);
+      return;
+    }
+
+    setLastGenerateAt(now);
     setIsProcessing(true);
 
     try {
@@ -143,6 +178,7 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
 
       setGeneratedIconUrl(iconUrl);
       setIsReviewDialogOpen(true);
+      message.success('Marker generated. Please confirm to apply it.');
     } catch {
       message.error('Error generating marker.');
     } finally {
@@ -173,7 +209,7 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
         {/* ICON SELECTION */}
         <section className="space-y-3 border-r xl:pr-4">
           <Label>Icon</Label>
-
+          <br />
           <input
             ref={customUploadInputRef}
             type="file"
@@ -183,7 +219,7 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
           />
 
           <Button onClick={handleSelectCustomUpload} variant="outline">
-            Upload Icon
+            Upload Custom Icon
           </Button>
 
           <div className="grid grid-cols-6 gap-2">
@@ -237,9 +273,12 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
               </div>
             </div>
 
-            <Button className="mt-4" onClick={handleReviewCreate}>
-              Generate
+            <Button className="mt-4" onClick={handleReviewCreate} disabled={isProcessing}>
+              {isProcessing ? 'Generating...' : 'Generate'}
             </Button>
+            {errors.destinationMarkerIconUrl && (
+              <p className="text-xs text-destructive mt-2">{errors.destinationMarkerIconUrl}</p>
+            )}
           </div>
         </section>
       </div>

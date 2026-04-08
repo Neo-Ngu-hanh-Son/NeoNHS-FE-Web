@@ -13,8 +13,10 @@ export interface EventPointRequest {
     name: string;
     latitude: number;
     longitude: number;
+    description?: string;
     address?: string;
     imageUrl?: string;
+    eventPointTagId?: string | null;
     eventPointTagRequest?: EventPointTagRequest;
 }
 
@@ -29,9 +31,11 @@ export interface EventPointTagResponse {
 export interface EventPointResponse {
     id: string;
     name: string;
+    description?: string;
     latitude: number;
     longitude: number;
     address?: string;
+    imageList?: string;
     imageUrl?: string;
     eventPointTag?: EventPointTagResponse;
 }

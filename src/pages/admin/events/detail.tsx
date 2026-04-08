@@ -29,6 +29,7 @@ import {
   Image as ImageIcon,
   Info,
   CalendarDays,
+  Tags,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
@@ -37,6 +38,8 @@ import { formatEventDate, formatEventPrice } from './utils';
 import { ImageGallery } from './components/ImageGallery';
 import { TicketCatalogList } from './components/TicketCatalogList';
 import { EventTimelineList } from './components/eventTimeline/EventTimelineList';
+import { EventPointList } from './components/eventPoint/EventPointList';
+import { EventPointTagList } from './components/eventPoint/EventPointTagList';
 import { useState } from 'react';
 
 export default function EventDetailPage() {
@@ -46,7 +49,15 @@ export default function EventDetailPage() {
   const { event, loading, fetchEvent } = useEvent(id!);
   const [showHide, setShowHide] = useState(false);
   const [showPermanentDelete, setShowPermanentDelete] = useState(false);
-  const defaultTab = searchParams.get('tab') === 'timeline' ? 'timeline' : 'overview';
+  const tabParam = searchParams.get('tab');
+  const defaultTab =
+    tabParam === 'timeline' ||
+    tabParam === 'gallery' ||
+    tabParam === 'tickets' ||
+    tabParam === 'points' ||
+    tabParam === 'point-tags'
+      ? tabParam
+      : 'overview';
 
   const isDeleted = !!event?.deletedAt;
 
@@ -196,6 +207,14 @@ export default function EventDetailPage() {
             <CalendarDays className="h-4 w-4" />
             Timeline
           </TabsTrigger>
+          <TabsTrigger value="points" className="gap-1.5">
+            <MapPin className="h-4 w-4" />
+            Points
+          </TabsTrigger>
+          <TabsTrigger value="point-tags" className="gap-1.5">
+            <Tags className="h-4 w-4" />
+            Point Tags
+          </TabsTrigger>
           <TabsTrigger value="tickets" className="gap-1.5">
             <Ticket className="h-4 w-4" />
             Tickets
@@ -327,6 +346,30 @@ export default function EventDetailPage() {
             </CardHeader>
             <CardContent>
               <EventTimelineList eventId={id!} eventStartDate={event.startTime} eventEndDate={event.endTime} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Points Tab */}
+        <TabsContent value="points">
+          <Card>
+            <CardHeader>
+              <CardTitle>Event Points</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EventPointList />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Point Tags Tab */}
+        <TabsContent value="point-tags">
+          <Card>
+            <CardHeader>
+              <CardTitle>Event Point Tags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EventPointTagList />
             </CardContent>
           </Card>
         </TabsContent>
