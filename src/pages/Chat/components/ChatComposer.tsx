@@ -1,5 +1,5 @@
 import { FormEvent, useRef } from 'react';
-import { SendOutlined, PictureOutlined, LoadingOutlined } from '@ant-design/icons';
+import { SendOutlined, CameraOutlined, LoadingOutlined } from '@ant-design/icons';
 
 interface ChatComposerProps {
   newMessage: string;
@@ -30,14 +30,14 @@ export default function ChatComposer({
   return (
     <div className="p-4 border-t border-[#d3e4da] dark:border-white/10 bg-white dark:bg-background-dark shrink-0">
       <form onSubmit={onSend} className="flex gap-2 items-center">
-        <input 
-          type="file" 
-          accept="image/*" 
-          ref={fileInputRef} 
-          className="hidden" 
-          onChange={handleFileChange} 
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
         />
-        
+
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -45,7 +45,7 @@ export default function ChatComposer({
           className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-none outline-none"
           title="Send image"
         >
-          {isUploadingImage ? <LoadingOutlined className="text-xl" /> : <PictureOutlined className="text-xl" />}
+          {isUploadingImage ? <LoadingOutlined className="text-xl" /> : <CameraOutlined className="text-xl" />}
         </button>
 
         <input
