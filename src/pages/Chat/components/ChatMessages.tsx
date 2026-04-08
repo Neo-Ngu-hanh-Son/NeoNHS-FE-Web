@@ -100,7 +100,21 @@ export default function ChatMessages({
                       : `${msg.messageType === 'IMAGE' ? '' : 'bg-[#f0f2f5] dark:bg-[#2a2d31] text-[#1c1e21] dark:text-white border border-black/5 dark:border-white/5'} ${showAvatar ? 'rounded-bl-sm' : ''}`
                       }`}
                   >
-                    {msg.messageType === 'IMAGE' && msg.mediaUrl ? (
+                    {msg.messageType === 'IMAGE' && (msg as any)._isUploading ? (
+                      <div className="rounded-xl overflow-hidden shadow-sm relative">
+                        <img
+                          src={(msg as any)._localPreview}
+                          alt="Uploading..."
+                          className="max-w-[200px] max-h-[300px] object-cover opacity-40 blur-[1px]"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl">
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+                            <span className="text-white text-xs font-medium drop-shadow">Uploading...</span>
+                          </div>
+                        </div>
+                      </div>
+                    ) : msg.messageType === 'IMAGE' && msg.mediaUrl ? (
                       <AntImage.PreviewGroup items={[msg.mediaUrl]}>
                         <div className="rounded-xl overflow-hidden shadow-sm flex">
                           <AntImage

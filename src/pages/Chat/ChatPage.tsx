@@ -182,13 +182,38 @@ export default function ChatPage() {
   const handleImageSelect = async (file: File) => {
     if (!activeRoomId || !wsServiceRef.current) return;
 
+    // Create a local preview URL for the placeholder
+    const localPreviewUrl = URL.createObjectURL(file);
+    const placeholderId = `_uploading_${Date.now()}`;
+
+    // Inject a temporary placeholder message immediately
+    const placeholderMsg: ChatMessage = {
+      id: placeholderId,
+      chatRoomId: activeRoomId,
+      senderId: currentUserId,
+      content: '',
+      timestamp: new Date().toISOString(),
+      status: 'SENT',
+      messageType: 'IMAGE',
+      mediaUrl: undefined, // no real URL yet — triggers the skeleton
+      _localPreview: localPreviewUrl,
+      _isUploading: true,
+    } as ChatMessage & { _localPreview: string; _isUploading: boolean };
+
+    setMessages(prev => [...prev, placeholderMsg]);
     setIsUploadingImage(true);
+
     try {
       const response = await ChatRestService.uploadMedia(file);
+      // Remove the placeholder before the real message arrives via WS
+      setMessages(prev => prev.filter(m => m.id !== placeholderId));
       wsServiceRef.current.sendMessage(activeRoomId, '', 'IMAGE', response.mediaUrl);
     } catch (error) {
       console.error('Failed to upload and send image:', error);
+      // Remove placeholder on failure
+      setMessages(prev => prev.filter(m => m.id !== placeholderId));
     } finally {
+      URL.revokeObjectURL(localPreviewUrl);
       setIsUploadingImage(false);
     }
   };
