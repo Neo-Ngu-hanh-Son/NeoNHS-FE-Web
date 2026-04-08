@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
     ArrowLeft, Pencil, Trash2, RotateCcw, MapPin, Calendar, Users,
-    DollarSign, Ticket, EyeOff, Image as ImageIcon, Info, CalendarDays,
+    DollarSign, Ticket, EyeOff, Image as ImageIcon, Info, CalendarDays, MoonStar,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
@@ -182,8 +182,28 @@ export default function EventDetailPage() {
                                 <CardHeader><CardTitle>Event Information</CardTitle></CardHeader>
                                 <CardContent>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="Start Time" value={formatEventDate(event.startTime)} />
-                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="End Time" value={formatEventDate(event.endTime)} />
+                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="Start Time" value={
+                                            <div>
+                                                <div>{formatEventDate(event.startTime)}</div>
+                                                {event.lunarStartDate && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 font-normal">
+                                                        <MoonStar className="h-3 w-3 shrink-0" />
+                                                        <span>{event.lunarStartDate}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        } />
+                                        <InfoItem icon={<Calendar className="h-4 w-4" />} label="End Time" value={
+                                            <div>
+                                                <div>{formatEventDate(event.endTime)}</div>
+                                                {event.lunarEndDate && (
+                                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1 font-normal">
+                                                        <MoonStar className="h-3 w-3 shrink-0" />
+                                                        <span>{event.lunarEndDate}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        } />
                                         <InfoItem icon={<MapPin className="h-4 w-4" />} label="Location" value={event.locationName || '—'} />
                                         <InfoItem icon={<DollarSign className="h-4 w-4" />} label="Price" value={formatEventPrice(event.price)} />
                                         <InfoItem icon={<Users className="h-4 w-4" />} label="Enrolled" value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants}` : ''}`} />
@@ -323,13 +343,13 @@ export default function EventDetailPage() {
     );
 }
 
-function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
     return (
         <div className="flex items-start gap-3">
             <div className="mt-0.5 text-muted-foreground">{icon}</div>
             <div>
                 <p className="text-xs text-muted-foreground">{label}</p>
-                <p className="text-sm font-medium">{value}</p>
+                <div className="text-sm font-medium">{value}</div>
             </div>
         </div>
     );

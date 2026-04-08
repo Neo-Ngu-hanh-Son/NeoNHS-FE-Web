@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import {
     MoreHorizontal, Eye, Pencil, Trash2, RotateCcw,
-    CalendarDays, Users, Tag, ImageIcon, ChevronLeft, ChevronRight, EyeOff,
+    CalendarDays, Users, Tag, ImageIcon, ChevronLeft, ChevronRight, EyeOff, MoonStar,
 } from 'lucide-react';
 import type { EventResponse } from '@/types/event';
 import { statusBadgeStyles, statusLabels } from '../constants';
@@ -230,7 +230,7 @@ export function EventCardGrid({
                                 )}
 
                                 {/* Meta row */}
-                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <div className="flex flex-col gap-1 text-xs text-muted-foreground mb-2">
                                     <span className="flex items-center gap-1">
                                         <CalendarDays className="h-3 w-3" />
                                         {(() => {
@@ -240,6 +240,14 @@ export function EventCardGrid({
                                                 : `${range.start} → ${range.end}`;
                                         })()}
                                     </span>
+                                    {(event.lunarStartDate || event.lunarEndDate) && (
+                                        <span className="flex items-center gap-1">
+                                            <MoonStar className="h-3 w-3" />
+                                            {event.lunarStartDate === event.lunarEndDate 
+                                                ? event.lunarStartDate 
+                                                : `${event.lunarStartDate || '?'} → ${event.lunarEndDate || '?'}`}
+                                        </span>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center justify-between">
