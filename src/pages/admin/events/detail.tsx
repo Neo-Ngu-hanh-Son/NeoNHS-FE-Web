@@ -259,7 +259,7 @@ export default function EventDetailPage() {
                             <CardTitle>Event Timeline</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <EventTimelineList eventId={id!} />
+                            <EventTimelineList eventId={id!} eventStartDate={event.startTime} eventEndDate={event.endTime} />
                         </CardContent>
                     </Card>
                 </TabsContent>

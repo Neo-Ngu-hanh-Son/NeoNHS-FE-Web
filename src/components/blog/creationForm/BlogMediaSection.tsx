@@ -6,11 +6,8 @@ import { formSchema } from "@/components/blog/type";
 import { Label } from "@/components/ui/label";
 import DragImageUploader from "@/components/common/DragImageUploader";
 
-export default function BlogMediaSection({
-  form,
-}: {
-  form: UseFormReturn<z.infer<typeof formSchema>>;
-}) {
+export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+  const [messageApi] = message.useMessage();
   return (
     <Card>
       <CardHeader>
@@ -27,14 +24,12 @@ export default function BlogMediaSection({
               <DragImageUploader
                 value={field.value}
                 onUpload={field.onChange}
-                onError={(msg) => message.error(msg)}
+                onError={(msg) => messageApi.error(msg)}
                 placeholder="Drag & drop a thumbnail image"
                 minHeight={140}
                 imageClassName="object-cover h-[140px]"
               />
-              {fieldState.error && (
-                <p className="text-sm text-destructive">{fieldState.error.message}</p>
-              )}
+              {fieldState.error && <p className="text-sm text-destructive">{fieldState.error.message}</p>}
             </div>
           )}
         />
@@ -49,14 +44,12 @@ export default function BlogMediaSection({
               <DragImageUploader
                 value={field.value}
                 onUpload={field.onChange}
-                onError={(msg) => message.error(msg)}
+                onError={(msg) => messageApi.error(msg)}
                 placeholder="Drag & drop a banner image"
                 minHeight={120}
                 imageClassName="object-cover h-[120px]"
               />
-              {fieldState.error && (
-                <p className="text-sm text-destructive">{fieldState.error.message}</p>
-              )}
+              {fieldState.error && <p className="text-sm text-destructive">{fieldState.error.message}</p>}
             </div>
           )}
         />

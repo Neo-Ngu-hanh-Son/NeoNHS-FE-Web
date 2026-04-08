@@ -15,31 +15,26 @@ interface BlogEditorSectionProps {
   editorPrestateJSON?: string;
 }
 
-export default function BlogEditorSection({
-  editorRef,
-  handleSave,
-  editorPrestateJSON,
-}: BlogEditorSectionProps) {
-  const [contextHolder] = notification.useNotification();
+export default function BlogEditorSection({ editorRef, handleSave, editorPrestateJSON }: BlogEditorSectionProps) {
+  const [messageApi] = message.useMessage();
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
       const resultUrl = await uploadImageToCloudinary(file);
       console.log("Result url: " + resultUrl);
       if (!resultUrl) {
-        message.error("Error uploading image, please try again");
+        messageApi.error("Error uploading image, please try again");
       }
       return resultUrl || "";
     } catch (error) {
       console.error("[BlogEditorSection] Error uploading image:", error);
-      message.error("Error uploading image, please try again");
+      messageApi.error("Error uploading image, please try again");
       return "";
     }
   };
 
   return (
     <>
-      {contextHolder}
       <Card className="min-h-[500px] flex flex-col">
         <CardHeader>
           <CardTitle>Content</CardTitle>

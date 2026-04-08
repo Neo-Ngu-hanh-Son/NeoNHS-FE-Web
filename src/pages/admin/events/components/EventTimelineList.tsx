@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
     Plus, Pencil, Trash2, MoreHorizontal, Clock, MapPin, User,
-    CalendarDays,
+    CalendarDays, MoonStar,
 } from 'lucide-react';
 import { useEventTimelines } from '@/hooks/event';
 import { EventTimelineFormDialog } from './EventTimelineFormDialog';
@@ -54,9 +54,11 @@ function formatTimeRange(start: string, end: string): string {
 
 interface EventTimelineListProps {
     eventId: string;
+    eventStartDate?: string;
+    eventEndDate?: string;
 }
 
-export function EventTimelineList({ eventId }: EventTimelineListProps) {
+export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: EventTimelineListProps) {
     const { timelines, loading, createTimeline, updateTimeline, deleteTimeline } = useEventTimelines(eventId);
 
     const [formOpen, setFormOpen] = useState(false);
@@ -194,6 +196,8 @@ export function EventTimelineList({ eventId }: EventTimelineListProps) {
                 timeline={editingTimeline}
                 onSubmit={handleSubmit}
                 defaultDate={defaultFormDate}
+                eventStartDate={eventStartDate}
+                eventEndDate={eventEndDate}
             />
 
             {/* Delete confirmation */}
@@ -265,6 +269,12 @@ function TimelineTable({ timelines, showDate, onEdit, onDelete }: TimelineTableP
                                         <CalendarDays className="h-3 w-3 shrink-0" />
                                         <span>{formatDate(tl.date)}</span>
                                     </div>
+                                    {tl.lunarDate && (
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
+                                            <MoonStar className="h-3 w-3 shrink-0" />
+                                            <span>{tl.lunarDate}</span>
+                                        </div>
+                                    )}
                                 </TableCell>
                             )}
                             <TableCell>
