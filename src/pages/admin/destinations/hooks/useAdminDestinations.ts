@@ -170,13 +170,18 @@ export function useAdminDestinations() {
                 message.error('Save failed: ' + (response.message || 'Unknown server error'));
             }
         } catch (error: any) {
-            console.error('--- SAVE POINT FAILED ---');
-            console.error('Error Object:', error);
-            if (error.response) {
-                console.error('Server Response Error:', error.response.data);
-                console.error('Status Code:', error.response.status);
+            const errorMsg = error.response?.data?.message || error.message;
+            if (errorMsg && errorMsg.toLowerCase().includes('already exists')) {
+                message.warning('Địa điểm này đã tồn tại trong hệ thống!');
+            } else {
+                console.error('--- SAVE POINT FAILED ---');
+                console.error('Error Object:', error);
+                if (error.response) {
+                    console.error('Server Response Error:', error.response.data);
+                    console.error('Status Code:', error.response.status);
+                }
+                message.error('Failed to save point: ' + errorMsg);
             }
-            message.error('Failed to save point: ' + (error.response?.data?.message || error.message));
         } finally {
             console.log('--- SAVE OPERATION COMPLETE ---');
             setPointsLoading(false);

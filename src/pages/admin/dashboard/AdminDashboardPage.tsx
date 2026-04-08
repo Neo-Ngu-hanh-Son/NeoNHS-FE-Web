@@ -41,21 +41,30 @@ export function AdminDashboardPage() {
     const loadAllData = async () => {
         setLoading(true);
         try {
-            const [kpiData, revData, actData, salesData, topData, regData, recentData] = await Promise.all([
+            const [kpiData, revData, actData, salesData, topEvents, topWorkshops, regData, recentData] = await Promise.all([
                 adminDashboardService.getKPIs(),
                 adminDashboardService.getRevenueTrends(revenuePeriod),
                 adminDashboardService.getActivityStatus(),
                 adminDashboardService.getSalesByType(),
                 adminDashboardService.getTopActivities('EVENT', 5),
+                adminDashboardService.getTopActivities('WORKSHOP', 5),
                 adminDashboardService.getRegistrations(regType),
                 adminDashboardService.getRecentActivities(10)
             ]);
+
+            // Merge and sort top activities
+            const combinedTop = [
+                ...topEvents.map(e => ({ ...e, type: 'EVENT' as const })),
+                ...topWorkshops.map(w => ({ ...w, type: 'WORKSHOP' as const }))
+            ]
+                .sort((a, b) => b.ticketsSold - a.ticketsSold)
+                .slice(0, 5);
 
             setKpis(kpiData);
             setRevenueTrendsData(revData);
             setActivityStatus(actData);
             setSalesByType(salesData);
-            setTopActivities(topData);
+            setTopActivities(combinedTop);
             setRegistrationsData(regData);
             setRecentActivities(recentData);
         } catch (error) {
@@ -136,16 +145,18 @@ export function AdminDashboardPage() {
             className="flex flex-col gap-8 max-w-7xl mx-auto p-4 md:p-6"
         >
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
-                    <p className="text-muted-foreground mt-1">Management platform for NeoNHS Tourism System</p>
-                </div>
-                <div className="flex items-center gap-3 bg-white p-2.5 px-4 rounded-xl shadow-sm border border-gray-100">
-                    <ClockCircleOutlined className="text-primary" />
-                    <span className="text-sm font-semibold text-gray-700">
-                        {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
+            <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-b from-slate-50 to-white dark:from-white/5 dark:to-transparent p-6 shadow-sm mb-2">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Admin Dashboard</h1>
+                        <p className="mt-1 text-slate-600 dark:text-slate-300">Management platform for NeoNHS Tourism System</p>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white/70 dark:bg-white/5 p-2.5 px-4 rounded-xl shadow-sm border border-slate-200 dark:border-white/10">
+                        <ClockCircleOutlined className="text-primary" />
+                        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </span>
+                    </div>
                 </div>
             </div>
 

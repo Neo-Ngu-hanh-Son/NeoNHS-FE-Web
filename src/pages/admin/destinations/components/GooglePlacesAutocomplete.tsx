@@ -39,6 +39,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
 
     const autocompleteSuggestion = useRef<any>(null);
     const sessionToken = useRef<any>(null);
+    const debounceTimeout = useRef<any>(null);
 
     useEffect(() => {
         const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
@@ -62,28 +63,36 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
         });
     }, []);
 
-    const handleInputChange = async (value: string) => {
+    const handleInputChange = (value: string) => {
         setInputValue(value);
+
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
         if (!value || value.length < 2 || !autocompleteSuggestion.current) {
             setPredictions([]);
             return;
         }
 
         setLoading(true);
-        try {
-            const { suggestions } = await autocompleteSuggestion.current.fetchAutocompleteSuggestions({
-                input: value,
-                sessionToken: sessionToken.current,
-                locationBias: { lat: 15.9986, lng: 108.2618 }, // Ngu Hanh Son area
-            });
-            // Map the new suggestion format back to a predictable structure for the UI
-            setPredictions(suggestions.map((s: any) => s.placePrediction));
-        } catch (err) {
-            console.error("Autocomplete fetch failed:", err);
-            setPredictions([]);
-        } finally {
-            setLoading(false);
-        }
+
+        debounceTimeout.current = setTimeout(async () => {
+            try {
+                const { suggestions } = await autocompleteSuggestion.current.fetchAutocompleteSuggestions({
+                    input: value,
+                    sessionToken: sessionToken.current,
+                    locationBias: { lat: 15.9986, lng: 108.2618 }, // Ngu Hanh Son area
+                });
+                // Map the new suggestion format back to a predictable structure for the UI
+                setPredictions(suggestions.map((s: any) => s.placePrediction));
+            } catch (err) {
+                console.error("Autocomplete fetch failed:", err);
+                setPredictions([]);
+            } finally {
+                setLoading(false);
+            }
+        }, 800); // 800ms debounce to save API cost
     };
 
     const handleSelect = async (prediction: any) => {

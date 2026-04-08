@@ -103,6 +103,16 @@ export function GoogleMapPickerModal({
     const initMap = () => {
         if (!mapRef.current) return;
 
+        // Reset stale refs from previous modal openings
+        if (marker.current) {
+            marker.current.map = null;
+            marker.current = null;
+        }
+        if (boundaryPolygon.current) {
+            boundaryPolygon.current.setMap(null);
+            boundaryPolygon.current = null;
+        }
+
         const center = initialCoord ? { lat: initialCoord[0], lng: initialCoord[1] } : { lat: MAP_CENTER[0], lng: MAP_CENTER[1] };
 
         const mapOptions: google.maps.MapOptions = {

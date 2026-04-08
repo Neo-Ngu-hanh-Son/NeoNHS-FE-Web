@@ -26,6 +26,16 @@ export default function AdminReportsPage() {
     const typeFilter = (searchParams.get('targetType') as ReportTargetType) || 'ALL';
     const searchTerm = searchParams.get('q') || '';
 
+    const [inputValue, setInputValue] = useState(searchTerm);
+
+    useEffect(() => {
+        setInputValue(searchTerm);
+    }, [searchTerm]);
+
+    const triggerSearch = () => {
+        handleFilterChange('q', inputValue);
+    };
+
     useEffect(() => {
         setPage(1);
     }, [statusFilter, typeFilter, searchTerm]);
@@ -47,9 +57,15 @@ export default function AdminReportsPage() {
             const response: SpringPage<AdminReport> = await adminReportService.getReports(filter);
             setReports(response.content || []);
             setTotal(response.totalElements || 0);
-        } catch (error) {
-            console.error('Failed to fetch reports:', error);
-            message.error('Failed to load reports');
+        } catch (error: any) {
+            setReports([]);
+            setTotal(0);
+
+            // Mute the 404/400 errors visually for search not found, only log them
+            const status = error?.response?.status;
+            if (!status || status >= 500) {
+                console.error('Failed to fetch reports:', error);
+            }
         } finally {
             setLoading(false);
         }
@@ -103,15 +119,22 @@ export default function AdminReportsPage() {
 
                 {/* Filter Bar */}
                 <div className="bg-white dark:bg-[#1a2b24] p-4 rounded-2xl shadow-sm border border-black/5 dark:border-white/10 flex flex-col lg:flex-row gap-4 items-center">
-                    <div className="relative w-full lg:max-w-md">
-                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#688277]">search</span>
+                    <div className="relative w-full lg:max-w-md flex items-center">
                         <input
                             type="text"
-                            placeholder="Search by reporter name..."
-                            className="w-full pl-12 pr-4 h-12 bg-transparent border border-black/5 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-[#1f6f4b]/20 transition-all"
-                            value={searchTerm}
-                            onChange={(e) => handleFilterChange('q', e.target.value)}
+                            placeholder="Search by reporter name... (Press Enter)"
+                            className="w-full pl-4 pr-12 h-12 bg-transparent border border-black/5 dark:border-white/10 rounded-xl text-sm focus:ring-2 focus:ring-[#1f6f4b]/20 transition-all"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && triggerSearch()}
                         />
+                        <div
+                            className="absolute right-2 p-2 hover:bg-black/5 dark:hover:bg-white/10 rounded-lg cursor-pointer text-[#688277] transition-colors flex items-center"
+                            onClick={triggerSearch}
+                            title="Click to search"
+                        >
+                            <span className="material-symbols-outlined text-lg">search</span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
@@ -154,8 +177,12 @@ export default function AdminReportsPage() {
                 {/* Reports Grid */}
                 <AnimatePresence mode="wait">
                     {loading ? (
-                        <div className="flex justify-center py-20">
-                            <Spin size="large" />
+                        <div className="flex items-center justify-center py-32">
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                className="size-16 border-4 border-primary border-t-transparent rounded-full shadow-lg"
+                            />
                         </div>
                     ) : reports.length > 0 ? (
                         <motion.div
@@ -224,7 +251,7 @@ export default function AdminReportsPage() {
                 </AnimatePresence>
 
                 {/* Pagination */}
-                {total > pageSize && (
+                {total > 0 && (
                     <div className="flex justify-center pt-8">
                         <Pagination
                             current={page}

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Plus,
   Pin,
@@ -68,6 +69,16 @@ export function PointManagement({
   destinations,
   onDestinationChange,
 }: PointManagementProps) {
+  const [inputValue, setInputValue] = useState(searchText);
+
+  useEffect(() => {
+    setInputValue(searchText);
+  }, [searchText]);
+
+  const triggerSearch = () => {
+    onSearchChange(inputValue);
+  };
+
   const totalPages = Math.ceil(pagination.totalElements / pagination.pageSize);
 
   return (
@@ -103,14 +114,21 @@ export function PointManagement({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <div className="relative flex items-center">
               <Input
-                placeholder="Search by name or description..."
-                value={searchText}
-                onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 bg-white"
+                placeholder="Search by name or description... (Press Enter)"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && triggerSearch()}
+                className="pl-4 pr-10 bg-white"
               />
+              <div
+                className="absolute right-2 p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer text-slate-400 hover:text-primary transition-colors"
+                onClick={triggerSearch}
+                title="Click to search"
+              >
+                <Search className="h-4 w-4" />
+              </div>
             </div>
             <Select
               value={currentDestination?.id || "all"}
