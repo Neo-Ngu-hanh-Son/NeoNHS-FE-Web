@@ -23,6 +23,8 @@ export interface EventResponse {
     longitude: string;
     startTime: string;       // ISO DateTime
     endTime: string;         // ISO DateTime
+    lunarStartDate?: string;
+    lunarEndDate?: string;
     isTicketRequired: boolean;
     price: number;
     maxParticipants: number;
