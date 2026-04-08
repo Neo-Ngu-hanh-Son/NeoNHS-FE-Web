@@ -296,9 +296,9 @@ export function PointFormModal({
                     variant="outline"
                     size="sm"
                     className="flex items-center gap-2"
-                    disabled={!editingPoint}
+                    disabled={!editingPoint?.id}
                     onClick={() => {
-                      if (!editingPoint) return;
+                      if (!editingPoint?.id) return;
                       navigate(`/admin/destinations/${editingPoint.id}/audioHistory`, {
                         state: { pointName: formData.name },
                       });
@@ -308,7 +308,7 @@ export function PointFormModal({
                     Manage History Audios
                   </Button>
 
-                  {!editingPoint && (
+                  {!editingPoint?.id && (
                     <p className="text-xs text-muted-foreground">
                       Save this point first to manage history audio.
                     </p>
@@ -323,9 +323,9 @@ export function PointFormModal({
                   variant="outline"
                   size="sm"
                   className="flex items-center gap-2"
-                  disabled={!editingPoint}
+                  disabled={!editingPoint?.id}
                   onClick={() => {
-                    if (!editingPoint) return;
+                    if (!editingPoint?.id) return;
                     navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
                   }}
                 >
