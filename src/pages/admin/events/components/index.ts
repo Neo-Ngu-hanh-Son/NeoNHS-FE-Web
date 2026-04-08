@@ -6,5 +6,5 @@ export { ImageGallery } from './ImageGallery';
 export { TicketCatalogList } from './TicketCatalogList';
 export { TicketCatalogFormDialog } from './TicketCatalogFormDialog';
 export { MapPickerModal } from './MapPickerModal';
-export { EventTimelineList } from './EventTimelineList';
-export { EventTimelineFormDialog } from './EventTimelineFormDialog';
+export { EventTimelineList } from './eventTimeline/EventTimelineList';
+export { EventTimelineFormDialog } from './eventTimeline/EventTimelineFormDialog';
