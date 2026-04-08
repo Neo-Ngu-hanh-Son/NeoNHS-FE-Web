@@ -65,7 +65,7 @@ export function useAdminDestinations() {
                     page,
                     size,
                     search,
-                    sortBy: 'id',
+                    sortBy: 'createdAt',
                     sortDir: 'desc'
                 });
             } else {
@@ -73,7 +73,7 @@ export function useAdminDestinations() {
                     page,
                     size,
                     search,
-                    sortBy: 'id',
+                    sortBy: 'createdAt',
                     sortDir: 'desc'
                 });
             }

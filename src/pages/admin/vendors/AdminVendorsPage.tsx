@@ -228,17 +228,22 @@ export default function AdminVendorsPage() {
     try {
       await adminVendorService.createVendor(data)
       notification.success({
-        message: 'Success',
-        description: 'Vendor account created successfully.',
+        message: 'Vendor Created',
+        description: 'Vendor account created successfully. A setup email has been sent.',
       })
       fetchVendors()
       fetchStats()
-    } catch (error) {
+    } catch (error: any) {
+      const errorMessage =
+        error?.message && error.message !== 'API request failed'
+          ? error.message
+          : 'Failed to create vendor account. Please try again.'
       notification.error({
-        message: 'Error',
-        description: 'Failed to create vendor account.',
+        message: 'Create Vendor Failed',
+        description: errorMessage,
+        duration: 6,
       })
-      throw error // Re-throw to keep dialog open/handle in component
+      throw error // Re-throw để giữ dialog mở
     }
   }
 

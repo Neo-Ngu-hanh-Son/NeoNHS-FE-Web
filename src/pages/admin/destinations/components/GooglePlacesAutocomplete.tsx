@@ -99,13 +99,24 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                 fields: ['displayName', 'formattedAddress', 'location', 'id', 'photos']
             });
 
+            const lat = typeof place.location?.lat === 'function' ? place.location.lat() : (place.location as any)?.lat || 0;
+            const lng = typeof place.location?.lng === 'function' ? place.location.lng() : (place.location as any)?.lng || 0;
+
+            const photoUrl = place.photos?.[0]
+                ? (typeof (place.photos[0] as any).getURI === 'function'
+                    ? (place.photos[0] as any).getURI({ maxWidth: 800 })
+                    : (typeof (place.photos[0] as any).getUrl === 'function'
+                        ? (place.photos[0] as any).getUrl({ maxWidth: 800 })
+                        : null))
+                : null;
+
             onPlaceSelect({
                 name: place.displayName || '',
                 address: place.formattedAddress || '',
-                latitude: place.location?.lat() || 0,
-                longitude: place.location?.lng() || 0,
+                latitude: lat,
+                longitude: lng,
                 googlePlaceId: place.id || '',
-                photoUrl: place.photos?.[0]?.getUrl({ maxWidth: 800 })
+                photoUrl: photoUrl || undefined
             });
 
             // Refresh session token for next search if library available

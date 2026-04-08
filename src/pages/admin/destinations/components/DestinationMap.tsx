@@ -5,7 +5,8 @@ import 'leaflet/dist/leaflet.css';
 import { NGU_HANH_SON_BOUNDARY, POINT_TYPE_CONFIG } from '../constants';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, X, Clock, Navigation } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { MapPin, X, Clock, Navigation, Edit } from 'lucide-react';
 import { Destination, Point } from '../types';
 
 // Fix for leaflet default icon issue
@@ -122,7 +123,7 @@ export function DestinationMap({
     mapZoom,
     previewPos,
     onMapClick,
-    onViewPoint: _onViewPoint,
+    onViewPoint,
     onPointClick,
 }: DestinationMapProps) {
 
@@ -250,7 +251,7 @@ export function DestinationMap({
                             <div className="flex gap-0">
                                 {/* Thumbnail */}
                                 {selectedPoint.thumbnailUrl && (
-                                    <div className="w-28 shrink-0">
+                                    <div className="w-32 shrink-0">
                                         <img
                                             src={selectedPoint.thumbnailUrl}
                                             alt={selectedPoint.name}
@@ -260,20 +261,31 @@ export function DestinationMap({
                                 )}
 
                                 {/* Info */}
-                                <div className="flex-1 p-4 pr-10 min-w-0 detail-panel-scroll overflow-y-auto max-h-[180px]">
-                                    <div className="flex items-center gap-2 mb-1.5">
-                                        <div
-                                            className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                                            style={{ backgroundColor: typeConfig.color }}
-                                        >
-                                            <span className="material-symbols-outlined text-white text-[12px]">{typeConfig.icon}</span>
+                                <div className="flex-1 p-4 pr-4 min-w-0 detail-panel-scroll overflow-y-auto max-h-[180px]">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                                                style={{ backgroundColor: typeConfig.color }}
+                                            >
+                                                <span className="material-symbols-outlined text-white text-[12px]">{typeConfig.icon}</span>
+                                            </div>
+                                            <Badge
+                                                className="text-[9px] px-1.5 py-0 border-none h-4 uppercase font-bold text-white"
+                                                style={{ backgroundColor: typeConfig.color }}
+                                            >
+                                                {selectedPoint.type}
+                                            </Badge>
                                         </div>
-                                        <Badge
-                                            className="text-[9px] px-1.5 py-0 border-none h-4 uppercase font-bold text-white"
-                                            style={{ backgroundColor: typeConfig.color }}
+                                        <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            className="h-6 text-[10px] font-bold text-primary hover:bg-primary/10"
+                                            onClick={() => onViewPoint(selectedPoint)}
                                         >
-                                            {selectedPoint.type}
-                                        </Badge>
+                                            <Edit className="w-3 h-3 mr-1" />
+                                            Manage Point
+                                        </Button>
                                     </div>
 
                                     <h4 className="font-bold text-sm text-slate-800 leading-tight truncate mb-1">

@@ -183,7 +183,11 @@ export function PointManagement({
                   allPoints.map((p, idx) => (
                     <TableRow
                       key={p.id}
-                      className="hover:bg-primary/5 transition-colors duration-200 group"
+                      className="hover:bg-primary/5 transition-colors duration-200 group cursor-pointer"
+                      onClick={() => {
+                        onFocus(p.latitude, p.longitude);
+                        onEditPoint(p);
+                      }}
                     >
                       <TableCell className="text-center font-bold text-gray-400 group-hover:text-primary transition-colors">
                         {pagination.currentPage * pagination.pageSize + idx + 1}
@@ -233,7 +237,10 @@ export function PointManagement({
                                   variant="ghost"
                                   size="icon"
                                   className="h-9 w-9 hover:bg-emerald-50 hover:text-emerald-600 rounded-full"
-                                  onClick={() => onFocus(p.latitude, p.longitude)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onFocus(p.latitude, p.longitude);
+                                  }}
                                 >
                                   <MapPin className="h-4.5 w-4.5" />
                                 </Button>
@@ -249,7 +256,10 @@ export function PointManagement({
                                   variant="ghost"
                                   size="icon"
                                   className="h-9 w-9 hover:bg-amber-50 hover:text-amber-600 rounded-full"
-                                  onClick={() => onEditPoint(p)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEditPoint(p);
+                                  }}
                                 >
                                   <Edit className="h-4.5 w-4.5" />
                                 </Button>
@@ -265,7 +275,10 @@ export function PointManagement({
                                   variant="ghost"
                                   size="icon"
                                   className="h-9 w-9 hover:bg-destructive/10 hover:text-destructive rounded-full"
-                                  onClick={() => onDeletePoint(p.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDeletePoint(p.id);
+                                  }}
                                 >
                                   <Trash2 className="h-4.5 w-4.5" />
                                 </Button>
