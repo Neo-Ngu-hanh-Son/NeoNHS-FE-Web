@@ -9,6 +9,8 @@ import type {
     EventTimelineResponse,
     CreateEventTimelineRequest,
     UpdateEventTimelineRequest,
+    EventPointResponse,
+    EventPointTagResponse,
 } from '@/types/eventTimeline';
 
 export const eventTimelineService = {
@@ -65,6 +67,24 @@ export const eventTimelineService = {
             `/admin/events/${eventId}/timelines/${id}`
         );
     },
+
+    /**
+     * Get all event points for an event (for timeline point creation)
+     */
+    getEventPoints: async (eventId: string): Promise<ApiResponse<EventPointResponse[]>> => {
+        return apiClient.get<ApiResponse<EventPointResponse[]>>(
+            `/admin/events/${eventId}/timelines/event-points`
+        );
+    },
+
+    /**
+     * Get all event point tags for an event (for timeline point tag reuse)
+     */
+    getEventPointTags: async (eventId: string): Promise<ApiResponse<EventPointTagResponse[]>> => {
+        return apiClient.get<ApiResponse<EventPointTagResponse[]>>(
+            `/admin/events/${eventId}/timelines/point-tags`
+        );
+    }
 };
 
 export default eventTimelineService;

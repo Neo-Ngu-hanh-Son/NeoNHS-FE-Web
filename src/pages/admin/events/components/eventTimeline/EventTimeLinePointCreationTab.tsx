@@ -8,8 +8,11 @@ import DragImageUploader from '@/components/common/DragImageUploader';
 import { uploadImageToCloudinary } from '@/utils/cloudinary';
 import { NGU_HANH_SON_BOUNDARY, MAP_CENTER, NGU_HANH_SON_GEOJSON_POLYGON } from '@/pages/admin/destinations/constants';
 import type { DiscoveryResult } from '@/pages/admin/destinations/components/GoogleMapPickerModal';
-import type { FormData } from './EventTimelineFormDialog';
 import GoogleMapPickerCompact from '@/pages/admin/destinations/components/GoogleMapPickerCompact';
+import { FormData } from '../../type';
+import EventPointPicker from './EventPointPicker';
+import { useEventTimelines } from '@/hooks/event/useEventTimelines';
+import { EventPointResponse } from '@/types/eventTimeline';
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 if (apiKey) {
@@ -29,9 +32,10 @@ type Props = {
   form: FormData;
   errors: Partial<Record<keyof FormData, string>>;
   handleChange: (field: keyof FormData, value: string) => void;
+  eventId: string;
 };
 
-export default function EventTimeLinePointCreationTab({ form, errors, handleChange }: Props) {
+export default function EventTimeLinePointCreationTab({ form, errors, handleChange, eventId }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMap = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
@@ -53,6 +57,8 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
   const [apiLoading, setApiLoading] = useState(true);
   const [geocoding, setGeocoding] = useState(false);
   const [processingImage, setProcessingImage] = useState(false);
+  const { fetchEventPoints } = useEventTimelines(eventId, false);
+  const [existingPoints, setExistingPoints] = useState<EventPointResponse[]>([]);
 
   useEffect(() => {
     Promise.all([importLibrary('maps'), importLibrary('places'), importLibrary('marker')])
@@ -204,6 +210,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
       return;
     }
 
+    handleChange('eventPointId', '');
     setError(null);
     setGeocoding(true);
     updateMarker(lat, lng);
@@ -217,6 +224,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
 
   const handlePlaceSearchSelect = (place: DiscoveryResult) => {
     if (isPointInBoundary(place.latitude, place.longitude)) {
+      handleChange('eventPointId', '');
       setError(null);
       setSelectedPoint({
         lat: place.latitude,
@@ -234,6 +242,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
   };
 
   const applyPointToForm = (point: {
+    id: string | null;
     lat: number;
     lng: number;
     name?: string;
@@ -245,6 +254,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
     handleChange('destinationLatitude', point.lat.toFixed(6));
     handleChange('destinationLongitude', point.lng.toFixed(6));
     handleChange('destinationImageUrl', point.photoUrl || '');
+    handleChange('eventPointId', point.id || '');
   };
 
   const handleConfirmSelection = async () => {
@@ -265,7 +275,36 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
       }
     }
 
-    applyPointToForm({ ...selectedPoint, photoUrl: finalPhotoUrl });
+    applyPointToForm({ ...selectedPoint, photoUrl: finalPhotoUrl, id: null });
+  };
+
+  useEffect(() => {
+    async function fetchPreviouslyUsedPoints() {
+      try {
+        const result = await fetchEventPoints();
+        setExistingPoints(result);
+      } catch (error: unknown) {
+        message.error(`Failed to fetch existing event points: ${(error as Error).message}`);
+      }
+    }
+    fetchPreviouslyUsedPoints();
+  }, [eventId]);
+
+  const handleSelectExistingPoint = (pointId: string) => {
+    const point = existingPoints.find((p) => p.id === pointId);
+    if (point) {
+      const { latitude, longitude, name, address, imageUrl } = point;
+      const lat = Number.parseFloat(latitude.toString());
+      const lng = Number.parseFloat(longitude.toString());
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        setSelectedPoint({ lat, lng, name, address, photoUrl: imageUrl });
+        updateMarker(lat, lng);
+        googleMap.current?.setZoom(19);
+        applyPointToForm({ id: point.id, lat, lng, name, address, photoUrl: imageUrl });
+      } else {
+        message.error('Selected event point has invalid coordinates.');
+      }
+    }
   };
 
   return (
@@ -280,7 +319,10 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
           <Input
             id="point-destination-name"
             value={form.destinationName}
-            onChange={(e) => handleChange('destinationName', e.target.value)}
+            onChange={(e) => {
+              handleChange('destinationName', e.target.value);
+              handleChange('eventPointId', '');
+            }}
             placeholder="e.g. Chua Quan The Am"
           />
           {errors.destinationName && <p className="text-xs text-destructive">{errors.destinationName}</p>}
@@ -291,7 +333,10 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
           <Input
             id="point-destination-address"
             value={form.destinationAddress}
-            onChange={(e) => handleChange('destinationAddress', e.target.value)}
+            onChange={(e) => {
+              handleChange('destinationAddress', e.target.value);
+              handleChange('eventPointId', '');
+            }}
             placeholder="e.g. Ngu Hanh Son, Da Nang"
           />
         </div>
@@ -302,7 +347,10 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
             <Input
               id="point-latitude"
               value={form.destinationLatitude}
-              onChange={(e) => handleChange('destinationLatitude', e.target.value)}
+              onChange={(e) => {
+                handleChange('destinationLatitude', e.target.value);
+                handleChange('eventPointId', '');
+              }}
               placeholder="15.998600"
             />
             {errors.destinationLatitude && <p className="text-xs text-destructive">{errors.destinationLatitude}</p>}
@@ -312,7 +360,10 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
             <Input
               id="point-longitude"
               value={form.destinationLongitude}
-              onChange={(e) => handleChange('destinationLongitude', e.target.value)}
+              onChange={(e) => {
+                handleChange('destinationLongitude', e.target.value);
+                handleChange('eventPointId', '');
+              }}
               placeholder="108.261800"
             />
             {errors.destinationLongitude && <p className="text-xs text-destructive">{errors.destinationLongitude}</p>}
@@ -323,11 +374,23 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
           <Label>Destination image</Label>
           <DragImageUploader
             value={form.destinationImageUrl}
-            onUpload={(url) => handleChange('destinationImageUrl', url)}
+            onUpload={(url) => {
+              handleChange('destinationImageUrl', url);
+              handleChange('eventPointId', '');
+            }}
             onError={(msg) => message.error(msg)}
             minHeight={110}
             imageClassName="!w-auto max-w-[220px] mx-auto"
             placeholder="Upload destination image"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <Label>Reusing existing event destinations</Label>
+          <EventPointPicker
+            points={existingPoints}
+            selectedPointId={form.eventPointId || undefined}
+            onPointSelect={handleSelectExistingPoint}
           />
         </div>
       </section>
