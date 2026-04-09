@@ -1,6 +1,10 @@
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "lucide-react"
+import {
+  formatInstantToVietnamDateTimeLocal,
+  vietnamDateTimeLocalToUtcInstant,
+} from "../utils/formatters"
 
 interface DateTimePickerProps {
   label: string
@@ -22,29 +26,19 @@ export function DateTimePicker({
   required = false 
 }: DateTimePickerProps) {
   
-  // Convert Date to datetime-local format (YYYY-MM-DDTHH:mm)
-  const toDateTimeLocal = (date: Date | undefined) => {
-    if (!date) return ''
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${year}-${month}-${day}T${hours}:${minutes}`
-  }
-
-  // Convert datetime-local format to Date
-  const fromDateTimeLocal = (dateTimeStr: string) => {
-    if (!dateTimeStr) return undefined
-    return new Date(dateTimeStr)
-  }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = fromDateTimeLocal(e.target.value)
-    onChange(newDate)
+    const raw = e.target.value
+    if (!raw) {
+      onChange(undefined)
+      return
+    }
+    const d = vietnamDateTimeLocalToUtcInstant(raw)
+    onChange(Number.isNaN(d.getTime()) ? undefined : d)
   }
 
-  const minDateStr = minDate ? toDateTimeLocal(minDate) : undefined
+  const minDateStr = minDate
+    ? formatInstantToVietnamDateTimeLocal(minDate)
+    : undefined
 
   return (
     <div className="space-y-2">
@@ -55,7 +49,7 @@ export function DateTimePicker({
         <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
         <Input
           type="datetime-local"
-          value={toDateTimeLocal(value)}
+          value={value ? formatInstantToVietnamDateTimeLocal(value) : ""}
           onChange={handleChange}
           disabled={disabled}
           min={minDateStr}

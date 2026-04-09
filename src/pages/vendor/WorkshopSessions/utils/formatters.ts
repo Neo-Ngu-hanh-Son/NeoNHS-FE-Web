@@ -1,34 +1,145 @@
 // Date and Time Formatting
-// Sử dụng locale 'vi-VN' cho định dạng ngày tháng Việt Nam
+// Giờ hiển thị theo múi giờ Việt Nam (Asia/Ho_Chi_Minh); locale vi-VN cho định dạng.
 
-export const formatDate = (isoDate: string) => {
-  return new Date(isoDate).toLocaleDateString('vi-VN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-  // Kết quả ví dụ: 13/02/2026
+/** Múi giờ cố định cho lịch workshop (không phụ thuộc múi trình duyệt). */
+export const VIETNAM_TIMEZONE = 'Asia/Ho_Chi_Minh'
+
+const vnDateOptions: Intl.DateTimeFormatOptions = {
+  timeZone: VIETNAM_TIMEZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
 }
 
-export const formatDateTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleString('vi-VN', {
+const vnTimeOptions: Intl.DateTimeFormatOptions = {
+  timeZone: VIETNAM_TIMEZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+}
+
+/**
+ * Parse chuỗi từ API thành Date (UTC instant).
+ *
+ * - Có Z hoặc offset ("+07:00") → parse thẳng (đúng chuẩn ISO-8601).
+ * - Không có Z / offset (kiểu Java LocalDateTime: "2026-04-10T08:00:00") →
+ *   coi là giờ VIỆT NAM (append "+07:00"), vì backend gửi/nhận giờ VN local.
+ */
+export function parseSessionInstant(iso: string): Date {
+  const s = iso?.trim() ?? ''
+  if (!s) return new Date(NaN)
+  if (/[zZ]$/.test(s) || /[+-]\d{2}:\d{2}$/.test(s) || /[+-]\d{4}$/.test(s)) {
+    return new Date(s)
+  }
+  if (s.includes('T')) {
+    // No timezone info → treat as Vietnam local time (+07:00)
+    return new Date(`${s}+07:00`)
+  }
+  return new Date(s)
+}
+
+/** YYYY-MM-DD của instant theo giờ Việt Nam */
+export function vietnamDateKey(iso: string): string {
+  return new Intl.DateTimeFormat('en-CA', vnDateOptions).format(parseSessionInstant(iso))
+}
+
+/** YYYY-MM-DD của một Date (ô lịch) theo giờ Việt Nam */
+export function vietnamDateKeyFromCalendarDate(d: Date): string {
+  return new Intl.DateTimeFormat('en-CA', vnDateOptions).format(d)
+}
+
+/** Session có cùng ngày lịch (VN) với ô đang chọn không */
+export function isSessionOnVietnamCalendarDay(iso: string, calendarDate: Date): boolean {
+  return vietnamDateKey(iso) === vietnamDateKeyFromCalendarDate(calendarDate)
+}
+
+export function getVietnamHour(iso: string): number {
+  const d = parseSessionInstant(iso)
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: VIETNAM_TIMEZONE,
+    hour: 'numeric',
+    hour12: false,
+    hourCycle: 'h23',
+  }).formatToParts(d)
+  return parseInt(parts.find((x) => x.type === 'hour')?.value ?? '0', 10)
+}
+
+export function getVietnamMinute(iso: string): number {
+  const d = parseSessionInstant(iso)
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: VIETNAM_TIMEZONE,
+    minute: 'numeric',
+  }).formatToParts(d)
+  return parseInt(parts.find((x) => x.type === 'minute')?.value ?? '0', 10)
+}
+
+/** Giá trị cho input datetime-local: giờ theo tường VN */
+export function formatInstantToVietnamDateTimeLocal(date: Date): string {
+  const p = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VIETNAM_TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
-    hour12: false // Sử dụng hệ 24 giờ
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    p.find((x) => x.type === type)?.value ?? ''
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`
+}
+
+/** Chuỗi từ datetime-local được hiểu là giờ Việt Nam → Date (UTC instant) */
+export function vietnamDateTimeLocalToUtcInstant(dateTimeStr: string): Date {
+  if (!dateTimeStr?.trim()) return new Date(NaN)
+  const trimmed = dateTimeStr.trim()
+  const withSeconds = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)
+    ? `${trimmed}:00`
+    : trimmed
+  if (/[zZ]$|[+-]\d{2}:\d{2}$/.test(withSeconds)) {
+    return new Date(withSeconds)
+  }
+  return new Date(`${withSeconds}+07:00`)
+}
+
+/**
+ * Format a Date for sending to the API as Vietnam local time string.
+ * Produces "YYYY-MM-DDTHH:mm:ss" (no Z, no offset, no milliseconds).
+ *
+ * Java LocalDateTime on the backend parses this directly as VN local.
+ * Example: user picks 8:00 AM VN → sends "2026-04-10T08:00:00"
+ */
+export function formatDateForApi(date: Date): string {
+  const p = new Intl.DateTimeFormat('en-CA', {
+    timeZone: VIETNAM_TIMEZONE,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(date)
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    p.find((x) => x.type === type)?.value ?? '00'
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}`
+}
+
+export const formatDate = (isoDate: string) => {
+  return parseSessionInstant(isoDate).toLocaleDateString('vi-VN', vnDateOptions)
+}
+
+export const formatDateTime = (isoDate: string) => {
+  return parseSessionInstant(isoDate).toLocaleString('vi-VN', {
+    ...vnDateOptions,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
   })
-  // Kết quả ví dụ: 13:30 13/02/2026
 }
 
 export const formatTime = (isoDate: string) => {
-  return new Date(isoDate).toLocaleTimeString('vi-VN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false // Sử dụng hệ 24 giờ
-  })
-  // Kết quả ví dụ: 14:30
+  return parseSessionInstant(isoDate).toLocaleTimeString('vi-VN', vnTimeOptions)
 }
 
 export const formatTimeRange = (startTime: string, endTime: string) => {
@@ -38,9 +149,9 @@ export const formatTimeRange = (startTime: string, endTime: string) => {
 }
 
 export const formatDayOfWeek = (isoDate: string) => {
-  // Viết hoa chữ cái đầu (ví dụ: thứ Hai -> Thứ Hai) nếu cần thiết
-  const day = new Date(isoDate).toLocaleDateString('vi-VN', {
-    weekday: 'long'
+  const day = parseSessionInstant(isoDate).toLocaleDateString('vi-VN', {
+    timeZone: VIETNAM_TIMEZONE,
+    weekday: 'long',
   })
   return day.charAt(0).toUpperCase() + day.slice(1)
 }
@@ -71,8 +182,8 @@ export const formatDuration = (minutes: number) => {
 
 // Calculate duration between two dates
 export const calculateDuration = (startTime: string, endTime: string): number => {
-  const start = new Date(startTime).getTime()
-  const end = new Date(endTime).getTime()
+  const start = parseSessionInstant(startTime).getTime()
+  const end = parseSessionInstant(endTime).getTime()
   return Math.floor((end - start) / (1000 * 60)) // minutes
 }
 
@@ -93,23 +204,22 @@ export const getEnrollmentPercentage = (current: number, max: number) => {
 
 // Date Calculations
 export const isToday = (isoDate: string) => {
-  const today = new Date()
-  const date = new Date(isoDate)
-  return today.toDateString() === date.toDateString()
+  const todayKey = vietnamDateKeyFromCalendarDate(new Date())
+  return vietnamDateKey(isoDate) === todayKey
 }
 
 export const isFuture = (isoDate: string) => {
-  return new Date(isoDate) > new Date()
+  return parseSessionInstant(isoDate) > new Date()
 }
 
 export const isPast = (isoDate: string) => {
-  return new Date(isoDate) < new Date()
+  return parseSessionInstant(isoDate) < new Date()
 }
 
 export const isOngoing = (startTime: string, endTime: string) => {
   const now = new Date()
-  const start = new Date(startTime)
-  const end = new Date(endTime)
+  const start = parseSessionInstant(startTime)
+  const end = parseSessionInstant(endTime)
   return now >= start && now <= end
 }
 

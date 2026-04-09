@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { TemplateSelector } from "./template-selector"
 import { DateTimePicker } from "./date-time-picker"
 import { formatDuration } from "../../WorkshopTemplates/utils/formatters"
-import { formatPrice } from "../utils/formatters"
+import { formatPrice, parseSessionInstant } from "../utils/formatters"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Info, TriangleAlert } from "lucide-react"
 
@@ -40,8 +40,8 @@ export function SessionForm({
     defaultValues: defaultValues
       ? {
           workshopTemplateId: defaultValues.workshopTemplate.id,
-          startTime: new Date(defaultValues.startTime),
-          endTime: new Date(defaultValues.endTime),
+          startTime: parseSessionInstant(defaultValues.startTime),
+          endTime: parseSessionInstant(defaultValues.endTime),
           price: defaultValues.price,
           maxParticipants: defaultValues.maxParticipants,
         }

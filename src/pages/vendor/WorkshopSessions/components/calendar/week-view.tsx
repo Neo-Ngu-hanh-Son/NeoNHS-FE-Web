@@ -1,5 +1,12 @@
 import { WorkshopSessionResponse, SessionStatus } from "../../types"
-import { isSameDay } from "../../utils/formatters"
+import {
+  formatTime,
+  isSessionOnVietnamCalendarDay,
+  vietnamDateKeyFromCalendarDate,
+  getVietnamHour,
+  getVietnamMinute,
+  parseSessionInstant,
+} from "../../utils/formatters"
 import { cn } from "@/lib/utils"
 
 interface WeekViewProps {
@@ -32,24 +39,24 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
 
   // Get sessions for a specific date
   const getSessionsForDate = (date: Date) => {
-    return sessions.filter(session => {
-      const sessionDate = new Date(session.startTime)
-      return isSameDay(sessionDate, date)
-    })
+    return sessions.filter((session) =>
+      isSessionOnVietnamCalendarDay(session.startTime, date)
+    )
   }
 
   // Get session position in hour slot
   const getSessionPosition = (session: WorkshopSessionResponse, hour: number) => {
-    const start = new Date(session.startTime)
-    const startHour = start.getHours()
-    const startMinute = start.getMinutes()
-    
-    // Check if session starts in this hour
+    const start = parseSessionInstant(session.startTime)
+    const startHour = getVietnamHour(session.startTime)
+    const startMinute = getVietnamMinute(session.startTime)
+
     if (startHour === hour) {
       return {
         show: true,
-        topOffset: (startMinute / 60) * 100, // percentage
-        duration: (new Date(session.endTime).getTime() - start.getTime()) / (1000 * 60 * 60) // hours
+        topOffset: (startMinute / 60) * 100,
+        duration:
+          (parseSessionInstant(session.endTime).getTime() - start.getTime()) /
+          (1000 * 60 * 60),
       }
     }
     return { show: false, topOffset: 0, duration: 0 }
@@ -70,7 +77,9 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
       <div className="grid grid-cols-8 gap-2 sticky top-0 bg-background z-10 pb-2">
         <div className="text-sm font-semibold text-muted-foreground">Time</div>
         {weekDates.map(date => {
-          const isToday = isSameDay(date, today)
+          const isToday =
+            vietnamDateKeyFromCalendarDate(date) ===
+            vietnamDateKeyFromCalendarDate(today)
           return (
             <div
               key={date.toISOString()}
@@ -143,11 +152,7 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
                           {session.workshopTemplate?.name || 'Workshop'}
                         </div>
                         <div className="text-[10px] opacity-90">
-                          {new Date(session.startTime).toLocaleTimeString('en-US', { 
-                            hour: 'numeric', 
-                            minute: '2-digit',
-                            hour12: true 
-                          })}
+                          {formatTime(session.startTime)}
                         </div>
                         <div className="text-[10px] opacity-90">
                           {session.currentEnrollments}/{session.maxParticipants}

@@ -11,7 +11,7 @@ import { CreateSessionDialog } from './components/create-session-dialog'
 import { EditSessionDialog } from './components/edit-session-dialog'
 import { ViewSessionDialog } from './components/view-session-dialog'
 import { SessionCalendar } from './components/calendar'
-import { formatDate } from './utils/formatters'
+import { formatDate, parseSessionInstant } from './utils/formatters'
 import { WorkshopSessionService } from '@/services/api/workshopSessionService'
 
 export default function WorkshopSessionsPage() {
@@ -81,8 +81,10 @@ export default function WorkshopSessionsPage() {
     }
 
     // Sort by start time (newest first)
-    filtered = [...filtered].sort((a, b) =>
-      new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+    filtered = [...filtered].sort(
+      (a, b) =>
+        parseSessionInstant(b.startTime).getTime() -
+        parseSessionInstant(a.startTime).getTime()
     )
 
     return filtered
