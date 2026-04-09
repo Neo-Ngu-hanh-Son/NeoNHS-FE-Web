@@ -29,6 +29,7 @@ import {
   Image as ImageIcon,
   Info,
   CalendarDays,
+  Tags,
 } from 'lucide-react';
 import { useEvent } from '@/hooks/event';
 import { eventService } from '@/services/api/eventService';
