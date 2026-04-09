@@ -18,7 +18,7 @@ export function StatCard({ title, value, icon: Icon, trend, iconBg }: StatCardPr
                     <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">{title}</p>
                         <p className="text-2xl font-bold tracking-tight">{value}</p>
-                        {trend && (
+                        {/* {trend && (
                             <div className="flex items-center gap-1 text-xs">
                                 {trend.isPositive ? (
                                     <TrendingUp className="h-3 w-3 text-emerald-500" />
@@ -31,7 +31,7 @@ export function StatCard({ title, value, icon: Icon, trend, iconBg }: StatCardPr
                                 </span>
                                 <span className="text-muted-foreground">vs last period</span>
                             </div>
-                        )}
+                        )} */}
                     </div>
                     <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${iconBg}`}>
                         <Icon className="h-6 w-6 text-white" />

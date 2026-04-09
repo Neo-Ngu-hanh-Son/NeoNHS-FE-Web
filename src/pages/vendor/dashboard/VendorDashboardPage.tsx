@@ -1,4 +1,4 @@
-import { Row, Col, Spin } from 'antd';
+import { Row, Col } from 'antd';
 import {
     DashboardStatsRow,
     NotificationsCard,
@@ -29,11 +29,14 @@ export default function VendorDashboardPage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-[60vh]">
-                <Spin size="large" />
+          <div className="flex items-center justify-center p-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading ...</p>
             </div>
+          </div>
         );
-    }
+      }
 
     return (
         <div className="p-4">

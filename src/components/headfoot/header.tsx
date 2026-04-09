@@ -26,12 +26,31 @@ const Header: FunctionComponent = () => {
   };
 
   const userMenuItems: MenuProps['items'] = [
-    {
-      key: 'dashboard',
-      label: 'Admin Dashboard',
-      icon: <LayoutDashboard className="w-4 h-4" />,
-      onClick: () => navigate('admin/dashboard'),
-    },
+    // Nếu là ADMIN -> Hiện Admin Dashboard
+    ...(user?.role === 'ADMIN'
+      ? [
+        {
+          key: 'admin-dashboard',
+          label: 'Admin Dashboard',
+          icon: <LayoutDashboard className="w-4 h-4" />,
+          onClick: () => navigate('/admin/dashboard'), // Thêm dấu '/' phía trước để đảm bảo absolute routing
+        },
+      ]
+      : []),
+
+    // Nếu là VENDOR -> Hiện Vendor Dashboard
+    ...(user?.role === 'VENDOR'
+      ? [
+        {
+          key: 'vendor-dashboard',
+          label: 'Vendor Dashboard',
+          icon: <LayoutDashboard className="w-4 h-4" />,
+          onClick: () => navigate('/vendor/dashboard'),
+        },
+      ]
+      : []),
+
+    // Các menu chung cho tất cả mọi người (kể cả TOURIST)
     {
       key: 'profile',
       label: 'Profile',
@@ -83,11 +102,10 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`text-base transition-colors duration-300 ${
-                      isActiveLink(link.href)
+                    className={`text-base transition-colors duration-300 ${isActiveLink(link.href)
                         ? 'text-emerald-400 font-semibold'
                         : 'text-gray-900 hover:text-emerald-400'
-                    }`}
+                      }`}
                   >
                     {link.label}
                   </Link>
@@ -146,11 +164,10 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`block text-base transition-colors duration-300 ${
-                      isActiveLink(link.href)
+                    className={`block text-base transition-colors duration-300 ${isActiveLink(link.href)
                         ? 'text-emerald-400 font-semibold'
                         : 'text-gray-300 hover:text-emerald-400'
-                    }`}
+                      }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}
