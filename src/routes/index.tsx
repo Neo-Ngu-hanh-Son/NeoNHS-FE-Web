@@ -65,6 +65,8 @@ import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile"
 import ManageHistoryAudioPage from "@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx";
 import AdminCheckinPointsPage from "@/pages/admin/checkin-points/AdminCheckinPointsPage";
 import ChatPage from "@/pages/Chat/ChatPage";
+import { RequireRole } from "@/routes/RequireRole";
+import { UserRole } from "@/types";
 
 export const router = createBrowserRouter([
   {
@@ -93,11 +95,6 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/admin",
-        element: <AdminLayout />,
-        children: [],
-      },
-      {
         element: <AppLayout />,
         children: [
           { path: "/", element: <HomePage /> },
@@ -114,7 +111,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/vendor",
-        element: <VendorLayout />,
+        element: (
+          <RequireRole allowedRoles={[UserRole.VENDOR]}>
+            <VendorLayout />
+          </RequireRole>
+        ),
         children: [
           { path: "dashboard", element: <VendorDashboardPage /> },
           { path: "profile", element: <VendorProfilePage /> },
@@ -132,7 +133,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin",
-        element: <AdminLayout />,
+        element: (
+          <RequireRole allowedRoles={[UserRole.ADMIN]}>
+            <AdminLayout />
+          </RequireRole>
+        ),
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "destinations", element: <AdminDestinationsPage /> },
