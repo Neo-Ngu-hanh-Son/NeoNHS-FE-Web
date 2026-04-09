@@ -65,6 +65,13 @@ export const checkinPointService = {
   delete: async (id: string): Promise<ApiResponse<null>> => {
     return apiClient.delete<ApiResponse<null>>(`${BASE_PATH}/${id}`);
   },
+
+  restore: async (id: string): Promise<ApiResponse<PointCheckinResponse>> => {
+    return apiClient.put<ApiResponse<PointCheckinResponse>>(
+      `${BASE_PATH}/restore/${id}`,
+      {}
+    );
+  },
 };
 
 export default checkinPointService;

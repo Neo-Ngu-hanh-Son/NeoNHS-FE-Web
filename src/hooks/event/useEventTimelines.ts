@@ -21,6 +21,37 @@ interface UseEventTimelinesReturn {
     deleteTimeline: (id: string) => Promise<boolean>;
 }
 
+type ApiLikeError = Error & {
+    status?: number;
+    response?: {
+        status?: number;
+    };
+};
+
+function handleTimelineApiError(error: unknown, fallback: string): void {
+    const err = error as ApiLikeError;
+    const status = err?.status ?? err?.response?.status;
+
+    if (status === 401) {
+        localStorage.removeItem('token');
+        message.error('Session expired. Please sign in again.');
+        window.location.href = '/login';
+        return;
+    }
+
+    if (status === 403) {
+        message.error('Access denied. ADMIN role is required to manage event timelines.');
+        return;
+    }
+
+    if (status === 404) {
+        message.error('The event or timeline entry no longer exists.');
+        return;
+    }
+
+    message.error(`${fallback}: ${err?.message || 'Unknown error'}`);
+}
+
 export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
     const [timelines, setTimelines] = useState<EventTimelineResponse[]>([]);
     const [loading, setLoading] = useState(false);
@@ -36,8 +67,7 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
                 message.error(response.message || 'Failed to fetch timelines');
             }
         } catch (error: unknown) {
-            const err = error as Error;
-            message.error('Failed to fetch timelines: ' + (err.message || 'Unknown error'));
+            handleTimelineApiError(error, 'Failed to fetch timelines');
         } finally {
             setLoading(false);
         }
@@ -59,8 +89,7 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
                 return false;
             }
         } catch (error: unknown) {
-            const err = error as Error;
-            message.error('Failed to create timeline entry: ' + (err.message || 'Unknown error'));
+            handleTimelineApiError(error, 'Failed to create timeline entry');
             return false;
         }
     }, [eventId, fetchTimelines]);
@@ -77,8 +106,7 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
                 return false;
             }
         } catch (error: unknown) {
-            const err = error as Error;
-            message.error('Failed to update timeline entry: ' + (err.message || 'Unknown error'));
+            handleTimelineApiError(error, 'Failed to update timeline entry');
             return false;
         }
     }, [eventId, fetchTimelines]);
@@ -95,8 +123,7 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
                 return false;
             }
         } catch (error: unknown) {
-            const err = error as Error;
-            message.error('Failed to delete timeline entry: ' + (err.message || 'Unknown error'));
+            handleTimelineApiError(error, 'Failed to delete timeline entry');
             return false;
         }
     }, [eventId, fetchTimelines]);
