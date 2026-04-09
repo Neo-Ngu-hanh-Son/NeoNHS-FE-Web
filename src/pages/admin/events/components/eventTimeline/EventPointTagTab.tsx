@@ -1,18 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import { message } from 'antd';
 import { Icon } from '@iconify/react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 import { uploadImageToCloudinary } from '@/utils/cloudinary';
 import type { FormData } from './EventTimelineFormDialog';
@@ -31,10 +24,25 @@ type VisualIconOption = {
 };
 
 const DEFAULT_TAG_COLOR = '#0f766e';
-const MARKER_GENERATE_COOLDOWN_MS = 4000;
 
-const QUICK_SWATCHES = ['#0f766e', '#0d9488', '#2563eb', '#db2777', '#ea580c', '#7c3aed'];
+const QUICK_SWATCHES = [
+  // --- Your Originals ---
+  '#0f766e',
+  '#0d9488',
+  '#2563eb',
+  '#db2777',
+  '#ea580c',
+  '#7c3aed',
 
+  // --- The New Diverse Additions ---
+  '#e11d48', // Vibrant Red (Festival/Spirit)
+  '#d97706', // Rich Amber (Golden/Monastery)
+  '#65a30d', // Fresh Green (Nature/Bamboo)
+  '#0284c7', // Bright Cyan (Sky/Water)
+  '#9333ea', // Deep Orchid (Cultural/Silk)
+  '#a16207', // Ochre/Bronze (Ancient Earth)
+  '#4f46e5', // Indigo (Traditional Dye)
+];
 export const NHS_CULTURAL_ICONS: VisualIconOption[] = [
   { key: 'marker', label: 'Location', iconName: 'mdi:map-marker' },
   { key: 'navigation', label: 'Navigation', iconName: 'mdi:compass' },
@@ -69,23 +77,26 @@ export const NHS_CULTURAL_ICONS: VisualIconOption[] = [
   { key: 'lantern', label: 'Lantern', iconName: 'mingcute:lantern-fill' },
 ];
 
-export default function EventPointTagTab({ form, errors, handleChange }: Props) {
+export interface EventPointTagTabHandle {
+  generateMarkerIcon: () => Promise<string | null>;
+}
+
+const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function EventPointTagTab(
+  { form, errors, handleChange }: Props,
+  ref,
+) {
   const markerPreviewRef = useRef<HTMLDivElement>(null);
   const customUploadInputRef = useRef<HTMLInputElement>(null);
 
-  const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [generatedIconUrl, setGeneratedIconUrl] = useState(form.destinationMarkerIconUrl || '');
   const [customUploadUrl, setCustomUploadUrl] = useState<string | null>(null);
   const [tagColor, setTagColor] = useState(form.destinationTagColor || DEFAULT_TAG_COLOR);
-  const [lastGenerateAt, setLastGenerateAt] = useState(0);
 
   const [selectedIcon, setSelectedIcon] = useState<VisualIconOption>(NHS_CULTURAL_ICONS[0]);
 
   useEffect(() => {
     setTagColor(form.destinationTagColor || DEFAULT_TAG_COLOR);
-    setGeneratedIconUrl(form.destinationMarkerIconUrl || '');
-  }, [form.destinationMarkerIconUrl, form.destinationTagColor]);
+  }, [form.destinationTagColor]);
 
   useEffect(() => {
     return () => {
@@ -151,21 +162,12 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
     return uploadImageToCloudinary(blob);
   };
 
-  const handleReviewCreate = async () => {
+  const generateMarkerIcon = async (): Promise<string | null> => {
     if (isProcessing) {
       message.warning('Marker generation is in progress. Please wait.');
-      return;
+      return null;
     }
 
-    const now = Date.now();
-    const elapsed = now - lastGenerateAt;
-    if (elapsed < MARKER_GENERATE_COOLDOWN_MS) {
-      const remaining = Math.ceil((MARKER_GENERATE_COOLDOWN_MS - elapsed) / 1000);
-      message.warning(`Please wait ${remaining}s before generating again to avoid duplicate uploads.`);
-      return;
-    }
-
-    setLastGenerateAt(now);
     setIsProcessing(true);
 
     try {
@@ -173,30 +175,25 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
 
       if (!iconUrl) {
         message.error('Failed to generate marker.');
-        return;
+        return null;
       }
 
-      setGeneratedIconUrl(iconUrl);
-      setIsReviewDialogOpen(true);
-      message.success('Marker generated. Please confirm to apply it.');
+      return iconUrl;
     } catch {
       message.error('Error generating marker.');
+      return null;
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleFinalConfirm = () => {
-    if (!generatedIconUrl) {
-      message.error('Generate marker first.');
-      return;
-    }
+  useImperativeHandle(ref, () => ({
+    generateMarkerIcon,
+  }));
 
-    handleChange('destinationMarkerIconUrl', generatedIconUrl);
-    handleChange('destinationTagColor', tagColor);
-
-    setIsReviewDialogOpen(false);
-    message.success('Tag created.');
+  const handleTagColorChange = (value: string) => {
+    setTagColor(value);
+    handleChange('destinationTagColor', value);
   };
 
   return (
@@ -209,7 +206,7 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
         {/* ICON SELECTION */}
         <section className="space-y-3 border-r xl:pr-4">
           <Label>Icon</Label>
-          <br />
+
           <input
             ref={customUploadInputRef}
             type="file"
@@ -243,6 +240,17 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
 
         {/* COLOR */}
         <section className="space-y-3 xl:border-r xl:pl-4">
+          <div className="space-y-1 mr-4">
+            <Label htmlFor="timeline-tag-name">Tag Name *</Label>
+            <Input
+              id="timeline-tag-name"
+              value={form.destinationTagName}
+              onChange={(e) => handleChange('destinationTagName', e.target.value)}
+              placeholder="e.g. Folk Lore, Activity, Marbel Carving"
+            />
+            {errors.destinationTagName && <p className="text-xs text-destructive">{errors.destinationTagName}</p>}
+          </div>
+
           <Label>Color</Label>
 
           <div className="flex gap-2 flex-wrap">
@@ -251,11 +259,11 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
                 key={color}
                 style={{ backgroundColor: color }}
                 className="h-8 w-8 rounded-full"
-                onClick={() => setTagColor(color)}
+                onClick={() => handleTagColorChange(color)}
               />
             ))}
 
-            <input type="color" value={tagColor} onChange={(e) => setTagColor(e.target.value)} />
+            <input type="color" value={tagColor} onChange={(e) => handleTagColorChange(e.target.value)} />
           </div>
         </section>
 
@@ -272,34 +280,17 @@ export default function EventPointTagTab({ form, errors, handleChange }: Props) 
                 {markerIcon}
               </div>
             </div>
-
-            <Button className="mt-4" onClick={handleReviewCreate} disabled={isProcessing}>
-              {isProcessing ? 'Generating...' : 'Generate'}
-            </Button>
+            <p className="mt-4 text-xs text-muted-foreground text-center">
+              Marker upload will run automatically during final creation confirmation.
+            </p>
             {errors.destinationMarkerIconUrl && (
               <p className="text-xs text-destructive mt-2">{errors.destinationMarkerIconUrl}</p>
             )}
           </div>
         </section>
       </div>
-
-      {/* DIALOG */}
-      <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm</DialogTitle>
-            <DialogDescription>Review marker</DialogDescription>
-          </DialogHeader>
-
-          <div className="flex justify-center">
-            {generatedIconUrl && <img src={generatedIconUrl} className="h-16 w-16" />}
-          </div>
-
-          <DialogFooter>
-            <Button onClick={handleFinalConfirm}>Confirm</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
-}
+});
+
+export default EventPointTagTab;
