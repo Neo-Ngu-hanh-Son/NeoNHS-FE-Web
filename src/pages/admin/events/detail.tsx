@@ -40,6 +40,7 @@ import { TicketCatalogList } from './components/TicketCatalogList';
 import { EventTimelineList } from './components/eventTimeline/EventTimelineList';
 import { EventPointList } from './components/eventPoint/EventPointList';
 import { EventPointTagList } from './components/eventPoint/EventPointTagList';
+
 import { useState } from 'react';
 
 export default function EventDetailPage() {
