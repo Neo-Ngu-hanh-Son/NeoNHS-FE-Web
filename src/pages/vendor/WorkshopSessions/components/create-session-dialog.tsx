@@ -8,6 +8,7 @@ import {
 import { SessionForm } from "./session-form"
 import { WorkshopSessionFormData, CreateWorkshopSessionRequest } from "../types"
 import { WorkshopSessionService } from "@/services/api/workshopSessionService"
+import { formatDateForApi } from "../utils/formatters"
 import { notification } from "antd"
 import { useState } from "react"
 
@@ -30,8 +31,8 @@ export function CreateSessionDialog({
     // Transform form data to API request format
     const createRequest: CreateWorkshopSessionRequest = {
       workshopTemplateId: data.workshopTemplateId,
-      startTime: data.startTime.toISOString(),
-      endTime: data.endTime.toISOString(),
+      startTime: formatDateForApi(data.startTime),
+      endTime: formatDateForApi(data.endTime),
       price: data.price,
       maxParticipants: data.maxParticipants,
     }
