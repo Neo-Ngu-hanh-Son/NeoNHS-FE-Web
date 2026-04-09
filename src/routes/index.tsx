@@ -14,6 +14,7 @@ import { ProfilePage } from "@/pages/ProfilePage";
 import UserProfilePage from "@/pages/ProfilePage/UserProfilePage";
 import VendorProfilePage from "@/pages/ProfilePage/VendorProfilePage";
 import { AboutUs } from "@/pages/AboutUs";
+import { ContactUs } from "@/pages/ContactUs";
 import { AdminLayout } from "@/layouts/admin/AdminLayout";
 import { VendorLayout } from "@/layouts/vendor/VendorLayout";
 // Dashboard Pages
@@ -101,6 +102,7 @@ export const router = createBrowserRouter([
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/about-us", element: <AboutUs /> },
+          { path: "/contact-us", element: <ContactUs /> },
           { path: "/blog/:id", element: <BlogDetailsPage /> },
 
           // Profile Routes - Auto-redirect based on role
