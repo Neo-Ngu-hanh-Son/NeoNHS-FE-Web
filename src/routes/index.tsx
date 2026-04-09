@@ -17,8 +17,7 @@ import { AboutUs } from "@/pages/AboutUs";
 import { ContactUs } from "@/pages/ContactUs";
 import { AdminLayout } from "@/layouts/admin/AdminLayout";
 import { VendorLayout } from "@/layouts/vendor/VendorLayout";
-// Dashboard Pages
-import VendorDashboardPage from "@/pages/vendor/dashboard/VendorDashboardPage";
+// Admin Pages
 import AdminDashboardPage from "@/pages/admin/dashboard/AdminDashboardPage";
 import AdminUsersPage from "@/pages/admin/users/AdminUsersPage";
 import AdminDestinationsPage from "@/pages/admin/destinations/AdminDestinationsPage";
@@ -39,8 +38,10 @@ import EventCreatePage from "@/pages/admin/events/create";
 import EventDetailPage from "@/pages/admin/events/detail";
 import EventEditPage from "@/pages/admin/events/edit";
 import RevenuePage from "@/pages/admin/revenue/RevenuePage";
+import EventTimelineCreatePage from "@/pages/admin/events/timeline/create";
 
 // Vendor specific pages
+import VendorDashboardPage from "@/pages/vendor/dashboard/VendorDashboardPage";
 import WorkshopTemplatesPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplatesPage";
 import WorkshopTemplateDetailPage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplateDetailPage";
 import WorkshopTemplateCreatePage from "@/pages/vendor/WorkshopTemplates/WorkshopTemplateCreatePage";
@@ -163,6 +164,7 @@ export const router = createBrowserRouter([
           { path: "events/create", element: <EventCreatePage /> },
           { path: "events/:id", element: <EventDetailPage /> },
           { path: "events/:id/edit", element: <EventEditPage /> },
+          { path: 'events/:id/timeline/create', element: <EventTimelineCreatePage /> },
           { path: "blog-categories", element: <BlogCategoryPage /> },
           { path: "blog", element: <ManageBlogPage /> },
           { path: "blog/create", element: <BlogCreationPage /> },

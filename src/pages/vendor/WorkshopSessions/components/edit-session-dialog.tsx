@@ -12,6 +12,7 @@ import { AlertTriangle } from "lucide-react"
 import { WorkshopSessionService } from "@/services/api/workshopSessionService"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
 import { WorkshopTemplateResponse } from "../../WorkshopTemplates/types"
+import { formatDateForApi } from "../utils/formatters"
 import { notification } from "antd"
 import { useState, useEffect } from "react"
 
@@ -46,8 +47,8 @@ export function EditSessionDialog({
   const handleSubmit = async (data: WorkshopSessionFormData) => {
     // Transform form data to API request format
     const updateRequest: UpdateWorkshopSessionRequest = {
-      startTime: data.startTime.toISOString(),
-      endTime: data.endTime.toISOString(),
+      startTime: formatDateForApi(data.startTime),
+      endTime: formatDateForApi(data.endTime),
       price: data.price,
       maxParticipants: data.maxParticipants,
     }

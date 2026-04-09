@@ -1,5 +1,11 @@
 import { WorkshopSessionResponse, SessionStatus } from "../../types"
-import { getDaysInMonth, getFirstDayOfMonth, isSameDay } from "../../utils/formatters"
+import {
+  getDaysInMonth,
+  getFirstDayOfMonth,
+  formatTime,
+  isSessionOnVietnamCalendarDay,
+  vietnamDateKeyFromCalendarDate,
+} from "../../utils/formatters"
 import { cn } from "@/lib/utils"
 
 interface MonthViewProps {
@@ -31,10 +37,9 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
 
   // Get sessions for a specific date
   const getSessionsForDate = (date: Date) => {
-    return sessions.filter(session => {
-      const sessionDate = new Date(session.startTime)
-      return isSameDay(sessionDate, date)
-    })
+    return sessions.filter((session) =>
+      isSessionOnVietnamCalendarDay(session.startTime, date)
+    )
   }
 
   // Get status color for indicator dot
@@ -69,7 +74,9 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
           }
 
           const dateSessions = getSessionsForDate(date)
-          const isToday = isSameDay(date, today)
+          const isToday =
+            vietnamDateKeyFromCalendarDate(date) ===
+            vietnamDateKeyFromCalendarDate(today)
           const isPast = date < today && !isToday
           const hasScheduledSessions = dateSessions.some(s => s.status === SessionStatus.SCHEDULED)
 
@@ -123,12 +130,7 @@ export function MonthView({ currentDate, sessions, onDateClick, onSessionClick }
                   {/* Mini Session List (max 3) */}
                   <div className="space-y-0.5 mt-1">
                     {dateSessions.slice(0, 3).map(session => {
-                      const startTime = new Date(session.startTime)
-                      const timeStr = startTime.toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit',
-                        hour12: true 
-                      })
+                      const timeStr = formatTime(session.startTime)
                       
                       return (
                         <div
