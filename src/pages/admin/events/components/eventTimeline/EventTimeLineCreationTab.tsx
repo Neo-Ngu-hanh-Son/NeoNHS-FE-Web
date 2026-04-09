@@ -1,6 +1,6 @@
 import { Input, Label, Textarea } from '@/components/ui';
-import { FormData } from './EventTimelineFormDialog';
 import dayjs from 'dayjs';
+import { FormData } from '../../type';
 
 type Props = {
   form: {

@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
 import {
   EnvironmentOutlined,
   PhoneOutlined,
@@ -8,57 +8,56 @@ import {
   CameraOutlined,
   TeamOutlined,
   SafetyCertificateOutlined,
-} from "@ant-design/icons";
+} from '@ant-design/icons';
 
-import hero from "@/assets/images/hero.jpg";
-import googlePlayBtn from "@/assets/button/ggplaylight.png";
-import appStoreBtn from "@/assets/button/appstorelight.png";
+import hero from '@/assets/images/hero.jpg';
+import googlePlayBtn from '@/assets/button/ggplaylight.png';
+import appStoreBtn from '@/assets/button/appstorelight.png';
 const landmarks = [
   {
     id: 1,
-    name: "Linh Ung Pagoda",
-    image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80",
+    name: 'Linh Ung Pagoda',
+    image:
+      'https://danangfantasticity.com/wp-content/uploads/2019/09/chua-linh-ung-chon-binh-yen-giua-long-da-nang-013-2.jpg',
   },
   {
     id: 2,
-    name: "Marble Mountains",
-    image: "https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80",
+    name: 'Marble Mountains',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755613/AboutNHSCover2_dynvk6.webp',
   },
   {
     id: 3,
-    name: "Am Phu Cave",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80",
+    name: 'Am Phu Cave',
+    image: 'https://statics.vinpearl.com/Am-Phu-Cave-thumb_1753717235.jpg',
   },
   {
     id: 4,
-    name: "Huyen Khong Cave",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
+    name: 'Huyen Khong Cave',
+    image: 'https://statics.vinpearl.com/Huyen-Khong-Cave-in-Da-Nang_1753368020.jpg',
   },
 ];
 
 const features = [
   {
     icon: <CompassOutlined className="text-2xl" />,
-    title: "Guided Tours",
+    title: 'Guided Tours',
     description:
-      "AI-powered tour planning tailored to your interests and schedule for the perfect cultural journey.Expert local guides for an authentic experience",
+      'AI-powered tour planning tailored to your interests and schedule for the perfect cultural journey.Expert local guides for an authentic experience',
   },
   {
     icon: <CameraOutlined className="text-2xl" />,
-    title: "Authentic Workshops",
-    description:
-      "Hands-on experiences with master craftsmen in traditional stone carving and local arts.",
+    title: 'Authentic Workshops',
+    description: 'Hands-on experiences with master craftsmen in traditional stone carving and local arts.',
   },
   {
     icon: <TeamOutlined className="text-2xl" />,
-    title: "Cultural Heritage",
-    description: "Deep dive into the rich history and living traditions of Ngu Hanh Son Ward.",
+    title: 'Cultural Heritage',
+    description: 'Deep dive into the rich history and living traditions of Ngu Hanh Son Ward.',
   },
   {
     icon: <SafetyCertificateOutlined className="text-2xl" />,
-    title: "Local Connection",
-    description:
-      "Direct support to local artisans and communities through our integrated commerce platform.",
+    title: 'Local Connection',
+    description: 'Direct support to local artisans and communities through our integrated commerce platform.',
   },
 ];
 
@@ -67,18 +66,15 @@ export function HomePage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative h-[1000px] w-full overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${hero})` }}
-        />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${hero})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent" />
         <div className="relative z-10 flex h-full flex-col items-start justify-center text-left text-white px-8 md:px-16 lg:px-24 max-w-4xl">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             Start your journey in Ngu Hanh Son, explore beautiful place!
           </h1>
           <p className="text-lg md:text-xl max-w-2xl mb-8 text-white/90">
-            Guided tours of tourist attractions with smart itineraries, and participation in
-            workshops at traditional craft villages.
+            Guided tours of tourist attractions with smart itineraries, and participation in workshops at traditional
+            craft villages.
           </p>
           <div className="flex flex-wrap gap-4">
             <a href="#" className="transition-transform hover:scale-105">
@@ -95,12 +91,8 @@ export function HomePage() {
       <section className="py-20 px-4 md:px-8 lg:px-20 bg-white">
         <div className=" mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Popular Destinations
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Discover the most iconic landmarks of Ngu Hanh Son
-            </p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Popular Destinations</h2>
+            <p className="text-muted-foreground text-lg">Discover the most iconic landmarks of Ngu Hanh Son</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {landmarks.map((landmark) => (
@@ -132,7 +124,7 @@ export function HomePage() {
             {/* Left - Image */}
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80"
+                src="https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755612/AboutNHSCover_xhfgu8.webp"
                 alt="Ngu Hanh Son Experience"
                 className="w-full h-[500px] object-cover rounded-2xl shadow-lg"
               />
@@ -141,12 +133,10 @@ export function HomePage() {
 
             {/* Right - Content */}
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Why Visit Ngu Hanh Son?
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Why Visit Ngu Hanh Son?</h2>
               <p className="text-muted-foreground text-lg mb-8">
-                Experience authentic cultural heritage through our integrated platform connecting
-                tourists with local artisans and traditional craft villages.
+                Experience authentic cultural heritage through our integrated platform connecting tourists with local
+                artisans and traditional craft villages.
               </p>
               <div className="space-y-6">
                 {features.map((feature, index) => (
@@ -171,9 +161,7 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Find Us Here</h2>
-            <p className="text-muted-foreground text-lg">
-              Located in the heart of Da Nang, Vietnam
-            </p>
+            <p className="text-muted-foreground text-lg">Located in the heart of Da Nang, Vietnam</p>
           </div>
           {/* Map - Centered */}
           <Card className="overflow-hidden h-[700px] mb-8">
@@ -198,9 +186,7 @@ export function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Address</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Ngu Hanh Son Ward, Da Nang, Vietnam
-                  </p>
+                  <p className="text-muted-foreground text-sm">Ngu Hanh Son Ward, Da Nang, Vietnam</p>
                 </div>
               </div>
             </Card>

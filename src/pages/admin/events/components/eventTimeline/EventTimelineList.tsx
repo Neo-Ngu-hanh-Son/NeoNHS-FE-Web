@@ -24,7 +24,7 @@ import {
 import { Plus, Pencil, Trash2, MoreHorizontal, Clock, MapPin, User, CalendarDays, MoonStar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEventTimelines } from '@/hooks/event';
-import { EventTimelineFormDialog } from './EventTimelineFormDialog';
+import { FormData } from '../../type';
 import type {
   EventTimelineResponse,
   CreateEventTimelineRequest,
@@ -207,14 +207,14 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
       )}
 
       {/* Form Dialog */}
-      <EventTimelineFormDialog
+      {/* <EventTimelineFormDialog
         open={formOpen}
         onOpenChange={handleFormOpenChange}
         timeline={editingTimeline}
         onSubmit={handleSubmit}
         eventStartDate={eventStartDate}
         eventEndDate={eventEndDate}
-      />
+      /> */}
 
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

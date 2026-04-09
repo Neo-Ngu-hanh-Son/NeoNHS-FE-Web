@@ -7,13 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
+import { useEventTimelines } from '@/hooks/event';
 import { uploadImageToCloudinary } from '@/utils/cloudinary';
-import type { FormData } from './EventTimelineFormDialog';
+import { EventPointTagResponse } from '@/types/eventTimeline';
+import { FormData } from '../../type';
+import EventPointTagPicker from './EventPointTagPicker';
 
 type Props = {
   form: FormData;
   errors: Partial<Record<keyof FormData, string>>;
   handleChange: (field: keyof FormData, value: string) => void;
+  eventId: string;
 };
 
 type VisualIconOption = {
@@ -82,7 +86,7 @@ export interface EventPointTagTabHandle {
 }
 
 const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function EventPointTagTab(
-  { form, errors, handleChange }: Props,
+  { form, errors, handleChange, eventId }: Props,
   ref,
 ) {
   const markerPreviewRef = useRef<HTMLDivElement>(null);
@@ -91,8 +95,11 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
   const [isProcessing, setIsProcessing] = useState(false);
   const [customUploadUrl, setCustomUploadUrl] = useState<string | null>(null);
   const [tagColor, setTagColor] = useState(form.destinationTagColor || DEFAULT_TAG_COLOR);
+  const [existingTags, setExistingTags] = useState<EventPointTagResponse[]>([]);
+  const [selectedExistingTagId, setSelectedExistingTagId] = useState<string>();
 
   const [selectedIcon, setSelectedIcon] = useState<VisualIconOption>(NHS_CULTURAL_ICONS[0]);
+  const { fetchEventPointTags } = useEventTimelines(eventId, false);
 
   useEffect(() => {
     setTagColor(form.destinationTagColor || DEFAULT_TAG_COLOR);
@@ -105,6 +112,19 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
       }
     };
   }, [customUploadUrl]);
+
+  useEffect(() => {
+    async function fetchPreviouslyUsedTags() {
+      try {
+        const result = await fetchEventPointTags();
+        setExistingTags(result);
+      } catch (error: unknown) {
+        message.error(`Failed to fetch existing event point tags: ${(error as Error).message}`);
+      }
+    }
+
+    fetchPreviouslyUsedTags();
+  }, [fetchEventPointTags]);
 
   const markerIcon = useMemo(() => {
     if (selectedIcon.isCustom) {
@@ -134,6 +154,8 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
       URL.revokeObjectURL(customUploadUrl);
     }
 
+    setSelectedExistingTagId(undefined);
+    handleChange('eventPointTagId', '');
     setCustomUploadUrl(objectUrl);
 
     setSelectedIcon({
@@ -191,15 +213,60 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
     generateMarkerIcon,
   }));
 
-  const handleTagColorChange = (value: string) => {
+  const handleTagColorChange = (value: string, preserveExistingTagId = false) => {
     setTagColor(value);
     handleChange('destinationTagColor', value);
+
+    if (!preserveExistingTagId) {
+      setSelectedExistingTagId(undefined);
+      handleChange('eventPointTagId', '');
+    }
+  };
+
+  const applyTagToForm = (tag: EventPointTagResponse) => {
+    handleChange('eventPointTagId', tag.id || '');
+    handleChange('destinationTagName', tag.name || '');
+    handleChange('destinationTagDescription', tag.description || '');
+
+    const color = tag.tagColor || DEFAULT_TAG_COLOR;
+    handleTagColorChange(color, true);
+
+    if (tag.iconUrl) {
+      setSelectedIcon({
+        key: `existing-${tag.id || 'tag'}`,
+        label: tag.name || 'Existing tag',
+        iconName: tag.iconUrl,
+        isCustom: true,
+      });
+      setCustomUploadUrl(tag.iconUrl);
+      handleChange('destinationMarkerIconUrl', tag.iconUrl);
+      return;
+    }
+
+    handleChange('destinationMarkerIconUrl', '');
+  };
+
+  const handleSelectExistingTag = (tagId: string) => {
+    const tag = existingTags.find((item) => item.id === tagId);
+    if (!tag) return;
+
+    setSelectedExistingTagId(tagId);
+    applyTagToForm(tag);
   };
 
   return (
     <div className="space-y-4 pt-2">
       <div className="border-b pb-2">
         <h3 className="text-sm font-semibold">Marker Tag</h3>
+      </div>
+
+      <div className="space-y-1">
+        <Label>Reusing existing event point tags</Label>
+        <EventPointTagPicker
+          tags={existingTags}
+          selectedTagId={selectedExistingTagId}
+          onTagSelect={handleSelectExistingTag}
+        />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -226,7 +293,11 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
               return (
                 <button
                   key={item.key}
-                  onClick={() => setSelectedIcon(item)}
+                  onClick={() => {
+                    setSelectedIcon(item);
+                    setSelectedExistingTagId(undefined);
+                    handleChange('eventPointTagId', '');
+                  }}
                   className={`h-12 w-12 border rounded flex items-center justify-center ${
                     isActive ? 'border-primary ring-1 ring-primary' : ''
                   }`}
@@ -245,7 +316,11 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
             <Input
               id="timeline-tag-name"
               value={form.destinationTagName}
-              onChange={(e) => handleChange('destinationTagName', e.target.value)}
+              onChange={(e) => {
+                handleChange('destinationTagName', e.target.value);
+                setSelectedExistingTagId(undefined);
+                handleChange('eventPointTagId', '');
+              }}
               placeholder="e.g. Folk Lore, Activity, Marbel Carving"
             />
             {errors.destinationTagName && <p className="text-xs text-destructive">{errors.destinationTagName}</p>}
