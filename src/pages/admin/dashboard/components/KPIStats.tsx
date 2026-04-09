@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { UserOutlined, ShopOutlined, TagOutlined, DollarOutlined } from '@ant-design/icons';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AdminKPIs } from '@/types/adminDashboard';
-import { formatCurrency } from '@/utils/helpers';
+import { formatCurrency, formatCompactNumber } from '@/utils/helpers';
 
 interface KPIStatsProps {
     kpis: AdminKPIs | null;
@@ -20,36 +20,33 @@ export function KPIStats({ kpis }: KPIStatsProps) {
                 <StatsCard
                     title="Total Users"
                     value={kpis?.totalUsers?.toLocaleString() || "0"}
-                    icon={<UserOutlined />}
-                    gradientFrom="from-blue-500"
-                    gradientTo="to-indigo-600"
+                    icon={<UserOutlined className="text-xl" />}
+                    gradientFrom="border-blue-500 text-blue-600"
                 />
             </motion.div>
             <motion.div variants={itemVariants}>
                 <StatsCard
                     title="Active Vendors"
                     value={kpis?.activeVendors?.toLocaleString() || "0"}
-                    icon={<ShopOutlined />}
-                    gradientFrom="from-emerald-500"
-                    gradientTo="to-teal-600"
+                    icon={<ShopOutlined className="text-xl" />}
+                    gradientFrom="border-emerald-500 text-emerald-600"
                 />
             </motion.div>
             <motion.div variants={itemVariants}>
                 <StatsCard
                     title="Tickets Sold"
                     value={kpis?.ticketsSold?.toLocaleString() || "0"}
-                    icon={<TagOutlined />}
-                    gradientFrom="from-amber-500"
-                    gradientTo="to-orange-600"
+                    icon={<TagOutlined className="text-xl" />}
+                    gradientFrom="border-amber-500 text-amber-600"
                 />
             </motion.div>
             <motion.div variants={itemVariants}>
                 <StatsCard
                     title="Total Revenue"
-                    value={kpis?.revenue ? formatCurrency(kpis.revenue) : "0 ₫"}
-                    icon={<DollarOutlined />}
-                    gradientFrom="from-rose-500"
-                    gradientTo="to-pink-600"
+                    value={kpis?.revenue ? formatCompactNumber(kpis.revenue) : "0"}
+                    icon={<DollarOutlined className="text-xl" />}
+                    gradientFrom="border-primary text-primary"
+                    subtitle={kpis?.revenue ? formatCurrency(kpis.revenue) : ""}
                 />
             </motion.div>
         </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -8,34 +8,36 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAdminCheckinPoints } from "@/hooks/checkinPoint/useAdminCheckinPoints";
-import type { CheckinPointRequest, PointCheckinResponse } from "@/types/checkinPoint";
-import CheckinPointFilters from "./components/CheckinPointFilters";
-import CheckinPointFormDialog from "./components/CheckinPointFormDialog";
-import CheckinPointTable from "./components/CheckinPointTable";
+} from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAdminCheckinPoints } from '@/hooks/checkinPoint/useAdminCheckinPoints';
+import type { CheckinPointRequest, PointCheckinResponse } from '@/types/checkinPoint';
+import CheckinPointFilters from './components/CheckinPointFilters';
+import CheckinPointFormDialog from './components/CheckinPointFormDialog';
+import CheckinPointTable from './components/CheckinPointTable';
+import { message } from 'antd';
 
 export default function AdminCheckinPointsPage() {
   const [page, setPage] = useState(0);
   const [size] = useState(10);
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [search, setSearch] = useState("");
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [search, setSearch] = useState('');
   const [includeDeleted, setIncludeDeleted] = useState(false);
-  const [selectedParentPointId, setSelectedParentPointId] = useState("");
+  const [selectedParentPointId, setSelectedParentPointId] = useState('');
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"create" | "edit">("create");
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [activeCheckinPoint, setActiveCheckinPoint] = useState<PointCheckinResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<PointCheckinResponse | null>(null);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const filters = useMemo(
     () => ({
       page,
       size,
-      sortBy: "createdAt",
+      sortBy: 'createdAt',
       sortDir,
       search,
       includeDeleted,
@@ -53,17 +55,18 @@ export default function AdminCheckinPointsPage() {
     updateCheckinPoint,
     deleteCheckinPoint,
     getCheckinPointById,
+    restoreCheckinPoint,
   } = useAdminCheckinPoints(filters);
 
   const openCreate = () => {
     if (!selectedParentPointId) return;
-    setModalMode("create");
+    setModalMode('create');
     setActiveCheckinPoint(null);
     setModalOpen(true);
   };
 
   const openEdit = async (item: PointCheckinResponse) => {
-    setModalMode("edit");
+    setModalMode('edit');
 
     const detail = await getCheckinPointById(item.id);
     setActiveCheckinPoint(detail || item);
@@ -73,7 +76,7 @@ export default function AdminCheckinPointsPage() {
   const handleSubmit = async (payload: CheckinPointRequest) => {
     setSubmitting(true);
     try {
-      if (modalMode === "create") {
+      if (modalMode === 'create') {
         const created = await createCheckinPoint(payload);
         if (created) {
           setModalOpen(false);
@@ -100,14 +103,23 @@ export default function AdminCheckinPointsPage() {
     }
   };
 
+  const handleRestoreCheckinPoint = async (id: string) => {
+    messageApi.loading('Restoring checkin point...');
+    const success = await restoreCheckinPoint(id);
+    if (success) {
+      // Handle successful restore (e.g., refresh the list)
+      messageApi.success('Checkin point restored successfully.');
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl space-y-5">
+      {contextHolder}
       <Card>
         <CardHeader>
           <CardTitle>Checkin Point Management</CardTitle>
           <CardDescription>
-            Manage point check-in records. Select a parent point before creating a new checkin
-            point.
+            Manage point check-in records. Select a parent point before creating a new checkin point.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -145,6 +157,7 @@ export default function AdminCheckinPointsPage() {
             onPageChange={setPage}
             onEdit={openEdit}
             onDelete={setDeleteTarget}
+            onRestore={handleRestoreCheckinPoint}
           />
         </CardContent>
       </Card>
@@ -165,8 +178,8 @@ export default function AdminCheckinPointsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Soft Delete Checkin Point</AlertDialogTitle>
             <AlertDialogDescription>
-              This will soft-delete "{deleteTarget?.name}". The record can still be listed when
-              include deleted is enabled.
+              This will soft-delete "{deleteTarget?.name}". The record can still be listed when include deleted is
+              enabled.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

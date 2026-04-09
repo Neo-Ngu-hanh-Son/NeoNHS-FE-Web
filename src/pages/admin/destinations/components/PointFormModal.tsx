@@ -190,6 +190,18 @@ export function PointFormModal({
 
           <form id="point-form" onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-6">
+              <div className="col-span-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11 border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 group transition-all"
+                  onClick={onOpenMapPicker}
+                >
+                  <MapPin className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
+                  Locate on Interactive Map
+                </Button>
+              </div>
+
               <div className="col-span-2 space-y-2">
                 <Label htmlFor="attractionId" className="text-sm font-bold text-primary flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
@@ -248,9 +260,9 @@ export function PointFormModal({
                     variant="outline"
                     size="sm"
                     className="flex items-center gap-2"
-                    disabled={!editingPoint}
+                    disabled={!editingPoint?.id}
                     onClick={() => {
-                      if (!editingPoint) return;
+                      if (!editingPoint?.id) return;
                       navigate(`/admin/destinations/${editingPoint.id}/audioHistory`, {
                         state: { pointName: formData.name },
                       });
@@ -260,7 +272,7 @@ export function PointFormModal({
                     Manage History Audios
                   </Button>
 
-                  {!editingPoint && (
+                  {!editingPoint?.id && (
                     <p className="text-xs text-muted-foreground">Save this point first to manage history audio.</p>
                   )}
                 </div>
@@ -268,65 +280,25 @@ export function PointFormModal({
 
               <div className="col-span-2 space-y-2">
                 <Label htmlFor="historyAudioUrl">Manage Panorama</Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                  disabled={!editingPoint}
-                  onClick={() => {
-                    if (!editingPoint) return;
-                    navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
-                  }}
-                >
-                  <MapPin className="w-4 h-4" />
-                  Edit Panorama
-                </Button>
-                {!editingPoint && (
-                  <p className="text-xs text-muted-foreground">Save this point first to manage panorama.</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="latitude" className="text-sm font-semibold">
-                  Latitude
-                </Label>
-                <Input
-                  id="latitude"
-                  type="number"
-                  step="0.000001"
-                  className="h-11"
-                  value={formData.latitude}
-                  onChange={(e) => handleChange('latitude', parseFloat(e.target.value))}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="longitude" className="text-sm font-semibold">
-                  Longitude
-                </Label>
-                <Input
-                  id="longitude"
-                  type="number"
-                  step="0.000001"
-                  className="h-11"
-                  value={formData.longitude}
-                  onChange={(e) => handleChange('longitude', parseFloat(e.target.value))}
-                  required
-                />
-              </div>
-
-              <div className="col-span-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full h-11 border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 group transition-all"
-                  onClick={onOpenMapPicker}
-                >
-                  <MapPin className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
-                  Locate on Interactive Map
-                </Button>
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-3"
+                    disabled={!editingPoint?.id}
+                    onClick={() => {
+                      if (!editingPoint?.id) return;
+                      navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
+                    }}
+                  >
+                    <MapPin className="w-4 h-4" />
+                    Edit Panorama
+                  </Button>
+                  {!editingPoint?.id && (
+                    <p className="text-xs text-muted-foreground">Save this point first to manage panorama.</p>
+                  )}
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -347,34 +319,18 @@ export function PointFormModal({
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="orderIndex" className="text-sm font-semibold">
-                    Sequence order
-                  </Label>
-                  <Input
-                    id="orderIndex"
-                    type="number"
-                    min={1}
-                    className="h-11"
-                    value={formData.orderIndex}
-                    onChange={(e) => handleChange('orderIndex', parseInt(e.target.value))}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="estTimeSpent" className="text-sm font-semibold">
-                    Est. Visit (Min)
-                  </Label>
-                  <Input
-                    id="estTimeSpent"
-                    type="number"
-                    min={5}
-                    className="h-11"
-                    value={formData.estTimeSpent}
-                    onChange={(e) => handleChange('estTimeSpent', parseInt(e.target.value))}
-                  />
-                </div>
+              <div className="col-span-2 space-y-2">
+                <Label htmlFor="estTimeSpent" className="text-sm font-semibold">
+                  Est. Visit (Min)
+                </Label>
+                <Input
+                  id="estTimeSpent"
+                  type="number"
+                  min={5}
+                  className="h-11 w-full lg:w-1/2"
+                  value={formData.estTimeSpent}
+                  onChange={(e) => handleChange('estTimeSpent', parseInt(e.target.value))}
+                />
               </div>
 
               <div className="col-span-2 space-y-2">
@@ -444,9 +400,9 @@ export function PointFormModal({
             type="submit"
             form="point-form"
             className="px-8 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20"
-            disabled={uploading['thumbnailUrl'] || uploading['historyAudioUrl']}
+            disabled={uploading['thumbnailUrl'] || uploading['historyAudioUrl'] || !safeFormData.attractionId}
           >
-            {editingPoint ? 'Update Point' : 'Create Point'}
+            {editingPoint?.id ? 'Update Point' : 'Create Point'}
           </Button>
         </DialogFooter>
       </DialogContent>

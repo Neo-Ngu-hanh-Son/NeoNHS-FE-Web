@@ -1,4 +1,4 @@
-import { MoreVertical, UserX, UserCheck } from "lucide-react";
+import { CheckCircle2, CircleSlash, MoreVertical, UserCheck, UserX, XCircle } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -55,46 +55,50 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
         }
     };
 
-    const getStatusBadge = (user: User) => {
+    const getAccountStatus = (user: User) => {
         if (user.isBanned) {
             return (
-                <div className="flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-red-500"></span>
-                    <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                        Banned
-                    </span>
+                <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-red-500" />
+                    <span className="text-sm font-semibold text-red-600 dark:text-red-400">Banned</span>
+                </div>
+            );
+        }
+        if (!user.isActive) {
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-amber-500" />
+                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">Inactive</span>
                 </div>
             );
         }
         return (
-            <div className="flex items-center gap-1.5">
-                <span className="size-2 rounded-full bg-green-500"></span>
-                <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                    Active
-                </span>
+            <div className="flex items-center gap-2">
+                <span className="size-2 rounded-full bg-green-500" />
+                <span className="text-sm font-semibold text-green-700 dark:text-green-400">Active</span>
             </div>
         );
     };
 
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-950/30 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
                 <Table className="w-full text-left border-collapse">
                     <TableHeader>
-                        <TableRow className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 hover:bg-transparent">
-                            <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                User Name
+                        <TableRow className="bg-slate-50/80 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-800 hover:bg-transparent">
+                            <TableHead className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                User
                             </TableHead>
-                            <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                Email Address
-                            </TableHead>
-                            <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            <TableHead className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Role
                             </TableHead>
-                            <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                Status
+                            <TableHead className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Verification
                             </TableHead>
-                            <TableHead className="p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
+                            <TableHead className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                Account
+                            </TableHead>
+                            <TableHead className="p-4 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">
                                 Actions
                             </TableHead>
                         </TableRow>
@@ -102,13 +106,13 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                     <TableBody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8">
+                                <TableCell colSpan={5} className="text-center py-10 text-slate-500 dark:text-slate-400">
                                     Loading users...
                                 </TableCell>
                             </TableRow>
                         ) : users.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8">
+                                <TableCell colSpan={5} className="text-center py-10 text-slate-500 dark:text-slate-400">
                                     No users found.
                                 </TableCell>
                             </TableRow>
@@ -119,9 +123,9 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                                     className="hover:bg-primary/5 transition-colors border-none"
                                 >
                                     <TableCell className="p-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3 min-w-[260px]">
                                             <div
-                                                className="size-10 rounded-full bg-cover bg-center bg-slate-200"
+                                                className="size-11 rounded-2xl bg-cover bg-center bg-slate-200 dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden"
                                                 style={{
                                                     backgroundImage: user.avatarUrl
                                                         ? `url("${user.avatarUrl}")`
@@ -129,21 +133,36 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                                                 }}
                                             >
                                                 {!user.avatarUrl && (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xs">
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-500 dark:text-slate-300 font-black text-sm">
                                                         {user.fullname.charAt(0)}
                                                     </div>
                                                 )}
                                             </div>
-                                            <p className="font-semibold text-sm text-slate-900 dark:text-white">
-                                                {user.fullname}
-                                            </p>
+                                            <div className="flex flex-col">
+                                                <p className="font-semibold text-sm text-slate-900 dark:text-white leading-tight">
+                                                    {user.fullname}
+                                                </p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                    {user.email}
+                                                </p>
+                                            </div>
                                         </div>
                                     </TableCell>
-                                    <TableCell className="p-4 text-sm text-slate-600 dark:text-slate-400">
-                                        {user.email}
-                                    </TableCell>
                                     <TableCell className="p-4">{getRoleBadge(user.role)}</TableCell>
-                                    <TableCell className="p-4">{getStatusBadge(user)}</TableCell>
+                                    <TableCell className="p-4">
+                                        {user.isVerified ? (
+                                            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 text-emerald-700 dark:text-emerald-300">
+                                                <CheckCircle2 className="size-4" />
+                                                <span className="text-xs font-bold">Verified</span>
+                                            </div>
+                                        ) : (
+                                            <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-slate-700 dark:text-slate-300">
+                                                <XCircle className="size-4" />
+                                                <span className="text-xs font-bold">Unverified</span>
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="p-4">{getAccountStatus(user)}</TableCell>
                                     <TableCell className="p-4 text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
@@ -171,6 +190,12 @@ export function UserTable({ users, onToggleBan, isLoading }: UserTableProps) {
                                                         </>
                                                     )}
                                                 </DropdownMenuItem>
+                                                {!user.isBanned && !user.isActive && (
+                                                    <DropdownMenuItem className="text-amber-700">
+                                                        <CircleSlash className="mr-2 h-4 w-4" />
+                                                        <span>Inactive</span>
+                                                    </DropdownMenuItem>
+                                                )}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

@@ -204,10 +204,10 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
                         </div>
                         <div>
                             <Label htmlFor="tc-status">Status</Label>
-                            <Select value={form.status} onValueChange={(v) => handleChange('status', v)}>
+                            <Select value={form.status} onValueChange={(v) => handleChange('status', v)} disabled={catalog?.status === 'SOLD_OUT'}>
                                 <SelectTrigger id="tc-status"><SelectValue /></SelectTrigger>
                                 <SelectContent>
-                                    {TICKET_STATUS_OPTIONS.map((opt) => (
+                                    {TICKET_STATUS_OPTIONS.filter((opt) => opt.value !== 'SOLD_OUT' || catalog?.status === 'SOLD_OUT').map((opt) => (
                                         <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                                     ))}
                                 </SelectContent>
