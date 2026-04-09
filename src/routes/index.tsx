@@ -8,11 +8,13 @@ import Forgot from "@/pages/AuthPage/Forgot";
 import Register from "@/pages/AuthPage/Register";
 import VerifyOTP from "@/pages/AuthPage/VerifyOTP";
 import NewPassword from "@/pages/AuthPage/NewPassword";
+import SetPasswordPage from "@/pages/AuthPage/SetPasswordPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import UserProfilePage from "@/pages/ProfilePage/UserProfilePage";
 import VendorProfilePage from "@/pages/ProfilePage/VendorProfilePage";
 import { AboutUs } from "@/pages/AboutUs";
+import { ContactUs } from "@/pages/ContactUs";
 import { AdminLayout } from "@/layouts/admin/AdminLayout";
 import { VendorLayout } from "@/layouts/vendor/VendorLayout";
 // Dashboard Pages
@@ -62,6 +64,9 @@ import AdminPanoramaEditorPage from "@/pages/admin/panorama/AdminPanoramaEditorP
 import PanoramaScreenMobile from "@/pages/Panorama/screens/PanoramaScreenMobile";
 import ManageHistoryAudioPage from "@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx";
 import AdminCheckinPointsPage from "@/pages/admin/checkin-points/AdminCheckinPointsPage";
+import ChatPage from "@/pages/Chat/ChatPage";
+import { RequireRole } from "@/routes/RequireRole";
+import { UserRole } from "@/types";
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +80,7 @@ export const router = createBrowserRouter([
           { path: "/register", element: <Register /> },
           { path: "/verify-otp", element: <VerifyOTP /> },
           { path: "/new-password", element: <NewPassword /> },
+          { path: "/set-password", element: <SetPasswordPage /> },
           { path: "/simple-map", element: <SimpleMapView /> },
           { path: "/places/:placeId/panorama", element: <PanoramaScreen /> },
           {
@@ -89,15 +95,11 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/admin",
-        element: <AdminLayout />,
-        children: [],
-      },
-      {
         element: <AppLayout />,
         children: [
           { path: "/", element: <HomePage /> },
           { path: "/about-us", element: <AboutUs /> },
+          { path: "/contact-us", element: <ContactUs /> },
           { path: "/blog/:id", element: <BlogDetailsPage /> },
 
           // Profile Routes - Auto-redirect based on role
@@ -109,7 +111,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/vendor",
-        element: <VendorLayout />,
+        element: (
+          <RequireRole allowedRoles={[UserRole.VENDOR]}>
+            <VendorLayout />
+          </RequireRole>
+        ),
         children: [
           { path: "dashboard", element: <VendorDashboardPage /> },
           { path: "profile", element: <VendorProfilePage /> },
@@ -119,6 +125,7 @@ export const router = createBrowserRouter([
           { path: "workshop-templates/:id/edit", element: <WorkshopTemplateEditPage /> },
           { path: "workshop-sessions", element: <WorkshopSessionsPage /> },
           { path: "workshop-calendar", element: <WorkshopCalendarPage /> },
+          { path: "messages", element: <ChatPage /> },
           { path: "ticket-verification", element: <TicketVerificationPage /> },
           { path: "vouchers", element: <VouchersPage /> },
           { path: "vouchers/deleted", element: <VendorDeletedVouchersPage /> },
@@ -126,7 +133,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin",
-        element: <AdminLayout />,
+        element: (
+          <RequireRole allowedRoles={[UserRole.ADMIN]}>
+            <AdminLayout />
+          </RequireRole>
+        ),
         children: [
           { path: "dashboard", element: <AdminDashboardPage /> },
           { path: "destinations", element: <AdminDestinationsPage /> },
@@ -162,6 +173,7 @@ export const router = createBrowserRouter([
             path: "places/:pointId/checkin-points/:checkinPointId/panorama/edit",
             element: <AdminPanoramaEditorPage />,
           },
+          { path: "messages", element: <ChatPage /> },
         ],
       },
     ],

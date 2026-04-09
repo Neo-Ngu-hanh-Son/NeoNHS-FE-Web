@@ -54,6 +54,7 @@ export interface TopActivity {
     id: string;
     name: string;
     ticketsSold: number;
+    type?: 'WORKSHOP' | 'EVENT';
 }
 
 export interface RegistrationTrendPoint {

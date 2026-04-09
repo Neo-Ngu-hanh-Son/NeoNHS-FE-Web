@@ -5,12 +5,12 @@ import { Card } from "@/components/ui/card"
 import { Upload, message } from "antd"
 import type { RcFile } from "antd/es/upload"
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary"
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 interface ImageUploaderProps {
-  imageUrls: string[]
+  imageUrls: (string | File)[]
   thumbnailIndex: number
-  onChange: (imageUrls: string[], thumbnailIndex: number) => void
+  onChange: (imageUrls: (string | File)[], thumbnailIndex: number) => void
   error?: string
   disabled?: boolean
 }
@@ -23,7 +23,8 @@ export function ImageUploader({
   disabled,
 }: ImageUploaderProps) {
   const [messageApi, contextHolder] = message.useMessage();
-  const [uploading, setUploading] = useState(false);
+  const batchFilesRef = useRef<File[]>([]);
+  const batchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleRemoveImage = (index: number) => {
     const newUrls = imageUrls.filter((_, i) => i !== index)
@@ -45,54 +46,57 @@ export function ImageUploader({
   }
 
   const handleBeforeUpload = async (file: RcFile) => {
-    // 1. Validate image file
-    const validationError = validateImageFile(file, 5) // Max 5MB
-    if (validationError) {
-      messageApi.error(validationError)
-      return Upload.LIST_IGNORE
+    batchFilesRef.current.push(file as unknown as File);
+
+    if (batchTimeoutRef.current) {
+      clearTimeout(batchTimeoutRef.current);
     }
 
-    // 2. Upload to Cloudinary
-    setUploading(true)
-    messageApi.loading({
-      content: 'Uploading image ...',
-      key: 'upload',
-      duration: 0, // Keep showing until we dismiss it
-    })
+    batchTimeoutRef.current = setTimeout(() => {
+      const newFiles = batchFilesRef.current;
+      batchFilesRef.current = [];
 
-    try {
-      const cloudinaryUrl = await uploadImageToCloudinary(file)
-      
-      if (!cloudinaryUrl) {
-        throw new Error('Failed to get Cloudinary URL')
+      const validFiles: File[] = [];
+      let hasError = false;
+
+      for (const f of newFiles) {
+        // Validate image file
+        const validationError = validateImageFile(f as RcFile, 5);
+        if (validationError) {
+          messageApi.error(validationError);
+          hasError = true;
+          continue;
+        }
+
+        // Check for duplicates
+        const isDuplicate = imageUrls.some(item => {
+          if (item instanceof File) {
+            return item.name === f.name && item.size === f.size;
+          }
+          return false;
+        });
+
+        if (isDuplicate) {
+          messageApi.warning({
+            content: `Image ${f.name} has already been added!`,
+            key: 'upload',
+          });
+          continue;
+        }
+
+        // Check if duplicate within current batch
+        const isDuplicateInBatch = validFiles.some(item => item.name === f.name && item.size === f.size);
+        if (!isDuplicateInBatch) {
+          validFiles.push(f);
+        }
       }
 
-      // 3. Check for duplicates
-      if (imageUrls.includes(cloudinaryUrl)) {
-        messageApi.warning({
-          content: 'This image has already been added!',
-          key: 'upload',
-        })
-        return Upload.LIST_IGNORE
+      if (validFiles.length > 0) {
+        onChange([...imageUrls, ...validFiles], thumbnailIndex);
+      } else if (!hasError && newFiles.length > 0) {
+        // All were duplicates
       }
-
-      // 4. Add Cloudinary URL to the list
-      onChange([...imageUrls, cloudinaryUrl], thumbnailIndex)
-
-      // 5. Show success message
-      messageApi.success({
-        content: 'Image uploaded successfully!',
-        key: 'upload',
-      })
-    } catch (error: any) {
-      console.error('Upload failed:', error)
-      messageApi.error({
-        content: error.message || 'Failed to upload image. Please try again.',
-        key: 'upload',
-      })
-    } finally {
-      setUploading(false)
-    }
+    }, 50);
 
     // Prevent default upload behavior
     return false
@@ -115,82 +119,70 @@ export function ImageUploader({
             accept="image/*"
             showUploadList={false}
             beforeUpload={handleBeforeUpload}
-            disabled={disabled || uploading}
+            disabled={disabled}
+            multiple={true}
           >
-            <Button type="button" variant="outline" disabled={disabled || uploading}>
-              {uploading ? (
-                <>
-                  <LoadingOutlined className="mr-2 animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <UploadOutlined className="mr-2" />
-                  Upload Image
-                </>
-              )}
+            <Button type="button" variant="outline" disabled={disabled}>
+              <>
+                <UploadOutlined className="mr-2" />
+                Select Images
+              </>
             </Button>
           </Upload>
         </div>
 
-        {/* Upload Info */}
-        {uploading && (
-          <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              ⏳ Uploading image... Please wait.
-            </p>
-          </div>
-        )}
-
         {/* Image Grid */}
         {imageUrls.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {imageUrls.map((url, index) => (
-              <Card key={index} className="relative group overflow-hidden">
-                <div className="aspect-video relative">
-                  <img
-                    src={url}
-                    alt={`Workshop image ${index + 1}`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://via.placeholder.com/400x300?text=Invalid+Image"
-                    }}
-                  />
+            {imageUrls.map((item, index) => {
+              const url = item instanceof File ? URL.createObjectURL(item) : item;
+              return (
+                <Card key={index} className="relative group overflow-hidden">
+                  <div className="aspect-video relative">
+                    <img
+                      src={url}
+                      alt={`Workshop image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://via.placeholder.com/400x300?text=Invalid+Image"
+                      }}
+                    />
 
-                  {/* Thumbnail Badge */}
-                  {index === thumbnailIndex && (
-                    <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1">
-                      <StarFilled />
-                      Thumbnail
+                    {/* Thumbnail Badge */}
+                    {index === thumbnailIndex && (
+                      <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1">
+                        <StarFilled />
+                        Thumbnail
+                      </div>
+                    )}
+
+                    {/* Overlay Controls */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleSetThumbnail(index)}
+                        disabled={disabled || index === thumbnailIndex}
+                        className="text-xs"
+                      >
+                        {index === thumbnailIndex ? <StarFilled className="mr-1" /> : <StarOutlined className="mr-1" />}
+                        Set Thumbnail
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveImage(index)}
+                        disabled={disabled}
+                      >
+                        <CloseOutlined />
+                      </Button>
                     </div>
-                  )}
-
-                  {/* Overlay Controls */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => handleSetThumbnail(index)}
-                      disabled={disabled || index === thumbnailIndex}
-                      className="text-xs"
-                    >
-                      {index === thumbnailIndex ? <StarFilled className="mr-1" /> : <StarOutlined className="mr-1" />}
-                      Set Thumbnail
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleRemoveImage(index)}
-                      disabled={disabled}
-                    >
-                      <CloseOutlined />
-                    </Button>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              )
+            })}
           </div>
         )}
 

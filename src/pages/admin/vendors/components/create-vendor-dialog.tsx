@@ -38,7 +38,6 @@ export function CreateVendorDialog({
         resolver: zodResolver(createVendorSchema),
         defaultValues: {
             email: "",
-            password: "",
             fullname: "",
             businessName: "",
         }
@@ -48,8 +47,12 @@ export function CreateVendorDialog({
         setIsSubmitting(true)
         try {
             await onSuccess(data)
+            // Chỉ reset và đóng dialog khi tạo thành công
             reset()
             onOpenChange(false)
+        } catch {
+            // Giữ dialog mở để người dùng có thể xem/sửa thông tin
+            // Lỗi đã được hiển thị từ handleCreateSuccess trong AdminVendorsPage
         } finally {
             setIsSubmitting(false)
         }
@@ -61,7 +64,7 @@ export function CreateVendorDialog({
                 <DialogHeader>
                     <DialogTitle>Create New Vendor Account</DialogTitle>
                     <DialogDescription>
-                        Register a new vendor and their business profile. They will use these credentials to log in.
+                        Register a new vendor and their business profile. A secure setup link will be sent to their email to set their password.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -69,7 +72,7 @@ export function CreateVendorDialog({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Account Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Account Credentials</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Account Information</h3>
 
                             <div className="space-y-2">
                                 <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
@@ -81,18 +84,6 @@ export function CreateVendorDialog({
                                     className={errors.email ? "border-red-500" : ""}
                                 />
                                 {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="password">Password <span className="text-red-500">*</span></Label>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    placeholder="Min. 8 chars, level 2 security"
-                                    {...register("password")}
-                                    className={errors.password ? "border-red-500" : ""}
-                                />
-                                {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
                             </div>
 
                             <div className="space-y-2">

@@ -222,7 +222,7 @@ export function HomePage() {
                 </div>
                 <div>
                   <h3 className="font-semibold mb-1">Email</h3>
-                  <p className="text-muted-foreground text-sm">info@nguhanhson.vn</p>
+                  <p className="text-muted-foreground text-sm">contact@neonhs.com</p>
                 </div>
               </div>
             </Card>

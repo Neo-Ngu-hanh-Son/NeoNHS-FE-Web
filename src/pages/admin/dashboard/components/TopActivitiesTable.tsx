@@ -25,6 +25,7 @@ export function TopActivitiesTable({ topActivities }: TopActivitiesTableProps) {
                     <TableHeader>
                         <TableRow className="hover:bg-transparent border-gray-100">
                             <TableHead className="font-bold text-gray-400 uppercase text-[10px]">Activity</TableHead>
+                            <TableHead className="font-bold text-gray-400 uppercase text-[10px]">Type</TableHead>
                             <TableHead className="font-bold text-gray-400 uppercase text-[10px] text-right">Tickets Sold</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -33,7 +34,7 @@ export function TopActivitiesTable({ topActivities }: TopActivitiesTableProps) {
                             <TableRow key={record.id} className="hover:bg-gray-50/50 transition-colors border-gray-50">
                                 <TableCell>
                                     <div className="flex items-center gap-3">
-                                        <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+                                        <div className={`p-2 rounded-lg ${record.type === 'EVENT' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
                                             <ThunderboltOutlined />
                                         </div>
                                         <div>
@@ -41,8 +42,19 @@ export function TopActivitiesTable({ topActivities }: TopActivitiesTableProps) {
                                         </div>
                                     </div>
                                 </TableCell>
+                                <TableCell>
+                                    <Badge
+                                        variant="secondary"
+                                        className={`text-[9px] font-bold px-1.5 py-0 border-none ${record.type === 'EVENT'
+                                                ? 'bg-blue-50 text-blue-600'
+                                                : 'bg-purple-50 text-purple-600'
+                                            }`}
+                                    >
+                                        {record.type}
+                                    </Badge>
+                                </TableCell>
                                 <TableCell className="text-right">
-                                    <span className="font-medium text-gray-600">{record.ticketsSold?.toLocaleString() || "0"}</span>
+                                    <span className="font-black text-gray-800">{record.ticketsSold?.toLocaleString() || "0"}</span>
                                 </TableCell>
                             </TableRow>
                         )) : (

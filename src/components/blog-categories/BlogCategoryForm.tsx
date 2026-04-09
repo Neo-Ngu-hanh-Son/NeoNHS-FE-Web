@@ -6,6 +6,7 @@
  * In "edit" mode all fields are shown and pre-filled.
  *
  * This is a controlled component — the parent owns the form state.
+ * Pass in the independent prop to let this component manage its own state and validation (for use outside of BlogCategorySection).
  */
 
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { BlogCategoryRequest, BlogCategoryStatus } from '@/types/blog';
+import { Button } from '../ui';
 
 export interface BlogCategoryFormErrors {
   name?: string;
@@ -30,6 +32,8 @@ interface BlogCategoryFormProps {
   values: BlogCategoryRequest;
   errors: BlogCategoryFormErrors;
   onChange: (field: keyof BlogCategoryRequest, value: string) => void;
+  isIndependent?: boolean; // if true, form manages its own state and validation (for use outside of BlogCategorySection)
+  onSubmit?: () => void; // only needed if isIndependent is true
 }
 
 export default function BlogCategoryForm({
@@ -37,6 +41,8 @@ export default function BlogCategoryForm({
   values,
   errors,
   onChange,
+  isIndependent = false,
+  onSubmit,
 }: BlogCategoryFormProps) {
   return (
     <div className="space-y-5 pt-2">
@@ -109,6 +115,18 @@ export default function BlogCategoryForm({
           </Select>
         </div>
       )}
+      {
+        isIndependent && (
+          <div className="pt-4">
+            <Button
+              variant={mode === 'create' ? 'default' : 'outline'}
+              onClick={onSubmit}
+            >
+              {mode === 'create' ? 'Create Category' : 'Save Changes'}
+            </Button>
+          </div>
+        )
+      }
     </div>
   );
 }

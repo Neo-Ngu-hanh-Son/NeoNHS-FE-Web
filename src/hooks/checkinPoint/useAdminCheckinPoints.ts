@@ -31,6 +31,7 @@ interface UseAdminCheckinPointsReturn {
   updateCheckinPoint: (id: string, payload: CheckinPointRequest) => Promise<boolean>;
   deleteCheckinPoint: (id: string) => Promise<boolean>;
   getCheckinPointById: (id: string) => Promise<PointCheckinResponse | null>;
+  restoreCheckinPoint: (id: string) => Promise<boolean>;
 }
 
 export function useAdminCheckinPoints(
@@ -169,6 +170,26 @@ export function useAdminCheckinPoints(
     [refresh],
   );
 
+  const restoreCheckinPoint = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        const response = await checkinPointService.restore(id);
+        if (!response.success) {
+          message.error(response.message || 'Failed to restore checkin point');
+          return false;
+        }
+
+        message.success(response.message || 'Checkin point restored successfully');
+        await refresh();
+        return true;
+      } catch (error: unknown) {
+        message.error(getApiErrorMessage(error, 'Failed to restore checkin point'));
+        return false;
+      }
+    },
+    [refresh],
+  )
+
   const getCheckinPointById = useCallback(
     async (id: string): Promise<PointCheckinResponse | null> => {
       try {
@@ -199,5 +220,6 @@ export function useAdminCheckinPoints(
     updateCheckinPoint,
     deleteCheckinPoint,
     getCheckinPointById,
+    restoreCheckinPoint,
   };
 }

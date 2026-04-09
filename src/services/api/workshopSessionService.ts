@@ -153,6 +153,21 @@ export const WorkshopSessionService = {
   },
 
   /**
+   * Update session status
+   * PATCH /api/workshops/sessions/{id}/status
+   */
+  async updateSessionStatus(id: string, status: 'ONGOING' | 'COMPLETED' | 'CANCELLED'): Promise<WorkshopSessionResponse> {
+    try {
+      const res = await apiClient.patch<ApiResponse<any>>(`/workshops/sessions/${id}/status`, { status });
+      const data = (res?.data ?? res) as any;
+      return transformSessionResponse(data);
+    } catch (error) {
+      console.error('updateSessionStatus error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Cancel session (soft delete)
    * POST /api/workshops/sessions/{id}/cancel
    */
