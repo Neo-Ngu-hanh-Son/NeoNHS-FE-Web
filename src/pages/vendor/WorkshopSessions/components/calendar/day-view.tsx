@@ -4,7 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { SessionStatusBadge } from "../session-status-badge"
 import { Eye, Edit, XCircle, Clock, Users, DollarSign } from "lucide-react"
-import { formatTimeRange, formatPrice, formatAvailability, isSameDay } from "../../utils/formatters"
+import {
+  formatTimeRange,
+  formatPrice,
+  formatAvailability,
+  isSessionOnVietnamCalendarDay,
+  getVietnamHour,
+  parseSessionInstant,
+} from "../../utils/formatters"
 import { cn } from "@/lib/utils"
 
 interface DayViewProps {
@@ -27,12 +34,15 @@ export function DayView({
   const hours = Array.from({ length: 24 }, (_, i) => i + 1) // 1 AM to 12 AM (24 hours)
 
   // Get sessions for the selected date
-  const daySessions = sessions.filter(session => {
-    const sessionDate = new Date(session.startTime)
-    return isSameDay(sessionDate, currentDate)
-  }).sort((a, b) => 
-    new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-  )
+  const daySessions = sessions
+    .filter((session) =>
+      isSessionOnVietnamCalendarDay(session.startTime, currentDate)
+    )
+    .sort(
+      (a, b) =>
+        parseSessionInstant(a.startTime).getTime() -
+        parseSessionInstant(b.startTime).getTime()
+    )
 
   // Format date header
   const dateHeader = currentDate.toLocaleDateString('en-US', {
@@ -56,10 +66,9 @@ export function DayView({
       <div className="space-y-2">
         {hours.map(hour => {
           const actualHour = hour % 24 // Convert 24 to 0 for midnight
-          const hourSessions = daySessions.filter(session => {
-            const startHour = new Date(session.startTime).getHours()
-            return startHour === actualHour
-          })
+          const hourSessions = daySessions.filter(
+            (session) => getVietnamHour(session.startTime) === actualHour
+          )
 
           const timeLabel = actualHour === 0 ? '12:00 AM' 
             : actualHour < 12 ? `${actualHour}:00 AM` 
