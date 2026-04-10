@@ -7,6 +7,5 @@ export { TicketCatalogList } from './TicketCatalogList';
 export { TicketCatalogFormDialog } from './TicketCatalogFormDialog';
 export { MapPickerModal } from './MapPickerModal';
 export { EventTimelineList } from './eventTimeline/EventTimelineList';
-export { EventTimelineFormDialog } from './eventTimeline/EventTimelineFormDialog';
 export { EventPointList } from './eventPoint/EventPointList';
 export { EventPointTagList } from './eventPoint/EventPointTagList';
