@@ -18,6 +18,7 @@ export default function VendorDashboardPage() {
         revenueFilter,
         setRevenueFilter,
         revenueData,
+        revenueError,
         workshopStatus,
         transactions,
         reviews,
@@ -55,6 +56,7 @@ export default function VendorDashboardPage() {
                                     revenueFilter={revenueFilter}
                                     onRevenueFilterChange={setRevenueFilter}
                                     revenueData={revenueData}
+                                    revenueError={revenueError}
                                 />
                             </div>
                         </Col>
