@@ -86,10 +86,14 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
                 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
               `}
             >
-              <div
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: tag.tagColor }}
-              />
+              {tag.iconUrl ? (
+                <img src={tag.iconUrl} alt={tag.name} className="w-4 h-4 object-contain rounded-sm" />
+              ) : (
+                <div
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: tag.tagColor }}
+                />
+              )}
               <span className="font-medium text-sm">{tag.name}</span>
               {isSelected && (
                 <CheckOutlined className="text-primary ml-1" />
