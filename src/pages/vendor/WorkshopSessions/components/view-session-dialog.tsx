@@ -5,16 +5,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 import { WorkshopSessionResponse, SessionStatus } from "../types"
 import { SessionStatusBadge } from "./session-status-badge"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { Calendar, Clock, Users, DollarSign, User, Mail, Play, CheckCircle, XCircle } from "lucide-react"
-import { 
-  formatFullDateTime, 
-  formatTimeRange, 
-  formatPrice, 
+import {
+  formatFullDateTime,
+  formatTimeRange,
+  formatPrice,
   getEnrollmentPercentage,
   formatAvailability,
   formatDuration,
@@ -38,11 +39,12 @@ export function ViewSessionDialog({
   onComplete,
   onCancel,
 }: ViewSessionDialogProps) {
-  
+
   if (!session) return null
 
-  const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
-    || session.workshopTemplate?.images?.[0]?.imageUrl
+  const images = session.workshopTemplate?.images ?? []
+  const thumbnailIdx = images.findIndex(img => img.isThumbnail)
+  const [activeImg, setActiveImg] = useState(thumbnailIdx >= 0 ? thumbnailIdx : 0)
   const enrollmentPercentage = getEnrollmentPercentage(session.currentEnrollments, session.maxParticipants)
   const duration = calculateDuration(session.startTime, session.endTime)
 
@@ -63,16 +65,41 @@ export function ViewSessionDialog({
 
         <div className="space-y-6">
           {/* Image Gallery */}
-          {thumbnail && (
-            <div className="relative h-64 rounded-lg overflow-hidden">
-              <img
-                src={thumbnail}
-                alt={session.workshopTemplate?.name || 'Workshop'}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "https://via.placeholder.com/800x400?text=No+Image"
-                }}
-              />
+          {images.length > 0 && (
+            <div className="space-y-3">
+              {/* Main image */}
+              <div className="relative h-64 rounded-lg overflow-hidden bg-muted">
+                <img
+                  src={images[activeImg]?.imageUrl}
+                  alt={session.workshopTemplate?.name || 'Workshop'}
+                  className="w-full h-full object-contain"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://via.placeholder.com/800x400?text=No+Image"
+                  }}
+                />
+              </div>
+              {/* Thumbnail strip */}
+              {images.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {images.map((img, idx) => (
+                    <button
+                      key={img.id ?? idx}
+                      onClick={() => setActiveImg(idx)}
+                      className={`relative flex-shrink-0 w-20 h-14 rounded-md overflow-hidden border-2 transition-all ${idx === activeImg ? 'border-primary ring-1 ring-primary/30' : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
+                    >
+                      <img
+                        src={img.imageUrl}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://via.placeholder.com/160x112?text=No+Image"
+                        }}
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -138,9 +165,9 @@ export function ViewSessionDialog({
           {session.workshopTemplate?.fullDescription && (
             <div className="space-y-3">
               <h3 className="text-lg font-semibold">About This Workshop</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {session.workshopTemplate.fullDescription}
-              </p>
+              </div>
             </div>
           )}
 

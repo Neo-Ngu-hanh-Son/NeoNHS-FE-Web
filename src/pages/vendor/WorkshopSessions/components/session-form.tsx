@@ -5,12 +5,11 @@ import { workshopSessionSchema, type WorkshopSessionFormData, type WorkshopSessi
 import { WorkshopTemplateResponse } from "../../WorkshopTemplates/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form"
 import { TemplateSelector } from "./template-selector"
 import { DateTimePicker } from "./date-time-picker"
 import { formatDuration } from "../../WorkshopTemplates/utils/formatters"
-import { formatPrice, parseSessionInstant } from "../utils/formatters"
+import { formatVndCommaAmount, parseSessionInstant } from "../utils/formatters"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Info, TriangleAlert } from "lucide-react"
 
@@ -34,6 +33,8 @@ export function SessionForm({
   template: externalTemplate,
 }: SessionFormProps) {
   const [selectedTemplate, setSelectedTemplate] = useState<WorkshopTemplateResponse | undefined>()
+  const [priceFieldFocused, setPriceFieldFocused] = useState(false)
+  const [priceInputDraft, setPriceInputDraft] = useState("")
   
   const form = useForm<WorkshopSessionFormData>({
     resolver: zodResolver(workshopSessionSchema),
@@ -58,16 +59,17 @@ export function SessionForm({
         })(),
   })
 
-  // Auto-calculate end time when template is selected or start time changes
+  const activeTemplate = selectedTemplate ?? externalTemplate
+  const watchedStartTime = form.watch("startTime")
+
+  // Auto-calculate end from template duration when start changes (create + edit)
   useEffect(() => {
-    if (selectedTemplate && !isEditing) {
-      const startTime = form.getValues("startTime")
-      if (startTime) {
-        const endTime = new Date(startTime.getTime() + selectedTemplate.estimatedDuration * 60 * 1000)
-        form.setValue("endTime", endTime)
-      }
-    }
-  }, [selectedTemplate, form.watch("startTime"), isEditing])
+    if (!activeTemplate || !watchedStartTime) return
+    const endTime = new Date(
+      watchedStartTime.getTime() + activeTemplate.estimatedDuration * 60 * 1000,
+    )
+    form.setValue("endTime", endTime)
+  }, [activeTemplate, watchedStartTime, form])
 
   // Auto-fill price and maxParticipants from template
   const handleTemplateChange = (templateId: string, template: WorkshopTemplateResponse | undefined) => {
@@ -77,6 +79,9 @@ export function SessionForm({
     if (template && !isEditing) {
       // Auto-fill if not editing
       form.setValue("price", template.defaultPrice)
+      if (priceFieldFocused) {
+        setPriceInputDraft(String(Math.trunc(template.defaultPrice)))
+      }
       form.setValue("maxParticipants", template.maxParticipants)
       
       // Auto-calculate end time
@@ -93,8 +98,6 @@ export function SessionForm({
 
   const watchedPrice = form.watch("price")
   const watchedMaxParticipants = form.watch("maxParticipants")
-
-  const activeTemplate = selectedTemplate ?? externalTemplate
 
   const priceExceedsTemplate =
     activeTemplate && watchedPrice != null && watchedPrice > activeTemplate.defaultPrice
@@ -197,32 +200,80 @@ export function SessionForm({
             <FormField
               control={form.control}
               name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price (VND)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="1000"
-                      min="1000"
-                      placeholder="1000"
-                      {...field}
-                      value={field.value || ''}
-                      onChange={e => field.onChange(parseFloat(e.target.value) || undefined)}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {activeTemplate && `Default: ${formatPrice(activeTemplate.defaultPrice)}`}
-                  </FormDescription>
-                  {priceExceedsTemplate && (
-                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                      <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
-                      Price exceeds template default ({formatPrice(activeTemplate!.defaultPrice)})
-                    </p>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const blurredValue =
+                  field.value != null &&
+                  !Number.isNaN(field.value as number)
+                    ? new Intl.NumberFormat("en-US", {
+                        maximumFractionDigits: 0,
+                      }).format(field.value as number)
+                    : ""
+
+                return (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="off"
+                          placeholder="1,000"
+                          disabled={submitting}
+                          className="pr-14"
+                          name={field.name}
+                          ref={field.ref}
+                          value={
+                            priceFieldFocused
+                              ? priceInputDraft
+                              : blurredValue
+                          }
+                          onFocus={() => {
+                            setPriceFieldFocused(true)
+                            const v = form.getValues("price")
+                            setPriceInputDraft(
+                              v != null && !Number.isNaN(v)
+                                ? String(Math.trunc(v))
+                                : "",
+                            )
+                          }}
+                          onBlur={() => {
+                            setPriceFieldFocused(false)
+                            field.onBlur()
+                          }}
+                          onChange={(e) => {
+                            const digits = e.target.value.replace(/\D/g, "")
+                            setPriceInputDraft(digits)
+                            if (digits === "") {
+                              field.onChange(undefined)
+                              return
+                            }
+                            const n = parseInt(digits, 10)
+                            if (!Number.isNaN(n)) {
+                              field.onChange(n)
+                            }
+                          }}
+                        />
+                        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                          VND
+                        </span>
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      {activeTemplate &&
+                        `Default: ${formatVndCommaAmount(activeTemplate.defaultPrice)}`}
+                    </FormDescription>
+                    {priceExceedsTemplate && (
+                      <p className="text-sm font-medium text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+                        Price exceeds template default (
+                        {formatVndCommaAmount(activeTemplate!.defaultPrice)})
+                      </p>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )
+              }}
             />
 
             {/* Max Participants */}
