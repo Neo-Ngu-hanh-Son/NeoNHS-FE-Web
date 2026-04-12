@@ -19,11 +19,11 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useEvent, useEventTimelines } from '@/hooks/event';
 import type { CreateEventTimelineRequest } from '@/types/eventTimeline';
-import type { FormData } from '../components/eventTimeline/EventTimelineFormDialog';
 import type { EventPointTagTabHandle } from '../components/eventTimeline/EventPointTagTab';
 import EventTimeLineCreationTab from '../components/eventTimeline/EventTimeLineCreationTab';
 import EventTimeLinePointCreationTab from '../components/eventTimeline/EventTimeLinePointCreationTab';
 import EventPointTagTab from '../components/eventTimeline/EventPointTagTab';
+import { FormData } from '../type';
 
 const emptyForm: FormData = {
   name: '',
@@ -42,6 +42,8 @@ const emptyForm: FormData = {
   destinationTagColor: '#0f766e',
   destinationTagName: '',
   destinationTagDescription: '',
+  eventPointId: '',
+  eventPointTagId: '',
 };
 
 const toApiTime = (time: string): string => (time.length === 5 ? `${time}:00` : time);
@@ -52,6 +54,7 @@ const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eve
   const name = form.destinationName.trim();
   const latitudeRaw = form.destinationLatitude.trim();
   const longitudeRaw = form.destinationLongitude.trim();
+  const pointId = form.eventPointId.trim() || null;
 
   if (!name || !latitudeRaw || !longitudeRaw) {
     return undefined;
@@ -67,6 +70,7 @@ const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eve
     name,
     latitude,
     longitude,
+    id: pointId,
   };
 
   const address = form.destinationAddress.trim();
@@ -78,9 +82,12 @@ const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eve
   const markerIconUrl = form.destinationMarkerIconUrl.trim();
   const tagColor = form.destinationTagColor.trim();
   const tagName = form.destinationTagName.trim();
+  const tagId = form.eventPointTagId.trim() || null;
   const tagDescription = tagName;
   if (markerIconUrl || tagColor || tagName) {
+    payload.eventPointTagId = tagId;
     payload.eventPointTagRequest = {
+      id: tagId,
       ...(tagName ? { name: tagName } : {}),
       ...(tagDescription ? { description: tagDescription } : {}),
       ...(tagColor ? { tagColor } : {}),
@@ -202,6 +209,7 @@ export default function EventTimelineCreatePage() {
   const submitTimeline = async () => {
     setLoading(true);
     const eventPoint = buildEventPointPayload(form);
+    const pointId = form.eventPointId.trim() || null;
 
     const data: CreateEventTimelineRequest = {
       name: form.name.trim(),
@@ -211,6 +219,7 @@ export default function EventTimelineCreatePage() {
       endTime: toApiTime(form.endTime),
       organizer: form.organizer.trim() || undefined,
       coOrganizer: form.coOrganizer.trim() || undefined,
+      eventPointId: pointId,
       eventPoint,
     };
 
@@ -344,11 +353,22 @@ export default function EventTimelineCreatePage() {
             </TabsContent>
 
             <TabsContent value="point" className="mt-4">
-              <EventTimeLinePointCreationTab form={form} errors={errors} handleChange={handleChange} />
+              <EventTimeLinePointCreationTab
+                form={form}
+                errors={errors}
+                handleChange={handleChange}
+                eventId={eventId}
+              />
             </TabsContent>
 
             <TabsContent value="visual" className="mt-4">
-              <EventPointTagTab ref={markerUploaderRef} form={form} errors={errors} handleChange={handleChange} />
+              <EventPointTagTab
+                ref={markerUploaderRef}
+                form={form}
+                errors={errors}
+                handleChange={handleChange}
+                eventId={eventId}
+              />
             </TabsContent>
           </Tabs>
 

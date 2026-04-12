@@ -10,15 +10,20 @@ import type {
     EventTimelineResponse,
     CreateEventTimelineRequest,
     UpdateEventTimelineRequest,
+    EventPointResponse,
+    EventPointTagResponse,
 } from '@/types/eventTimeline';
 
 interface UseEventTimelinesReturn {
     timelines: EventTimelineResponse[];
     loading: boolean;
     fetchTimelines: () => Promise<void>;
+    fetchTimelineById: (id: string) => Promise<EventTimelineResponse | null>;
     createTimeline: (data: CreateEventTimelineRequest) => Promise<boolean>;
     updateTimeline: (id: string, data: UpdateEventTimelineRequest) => Promise<boolean>;
     deleteTimeline: (id: string) => Promise<boolean>;
+    fetchEventPoints: () => Promise<EventPointResponse[]>;
+    fetchEventPointTags: () => Promise<EventPointTagResponse[]>;
 }
 
 type ApiLikeError = Error & {
@@ -52,7 +57,7 @@ function handleTimelineApiError(error: unknown, fallback: string): void {
     message.error(`${fallback}: ${err?.message || 'Unknown error'}`);
 }
 
-export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
+export function useEventTimelines(eventId: string, autoFetch: boolean = true): UseEventTimelinesReturn {
     const [timelines, setTimelines] = useState<EventTimelineResponse[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -74,8 +79,28 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
     }, [eventId]);
 
     useEffect(() => {
-        if (eventId) fetchTimelines();
-    }, [eventId, fetchTimelines]);
+        if (eventId && autoFetch) fetchTimelines();
+    }, [eventId, autoFetch, fetchTimelines]);
+
+    const fetchTimelineById = useCallback(async (id: string): Promise<EventTimelineResponse | null> => {
+        if (!eventId || !id) return null;
+
+        setLoading(true);
+        try {
+            const response = await eventTimelineService.getById(eventId, id);
+            if (response.success) {
+                return response.data;
+            }
+
+            message.error(response.message || 'Failed to fetch timeline entry');
+            return null;
+        } catch (error: unknown) {
+            handleTimelineApiError(error, 'Failed to fetch timeline entry');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, [eventId]);
 
     const createTimeline = useCallback(async (data: CreateEventTimelineRequest): Promise<boolean> => {
         try {
@@ -128,5 +153,45 @@ export function useEventTimelines(eventId: string): UseEventTimelinesReturn {
         }
     }, [eventId, fetchTimelines]);
 
-    return { timelines, loading, fetchTimelines, createTimeline, updateTimeline, deleteTimeline };
+    const fetchEventPoints = useCallback(async () => {
+        try {
+            const response = await eventTimelineService.getEventPoints(eventId);
+            if (response.success) {
+                return response.data;
+            } else {
+                message.error(response.message || 'Failed to fetch event points');
+                return [];
+            }
+        } catch (error: unknown) {
+            handleTimelineApiError(error, 'Failed to fetch event points');
+            return [];
+        }
+    }, [eventId]);
+
+    const fetchEventPointTags = useCallback(async () => {
+        try {
+            const response = await eventTimelineService.getEventPointTags(eventId);
+            if (response.success) {
+                return response.data;
+            } else {
+                message.error(response.message || 'Failed to fetch event point tags');
+                return [];
+            }
+        } catch (error: unknown) {
+            handleTimelineApiError(error, 'Failed to fetch event point tags');
+            return [];
+        }
+    }, [eventId]);
+
+    return {
+        timelines,
+        loading,
+        fetchTimelines,
+        fetchTimelineById,
+        createTimeline,
+        updateTimeline,
+        deleteTimeline,
+        fetchEventPoints,
+        fetchEventPointTags,
+    };
 }

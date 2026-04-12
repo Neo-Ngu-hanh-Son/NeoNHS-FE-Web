@@ -3,6 +3,7 @@
  */
 
 export interface EventPointTagRequest {
+    id?: string | null;
     name?: string;
     description?: string;
     tagColor?: string;
@@ -10,6 +11,7 @@ export interface EventPointTagRequest {
 }
 
 export interface EventPointRequest {
+    id?: string | null;
     name: string;
     latitude: number;
     longitude: number;
@@ -64,7 +66,7 @@ export interface CreateEventTimelineRequest {
     endTime: string;
     organizer?: string;
     coOrganizer?: string;
-    eventPointId?: string;
+    eventPointId?: string | null;
     eventPoint?: EventPointRequest;
 }
 
@@ -76,6 +78,6 @@ export interface UpdateEventTimelineRequest {
     endTime?: string;
     organizer?: string;
     coOrganizer?: string;
-    eventPointId?: string;
+    eventPointId?: string | null;
     eventPoint?: EventPointRequest;
 }

@@ -1,14 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { message } from 'antd';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,47 +17,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Loader2 } from 'lucide-react';
-import dayjs from 'dayjs';
-import type {
-  EventTimelineResponse,
-  CreateEventTimelineRequest,
-  UpdateEventTimelineRequest,
-} from '@/types/eventTimeline';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import EventTimeLineCreationTab from './EventTimeLineCreationTab';
-import EventTimeLinePointCreationTab from './EventTimeLinePointCreationTab';
-import EventPointTagTab, { type EventPointTagTabHandle } from './EventPointTagTab';
+import { useEvent, useEventTimelines } from '@/hooks/event';
+import type { EventTimelineResponse, UpdateEventTimelineRequest } from '@/types/eventTimeline';
+import type { EventPointTagTabHandle } from '../components/eventTimeline/EventPointTagTab';
+import EventTimeLineCreationTab from '../components/eventTimeline/EventTimeLineCreationTab';
+import EventTimeLinePointCreationTab from '../components/eventTimeline/EventTimeLinePointCreationTab';
+import EventPointTagTab from '../components/eventTimeline/EventPointTagTab';
+import { FormData } from '../type';
 
-interface EventTimelineFormDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  timeline?: EventTimelineResponse | null;
-  onSubmit: (data: CreateEventTimelineRequest | UpdateEventTimelineRequest) => Promise<boolean>;
-  /** Optional: pre-fill date when creating from a specific date tab */
-  defaultDate?: string;
-  eventStartDate?: string;
-  eventEndDate?: string;
-}
-
-export interface FormData {
-  name: string;
-  description: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  organizer: string;
-  coOrganizer: string;
-  destinationName: string;
-  destinationAddress: string;
-  destinationLatitude: string;
-  destinationLongitude: string;
-  destinationImageUrl: string;
-  destinationMarkerIconUrl: string;
-  destinationTagColor: string;
-  destinationTagName: string;
-  destinationTagDescription: string;
-}
+const DEFAULT_TAG_COLOR = '#0f766e';
 
 const emptyForm: FormData = {
   name: '',
@@ -75,27 +41,27 @@ const emptyForm: FormData = {
   destinationLongitude: '',
   destinationImageUrl: '',
   destinationMarkerIconUrl: '',
-  destinationTagColor: '#0f766e',
+  destinationTagColor: DEFAULT_TAG_COLOR,
   destinationTagName: '',
   destinationTagDescription: '',
+  eventPointId: '',
+  eventPointTagId: '',
 };
 
 const toApiTime = (time: string): string => (time.length === 5 ? `${time}:00` : time);
 
-const toTimeInputValue = (time: string): string => {
+const toInputTime = (time?: string): string => {
   if (!time) return '';
   return time.length >= 5 ? time.slice(0, 5) : time;
 };
 
 const summaryValue = (value: string): string => (value.trim() ? value.trim() : 'Not provided');
 
-const buildEventPointPayload = (
-  form: FormData,
-  existingTagId?: string,
-): CreateEventTimelineRequest['eventPoint'] | undefined => {
+const buildEventPointPayload = (form: FormData): UpdateEventTimelineRequest['eventPoint'] | undefined => {
   const name = form.destinationName.trim();
   const latitudeRaw = form.destinationLatitude.trim();
   const longitudeRaw = form.destinationLongitude.trim();
+  const pointId = form.eventPointId.trim() || null;
 
   if (!name || !latitudeRaw || !longitudeRaw) {
     return undefined;
@@ -107,10 +73,11 @@ const buildEventPointPayload = (
     return undefined;
   }
 
-  const payload: NonNullable<CreateEventTimelineRequest['eventPoint']> = {
+  const payload: NonNullable<UpdateEventTimelineRequest['eventPoint']> = {
     name,
     latitude,
     longitude,
+    id: pointId,
   };
 
   const address = form.destinationAddress.trim();
@@ -119,17 +86,16 @@ const buildEventPointPayload = (
   const imageUrl = form.destinationImageUrl.trim();
   if (imageUrl) payload.imageUrl = imageUrl;
 
-  if (existingTagId) {
-    payload.eventPointTagId = existingTagId;
-    return payload;
-  }
-
   const markerIconUrl = form.destinationMarkerIconUrl.trim();
   const tagColor = form.destinationTagColor.trim();
   const tagName = form.destinationTagName.trim();
+  const tagId = form.eventPointTagId.trim() || null;
   const tagDescription = tagName;
+
   if (markerIconUrl || tagColor || tagName) {
+    payload.eventPointTagId = tagId;
     payload.eventPointTagRequest = {
+      id: tagId,
       ...(tagName ? { name: tagName } : {}),
       ...(tagDescription ? { description: tagDescription } : {}),
       ...(tagColor ? { tagColor } : {}),
@@ -140,61 +106,93 @@ const buildEventPointPayload = (
   return payload;
 };
 
-export function EventTimelineFormDialog({
-  open,
-  onOpenChange,
-  timeline,
-  onSubmit,
-  defaultDate,
-  eventStartDate,
-  eventEndDate,
-}: EventTimelineFormDialogProps) {
-  const [form, setForm] = useState<FormData>(emptyForm);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+const mapTimelineToForm = (timeline: EventTimelineResponse): FormData => {
+  const point = timeline.eventPoint;
+  const pointTag = point?.eventPointTag;
+
+  return {
+    ...emptyForm,
+    name: timeline.name || '',
+    description: timeline.description || '',
+    date: timeline.date || '',
+    startTime: toInputTime(timeline.startTime),
+    endTime: toInputTime(timeline.endTime),
+    organizer: timeline.organizer || '',
+    coOrganizer: timeline.coOrganizer || '',
+    destinationName: point?.name || '',
+    destinationAddress: point?.address || '',
+    destinationLatitude: point?.latitude != null ? String(point.latitude) : '',
+    destinationLongitude: point?.longitude != null ? String(point.longitude) : '',
+    destinationImageUrl: point?.imageUrl || '',
+    destinationMarkerIconUrl: pointTag?.iconUrl || '',
+    destinationTagColor: pointTag?.tagColor || DEFAULT_TAG_COLOR,
+    destinationTagName: pointTag?.name || '',
+    destinationTagDescription: pointTag?.description || '',
+    eventPointId: point?.id || '',
+    eventPointTagId: pointTag?.id || '',
+  };
+};
+
+export default function EventTimelineUpdatePage() {
+  const { id, timelineId } = useParams<{ id: string; timelineId: string }>();
+  const navigate = useNavigate();
+
+  const eventId = id || '';
+  const currentTimelineId = timelineId || '';
+
+  const { event, loading: eventLoading } = useEvent(eventId);
+  const { updateTimeline, fetchTimelineById } = useEventTimelines(eventId, false);
+
+  const [step, setStep] = useState<'timeline' | 'point' | 'visual'>('timeline');
   const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isMarkerUploading, setIsMarkerUploading] = useState(false);
   const [markerUploadError, setMarkerUploadError] = useState<string | null>(null);
+  const [form, setForm] = useState<FormData>(emptyForm);
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const markerUploaderRef = useRef<EventPointTagTabHandle | null>(null);
-  const isEdit = !!timeline;
 
   useEffect(() => {
-    if (timeline) {
-      const eventPoint = timeline.eventPoint;
-      setForm({
-        name: timeline.name || '',
-        description: timeline.description || '',
-        date: timeline.date || '',
-        startTime: toTimeInputValue(timeline.startTime || ''),
-        endTime: toTimeInputValue(timeline.endTime || ''),
-        organizer: timeline.organizer || '',
-        coOrganizer: timeline.coOrganizer || '',
-        destinationName: eventPoint?.name || '',
-        destinationAddress: eventPoint?.address || '',
-        destinationLatitude: eventPoint ? String(eventPoint.latitude) : '',
-        destinationLongitude: eventPoint ? String(eventPoint.longitude) : '',
-        destinationImageUrl: eventPoint?.imageUrl || '',
-        destinationMarkerIconUrl: eventPoint?.eventPointTag?.iconUrl || '',
-        destinationTagColor: eventPoint?.eventPointTag?.tagColor || '#0f766e',
-        destinationTagName: eventPoint?.eventPointTag?.name || '',
-        destinationTagDescription: eventPoint?.eventPointTag?.description || '',
-      });
-    } else {
-      setForm({
-        ...emptyForm,
-        date: defaultDate || '',
-      });
+    let mounted = true;
+
+    async function loadTimeline() {
+      if (!eventId || !currentTimelineId) {
+        if (mounted) setInitializing(false);
+        return;
+      }
+
+      const timeline = await fetchTimelineById(currentTimelineId);
+      if (!mounted) return;
+
+      if (!timeline) {
+        setInitializing(false);
+        message.error('Timeline entry not found.');
+        navigate(`/admin/events/${eventId}?tab=timeline`, { replace: true });
+        return;
+      }
+
+      setForm(mapTimelineToForm(timeline));
+      setInitializing(false);
     }
-    setErrors({});
-  }, [timeline, open, defaultDate]);
+
+    void loadTimeline();
+
+    return () => {
+      mounted = false;
+    };
+  }, [eventId, currentTimelineId, fetchTimelineById, navigate]);
 
   const handleChange = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
   const validate = (stage: 'timeline' | 'submit' = 'submit'): boolean => {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
+
     if (!form.name.trim()) newErrors.name = 'Name is required';
     if (!form.date) newErrors.date = 'Date is required';
     if (!form.startTime) newErrors.startTime = 'Start time is required';
@@ -210,8 +208,8 @@ export function EventTimelineFormDialog({
       newErrors.coOrganizer = 'Co-organizer name must be less than 100 characters';
     }
 
-    if (eventStartDate && form.date && form.startTime) {
-      const eventStartDT = dayjs(eventStartDate);
+    if (event?.startTime && form.date && form.startTime) {
+      const eventStartDT = dayjs(event.startTime);
       const minDate = eventStartDT.format('YYYY-MM-DD');
       if (form.date < minDate) {
         newErrors.date = `Date must be at or after ${minDate}`;
@@ -223,8 +221,8 @@ export function EventTimelineFormDialog({
       }
     }
 
-    if (eventEndDate && form.date) {
-      const eventEndDT = dayjs(eventEndDate);
+    if (event?.endTime && form.date) {
+      const eventEndDT = dayjs(event.endTime);
       const maxDate = eventEndDT.format('YYYY-MM-DD');
       if (form.date > maxDate) {
         newErrors.date = `Date must be at or before ${maxDate}`;
@@ -236,7 +234,7 @@ export function EventTimelineFormDialog({
       }
     }
 
-    if (stage === 'submit' && !isEdit) {
+    if (stage === 'submit') {
       if (!form.destinationName.trim()) {
         newErrors.destinationName = 'Destination name is required';
       }
@@ -262,12 +260,23 @@ export function EventTimelineFormDialog({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleNextStep = () => {
+    if (step === 'timeline' && validate('timeline')) {
+      setStep('point');
+      return;
+    }
+
+    if (step === 'point') {
+      setStep('visual');
+    }
+  };
+
   const submitTimeline = async () => {
     setLoading(true);
+    const eventPoint = buildEventPointPayload(form);
+    const pointId = form.eventPointId.trim() || null;
 
-    const eventPoint = buildEventPointPayload(form, timeline?.eventPoint?.eventPointTag?.id);
-
-    const data: CreateEventTimelineRequest = {
+    const data: UpdateEventTimelineRequest = {
       name: form.name.trim(),
       description: form.description.trim() || undefined,
       date: form.date,
@@ -275,16 +284,19 @@ export function EventTimelineFormDialog({
       endTime: toApiTime(form.endTime),
       organizer: form.organizer.trim() || undefined,
       coOrganizer: form.coOrganizer.trim() || undefined,
+      eventPointId: pointId,
       eventPoint,
     };
 
-    const success = await onSubmit(data);
+    const success = await updateTimeline(currentTimelineId, data);
     setLoading(false);
-    if (success) onOpenChange(false);
+
+    if (success) {
+      navigate(`/admin/events/${eventId}?tab=timeline`);
+    }
   };
 
   const uploadMarkerInBackground = async (): Promise<void> => {
-    if (isEdit) return;
     if (!markerUploaderRef.current) {
       setMarkerUploadError('Unable to initialize marker upload. Please try again.');
       return;
@@ -310,16 +322,11 @@ export function EventTimelineFormDialog({
     setIsMarkerUploading(false);
   };
 
-  const handleCreateRequest = async () => {
+  const handleSubmit = async () => {
     if (!validate('submit')) {
       if (!form.destinationTagName.trim()) {
-        message.warning('Please enter a required tag name before creating.');
+        message.warning('Please enter a required tag name before updating.');
       }
-      return;
-    }
-
-    if (isEdit) {
-      await submitTimeline();
       return;
     }
 
@@ -341,137 +348,133 @@ export function EventTimelineFormDialog({
     await submitTimeline();
   };
 
-  // Timeline creation uses 3 steps: timeline detail, destination point, and visual identity.
-  const [step, setStep] = useState<'timeline' | 'point' | 'visual'>('timeline');
+  if (!eventId || !currentTimelineId) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        <p className="text-sm text-muted-foreground">Invalid event id or timeline id.</p>
+      </div>
+    );
+  }
 
-  const handleNextStep = () => {
-    if (step === 'timeline') {
-      if (validate('timeline')) {
-        setStep('point');
-      }
-      return;
-    }
-
-    if (step === 'point') {
-      setStep('visual');
-    }
-  };
-
-  const getCurrentStepButton = () => {
-    if (step === 'timeline' || step === 'point') {
-      return (
-        <Button onClick={handleNextStep} disabled={loading}>
-          Next
-        </Button>
-      );
-    } else {
-      // handleSubmit
-      return (
-        <Button onClick={handleCreateRequest} disabled={loading}>
-          {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isEdit ? 'Update' : 'Create'}
-        </Button>
-      );
-    }
-  };
-
-  const clearForm = () => {
-    setForm(emptyForm);
-    setErrors({});
-    setStep('timeline');
-    setConfirmOpen(false);
-    setIsMarkerUploading(false);
-    setMarkerUploadError(null);
-  };
-
-  const getBackButton = () => {
-    if (step === 'point' || step === 'visual') {
-      return (
-        <Button variant="outline" onClick={() => setStep(step === 'visual' ? 'point' : 'timeline')} disabled={loading}>
-          Back
-        </Button>
-      );
-    } else {
-      return (
-        <Button
-          variant="outline"
-          onClick={() => {
-            onOpenChange(false);
-            clearForm();
-          }}
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-      );
-    }
-  };
+  if (eventLoading || initializing) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-4">
+        <Skeleton className="h-8 w-80" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-[480px] w-full" />
+      </div>
+    );
+  }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[96vw] max-w-[1280px] max-h-[92vh] overflow-y-auto p-4 sm:p-5">
-        <DialogHeader>
-          <DialogTitle>{isEdit ? 'Edit Timeline Entry' : 'Add Timeline Entry'}</DialogTitle>
-          <DialogDescription>
-            {isEdit ? 'Update the timeline entry details.' : 'Create a new timeline entry for this event.'}
-          </DialogDescription>
-        </DialogHeader>
+    <div className="max-w-6xl mx-auto space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Update Timeline Entry</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {event ? `Event: ${event.name}` : 'Update this timeline entry.'}
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Event
+        </Button>
+      </div>
 
-        <Tabs value={step} onValueChange={(value) => setStep(value as 'timeline' | 'point' | 'visual')}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger
-              value="timeline"
-              disabled={step !== 'timeline'}
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              1. Create timeline
-            </TabsTrigger>
-            <TabsTrigger
-              value="point"
-              disabled={step !== 'point'}
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              2. Set timeline location
-            </TabsTrigger>
-            <TabsTrigger
-              value="visual"
-              disabled={step !== 'visual'}
-              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              3. Visual identity
-            </TabsTrigger>
-          </TabsList>
+      <Card>
+        <CardContent className="p-4 sm:p-5">
+          <Tabs value={step} onValueChange={(v) => setStep(v as 'timeline' | 'point' | 'visual')}>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger
+                value="timeline"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                1. Update event timeline
+              </TabsTrigger>
+              <TabsTrigger
+                value="point"
+                disabled={step !== 'point'}
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                2. Set event timeline location
+              </TabsTrigger>
+              <TabsTrigger
+                value="visual"
+                disabled={step !== 'visual'}
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                3. Visual identity
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="timeline" className="max-w-screen-sm mx-auto">
-            <EventTimeLineCreationTab
-              form={form}
-              errors={errors}
-              eventStartDate={eventStartDate}
-              eventEndDate={eventEndDate}
-              handleChange={handleChange}
-            />
-          </TabsContent>
+            <TabsContent value="timeline" className="max-w-screen-sm mx-auto mt-4">
+              <EventTimeLineCreationTab
+                form={form}
+                errors={errors}
+                eventStartDate={event?.startTime}
+                eventEndDate={event?.endTime}
+                handleChange={handleChange}
+              />
+            </TabsContent>
 
-          <TabsContent value="point">
-            <EventTimeLinePointCreationTab form={form} errors={errors} handleChange={handleChange} />
-          </TabsContent>
+            <TabsContent value="point" className="mt-4">
+              <EventTimeLinePointCreationTab
+                form={form}
+                errors={errors}
+                handleChange={handleChange}
+                eventId={eventId}
+              />
+            </TabsContent>
 
-          <TabsContent value="visual">
-            <EventPointTagTab ref={markerUploaderRef} form={form} errors={errors} handleChange={handleChange} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="visual" className="mt-4">
+              <EventPointTagTab
+                ref={markerUploaderRef}
+                form={form}
+                errors={errors}
+                handleChange={handleChange}
+                eventId={eventId}
+              />
+            </TabsContent>
+          </Tabs>
 
-        <DialogFooter>
-          {getBackButton()}
-          {getCurrentStepButton()}
-        </DialogFooter>
-      </DialogContent>
+          <div className="mt-5 flex items-center justify-end gap-2 border-t pt-4">
+            {step === 'point' || step === 'visual' ? (
+              <Button
+                variant="outline"
+                onClick={() => setStep(step === 'visual' ? 'point' : 'timeline')}
+                disabled={loading}
+              >
+                Back
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+            )}
+
+            {step === 'timeline' || step === 'point' ? (
+              <Button onClick={handleNextStep} disabled={loading}>
+                Next
+              </Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Update
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent className="max-w-3xl">
           <AlertDialogHeader>
             <AlertDialogTitle>Final Confirmation</AlertDialogTitle>
-            <AlertDialogDescription>Review all information below before final creation.</AlertDialogDescription>
+            <AlertDialogDescription>Review all information below before final update.</AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4">
@@ -482,7 +485,7 @@ export function EventTimelineFormDialog({
                   ? 'Uploading marker icon in the background...'
                   : markerUploadError
                     ? markerUploadError
-                    : 'Marker icon uploaded successfully and ready for final creation.'}
+                    : 'Marker icon uploaded successfully and ready for final update.'}
               </p>
             </div>
 
@@ -567,12 +570,12 @@ export function EventTimelineFormDialog({
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Final Confirm Creation
+              Final Confirm Update
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Dialog>
+    </div>
   );
 }
 
