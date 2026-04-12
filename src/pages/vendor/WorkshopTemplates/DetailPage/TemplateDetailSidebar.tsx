@@ -78,7 +78,7 @@ export const TemplateDetailSidebar = ({ template }: TemplateDetailSidebarProps) 
       {/* Timeline Card */}
       <Card className="rounded-2xl border-[#d3e4da] dark:border-white/10 shadow-sm">
         <CardHeader>
-          <CardTitle>Timeline</CardTitle>
+          <CardTitle>Approval Info</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2 text-sm">

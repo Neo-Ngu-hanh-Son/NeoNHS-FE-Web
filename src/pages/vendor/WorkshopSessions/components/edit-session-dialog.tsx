@@ -102,6 +102,7 @@ export function EditSessionDialog({
           </Alert>
         ) : (
           <SessionForm
+            key={session.id}
             defaultValues={session}
             onSubmit={handleSubmit}
             onCancel={handleCancel}

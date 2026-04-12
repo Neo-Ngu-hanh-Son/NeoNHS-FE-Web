@@ -6,6 +6,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Pie } from '@ant-design/charts';
+import { PieChart } from 'lucide-react';
 import type { WorkshopStatusPoint } from '../types';
 
 interface WorkshopStatusCardProps {
@@ -13,7 +14,11 @@ interface WorkshopStatusCardProps {
 }
 
 export function WorkshopStatusCard({ data }: WorkshopStatusCardProps) {
-    const pieData = data.map((d) => ({ type: d.name, value: d.value }));
+    const pieData = data
+        .filter((d) => d.value > 0)
+        .map((d) => ({ type: d.name, value: d.value }));
+
+    const hasData = pieData.length > 0;
 
     const config = {
         data: pieData,
@@ -22,18 +27,14 @@ export function WorkshopStatusCard({ data }: WorkshopStatusCardProps) {
         innerRadius: 0.6,
         label: {
             text: 'value',
-            style: {
-                fontWeight: 'bold',
-            },
+            style: { fontWeight: 'bold' },
         },
         legend: {
             color: {
                 title: false,
                 position: 'bottom' as const,
                 rowPadding: 5,
-                layout: {
-                    justifyContent: 'center'
-                }
+                layout: { justifyContent: 'center' },
             },
         },
     };
@@ -45,8 +46,17 @@ export function WorkshopStatusCard({ data }: WorkshopStatusCardProps) {
                 <CardDescription>Distribution of your workshops</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-4">
-                <div className="h-full w-full min-h-[200px]">
-                    <Pie {...config} />
+                <div className="h-full w-full min-h-[200px] flex items-center justify-center">
+                    {hasData ? (
+                        <div className="h-full w-full">
+                            <Pie {...config} />
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm py-8">
+                            <PieChart className="w-8 h-8 opacity-30" />
+                            <p>No workshop data available</p>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>

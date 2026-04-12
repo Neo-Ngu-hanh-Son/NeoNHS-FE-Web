@@ -36,6 +36,7 @@ export interface TransactionResponse {
     currency?: string;
     paidAt: string;
     status: 'completed' | 'pending' | 'refunded';
+    ticketCodes?: string;
 }
 
 export interface WorkshopReviewResponse {
@@ -77,6 +78,7 @@ export interface Transaction {
     workshop: string;
     customer: string;
     amount: number;
+    ticketCodes: string[];
     date: string;
     status: 'completed' | 'pending' | 'refunded';
 }

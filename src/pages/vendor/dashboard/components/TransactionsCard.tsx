@@ -53,20 +53,22 @@ export function TransactionsCard({ transactions }: TransactionsCardProps) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Transaction</TableHead>
                             <TableHead>Workshop</TableHead>
-                            <TableHead>Customer</TableHead>
+                            <TableHead>Tourist</TableHead>
                             <TableHead className="text-right">Amount</TableHead>
+                            <TableHead>Ticket Code</TableHead>
                             <TableHead>Status</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {transactions.map((tx) => (
                             <TableRow key={tx.id}>
-                                <TableCell className="font-medium text-xs">{tx.id}</TableCell>
-                                <TableCell className="text-xs">{tx.workshop}</TableCell>
+                                <TableCell className="font-medium text-xs">{tx.workshop}</TableCell>
                                 <TableCell className="text-xs">{tx.customer}</TableCell>
-                                <TableCell className="text-right text-xs font-semibold">${tx.amount}</TableCell>
+                                <TableCell className="text-right text-xs font-semibold">
+                                    {new Intl.NumberFormat('vi-VN').format(tx.amount)} VNĐ
+                                </TableCell>
+                                <TableCell className="text-xs">{tx.ticketCodes?.join(', ')}</TableCell>
                                 <TableCell>
                                     <Badge variant={statusBadgeVariant(tx.status)} className="text-[10px] capitalize">
                                         {tx.status}

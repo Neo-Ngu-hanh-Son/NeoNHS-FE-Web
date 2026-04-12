@@ -15,9 +15,9 @@ export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
 
     const formatCurrency = (value?: number, currency?: string) => {
         if (value == null) return '--';
-        return new Intl.NumberFormat('en-US', {
+        return new Intl.NumberFormat('vi-VN', {
             style: 'currency',
-            currency: currency ?? 'USD',
+            currency: currency ?? 'VND',
             maximumFractionDigits: 0,
         }).format(value);
     };
