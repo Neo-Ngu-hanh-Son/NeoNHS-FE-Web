@@ -36,7 +36,6 @@ interface VendorDetailDialogProps {
   onEdit?: (id: string) => void
   onBan?: (vendor: VendorProfileResponse) => void
   onUnban?: (vendor: VendorProfileResponse) => void
-  onVerify?: (vendor: VendorProfileResponse) => void
 }
 
 export function VendorDetailDialog({
@@ -46,7 +45,6 @@ export function VendorDetailDialog({
   onEdit,
   onBan,
   onUnban,
-  onVerify,
 }: VendorDetailDialogProps) {
   if (!vendor) return null
 
@@ -290,16 +288,7 @@ export function VendorDetailDialog({
                 </Button>
               )}
 
-              {!vendor.isVerifiedVendor && !vendor.isBanned && (
-                <Button
-                  onClick={() => onVerify?.(vendor)}
-                  variant="default"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Verify Vendor
-                </Button>
-              )}
+
             </div>
           </div>
         </DialogContent>
