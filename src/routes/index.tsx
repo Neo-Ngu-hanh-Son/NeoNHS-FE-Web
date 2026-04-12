@@ -68,6 +68,7 @@ import ChatPage from '@/pages/Chat/ChatPage';
 import { RequireRole } from '@/routes/RequireRole';
 import { UserRole } from '@/types';
 import EventTimelineCreatePage from '@/pages/admin/events/timeline/EventTimelineCreatePage';
+import EventTimelineUpdatePage from '@/pages/admin/events/timeline/EventTimelineUpdatePage';
 
 export const router = createBrowserRouter([
   {
@@ -165,6 +166,7 @@ export const router = createBrowserRouter([
           { path: 'events/:id', element: <EventDetailPage /> },
           { path: 'events/:id/edit', element: <EventEditPage /> },
           { path: 'events/:id/timeline/create', element: <EventTimelineCreatePage /> },
+          { path: 'events/:id/timeline/:timelineId/edit', element: <EventTimelineUpdatePage /> },
           { path: 'blog-categories', element: <BlogCategoryPage /> },
           { path: 'blog', element: <ManageBlogPage /> },
           { path: 'blog/create', element: <BlogCreationPage /> },

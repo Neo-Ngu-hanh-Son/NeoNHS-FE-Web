@@ -24,12 +24,7 @@ import {
 import { Plus, Pencil, Trash2, MoreHorizontal, Clock, MapPin, User, CalendarDays, MoonStar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEventTimelines } from '@/hooks/event';
-import { FormData } from '../../type';
-import type {
-  EventTimelineResponse,
-  CreateEventTimelineRequest,
-  UpdateEventTimelineRequest,
-} from '@/types/eventTimeline';
+import type { EventTimelineResponse } from '@/types/eventTimeline';
 import dayjs from 'dayjs';
 
 // ── Helpers ──────────────────────────────────────────
@@ -71,10 +66,8 @@ interface EventTimelineListProps {
 
 export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: EventTimelineListProps) {
   const navigate = useNavigate();
-  const { timelines, loading, updateTimeline, deleteTimeline } = useEventTimelines(eventId);
+  const { timelines, loading, deleteTimeline } = useEventTimelines(eventId);
 
-  const [formOpen, setFormOpen] = useState(false);
-  const [editingTimeline, setEditingTimeline] = useState<EventTimelineResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EventTimelineResponse | null>(null);
   const [activeTab, setActiveTab] = useState<string>('all');
 
@@ -105,20 +98,7 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
   };
 
   const handleEdit = (timeline: EventTimelineResponse) => {
-    setEditingTimeline(timeline);
-    setFormOpen(true);
-  };
-
-  const handleSubmit = async (data: CreateEventTimelineRequest | UpdateEventTimelineRequest) => {
-    if (!editingTimeline) return false;
-    return updateTimeline(editingTimeline.id, data as UpdateEventTimelineRequest);
-  };
-
-  const handleFormOpenChange = (open: boolean) => {
-    setFormOpen(open);
-    if (!open) {
-      setEditingTimeline(null);
-    }
+    navigate(`/admin/events/${eventId}/timeline/${timeline.id}/edit`);
   };
 
   const handleDeleteConfirm = async () => {
@@ -205,17 +185,6 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
           </Tabs>
         </>
       )}
-
-      {/* Form Dialog */}
-      {/* <EventTimelineFormDialog
-        open={formOpen}
-        onOpenChange={handleFormOpenChange}
-        timeline={editingTimeline}
-        onSubmit={handleSubmit}
-        eventStartDate={eventStartDate}
-        eventEndDate={eventEndDate}
-      /> */}
-
       {/* Delete confirmation */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>

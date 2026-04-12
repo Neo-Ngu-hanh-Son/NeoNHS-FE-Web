@@ -203,23 +203,6 @@ export default function AdminVendorsPage() {
     }
   }
 
-  const handleVerify = async (vendor: VendorProfileResponse) => {
-    try {
-      await adminVendorService.verifyVendor(vendor.id)
-      notification.success({
-        message: 'Vendor Verified',
-        description: `${vendor.businessName} has been verified.`,
-      })
-      fetchVendors()
-      fetchStats()
-    } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: 'Failed to verify vendor.',
-      })
-    }
-  }
-
   const handleCreateVendor = () => {
     setCreateDialogOpen(true)
   }
@@ -418,7 +401,6 @@ export default function AdminVendorsPage() {
                 onEdit={handleEdit}
                 onBan={handleBanClick}
                 onUnban={handleUnbanClick}
-                onVerify={handleVerify}
               />
             ))}
           </div>
@@ -481,7 +463,6 @@ export default function AdminVendorsPage() {
         onEdit={handleEdit}
         onBan={handleBanClick}
         onUnban={handleUnbanClick}
-        onVerify={handleVerify}
       />
 
       <CreateVendorDialog
