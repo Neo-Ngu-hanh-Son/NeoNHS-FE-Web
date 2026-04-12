@@ -46,6 +46,7 @@ export interface PointResponse {
     defaultPitch?: number | null;
     checkinPoints?: unknown[] | null;
     historyAudioCount: number;
+    deletedAt?: string | null;
 }
 
 export interface PointQueryParams {
