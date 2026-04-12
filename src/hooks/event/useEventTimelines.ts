@@ -18,6 +18,7 @@ interface UseEventTimelinesReturn {
     timelines: EventTimelineResponse[];
     loading: boolean;
     fetchTimelines: () => Promise<void>;
+    fetchTimelineById: (id: string) => Promise<EventTimelineResponse | null>;
     createTimeline: (data: CreateEventTimelineRequest) => Promise<boolean>;
     updateTimeline: (id: string, data: UpdateEventTimelineRequest) => Promise<boolean>;
     deleteTimeline: (id: string) => Promise<boolean>;
@@ -80,6 +81,26 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
     useEffect(() => {
         if (eventId && autoFetch) fetchTimelines();
     }, [eventId, autoFetch, fetchTimelines]);
+
+    const fetchTimelineById = useCallback(async (id: string): Promise<EventTimelineResponse | null> => {
+        if (!eventId || !id) return null;
+
+        setLoading(true);
+        try {
+            const response = await eventTimelineService.getById(eventId, id);
+            if (response.success) {
+                return response.data;
+            }
+
+            message.error(response.message || 'Failed to fetch timeline entry');
+            return null;
+        } catch (error: unknown) {
+            handleTimelineApiError(error, 'Failed to fetch timeline entry');
+            return null;
+        } finally {
+            setLoading(false);
+        }
+    }, [eventId]);
 
     const createTimeline = useCallback(async (data: CreateEventTimelineRequest): Promise<boolean> => {
         try {
@@ -166,6 +187,7 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
         timelines,
         loading,
         fetchTimelines,
+        fetchTimelineById,
         createTimeline,
         updateTimeline,
         deleteTimeline,

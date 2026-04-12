@@ -106,6 +106,24 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
   }, [form.destinationTagColor]);
 
   useEffect(() => {
+    const tagId = form.eventPointTagId.trim();
+    setSelectedExistingTagId(tagId || undefined);
+  }, [form.eventPointTagId]);
+
+  useEffect(() => {
+    const existingIconUrl = form.destinationMarkerIconUrl.trim();
+    if (!existingIconUrl) return;
+
+    setSelectedIcon({
+      key: form.eventPointTagId.trim() ? `existing-${form.eventPointTagId}` : 'current-marker-icon',
+      label: form.destinationTagName.trim() || 'Current marker',
+      iconName: existingIconUrl,
+      isCustom: true,
+    });
+    setCustomUploadUrl(existingIconUrl);
+  }, [form.destinationMarkerIconUrl, form.destinationTagName, form.eventPointTagId]);
+
+  useEffect(() => {
     return () => {
       if (customUploadUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(customUploadUrl);
