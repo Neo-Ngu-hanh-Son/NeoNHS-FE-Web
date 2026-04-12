@@ -49,10 +49,12 @@ export default function AdminDestinationsPage() {
         setPreviewPos,
 
         // Actions
+        fetchPoints,
         handleFileUpload,
         handleFocus,
         handleSavePoint,
         handleDeletePoint,
+        handleRestorePoint,
         handleImportPoints,
         handleSelectDiscovery,
     } = useAdminDestinations();
@@ -174,8 +176,10 @@ export default function AdminDestinationsPage() {
                                     setIsPointModalVisible(true);
                                 }}
                                 onDeletePoint={(id) => setDeleteTarget({ id, type: 'point' })}
+                                onRestorePoint={handleRestorePoint}
                                 onFocus={handleFocusWithScroll}
                                 onImportPoints={handleImportPoints}
+                                onRefresh={() => fetchPoints()}
                                 pagination={{
                                     currentPage,
                                     pageSize,
@@ -238,7 +242,7 @@ export default function AdminDestinationsPage() {
                     <AlertDialogHeader className="p-2 pt-4">
                         <AlertDialogTitle className="text-2xl font-bold text-slate-800">Confirm Deletion</AlertDialogTitle>
                         <AlertDialogDescription className="text-slate-500 font-medium text-base">
-                            Warning: This action will permanently remove the <span className="text-destructive font-bold underline underline-offset-4">point</span> from the central database. This cannot be undone.
+                            Are you sure you want to hide this destination from the public?
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="p-4 bg-slate-50/50 flex gap-3">

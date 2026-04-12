@@ -200,6 +200,18 @@ export function useAdminDestinations() {
         }
     };
 
+    const handleRestorePoint = async (pointId: string) => {
+        try {
+            const response = await pointService.restorePoint(pointId);
+            if (response.success) {
+                message.success('Point restored successfully');
+                fetchPoints();
+            }
+        } catch (error: any) {
+            message.error('Failed to restore point: ' + error.message);
+        }
+    };
+
     const handleImportPoints = async (file: File) => {
         if (!currentPointDestination) {
             message.warning("Please select a destination to import points into.");
@@ -330,6 +342,7 @@ export function useAdminDestinations() {
         handleFocus,
         handleSavePoint,
         handleDeletePoint,
+        handleRestorePoint,
         handleImportPoints,
         handleSelectDiscovery,
     };
