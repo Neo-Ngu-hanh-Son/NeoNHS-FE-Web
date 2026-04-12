@@ -90,7 +90,12 @@ export function WorkshopTemplateCard({
                   color: tag.tagColor,
                 }}
               >
-                {tag.name}
+                <div className="flex items-center gap-1">
+                  {tag.iconUrl && (
+                    <img src={tag.iconUrl} alt={tag.name} className="w-3 h-3 object-contain rounded-sm" />
+                  )}
+                  <span>{tag.name}</span>
+                </div>
               </Badge>
             ))}
             {template.tags.length > 3 && (
