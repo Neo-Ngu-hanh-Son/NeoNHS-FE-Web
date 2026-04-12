@@ -1,13 +1,13 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Eye, 
-  Edit, 
-  Ban, 
-  CheckCircle, 
-  Mail, 
-  Phone, 
+import {
+  Eye,
+  Edit,
+  Ban,
+  CheckCircle,
+  Mail,
+  Phone,
   MapPin,
   Building2,
   Calendar,
@@ -23,7 +23,6 @@ interface VendorCardProps {
   onEdit?: (id: string) => void
   onBan?: (vendor: VendorProfileResponse) => void
   onUnban?: (vendor: VendorProfileResponse) => void
-  onVerify?: (vendor: VendorProfileResponse) => void
 }
 
 export function VendorCard({
@@ -32,7 +31,6 @@ export function VendorCard({
   onEdit,
   onBan,
   onUnban,
-  onVerify,
 }: VendorCardProps) {
   return (
     <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -57,7 +55,7 @@ export function VendorCard({
                   </div>
                 )}
               </div>
-              
+
               {/* Name and Business */}
               <div>
                 <h3 className="font-bold text-lg">{vendor.fullname}</h3>
@@ -67,10 +65,10 @@ export function VendorCard({
                 </p>
               </div>
             </div>
-            
+
             {/* Status Badges */}
             <div className="flex flex-col gap-2 items-end">
-              <VendorStatusBadge 
+              <VendorStatusBadge
                 isActive={vendor.isActive}
                 isBanned={vendor.isBanned}
                 isVerified={vendor.isVerifiedVendor}
@@ -160,7 +158,7 @@ export function VendorCard({
               <Edit className="w-3.5 h-3.5 mr-1.5" />
               Edit
             </Button>
-            
+
             {/* Ban/Unban Button */}
             {vendor.isBanned ? (
               <Button
@@ -184,18 +182,7 @@ export function VendorCard({
               </Button>
             )}
 
-            {/* Verify Button */}
-            {!vendor.isVerifiedVendor && !vendor.isBanned && (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => onVerify?.(vendor)}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-              >
-                <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
-                Verify
-              </Button>
-            )}
+
           </div>
         </div>
       </CardContent>
