@@ -49,7 +49,11 @@ export const pointService = {
     },
 
     deletePoint: async (id: string): Promise<ApiResponse<void>> => {
-        return apiClient.delete<ApiResponse<void>>(`/admin/points/${id}/hard`);
+        return apiClient.delete<ApiResponse<void>>(`/admin/points/${id}`);
+    },
+
+    restorePoint: async (id: string): Promise<ApiResponse<void>> => {
+        return apiClient.put<ApiResponse<void>>(`/admin/points/${id}/restore`, {});
     },
 };
 

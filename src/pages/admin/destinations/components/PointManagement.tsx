@@ -9,6 +9,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
+  RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,8 +41,10 @@ interface PointManagementProps {
   onAddPoint: () => void;
   onEditPoint: (point: Point) => void;
   onDeletePoint: (id: string) => void;
+  onRestorePoint: (id: string) => void;
   onFocus: (lat: number, lng: number) => void;
   onImportPoints: (file: File) => void;
+  onRefresh: () => void;
   pagination: {
     currentPage: number;
     pageSize: number;
@@ -61,8 +65,10 @@ export function PointManagement({
   onAddPoint,
   onEditPoint,
   onDeletePoint,
+  onRestorePoint,
   onFocus,
   onImportPoints,
+  onRefresh,
   pagination,
   searchText,
   onSearchChange,
@@ -93,6 +99,9 @@ export function PointManagement({
               Management POIs
             </CardTitle>
             <div className="flex items-center gap-3">
+              <Button variant="outline" className="shadow-sm border-gray-200" onClick={onRefresh} title="Refresh point data">
+                <RefreshCw className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
               <label className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg shadow-sm hover:bg-gray-50 hover:border-primary/30 cursor-pointer text-sm font-semibold transition-all">
                 <Upload className="w-4 h-4 text-primary" />
                 <span>Import</span>
@@ -201,7 +210,7 @@ export function PointManagement({
                   allPoints.map((p, idx) => (
                     <TableRow
                       key={p.id}
-                      className="hover:bg-primary/5 transition-colors duration-200 group cursor-pointer"
+                      className={`hover:bg-primary/5 transition-colors duration-200 group cursor-pointer ${p.deletedAt ? 'opacity-60 bg-gray-50' : ''}`}
                       onClick={() => {
                         onFocus(p.latitude, p.longitude);
                         onEditPoint(p);
@@ -225,8 +234,11 @@ export function PointManagement({
                               </div>
                             )}
                           </div>
-                          <div className="truncate max-w-[180px]" title={p.name}>
-                            {p.name}
+                          <div className="flex items-center gap-2">
+                            <span className="truncate max-w-[180px]" title={p.name}>{p.name}</span>
+                            {p.deletedAt && (
+                              <Badge variant="outline" className="text-[10px] px-1 py-0 h-4 border-destructive text-destructive bg-destructive/10">Hidden</Badge>
+                            )}
                           </div>
                         </div>
                       </TableCell>
@@ -289,19 +301,33 @@ export function PointManagement({
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-9 w-9 hover:bg-destructive/10 hover:text-destructive rounded-full"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDeletePoint(p.id);
-                                  }}
-                                >
-                                  <Trash2 className="h-4.5 w-4.5" />
-                                </Button>
+                                {p.deletedAt ? (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 hover:bg-emerald-50 hover:text-emerald-600 rounded-full"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onRestorePoint(p.id);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-4.5 w-4.5" />
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 hover:bg-destructive/10 hover:text-destructive rounded-full"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      onDeletePoint(p.id);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4.5 w-4.5" />
+                                  </Button>
+                                )}
                               </TooltipTrigger>
-                              <TooltipContent>Remove</TooltipContent>
+                              <TooltipContent>{p.deletedAt ? 'Restore Point' : 'Remove'}</TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </div>
