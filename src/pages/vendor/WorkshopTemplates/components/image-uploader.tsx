@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { CloseOutlined, PictureOutlined, StarOutlined, StarFilled, UploadOutlined, LoadingOutlined } from "@ant-design/icons"
 import { Card } from "@/components/ui/card"
-import { Upload, message } from "antd"
+import { Upload, message, Image as AntImage } from "antd"
 import type { RcFile } from "antd/es/upload"
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary"
 import { useState, useRef } from "react"
@@ -131,52 +131,60 @@ export function ImageUploader({
           </Upload>
         </div>
 
-        {/* Image Grid */}
+        {/* Image Previews — 2 per row */}
         {imageUrls.length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {imageUrls.map((item, index) => {
               const url = item instanceof File ? URL.createObjectURL(item) : item;
+              const isThumbnail = index === thumbnailIndex;
+
               return (
                 <Card key={index} className="relative group overflow-hidden">
-                  <div className="aspect-video relative">
-                    <img
+                  <div className="relative aspect-square">
+                    
+                    {/* Ant Design Image */}
+                    <AntImage
                       src={url}
                       alt={`Workshop image ${index + 1}`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://via.placeholder.com/400x300?text=Invalid+Image"
-                      }}
+                      className="object-cover w-full h-full"
+                      rootClassName="absolute inset-0 w-full h-full"
+                      fallback="https://via.placeholder.com/400x400?text=Invalid"
+                      // Tắt mask preview mặc định của Ant để không bị đè với UI hover của bạn
+                      preview={{ mask: <div className="hidden"></div> }} 
                     />
 
                     {/* Thumbnail Badge */}
-                    {index === thumbnailIndex && (
-                      <div className="absolute top-2 left-2 bg-primary text-primary-foreground px-2 py-1 rounded-md text-xs font-semibold flex items-center gap-1">
+                    {isThumbnail && (
+                      <div className="absolute top-1.5 left-1.5 bg-primary text-primary-foreground px-1.5 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 shadow-sm z-10">
                         <StarFilled />
                         Thumbnail
                       </div>
                     )}
 
                     {/* Overlay Controls */}
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    {/* Thêm pointer-events-none và z-10 vào overlay, pointer-events-auto vào buttons */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 pointer-events-none z-10">
                       <Button
                         type="button"
                         size="sm"
                         variant="secondary"
+                        className="text-[11px] h-7 px-2 pointer-events-auto"
                         onClick={() => handleSetThumbnail(index)}
-                        disabled={disabled || index === thumbnailIndex}
-                        className="text-xs"
+                        disabled={disabled || isThumbnail}
                       >
-                        {index === thumbnailIndex ? <StarFilled className="mr-1" /> : <StarOutlined className="mr-1" />}
-                        Set Thumbnail
+                        {isThumbnail ? <StarFilled className="mr-1" /> : <StarOutlined className="mr-1" />}
+                        {isThumbnail ? "Thumbnail" : "Set Thumbnail"}
                       </Button>
                       <Button
                         type="button"
                         size="sm"
                         variant="destructive"
+                        className="text-[11px] h-7 px-2 pointer-events-auto"
                         onClick={() => handleRemoveImage(index)}
                         disabled={disabled}
                       >
-                        <CloseOutlined />
+                        <CloseOutlined className="mr-1" />
+                        Remove
                       </Button>
                     </div>
                   </div>
