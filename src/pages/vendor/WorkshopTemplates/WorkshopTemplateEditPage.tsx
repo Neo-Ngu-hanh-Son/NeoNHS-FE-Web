@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { ArrowLeftOutlined, SendOutlined } from "@ant-design/icons"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { WorkshopTemplateForm } from "./components/workshop-template-form"
 import { WorkshopTemplateFormData, UpdateWorkshopTemplateRequest, WorkshopStatus, WorkshopTemplateResponse } from "./types"
 import { TemplateStatusBadge } from "./components/template-status-badge"
@@ -10,6 +10,7 @@ import { RejectionAlert } from "./components/rejection-alert"
 import { SubmitApprovalDialog } from "./components/submit-approval-dialog"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
 import { notification } from "antd"
+import { Lightbulb } from "lucide-react"
 
 export default function WorkshopTemplateEditPage() {
   const { id } = useParams<{ id: string }>()
@@ -46,7 +47,7 @@ export default function WorkshopTemplateEditPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
         <p className="text-muted-foreground">Loading template...</p>
       </div>
     )
@@ -64,12 +65,11 @@ export default function WorkshopTemplateEditPage() {
     )
   }
 
-  // Check if template can be edited
   const canEdit = template.status === WorkshopStatus.DRAFT || template.status === WorkshopStatus.REJECTED
 
   if (!canEdit) {
     return (
-      <div className="flex flex-col gap-6 max-w-5xl mx-auto py-6">
+      <div className="flex flex-col gap-6 max-w-6xl mx-auto py-8 px-4">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
@@ -87,7 +87,7 @@ export default function WorkshopTemplateEditPage() {
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardContent className="pt-6">
             <p className="font-medium">
-              ⚠️ This template is currently <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" /> and cannot be edited.
+              This template is currently <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" /> and cannot be edited.
             </p>
             <p className="text-sm mt-2 text-muted-foreground">
               {template.status === WorkshopStatus.PENDING
@@ -112,10 +112,8 @@ export default function WorkshopTemplateEditPage() {
   const handleSubmit = async (data: WorkshopTemplateFormData) => {
     if (!id) return
 
-    // Keep only persisted image URLs for update payload
     const imageUrls = data.imageUrls.filter((url): url is string => typeof url === "string")
 
-    // Transform form data to API request format
     const updateRequest: UpdateWorkshopTemplateRequest = {
       name: data.name,
       shortDescription: data.shortDescription,
@@ -138,7 +136,6 @@ export default function WorkshopTemplateEditPage() {
         description: `Template "${updatedTemplate.name}" has been updated successfully.`
       })
 
-      // Navigate to detail page
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
       console.error('Update failed:', error)
@@ -177,27 +174,27 @@ export default function WorkshopTemplateEditPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto py-6">
+    <div className="flex flex-col gap-6 max-w-6xl mx-auto py-8 px-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
             size="icon"
+            className="shrink-0"
             onClick={handleCancel}
           >
             <ArrowLeftOutlined />
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">Edit Workshop Template</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Edit Template</h1>
               <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" />
             </div>
-            <p className="text-muted-foreground">{template.name}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">{template.name}</p>
           </div>
         </div>
 
-        {/* Submit for Approval Button */}
         <Button
           onClick={() => setSubmitDialog(true)}
           variant="default"
@@ -213,34 +210,23 @@ export default function WorkshopTemplateEditPage() {
         <RejectionAlert adminNote={template.adminNote} />
       )}
 
-      {/* Info Card */}
-      <Card className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
-        <CardContent className="pt-6">
-          <p className="text-sm">
-            💡 <strong>Tip:</strong> After saving your changes, you can submit this template for admin approval.
-            Once submitted, you won't be able to edit it until it's approved or rejected.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Tip Banner */}
+      <div className="flex items-start gap-3 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 px-4 py-3">
+        <Lightbulb className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+        <p className="text-sm text-blue-800 dark:text-blue-200">
+          <strong>Tip:</strong> After saving your changes, you can submit this template for admin approval.
+          Once submitted, you won't be able to edit it until it's approved or rejected.
+        </p>
+      </div>
 
-      {/* Form Card */}
-      <Card className="rounded-2xl border-[#d3e4da] dark:border-white/10 shadow-sm">
-        <CardHeader>
-          <CardTitle>Template Information</CardTitle>
-          <CardDescription>
-            Update the details of your workshop template
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <WorkshopTemplateForm
-            defaultValues={template}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isEditing={true}
-            submitting={submitting}
-          />
-        </CardContent>
-      </Card>
+      {/* Form (contains its own section cards) */}
+      <WorkshopTemplateForm
+        defaultValues={template}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isEditing={true}
+        submitting={submitting}
+      />
 
       {/* Submit for Approval Dialog */}
       <SubmitApprovalDialog
