@@ -108,6 +108,7 @@
 
   html {
     font-family: theme("fontFamily.sans");
+    scroll-behavior: smooth;
   }
 
   body {
@@ -121,6 +122,162 @@ body,
 #root {
   height: 100%;
 }
+
+/* ===== PREMIUM UI UTILITIES ===== */
+
+/* Gradient text utility */
+.gradient-text {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #10b981, #06b6d4, #8b5cf6);
+}
+
+.gradient-text-warm {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #f97316, #ef4444, #ec4899);
+}
+
+.gradient-text-cool {
+  @apply bg-clip-text text-transparent;
+  background-image: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+}
+
+/* Glassmorphism navigation */
+.glass-nav {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.glass-nav-transparent {
+  backdrop-filter: none;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+
+/* Soft page background inspired by Docimal */
+.bg-page-gradient {
+  background: linear-gradient(180deg, #f5f3ff 0%, #ede9fe 15%, #f0eef6 40%, #faf9fe 70%, #ffffff 100%);
+}
+
+/* Section badge – dark pill style */
+.section-badge {
+  @apply inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold;
+  background: rgba(15, 23, 42, 0.9);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-badge-light {
+  @apply inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Floating particles */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.15);
+  animation: float-particle 20s ease-in-out infinite;
+}
+
+.particle:nth-child(2) {
+  animation-delay: -5s;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.particle:nth-child(3) {
+  animation-delay: -10s;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+  25% { transform: translateY(-30px) translateX(15px); opacity: 0.8; }
+  50% { transform: translateY(-15px) translateX(-10px); opacity: 0.5; }
+  75% { transform: translateY(-40px) translateX(20px); opacity: 0.7; }
+}
+
+/* Phone mockup video container */
+.phone-mockup {
+  position: relative;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 2.8rem;
+  padding: 12px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.12),
+    0 10px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.phone-mockup-screen {
+  border-radius: 2.2rem;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 9 / 19.5;
+}
+
+.phone-mockup-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Vibrant gradient card backgrounds */
+.card-gradient-purple {
+  background: linear-gradient(135deg, #c084fc 0%, #a855f7 40%, #7c3aed 100%);
+}
+
+.card-gradient-teal {
+  background: linear-gradient(135deg, #2dd4bf 0%, #0d9488 40%, #134e4a 100%);
+}
+
+.card-gradient-pink {
+  background: linear-gradient(135deg, #fb7185 0%, #f43f5e 40%, #e11d48 100%);
+}
+
+.card-gradient-orange {
+  background: linear-gradient(135deg, #fdba74 0%, #f97316 40%, #ea580c 100%);
+}
+
+.card-gradient-dark {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%, #020617 100%);
+}
+
+/* Dark CTA section gradient */
+.bg-dark-cta {
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
+
+/* FAQ accordion transitions */
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), padding 0.35s ease;
+}
+
+.faq-answer.open {
+  max-height: 500px;
+}
+
+/* Testimonial card hover */
+.testimonial-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== EXISTING COMPONENT OVERRIDES ===== */
 
 /* Add this to your CSS file */
 
