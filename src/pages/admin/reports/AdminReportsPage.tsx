@@ -84,7 +84,6 @@ export default function AdminReportsPage() {
     const getStatusColor = (status: ReportStatus) => {
         switch (status) {
             case 'PENDING': return 'gold';
-            case 'REVIEWING': return 'blue';
             case 'RESOLVED': return 'green';
             case 'REJECTED': return 'red';
             default: return 'default';
@@ -94,7 +93,6 @@ export default function AdminReportsPage() {
     const getStatusLabel = (status: ReportStatus) => {
         switch (status) {
             case 'PENDING': return 'Pending';
-            case 'REVIEWING': return 'Reviewing';
             case 'RESOLVED': return 'Resolved';
             case 'REJECTED': return 'Rejected';
             default: return status;
@@ -158,7 +156,6 @@ export default function AdminReportsPage() {
                         >
                             <Option value="ALL">All Status</Option>
                             <Option value="PENDING">Pending</Option>
-                            <Option value="REVIEWING">Reviewing</Option>
                             <Option value="RESOLVED">Resolved</Option>
                             <Option value="REJECTED">Rejected</Option>
                         </Select>
@@ -265,7 +262,7 @@ export default function AdminReportsPage() {
                 )}
 
                 {/* Footer Stats */}
-                <footer className="pt-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 opacity-80">
+                <footer className="pt-8 grid grid-cols-2 md:grid-cols-4 gap-6 opacity-80">
                     <div className="flex flex-col gap-1">
                         <p className="text-[#688277] text-[10px] uppercase font-bold tracking-widest">Total Reports</p>
                         <p className="text-2xl font-bold">{total}</p>
@@ -273,10 +270,6 @@ export default function AdminReportsPage() {
                     <div className="flex flex-col gap-1">
                         <p className="text-[#688277] text-[10px] uppercase font-bold tracking-widest">Pending</p>
                         <p className="text-2xl font-bold text-amber-600">{reports.filter(r => r.status === 'PENDING').length}</p>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        <p className="text-[#688277] text-[10px] uppercase font-bold tracking-widest">Reviewing</p>
-                        <p className="text-2xl font-bold text-blue-600">{reports.filter(r => r.status === 'REVIEWING').length}</p>
                     </div>
                     <div className="flex flex-col gap-1">
                         <p className="text-[#688277] text-[10px] uppercase font-bold tracking-widest">Resolved</p>

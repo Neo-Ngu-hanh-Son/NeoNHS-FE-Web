@@ -69,7 +69,6 @@ export default function AdminReportDetailPage() {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'PENDING': return 'gold';
-            case 'REVIEWING': return 'blue';
             case 'RESOLVED': return 'green';
             case 'REJECTED': return 'red';
             default: return 'default';
@@ -110,7 +109,7 @@ export default function AdminReportDetailPage() {
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight text-[#121715] dark:text-white">Report Case Analysis</h1>
                         <p className="text-[#688277] dark:text-gray-400 mt-1">
-                            Reviewing: <span className="font-bold text-[#1f6f4b]">{report.targetName}</span> (ID: #{id})
+                            Reviewing: <span className="font-bold text-[#1f6f4b]">{report.targetName}</span>
                         </p>
                     </div>
                     <Tag
