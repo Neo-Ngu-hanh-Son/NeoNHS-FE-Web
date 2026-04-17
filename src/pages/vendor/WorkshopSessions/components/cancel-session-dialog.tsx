@@ -26,28 +26,28 @@ export function CancelSessionDialog({
 }: CancelSessionDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Cancel this session?</AlertDialogTitle>
+          <AlertDialogTitle>Hủy phiên này?</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
-            <p>
-              You are about to cancel <span className="font-semibold text-foreground">"{sessionName}"</span>.
+            <p className="text-sm">
+              Bạn đang yêu cầu hủy bỏ <span className="font-semibold text-foreground">"{sessionName}"</span>.
             </p>
             {enrollmentCount > 0 && (
               <p className="font-medium text-destructive">
-                ⚠️ Warning: This session has {enrollmentCount} enrolled participant{enrollmentCount !== 1 ? 's' : ''}. They will be notified of the cancellation.
+                ⚠️ Lưu ý: Phiên này đã có {enrollmentCount} học viên đăng ký. Hệ thống sẽ tự động gửi thông báo hủy đến tất cả học viên.
               </p>
             )}
-            <p>This action cannot be undone. Do you want to proceed?</p>
+            <p className="text-sm">Hành động này không thể hoàn tác. Bạn có chắc chắn muốn tiếp tục?</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Keep Session</AlertDialogCancel>
+          <AlertDialogCancel className="rounded-xl">Giữ Lại Phiên</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl"
           >
-            Cancel Session
+            Xác Nhận Hủy
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -132,6 +132,27 @@ export const WorkshopSessionService = {
   },
 
   /**
+   * Create multiple new sessions (batch)
+   * POST /api/workshops/sessions/batch
+   */
+  async createBatchSessions(data: CreateWorkshopSessionRequest[]): Promise<WorkshopSessionResponse[]> {
+    try {
+      console.log('Creating batch sessions with data:', data);
+      const res = await apiClient.post<ApiResponse<any>>('/workshops/sessions/batch', data);
+      const created = (res?.data ?? res) as any[];
+      console.log('createBatchSessions raw response:', created);
+      
+      // The API should return an array or a wrapper containing the array. Adjusting for standard unwrap:
+      const sessionsArray = Array.isArray(created) ? created : (created.content || []);
+      const transformed = sessionsArray.map((session: any) => transformSessionResponse(session));
+      return transformed;
+    } catch (error) {
+      console.error('createBatchSessions error:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Update session (SCHEDULED only)
    * PUT /api/workshops/sessions/{id}
    */

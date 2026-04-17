@@ -21,6 +21,7 @@ export const formatDateTime = (isoDate: string) => {
 
 // Price Formatting (Định dạng Giá tiền)
 export const formatPrice = (price: number) => {
+  if (price === 0) return "Miễn phí"
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'

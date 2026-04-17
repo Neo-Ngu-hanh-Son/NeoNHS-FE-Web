@@ -27,7 +27,7 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
   const enrollmentPercentage = getEnrollmentPercentage(session.currentEnrollments, session.maxParticipants)
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 group">
+    <Card className="overflow-hidden hover:shadow-lg transition-all duration-200 group rounded-2xl border-slate-100 flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/50">
       {/* Thumbnail Image */}
       {thumbnail && (
         <div className="relative h-40 overflow-hidden">
@@ -43,20 +43,20 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
             <SessionStatusBadge status={session.status} size="sm" />
           </div>
           {session.availableSlots === 0 && session.status === SessionStatus.SCHEDULED && (
-            <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 text-white text-center py-1 text-sm font-semibold">
-              FULLY BOOKED
+            <div className="absolute bottom-0 left-0 right-0 bg-red-500/90 text-white text-center py-1 text-sm font-semibold tracking-wider">
+              KÍN CHỖ
             </div>
           )}
         </div>
       )}
 
-      <CardHeader className="pb-3">
-        <h3 className="font-semibold text-lg line-clamp-2 leading-tight">
-          {session.workshopTemplate?.name || 'Unnamed Workshop'}
+      <CardHeader className="pb-3 px-5 pt-5">
+        <h3 className="font-semibold text-lg line-clamp-2 leading-tight text-slate-800 dark:text-slate-200">
+          {session.workshopTemplate?.name || 'Workshop chưa phân loại'}
         </h3>
       </CardHeader>
 
-      <CardContent className="space-y-3 pb-3">
+      <CardContent className="space-y-4 px-5 pb-5 flex-1">
         {/* Date and Time */}
         <div className="flex items-start gap-2 text-sm">
           <Calendar className="w-4 h-4 mt-0.5 text-muted-foreground shrink-0" />
@@ -67,8 +67,8 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
         </div>
 
         {/* Price */}
-        <div className="flex items-center gap-2 text-sm">
-          <span className="font-semibold text-primary text-base">{formatPrice(session.price)}</span>
+        <div className="flex items-center gap-2 text-sm bg-orange-50 dark:bg-orange-500/10 p-2 rounded-xl">
+          <span className="font-bold text-orange-600 dark:text-orange-400 text-lg px-1">{formatPrice(session.price)}</span>
         </div>
 
         {/* Enrollment Progress */}
@@ -80,9 +80,9 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
                 {session.currentEnrollments} / {session.maxParticipants}
               </span>
             </div>
-            <span className="text-muted-foreground">{enrollmentPercentage}% filled</span>
+            <span className="text-muted-foreground font-semibold text-emerald-600 dark:text-emerald-400">{enrollmentPercentage}%</span>
           </div>
-          <Progress value={enrollmentPercentage} className="h-2" />
+          <Progress value={enrollmentPercentage} className="h-2 bg-slate-200 dark:bg-slate-700" />
         </div>
 
         {/* Tags */}
@@ -111,38 +111,38 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
         )}
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 pt-4 border-t">
+      <CardFooter className="flex flex-col gap-2 pt-4 px-5 pb-5 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 mt-auto">
         <div className="flex gap-2 w-full">
           {onView && (
-            <Button size="sm" variant="outline" onClick={onView} className="flex-1">
-              <Eye className="w-3.5 h-3.5 mr-1" />
-              View
+            <Button size="sm" variant="outline" onClick={onView} className="flex-1 rounded-xl bg-slate-50 hover:bg-slate-100 hover:text-slate-900 border-none">
+              <Eye className="w-3.5 h-3.5 mr-1.5" />
+              Chi tiết
             </Button>
           )}
           {canEdit && onEdit && (
-            <Button size="sm" variant="outline" onClick={onEdit} className="flex-1">
-              <Edit className="w-3.5 h-3.5 mr-1" />
-              Edit
+            <Button size="sm" variant="outline" onClick={onEdit} className="flex-1 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 border-none">
+              <Edit className="w-3.5 h-3.5 mr-1.5" />
+              Sửa lịch
             </Button>
           )}
           {canCancel && onCancel && (
-            <Button size="sm" variant="destructive" onClick={onCancel}>
-              <XCircle className="w-3.5 h-3.5" />
+            <Button size="sm" variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl px-2" onClick={onCancel}>
+              <XCircle className="w-4 h-4" />
             </Button>
           )}
         </div>
         {(canStart || canComplete) && (
-          <div className="flex gap-2 w-full">
+          <div className="flex gap-2 w-full pt-1">
             {canStart && onStart && (
-              <Button size="sm" onClick={onStart} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
-                <Play className="w-3.5 h-3.5 mr-1" />
-                Start Session
+              <Button size="sm" onClick={onStart} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-sm">
+                <Play className="w-3.5 h-3.5 mr-1.5" />
+                Bắt đầu lớp
               </Button>
             )}
             {canComplete && onComplete && (
-              <Button size="sm" onClick={onComplete} className="flex-1 bg-green-600 hover:bg-green-700 text-white">
-                <CheckCircle className="w-3.5 h-3.5 mr-1" />
-                Complete
+              <Button size="sm" onClick={onComplete} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-sm">
+                <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
+                Hoàn tất
               </Button>
             )}
           </div>
