@@ -14,12 +14,12 @@ import { useHistoryAudios } from "../../../../hooks/historyAudio/useHistoryAudio
 import type { CreateHistoryAudioRequest } from "@/types/historyAudio";
 import HistoryAudioDeleteDialog from "./HistoryAudioDeleteDialog";
 import AudioSourceSection from "./AudioSourceSection.tsx";
-import TimingSection from "../../destinations/components/historyAudio/TimingSection.tsx";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import HistoryAudiosTable from "./HistoryAudiosTable.tsx";
 import HistoryTextSection from "./HistoryTextSection.tsx";
 import { clearEmtpyLines } from "../helpers.ts";
+import TimingSection from "./TimingSection.tsx";
 
 interface HistoryAudioPanelProps {
   pointId: string;

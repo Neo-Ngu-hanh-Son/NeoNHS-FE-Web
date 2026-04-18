@@ -7,27 +7,7 @@ import { Destination, Point } from '../types';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { PointType } from '@/types/point';
-
-const POINT_TYPE_VI: Record<PointType, string> = {
-    PAGODA: 'Chùa',
-    CAVE: 'Hang động',
-    VIEWPOINT: 'Điểm ngắm cảnh',
-    GENERAL: 'Chung',
-    CHECKIN: 'Check-in',
-    STATUE: 'Tượng',
-    GATE: 'Cổng',
-    SHOP: 'Cửa hàng',
-    ELEVATOR: 'Thang máy',
-    EVENT: 'Sự kiện',
-    WORKSHOP: 'Workshop',
-    ATTRACTION: 'Danh thắng',
-    DEFAULT: 'Mặc định',
-};
-
-function pointTypeLabel(type: string): string {
-    return POINT_TYPE_VI[type as PointType] ?? type;
-}
+import { pointTypeLabel } from '../pointTypeLabels';
 
 interface PointManagementProps {
     currentDestination: Destination | null;

@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Upload, Loader2, AudioLines, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { MapPin, Upload, Loader2, AudioLines, AlertTriangle, ImageIcon } from 'lucide-react';
 import { Destination, Point } from '../types';
 import { PointRequest, PointType } from '@/types/point';
 import * as turf from '@turf/turf';
 import { NGU_HANH_SON_GEOJSON_POLYGON } from '../constants';
 import { message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { pointTypeLabel } from '../pointTypeLabels';
 
-// ─── Turf Point-in-Polygon Check ───
 function isPointInBoundary(lat: number, lng: number): boolean {
   const point = turf.point([lng, lat]);
   const polygon = turf.polygon(NGU_HANH_SON_GEOJSON_POLYGON);
@@ -37,6 +39,8 @@ interface PointFormModalProps {
   ) => void;
   uploading: { [key: string]: boolean };
 }
+
+const POINT_TYPES = Object.values(PointType);
 
 export function PointFormModal({
   open,
@@ -85,7 +89,7 @@ export function PointFormModal({
         orderIndex: editingPoint.orderIndex,
         estTimeSpent: editingPoint.estTimeSpent,
         thumbnailUrl: editingPoint.thumbnailUrl,
-        attractionId: editingPoint.attractionId || (editingPoint as any).attraction?.id || '',
+        attractionId: editingPoint.attractionId || (editingPoint as { attraction?: { id: string } }).attraction?.id || '',
         googlePlaceId: editingPoint.googlePlaceId || '',
       });
     } else {
@@ -98,9 +102,10 @@ export function PointFormModal({
         orderIndex: 1,
         estTimeSpent: 30,
         thumbnailUrl: '',
+        attractionId: initialDestinationId || '',
       });
     }
-  }, [editingPoint, open]);
+  }, [editingPoint, open, initialDestinationId]);
 
   const safeFormData = {
     ...formData,
@@ -108,7 +113,7 @@ export function PointFormModal({
     type: formData.type || 'GENERAL',
   };
 
-  const handleChange = (field: keyof PointRequest, value: any) => {
+  const handleChange = (field: keyof PointRequest, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -116,293 +121,312 @@ export function PointFormModal({
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const outOfBoundary =
+    Boolean(formData.latitude && formData.longitude) &&
+    !isPointInBoundary(formData.latitude!, formData.longitude!);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate boundary
     try {
       if (formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude)) {
-        message.error('Vị trí này nằm ngoài ranh giới Ngũ Hành Sơn. Vui lòng kiểm tra lại tọa độ.');
+        message.error('Vị trí nằm ngoài ranh giới quận Ngũ Hành Sơn. Vui lòng chọn lại trên bản đồ.');
         return;
       }
     } catch (error) {
       console.error('Boundary validation error:', error);
-      // If validation fails due to data error, we log it but don't block the user
     }
-    // Validate boundary
-    try {
-      if (formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude)) {
-        message.error('This location is outside the boundary of Ngũ Hành Sơn.Please check the coordinates again.');
-        return;
-      }
-    } catch (error) {
-      console.error('Boundary validation error:', error);
-      // If validation fails due to data error, we log it but don't block the user
-    }
-
     onSave(safeFormData as PointRequest);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden flex flex-col p-0 text-gray-900 border-none shadow-2xl">
-        <DialogHeader className="px-6 pt-6 bg-white shrink-0">
-          <DialogTitle className="text-xl font-bold">
-            {editingPoint?.id ? 'Edit Point of Interest' : 'Add New Point of Interest'}
+      <DialogContent className="flex max-h-[92vh] max-w-5xl flex-col gap-0 overflow-hidden border border-slate-200 p-0 shadow-lg dark:border-slate-700">
+        <DialogHeader className="shrink-0 space-y-1 border-b border-slate-100 px-6 py-4 text-left dark:border-slate-700">
+          <DialogTitle className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+            {editingPoint?.id ? 'Sửa điểm tham quan (POI)' : 'Thêm điểm tham quan (POI)'}
           </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Điền thông tin bên trái; chọn vị trí và ảnh đại diện bên phải.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-6 py-4">
           <div
-            className={`border rounded-2xl p-5 mb-8 flex items-start gap-4 shadow-sm group transition-colors ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? 'bg-red-50 border-red-100' : 'bg-slate-50 border-slate-100'}`}
+            className={`mb-6 flex items-start gap-3 rounded-2xl border p-4 transition-colors ${outOfBoundary
+                ? 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30'
+                : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40'
+              }`}
           >
             <div
-              className={`p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? 'text-red-500' : 'text-primary'}`}
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${outOfBoundary
+                  ? 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                  : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                }`}
             >
-              {formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? (
-                <AlertTriangle className="w-5 h-5" />
-              ) : (
-                <MapPin className="w-5 h-5" />
-              )}
+              {outOfBoundary ? <AlertTriangle className="h-5 w-5" /> : <MapPin className="h-5 w-5" />}
             </div>
-            <div className="flex-1">
-              <h4
-                className={`text-[10px] font-black uppercase tracking-[0.2em] mb-1 ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? 'text-red-500' : 'text-cyan-500'}`}
-              >
-                {formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude)
-                  ? 'Boundary Violation'
-                  : 'Geocoded Metadata'}
-              </h4>
+            <div className="min-w-0 flex-1">
               <p
-                className={`text-sm font-bold ${formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude) ? 'text-red-700' : 'text-slate-700'}`}
+                className={`text-xs font-semibold uppercase tracking-wide ${outOfBoundary ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'
+                  }`}
               >
-                {formData.latitude?.toFixed(6)}, {formData.longitude?.toFixed(6)}
+                {outOfBoundary ? 'Cảnh báo ranh giới' : 'Tọa độ hiện tại'}
               </p>
-              <p className="text-[11px] text-slate-400 font-medium truncate max-w-[400px]">
-                {formData.latitude && formData.longitude && !isPointInBoundary(formData.latitude, formData.longitude)
-                  ? 'WARNING: This location is outside the district boundary!'
+              <p className={`mt-1 font-mono text-sm font-semibold ${outOfBoundary ? 'text-red-800 dark:text-red-200' : 'text-slate-800 dark:text-slate-100'}`}>
+                {Number(formData.latitude || 0).toFixed(6)}, {Number(formData.longitude || 0).toFixed(6)}
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {outOfBoundary
+                  ? 'Điểm nằm ngoài khu vực Ngũ Hành Sơn. Hãy chọn lại vị trí trên bản đồ.'
                   : editingPoint?.googlePlaceId
-                    ? `Linked to Google Place ID: ${editingPoint.googlePlaceId}`
-                    : 'Visual Projection via Map Hub'}
+                    ? `Đã liên kết Google Place ID: ${editingPoint.googlePlaceId}`
+                    : 'Chọn vị trí trên bản đồ để cập nhật tọa độ.'}
               </p>
             </div>
           </div>
 
-          <form id="point-form" onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="col-span-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full h-11 border-dashed border-2 hover:border-primary/50 hover:bg-primary/5 group transition-all"
-                  onClick={onOpenMapPicker}
-                >
-                  <MapPin className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" />
-                  Locate on Interactive Map
-                </Button>
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="attractionId" className="text-sm font-bold text-primary flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Target Destination <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={safeFormData.attractionId}
-                  onValueChange={(value) => handleChange('attractionId', value)}
-                  required
-                >
-                  <SelectTrigger className="h-11 border-primary/20 bg-primary/5 focus:ring-primary/20">
-                    <SelectValue placeholder="Select destination for this point..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {destinations.map((dest) => (
-                      <SelectItem key={dest.id} value={dest.id}>
-                        {dest.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="name" className="text-sm font-semibold">
-                  Point Name
-                </Label>
-                <Input
-                  id="name"
-                  className="h-11"
-                  value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
-                  placeholder="e.g. Linh Ung Pagoda"
-                  required
-                />
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="description" className="text-sm font-semibold">
-                  Short Description / Address
-                </Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
-                  placeholder="Provide a brief description or the full address"
-                  rows={2}
-                />
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="historyAudioUrl">History & Audios ({editingPoint?.historyAudioCount || 0})</Label>
-                <div className="flex items-center gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2"
-                    disabled={!editingPoint?.id}
-                    onClick={() => {
-                      if (!editingPoint?.id) return;
-                      navigate(`/admin/destinations/${editingPoint.id}/audioHistory`, {
-                        state: { pointName: formData.name },
-                      });
-                    }}
-                  >
-                    <AudioLines className="w-4 h-4" />
-                    Manage History Audios
-                  </Button>
-
-                  {!editingPoint?.id && (
-                    <p className="text-xs text-muted-foreground">Save this point first to manage history audio.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="historyAudioUrl">Manage Panorama</Label>
-                <div className="flex items-center gap-3">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-3"
-                    disabled={!editingPoint?.id}
-                    onClick={() => {
-                      if (!editingPoint?.id) return;
-                      navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
-                    }}
-                  >
-                    <MapPin className="w-4 h-4" />
-                    Edit Panorama
-                  </Button>
-                  {!editingPoint?.id && (
-                    <p className="text-xs text-muted-foreground">Save this point first to manage panorama.</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="type" className="text-sm font-semibold">
-                  Point Category
-                </Label>
-                <Select value={safeFormData.type} onValueChange={(value) => handleChange('type', value)}>
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder="Select type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(PointType).map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="estTimeSpent" className="text-sm font-semibold">
-                  Est. Visit (Min)
-                </Label>
-                <Input
-                  id="estTimeSpent"
-                  type="number"
-                  min={5}
-                  className="h-11 w-full lg:w-1/2"
-                  value={formData.estTimeSpent}
-                  onChange={(e) => handleChange('estTimeSpent', parseInt(e.target.value))}
-                />
-              </div>
-
-              <div className="col-span-2 space-y-2">
-                <Label htmlFor="thumbnailUrl" className="text-sm font-semibold">
-                  Visual Representation
-                </Label>
-                <div className="flex flex-col gap-4 p-4 border rounded-xl bg-gray-50/50">
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-4 py-2 bg-white border rounded-lg shadow-sm cursor-pointer hover:bg-gray-50 hover:border-primary/30 transition-all text-sm font-medium">
-                      {uploading['thumbnailUrl'] ? (
-                        <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                      ) : (
-                        <Upload className="w-4 h-4 text-primary" />
-                      )}
-                      <span>{uploading['thumbnailUrl'] ? 'Uploading...' : 'Upload Image'}</span>
-                      <input
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) onFileUpload(file, 'thumbnailUrl', 'image', setFieldValue);
-                        }}
-                        disabled={uploading['thumbnailUrl']}
-                      />
-                    </label>
-                    <p className="text-[11px] text-muted-foreground italic">MAX 5MB - JPG, PNG</p>
+          <form id="point-form" onSubmit={handleSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Cột trái: thông tin nhập */}
+            <div className="space-y-6 lg:col-span-7">
+              <Card className="rounded-2xl border border-slate-100 shadow-sm dark:border-slate-700">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Thông tin điểm</CardTitle>
+                  <CardDescription>Tên, mô tả, điểm đến và phân loại</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="attractionId" className="text-sm font-medium">
+                      Điểm đến <span className="text-destructive">*</span>
+                    </Label>
+                    <Select value={safeFormData.attractionId} onValueChange={(value) => handleChange('attractionId', value)} required>
+                      <SelectTrigger id="attractionId" className="h-10 bg-background">
+                        <SelectValue placeholder="Chọn điểm đến gắn với POI…" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {destinations.map((dest) => (
+                          <SelectItem key={dest.id} value={dest.id}>
+                            {dest.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <Input
-                    id="thumbnailUrl"
-                    className="bg-white"
-                    value={formData.thumbnailUrl}
-                    onChange={(e) => handleChange('thumbnailUrl', e.target.value)}
-                    placeholder="Or paste direct image URL"
-                  />
-                  {formData.thumbnailUrl && (
-                    <div className="mt-2 relative group w-full aspect-video rounded-xl overflow-hidden border shadow-inner">
-                      <img
-                        src={formData.thumbnailUrl}
-                        alt="Thumbnail preview"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+
+                  <div className="space-y-2">
+                    <Label htmlFor="name" className="text-sm font-medium">
+                      Tên điểm <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="name"
+                      className="h-10"
+                      value={formData.name}
+                      onChange={(e) => handleChange('name', e.target.value)}
+                      placeholder="Ví dụ: Chùa Linh Ứng"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="description" className="text-sm font-medium">
+                      Mô tả / địa chỉ
+                    </Label>
+                    <Textarea
+                      id="description"
+                      value={formData.description}
+                      onChange={(e) => handleChange('description', e.target.value)}
+                      placeholder="Mô tả ngắn hoặc địa chỉ đầy đủ"
+                      rows={4}
+                      className="min-h-[100px] resize-y"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="type" className="text-sm font-medium">
+                        Loại điểm
+                      </Label>
+                      <Select value={safeFormData.type} onValueChange={(value) => handleChange('type', value as PointType)}>
+                        <SelectTrigger id="type" className="h-10 bg-background">
+                          <SelectValue placeholder="Chọn loại" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {POINT_TYPES.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {pointTypeLabel(t)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="estTimeSpent" className="text-sm font-medium">
+                        Thời gian tham quan (phút)
+                      </Label>
+                      <Input
+                        id="estTimeSpent"
+                        type="number"
+                        min={5}
+                        className="h-10"
+                        value={formData.estTimeSpent ?? 30}
+                        onChange={(e) => handleChange('estTimeSpent', parseInt(e.target.value, 10) || 0)}
                       />
-                      <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+                    </div>
+                  </div>
+                </CardContent>
+                <Card className="rounded-2xl border border-slate-100 shadow-sm dark:border-slate-700">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Tiện ích khác</CardTitle>
+                    <CardDescription>Âm thanh lịch sử và ảnh toàn cảnh (sau khi đã lưu điểm)</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Âm thanh lịch sử ({editingPoint?.historyAudioCount ?? 0})</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start gap-2 transition-colors"
+                        disabled={!editingPoint?.id}
+                        onClick={() => {
+                          if (!editingPoint?.id) return;
+                          navigate(`/admin/destinations/${editingPoint.id}/audioHistory`, {
+                            state: { pointName: formData.name },
+                          });
+                        }}
+                      >
+                        <AudioLines className="" />
+                        Quản lý âm thanh lịch sử
+                      </Button>
+                      {!editingPoint?.id && (
+                        <p className="text-xs text-muted-foreground">Lưu điểm trước để thêm âm thanh.</p>
+                      )}
+                    </div>
+                    <Separator />
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Ảnh toàn cảnh (360°)</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-start gap-2 transition-colors"
+                        disabled={!editingPoint?.id}
+                        onClick={() => {
+                          if (!editingPoint?.id) return;
+                          navigate(`/admin/places/${editingPoint.id}/panorama/edit`);
+                        }}
+                      >
+                        <MapPin className="h-4 w-4" />
+                        Chỉnh sửa panorama
+                      </Button>
+                      {!editingPoint?.id && <p className="text-xs text-muted-foreground">Lưu điểm trước để chỉnh panorama.</p>}
+                    </div>
+                    {formData.googlePlaceId ? (
+                      <>
+                        <Separator />
+                        <p className="break-all text-center text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                          Google Place ID: {formData.googlePlaceId}
+                        </p>
+                      </>
+                    ) : null}
+                  </CardContent>
+                </Card>
+              </Card>
+            </div>
+
+            {/* Cột phải: bản đồ, ảnh, tiện ích */}
+            <div className="space-y-6 lg:col-span-5">
+              <Card className="rounded-2xl border border-slate-100 shadow-sm dark:border-slate-700">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Vị trí</CardTitle>
+                  <CardDescription>Mở bản đồ để chọn hoặc tinh chỉnh tọa độ</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-10 w-full border-dashed transition-colors hover:border-primary hover:bg-primary/5"
+                    onClick={onOpenMapPicker}
+                  >
+                    <MapPin className="mr-2 h-4 w-4 text-primary" />
+                    Chọn vị trí trên bản đồ
+                  </Button>
+                </CardContent>
+
+              </Card>
+
+              <Card className="rounded-2xl border border-slate-100 shadow-sm dark:border-slate-700">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-500/20">
+                      <ImageIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Ảnh đại diện</CardTitle>
+                      <CardDescription>Tải lên hoặc dán URL ảnh (tối đa 5MB, JPG/PNG)</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-input bg-background px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:bg-muted/60">
+                    {uploading.thumbnailUrl ? (
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    ) : (
+                      <Upload className="h-4 w-4 text-primary" />
+                    )}
+                    <span>{uploading.thumbnailUrl ? 'Đang tải lên…' : 'Chọn ảnh từ máy'}</span>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) onFileUpload(file, 'thumbnailUrl', 'image', setFieldValue);
+                        e.target.value = '';
+                      }}
+                      disabled={uploading.thumbnailUrl}
+                    />
+                  </label>
+                  <div className="space-y-2">
+                    <Label htmlFor="thumbnailUrl" className="text-xs text-muted-foreground">
+                      Hoặc URL ảnh
+                    </Label>
+                    <Input
+                      id="thumbnailUrl"
+                      className="h-9 bg-background"
+                      value={formData.thumbnailUrl || ''}
+                      onChange={(e) => handleChange('thumbnailUrl', e.target.value)}
+                      placeholder="https://…"
+                    />
+                  </div>
+                  {formData.thumbnailUrl ? (
+                    <div className="relative mt-2 aspect-video w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-600">
+                      <img src={formData.thumbnailUrl} alt="Xem trước ảnh đại diện" className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-video flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-muted/30 text-center dark:border-slate-700">
+                      <ImageIcon className="mb-2 h-8 w-8 text-muted-foreground opacity-50" />
+                      <p className="text-xs text-muted-foreground">Chưa có ảnh xem trước</p>
                     </div>
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
 
-              {formData.googlePlaceId && (
-                <div className="col-span-2 pt-2 px-2">
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
-                    <div className="h-px bg-gray-200 flex-1" />
-                    <span>Linked to Google Place ID: {formData.googlePlaceId}</span>
-                    <div className="h-px bg-gray-200 flex-1" />
-                  </div>
-                </div>
-              )}
+
             </div>
           </form>
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t gap-3 bg-white shrink-0">
-          <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="px-6">
-            Cancel
+        <DialogFooter className="shrink-0 flex-col gap-2 border-t border-slate-100 px-6 py-4 sm:flex-row sm:justify-end dark:border-slate-700">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
+            Hủy
           </Button>
           <Button
             type="submit"
             form="point-form"
-            className="px-8 bg-primary hover:bg-primary/90 shadow-md shadow-primary/20"
-            disabled={uploading['thumbnailUrl'] || uploading['historyAudioUrl'] || !safeFormData.attractionId}
+            className="w-full sm:w-auto"
+            disabled={uploading.thumbnailUrl || uploading.historyAudioUrl || !safeFormData.attractionId}
           >
-            {editingPoint?.id ? 'Update Point' : 'Create Point'}
+            {editingPoint?.id ? 'Cập nhật điểm' : 'Tạo điểm'}
           </Button>
         </DialogFooter>
       </DialogContent>
