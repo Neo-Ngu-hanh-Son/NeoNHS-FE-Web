@@ -42,22 +42,22 @@ export function CheckinPointFilters({
   createDisabled,
 }: CheckinPointFiltersProps) {
   return (
-    <div className="space-y-4 rounded-xl border bg-card p-4">
+    <div className="space-y-4 rounded-xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <div className="space-y-1.5 lg:col-span-7">
-          <Label>Search by checkin name</Label>
+          <Label className="text-slate-900 dark:text-white">Tìm kiếm theo tên</Label>
           <DebouncedSearchInput
             value={search}
             onChange={onSearchChange}
-            placeholder="Search checkin points..."
+            placeholder="Nhập tên điểm check-in..."
             delayMs={1000}
           />
         </div>
 
         <div className="flex items-end lg:col-span-2">
           <div className="flex h-10 items-center gap-2">
-            <Label htmlFor="includeDeleted" className="text-sm font-medium">
-              Include deleted
+            <Label htmlFor="includeDeleted" className="text-sm font-medium text-slate-900 dark:text-white">
+              Bao gồm đã xóa
             </Label>
             <Switch
               id="includeDeleted"
@@ -68,17 +68,17 @@ export function CheckinPointFilters({
         </div>
 
         <div className="space-y-1.5 lg:col-span-3">
-          <Label className="text-sm font-medium">Sort</Label>
+          <Label className="text-sm font-medium text-slate-900 dark:text-white">Sắp xếp</Label>
           <Select
             value={sortDir}
             onValueChange={(value) => onSortDirChange(value as "asc" | "desc")}
           >
-            <SelectTrigger>
+            <SelectTrigger className="border-slate-200 dark:border-slate-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="desc">Created At Desc</SelectItem>
-              <SelectItem value="asc">Created At Asc</SelectItem>
+              <SelectItem value="desc">Ngày tạo giảm dần</SelectItem>
+              <SelectItem value="asc">Ngày tạo tăng dần</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -86,11 +86,11 @@ export function CheckinPointFilters({
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="space-y-1.5 sm:min-w-[300px] sm:flex-1 sm:max-w-md">
-          <Label>Parent Point (required for create)</Label>
+          <Label className="text-slate-900 dark:text-white">Địa điểm chính (Bắt buộc để tạo mới gốc)</Label>
           <Select value={selectedParentPointId} onValueChange={onSelectedParentPointIdChange}>
-            <SelectTrigger>
+            <SelectTrigger className="border-slate-200 dark:border-slate-700">
               <SelectValue
-                placeholder={parentPointsLoading ? "Loading points..." : "Select parent point"}
+                placeholder={parentPointsLoading ? "Đang tải điểm..." : "Chọn địa điểm chính"}
               />
             </SelectTrigger>
             <SelectContent>
@@ -103,9 +103,9 @@ export function CheckinPointFilters({
           </Select>
         </div>
 
-        <Button onClick={onCreate} disabled={createDisabled} className="sm:self-end">
+        <Button onClick={onCreate} disabled={createDisabled} className="sm:self-end bg-primary shadow-sm hover:bg-primary/90 transition-colors text-primary-foreground">
           <Plus className="mr-2 h-4 w-4" />
-          Add Checkin Point
+          Thêm điểm Check-in
         </Button>
       </div>
     </div>

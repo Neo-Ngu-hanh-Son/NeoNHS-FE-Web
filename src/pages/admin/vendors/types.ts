@@ -135,10 +135,10 @@ export interface VendorStats {
 
 // Zod Validation Schemas
 export const createVendorSchema = z.object({
-  email: z.string().email("Invalid email format"),
-  fullname: z.string().min(1, "Full name is required"),
+  email: z.string().email("Định dạng email không hợp lệ"),
+  fullname: z.string().min(1, "Họ tên là bắt buộc"),
   phoneNumber: z.string().optional(),
-  businessName: z.string().min(1, "Business name is required"),
+  businessName: z.string().min(1, "Tên doanh nghiệp là bắt buộc"),
   description: z.string().optional(),
   address: z.string().optional(),
   taxCode: z.string().optional(),
@@ -148,9 +148,9 @@ export const createVendorSchema = z.object({
 })
 
 export const updateVendorSchema = z.object({
-  fullname: z.string().min(1, "Full name is required").optional(),
+  fullname: z.string().min(1, "Họ tên là bắt buộc").optional(),
   phoneNumber: z.string().optional(),
-  businessName: z.string().min(1, "Business name is required").optional(),
+  businessName: z.string().min(1, "Tên doanh nghiệp là bắt buộc").optional(),
   description: z.string().optional(),
   address: z.string().optional(),
   latitude: z.string().optional(),

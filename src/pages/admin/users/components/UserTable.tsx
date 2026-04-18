@@ -26,7 +26,7 @@ interface UserTableProps {
 
 const ROLE_LABELS: Record<string, string> = {
   ADMIN: "Quản trị",
-  VENDOR: "Nhà cung cấp",
+  VENDOR: "Đối tác",
   TOURIST: "Du khách",
 };
 

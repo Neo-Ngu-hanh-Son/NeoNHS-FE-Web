@@ -55,9 +55,9 @@ export function VendorDetailDialog({
           <DialogHeader>
             <div className="flex items-start justify-between">
               <div>
-                <DialogTitle className="text-2xl">Vendor Details</DialogTitle>
+                <DialogTitle className="text-2xl">Chi tiết Đối tác</DialogTitle>
                 <DialogDescription>
-                  Complete information about {vendor.businessName}
+                  Thông tin đầy đủ về {vendor.businessName}
                 </DialogDescription>
               </div>
               <VendorStatusBadge
@@ -91,7 +91,7 @@ export function VendorDetailDialog({
                   {vendor.taxCode && (
                     <Badge variant="outline" className="text-xs">
                       <FileText className="w-3 h-3 mr-1" />
-                      Tax: {vendor.taxCode}
+                      Thuế: {vendor.taxCode}
                     </Badge>
                   )}
                 </div>
@@ -104,7 +104,7 @@ export function VendorDetailDialog({
             {vendor.description && (
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-sm text-muted-foreground mb-2">About</h3>
+                  <h3 className="font-semibold text-sm text-muted-foreground mb-2">Giới thiệu</h3>
                   <p className="text-sm">{vendor.description}</p>
                 </CardContent>
               </Card>
@@ -114,7 +114,7 @@ export function VendorDetailDialog({
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <Mail className="w-4 h-4 text-primary" />
-                Contact Information
+                Thông tin liên hệ
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg">
@@ -127,22 +127,22 @@ export function VendorDetailDialog({
                 <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg">
                   <Phone className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Phone</p>
+                    <p className="text-xs text-muted-foreground">Số điện thoại</p>
                     <p className="text-sm font-medium">{formatPhoneNumber(vendor.phoneNumber)}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg md:col-span-2">
                   <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Address</p>
-                    <p className="text-sm font-medium">{vendor.address || 'Not provided'}</p>
+                    <p className="text-xs text-muted-foreground">Địa chỉ</p>
+                    <p className="text-sm font-medium">{vendor.address || 'Chưa Đối tác'}</p>
                   </div>
                 </div>
                 {(vendor.latitude && vendor.longitude) && (
                   <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg md:col-span-2">
                     <MapPinned className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                     <div>
-                      <p className="text-xs text-muted-foreground">GPS Coordinates</p>
+                      <p className="text-xs text-muted-foreground">Tọa độ GPS</p>
                       <p className="text-sm font-medium">
                         {vendor.latitude}, {vendor.longitude}
                       </p>
@@ -158,26 +158,26 @@ export function VendorDetailDialog({
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-primary" />
-                Business Information
+                Thông tin doanh nghiệp
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg">
                   <FileText className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Tax Code</p>
-                    <p className="text-sm font-medium">{vendor.taxCode || 'Not provided'}</p>
+                    <p className="text-xs text-muted-foreground">Mã số thuế</p>
+                    <p className="text-sm font-medium">{vendor.taxCode || 'Chưa Đối tác'}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-secondary/50 rounded-lg">
                   <CreditCard className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                   <div>
-                    <p className="text-xs text-muted-foreground">Bank Account</p>
+                    <p className="text-xs text-muted-foreground">Tài khoản ngân hàng</p>
                     <p className="text-sm font-medium">
                       {formatBankAccount(vendor.bankName, vendor.bankAccountNumber)}
                     </p>
                     {vendor.bankAccountName && (
                       <p className="text-xs text-muted-foreground mt-1">
-                        Account Name: {vendor.bankAccountName}
+                        Tên tài khoản: {vendor.bankAccountName}
                       </p>
                     )}
                   </div>
@@ -192,7 +192,7 @@ export function VendorDetailDialog({
               <div className="flex items-center justify-between mb-3">
                 <h3 className="font-semibold flex items-center gap-2">
                   <ClipboardList className="w-4 h-4 text-primary" />
-                  Statistics
+                  Thống kê
                 </h3>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -200,28 +200,28 @@ export function VendorDetailDialog({
                   <CardContent className="p-4 text-center">
                     <Users className="w-6 h-6 mx-auto text-blue-600 mb-2" />
                     <p className="text-2xl font-bold">{vendor.totalTemplates || 0}</p>
-                    <p className="text-xs text-muted-foreground">Total Templates</p>
+                    <p className="text-xs text-muted-foreground">Tổng số mẫu</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <CheckCircle className="w-6 h-6 mx-auto text-green-600 mb-2" />
                     <p className="text-2xl font-bold">{vendor.activeTemplates || 0}</p>
-                    <p className="text-xs text-muted-foreground">Active Templates</p>
+                    <p className="text-xs text-muted-foreground">Mẫu thiết kế hoạt động</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <Calendar className="w-6 h-6 mx-auto text-purple-600 mb-2" />
                     <p className="text-2xl font-bold">{vendor.totalSessions || 0}</p>
-                    <p className="text-xs text-muted-foreground">Total Sessions</p>
+                    <p className="text-xs text-muted-foreground">Tổng số phiên</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 text-center">
                     <Calendar className="w-6 h-6 mx-auto text-orange-600 mb-2" />
                     <p className="text-2xl font-bold">{formatDate(vendor.createdAt)}</p>
-                    <p className="text-xs text-muted-foreground">Join Date</p>
+                    <p className="text-xs text-muted-foreground">Ngày tham gia</p>
                   </CardContent>
                 </Card>
               </div>
@@ -233,25 +233,25 @@ export function VendorDetailDialog({
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-primary" />
-                System Information
+                Thông tin hệ thống
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Role:</span>
+                  <span className="text-muted-foreground">Vai trò:</span>
                   <Badge variant="outline">{vendor.role}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Account Status:</span>
+                  <span className="text-muted-foreground">Trạng thái tài khoản:</span>
                   <Badge variant={vendor.isActive ? "default" : "secondary"}>
-                    {vendor.isActive ? 'Active' : 'Inactive'}
+                    {vendor.isActive ? 'Đang hoạt động' : 'Không hoạt động'}
                   </Badge>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Created:</span>
+                  <span className="text-muted-foreground">Đã tạo:</span>
                   <span>{formatDateTime(vendor.createdAt)}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-muted-foreground">Last Updated:</span>
+                  <span className="text-muted-foreground">Cập nhật lần cuối:</span>
                   <span>{formatDateTime(vendor.updatedAt)}</span>
                 </div>
               </div>
@@ -265,7 +265,7 @@ export function VendorDetailDialog({
                 className="flex-1"
               >
                 <Edit className="w-4 h-4 mr-2" />
-                Edit Vendor
+                Sửa Đối tác
               </Button>
 
               {vendor.isBanned ? (
@@ -275,7 +275,7 @@ export function VendorDetailDialog({
                   className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
-                  Unban Vendor
+                  Khôi phục Đối tác
                 </Button>
               ) : (
                 <Button
@@ -284,7 +284,7 @@ export function VendorDetailDialog({
                   className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <Ban className="w-4 h-4 mr-2" />
-                  Ban Vendor
+                  Cấm Đối tác
                 </Button>
               )}
 

@@ -40,48 +40,48 @@ export function BanVendorDialog({
       <AlertDialogContent className="max-w-lg">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-red-600">
-            Ban Vendor Account
+            Cấm tài khoản Đối tác
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-3">
             <p>
-              You are about to ban <strong>{vendor.businessName}</strong> ({vendor.fullname}).
+              Bạn sắp cấm <strong>{vendor.businessName}</strong> ({vendor.fullname}).
             </p>
             <p className="text-sm text-amber-600 font-medium">
-              ⚠️ This action will:
+              ⚠️ Hành động này sẽ:
             </p>
             <ul className="text-sm space-y-1 pl-4 list-disc">
-              <li>Prevent the vendor from logging in</li>
-              <li>Hide all their workshop templates from customers</li>
-              <li>Cancel all upcoming workshop sessions</li>
-              <li>Notify enrolled participants about cancellations</li>
+              <li>Ngăn Đối tác đăng nhập</li>
+              <li>Ẩn tất cả mẫu thiết kế workshop của họ khỏi khách hàng</li>
+              <li>Hủy tất cả các phiên workshop sắp tới</li>
+              <li>Thông báo cho người tham gia đã đăng ký về việc hủy</li>
             </ul>
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-2 py-4">
-          <Label htmlFor="ban-reason">Ban Reason (Optional)</Label>
+          <Label htmlFor="ban-reason">Lý do cấm (Tùy chọn)</Label>
           <Textarea
             id="ban-reason"
-            placeholder="e.g., Violated terms of service, spam activity, fraudulent behavior..."
+            placeholder="Ví dụ: Vi phạm điều khoản dịch vụ, hoạt động spam, hành vi gian lận..."
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={4}
             className="resize-none"
           />
           <p className="text-xs text-muted-foreground">
-            This reason will be recorded in the system logs and may be shared with the vendor.
+            Lý do này sẽ được ghi lại trong nhật ký hệ thống và có thể được chia sẻ với Đối tác.
           </p>
         </div>
 
         <AlertDialogFooter>
           <AlertDialogCancel onClick={() => setReason("")}>
-            Cancel
+            Hủy
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             className="bg-red-600 hover:bg-red-700"
           >
-            Confirm Ban
+            Xác nhận cấm
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -110,28 +110,28 @@ export function UnbanVendorDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-green-600">
-            Unban Vendor Account
+            Khôi phục tài khoản Đối tác
           </AlertDialogTitle>
           <AlertDialogDescription>
-            You are about to restore access for <strong>{vendor.businessName}</strong> ({vendor.fullname}).
+            Bạn sắp khôi phục quyền truy cập cho <strong>{vendor.businessName}</strong> ({vendor.fullname}).
             
             <p className="mt-3 text-sm">
-              ✅ This will allow the vendor to:
+              ✅ Điều này sẽ cho phép Đối tác:
             </p>
             <ul className="text-sm space-y-1 pl-4 list-disc mt-1">
-              <li>Log in to their account</li>
-              <li>Create and manage workshop templates</li>
-              <li>Schedule workshop sessions</li>
+              <li>Đăng nhập lại vào tài khoản của họ</li>
+              <li>Tạo và quản lý các mẫu thiết kế workshop</li>
+              <li>Lên lịch các phiên workshop</li>
             </ul>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Hủy</AlertDialogCancel>
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-green-600 hover:bg-green-700"
           >
-            Confirm Unban
+            Xác nhận khôi phục
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
