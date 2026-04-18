@@ -7,6 +7,7 @@ import { apiClient } from './apiClient';
 import type { ApiResponse } from '@/types';
 import type {
     EventResponse,
+    EventImageResponse,
     CreateEventRequest,
     UpdateEventRequest,
     EventStatus,
@@ -71,15 +72,33 @@ export const eventService = {
     /**
      * Create a new event
      */
-    createEvent: async (data: CreateEventRequest): Promise<ApiResponse<EventResponse>> => {
-        return apiClient.post<ApiResponse<EventResponse>>('/admin/events', data);
+    createEvent: async (data: CreateEventRequest, file?: File): Promise<ApiResponse<EventResponse>> => {
+        const formData = new FormData();
+        formData.append('event', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+        if (file) {
+            formData.append('thumbnail', file);
+        }
+        return apiClient.post<ApiResponse<EventResponse>>('/admin/events', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     },
 
     /**
      * Update an existing event
      */
-    updateEvent: async (id: string, data: UpdateEventRequest): Promise<ApiResponse<EventResponse>> => {
-        return apiClient.put<ApiResponse<EventResponse>>(`/admin/events/${id}`, data);
+    updateEvent: async (id: string, data: UpdateEventRequest, file?: File): Promise<ApiResponse<EventResponse>> => {
+        const formData = new FormData();
+        formData.append('event', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+        if (file) {
+            formData.append('thumbnail', file);
+        }
+        return apiClient.put<ApiResponse<EventResponse>>(`/admin/events/${id}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     },
 
     /**
@@ -101,6 +120,52 @@ export const eventService = {
      */
     permanentDeleteEvent: async (id: string): Promise<ApiResponse<void>> => {
         return apiClient.delete<ApiResponse<void>>(`/admin/events/${id}/permanent`);
+    },
+
+    // ─── Gallery Management ────────────────────────────────────────────
+
+    /**
+     * Get all images for an event
+     */
+    getEventImages: async (eventId: string): Promise<ApiResponse<EventImageResponse[]>> => {
+        return apiClient.get<ApiResponse<EventImageResponse[]>>(`/admin/events/${eventId}/images`);
+    },
+
+    /**
+     * Upload one or more images to an event gallery
+     */
+    uploadEventImages: async (eventId: string, files: File[]): Promise<ApiResponse<EventImageResponse[]>> => {
+        const formData = new FormData();
+        files.forEach((file) => formData.append('images', file));
+        return apiClient.post<ApiResponse<EventImageResponse[]>>(`/admin/events/${eventId}/images`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        });
+    },
+
+    /**
+     * Delete a single image from an event gallery
+     */
+    deleteEventImage: async (eventId: string, imageId: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/admin/events/${eventId}/images/${imageId}`);
+    },
+
+    /**
+     * Delete multiple images from an event gallery
+     */
+    deleteMultipleEventImages: async (eventId: string, imageIds: string[]): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/admin/events/${eventId}/images`, {
+            data: imageIds,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    },
+
+    /**
+     * Set an image as the event thumbnail
+     */
+    setEventThumbnail: async (eventId: string, imageId: string): Promise<ApiResponse<EventImageResponse>> => {
+        return apiClient.patch<ApiResponse<EventImageResponse>>(`/admin/events/${eventId}/images/${imageId}/set-thumbnail`);
     },
 };
 
