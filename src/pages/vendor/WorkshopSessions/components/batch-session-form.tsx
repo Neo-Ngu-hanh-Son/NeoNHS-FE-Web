@@ -82,7 +82,8 @@ export function BatchSessionForm({
   }, [activeTemplate, form])
 
   // Ensure first block offsets if the base start time picker changes
-  const handleBaseStartTimeChange = (date: Date) => {
+  const handleBaseStartTimeChange = (date: Date | undefined) => {
+    if (!date) return
     form.setValue("startTime", date)
     if (timeBlocks.length > 0 && activeTemplate) {
       const diff = date.getTime() - timeBlocks[0].startTime.getTime()

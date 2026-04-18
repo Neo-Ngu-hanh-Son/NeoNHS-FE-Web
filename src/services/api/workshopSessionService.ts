@@ -38,6 +38,7 @@ const transformSessionResponse = (apiSession: any): WorkshopSessionResponse => {
       minParticipants: apiSession.minParticipants || 1,
       averageRating: apiSession.averageRating,
       totalReview: apiSession.totalReview,
+      totalRatings: apiSession.totalRatings,
       images: apiSession.images || [],
       tags: apiSession.tags || [],
     },
@@ -139,11 +140,10 @@ export const WorkshopSessionService = {
     try {
       console.log('Creating batch sessions with data:', data);
       const res = await apiClient.post<ApiResponse<any>>('/workshops/sessions/batch', data);
-      const created = (res?.data ?? res) as any[];
+      const created = (res?.data ?? res) as any[] | { content?: any[] };
       console.log('createBatchSessions raw response:', created);
-      
-      // The API should return an array or a wrapper containing the array. Adjusting for standard unwrap:
-      const sessionsArray = Array.isArray(created) ? created : (created.content || []);
+
+      const sessionsArray = Array.isArray(created) ? created : (created.content ?? []);
       const transformed = sessionsArray.map((session: any) => transformSessionResponse(session));
       return transformed;
     } catch (error) {
