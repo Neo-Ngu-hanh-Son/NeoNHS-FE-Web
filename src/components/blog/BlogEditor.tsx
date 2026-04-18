@@ -71,7 +71,7 @@ function onError(error: Error) {
 
 // --- Placeholder component ---
 function EditorPlaceholder() {
-  return <div className="blog-editor-placeholder">Start writing your blog post…</div>;
+  return <div className="blog-editor-placeholder">Bắt đầu viết bài của bạn…</div>;
 }
 import CharacterCountPlugin from "./editor/CharacterCountPlugin";
 

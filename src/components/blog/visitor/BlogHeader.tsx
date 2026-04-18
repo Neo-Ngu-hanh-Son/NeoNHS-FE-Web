@@ -11,11 +11,11 @@ import type { BlogResponse } from "@/types/blog";
 
 /** Estimate reading time from HTML content (avg 200 wpm) */
 function estimateReadTime(html: string | undefined): string {
-  if (!html) return "1 min read";
+  if (!html) return "1 phút đọc";
   const text = html.replace(/<[^>]*>/g, " ");
   const words = text.split(/\s+/).filter(Boolean).length;
   const minutes = Math.max(1, Math.round(words / 200));
-  return `${minutes} min read`;
+  return `${minutes} phút đọc`;
 }
 
 interface BlogHeaderProps {
@@ -61,7 +61,7 @@ export default function BlogHeader({ blog }: BlogHeaderProps) {
           ) : (
             <User className="h-4 w-4" />
           )}
-          <span>{blog.user?.fullname ?? "Unknown"}</span>
+          <span>{blog.user?.fullname ?? "Chưa rõ"}</span>
         </div>
 
         <Separator orientation="vertical" className="h-4" />
@@ -69,7 +69,7 @@ export default function BlogHeader({ blog }: BlogHeaderProps) {
         {/* Published date */}
         <div className="flex items-center gap-1.5">
           <Calendar className="h-4 w-4" />
-          <span>{blog.publishedAt ? formatShortDate(blog.publishedAt) : "Not published"}</span>
+          <span>{blog.publishedAt ? formatShortDate(blog.publishedAt) : "Chưa xuất bản"}</span>
         </div>
 
         <Separator orientation="vertical" className="h-4" />
@@ -86,7 +86,7 @@ export default function BlogHeader({ blog }: BlogHeaderProps) {
             <Separator orientation="vertical" className="h-4" />
             <div className="flex items-center gap-1.5">
               <Eye className="h-4 w-4" />
-              <span>{blog.viewCount.toLocaleString()} views</span>
+              <span>{blog.viewCount.toLocaleString()} lượt xem</span>
             </div>
           </>
         )}

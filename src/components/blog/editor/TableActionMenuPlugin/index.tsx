@@ -416,7 +416,7 @@ function TableActionMenu({
           onClick={() => mergeTableCellsAtSelection()}
           data-test-id="table-merge-cells"
         >
-          <span className="text">Merge cells</span>
+          <span className="text">Gộp ô</span>
         </button>
       );
     } else if (canUnmergeCell) {
@@ -427,7 +427,7 @@ function TableActionMenu({
           onClick={() => unmergeTableCellsAtSelection()}
           data-test-id="table-unmerge-cells"
         >
-          <span className="text">Unmerge cells</span>
+          <span className="text">Tách ô</span>
         </button>
       );
     }
@@ -444,18 +444,18 @@ function TableActionMenu({
     >
       {mergeCellButton}
       <button type="button" className="item" onClick={() => toggleRowStriping()} data-test-id="table-row-striping">
-        <span className="text">Toggle Row Striping</span>
+        <span className="text">Bật/tắt kẻ sọc dòng</span>
       </button>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <button type="button" className="item" aria-label="Formatting options for vertical alignment">
-            <span className="text">Vertical Align</span>
+          <button type="button" className="item" aria-label="Tùy chọn căn chỉnh theo chiều dọc">
+            <span className="text">Căn dọc</span>
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="right" onClick={(e) => e.stopPropagation()}>
-          <DropdownMenuItem onSelect={() => formatVerticalAlign("top")}>Top Align</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => formatVerticalAlign("middle")}>Middle Align</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => formatVerticalAlign("bottom")}>Bottom Align</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => formatVerticalAlign("top")}>Căn trên</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => formatVerticalAlign("middle")}>Căn giữa (dọc)</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => formatVerticalAlign("bottom")}>Căn dưới</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <button
@@ -464,7 +464,7 @@ function TableActionMenu({
         onClick={() => toggleFirstRowFreeze()}
         data-test-id="table-freeze-first-row"
       >
-        <span className="text">Toggle First Row Freeze</span>
+        <span className="text">Bật/tắt cố định hàng đầu</span>
       </button>
       <button
         type="button"
@@ -481,7 +481,9 @@ function TableActionMenu({
         onClick={() => insertTableRowAtSelection(false)}
         data-test-id="table-insert-row-above"
       >
-        <span className="text">Insert {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`} above</span>
+        <span className="text">
+          Chèn {selectionCounts.rows === 1 ? "một hàng" : `${selectionCounts.rows} hàng`} phía trên
+        </span>
       </button>
       <button
         type="button"
@@ -489,7 +491,9 @@ function TableActionMenu({
         onClick={() => insertTableRowAtSelection(true)}
         data-test-id="table-insert-row-below"
       >
-        <span className="text">Insert {selectionCounts.rows === 1 ? "row" : `${selectionCounts.rows} rows`} below</span>
+        <span className="text">
+          Chèn {selectionCounts.rows === 1 ? "một hàng" : `${selectionCounts.rows} hàng`} phía dưới
+        </span>
       </button>
       <hr />
       <button
@@ -509,7 +513,7 @@ function TableActionMenu({
         data-test-id="table-insert-column-after"
       >
         <span className="text">
-          Insert {selectionCounts.columns === 1 ? "column" : `${selectionCounts.columns} columns`} right
+          Chèn {selectionCounts.columns === 1 ? "một cột" : `${selectionCounts.columns} cột`} bên phải
         </span>
       </button>
       <hr />
@@ -519,7 +523,7 @@ function TableActionMenu({
         onClick={() => deleteTableColumnAtSelection()}
         data-test-id="table-delete-columns"
       >
-        <span className="text">Delete column</span>
+        <span className="text">Xóa cột</span>
       </button>
       <button
         type="button"
@@ -527,16 +531,17 @@ function TableActionMenu({
         onClick={() => deleteTableRowAtSelection()}
         data-test-id="table-delete-rows"
       >
-        <span className="text">Delete row</span>
+        <span className="text">Xóa hàng</span>
       </button>
       <button type="button" className="item" onClick={() => deleteTableAtSelection()} data-test-id="table-delete">
-        <span className="text">Delete table</span>
+        <span className="text">Xóa bảng</span>
       </button>
       <hr />
       <button type="button" className="item" onClick={() => toggleTableRowIsHeader()} data-test-id="table-row-header">
         <span className="text">
-          {(tableCellNode.__headerState & TableCellHeaderStates.ROW) === TableCellHeaderStates.ROW ? "Remove" : "Add"}{" "}
-          row header
+          {(tableCellNode.__headerState & TableCellHeaderStates.ROW) === TableCellHeaderStates.ROW
+            ? "Bỏ tiêu đề hàng"
+            : "Thêm tiêu đề hàng"}
         </span>
       </button>
       <button
@@ -547,9 +552,8 @@ function TableActionMenu({
       >
         <span className="text">
           {(tableCellNode.__headerState & TableCellHeaderStates.COLUMN) === TableCellHeaderStates.COLUMN
-            ? "Remove"
-            : "Add"}{" "}
-          column header
+            ? "Bỏ tiêu đề cột"
+            : "Thêm tiêu đề cột"}
         </span>
       </button>
     </div>,

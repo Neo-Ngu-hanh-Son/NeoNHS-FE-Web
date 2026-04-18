@@ -112,7 +112,7 @@ export default function SelectionFormatToolbarPlugin() {
         type="button"
         className={`blog-selection-toolbar-btn ${isBold ? "active" : ""}`}
         onClick={() => handleTextFormat("bold")}
-        aria-label="Bold"
+        aria-label="In đậm"
       >
         <Bold className="size-4" />
       </button>
@@ -120,7 +120,7 @@ export default function SelectionFormatToolbarPlugin() {
         type="button"
         className={`blog-selection-toolbar-btn ${isItalic ? "active" : ""}`}
         onClick={() => handleTextFormat("italic")}
-        aria-label="Italic"
+        aria-label="In nghiêng"
       >
         <Italic className="size-4" />
       </button>
@@ -136,7 +136,7 @@ export default function SelectionFormatToolbarPlugin() {
         type="button"
         className={`blog-selection-toolbar-btn ${isStrikethrough ? "active" : ""}`}
         onClick={() => handleTextFormat("strikethrough")}
-        aria-label="Strikethrough"
+        aria-label="Gạch ngang"
       >
         <Strikethrough className="size-4" />
       </button>

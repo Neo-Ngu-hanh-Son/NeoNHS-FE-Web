@@ -77,7 +77,7 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
         setTotalElements(page.totalElements);
         setTotalPages(page.totalPages);
       } catch {
-        setError("Unable to load blog categories. Please try again later.");
+        setError("Không tải được danh mục blog. Vui lòng thử lại sau.");
         setCategories([]);
       } finally {
         setLoading(false);
@@ -148,7 +148,7 @@ export function useBlogCategories(): UseBlogCategoriesReturn {
       setTotalPages(page.totalPages);
       return page;
     } catch (error) {
-      setError("Unable to load blog categories. Please try again later.");
+      setError("Không tải được danh mục blog. Vui lòng thử lại sau.");
       setCategories([]);
     }
   }, []);

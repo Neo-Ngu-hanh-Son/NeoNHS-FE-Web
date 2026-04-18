@@ -161,7 +161,7 @@ export default function ImageComponent({
         )}
         {hasError ? (
           <div className="blog-editor-image-error">
-            <span>⚠️ Failed to load image</span>
+            <span>⚠️ Không tải được ảnh</span>
           </div>
         ) : (
           <div
@@ -186,31 +186,31 @@ export default function ImageComponent({
             {!hasError && showResizeControls && (
               <>
                 <div className="blog-editor-image-hint">
-                  Hold Shift for free resize
+                  Giữ Shift để thay đổi kích thước tự do
                 </div>
                 <button
                   type="button"
                   className="blog-editor-image-handle top-left"
                   onMouseDown={(event) => handleResizeStart(event, 'top-left')}
-                  aria-label="Resize image from top left"
+                  aria-label="Thay đổi kích thước ảnh từ góc trên trái"
                 />
                 <button
                   type="button"
                   className="blog-editor-image-handle top-right"
                   onMouseDown={(event) => handleResizeStart(event, 'top-right')}
-                  aria-label="Resize image from top right"
+                  aria-label="Thay đổi kích thước ảnh từ góc trên phải"
                 />
                 <button
                   type="button"
                   className="blog-editor-image-handle bottom-left"
                   onMouseDown={(event) => handleResizeStart(event, 'bottom-left')}
-                  aria-label="Resize image from bottom left"
+                  aria-label="Thay đổi kích thước ảnh từ góc dưới trái"
                 />
                 <button
                   type="button"
                   className="blog-editor-image-handle bottom-right"
                   onMouseDown={(event) => handleResizeStart(event, 'bottom-right')}
-                  aria-label="Resize image from bottom right"
+                  aria-label="Thay đổi kích thước ảnh từ góc dưới phải"
                 />
               </>
             )}

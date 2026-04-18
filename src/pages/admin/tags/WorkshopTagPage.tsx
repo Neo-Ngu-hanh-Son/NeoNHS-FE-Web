@@ -28,7 +28,7 @@ export function WorkshopTagPage() {
     overflow-hidden px-6 py-4"
     >
       <TagToolbar
-        title="Workshop Tags"
+        title="Nhãn workshop"
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
         onAdd={() => openModal("create")}

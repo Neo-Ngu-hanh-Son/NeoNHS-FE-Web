@@ -25,7 +25,7 @@ export default function BlogFormHeaderSection({
       onSubmit(data);
     },
     (errors) => {
-      messageApi.error("There are errors in the form. Please fix them before submitting.");
+      messageApi.error("Biểu mẫu còn lỗi. Vui lòng sửa trước khi gửi.");
       console.log("Blog form error: ", errors);
     },
   );
@@ -39,8 +39,8 @@ export default function BlogFormHeaderSection({
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Create New Blog</h1>
-          <p className="text-muted-foreground">Draft and publish a new blog post.</p>
+          <h1 className="text-3xl font-bold tracking-tight">Tạo bài blog mới</h1>
+          <p className="text-muted-foreground">Soạn thảo và xuất bản bài viết mới.</p>
         </div>
       </div>
       <div className="flex items-center space-x-2">
@@ -48,12 +48,12 @@ export default function BlogFormHeaderSection({
           {form.formState.isSubmitting || submitting ? (
             <>
               <Spinner className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
+              Đang lưu...
             </>
           ) : (
             <>
               <Save className="mr-2 h-4 w-4" />
-              {isPublished ? "Publish" : "Save Blog"}
+              {isPublished ? "Xuất bản" : "Lưu bài viết"}
             </>
           )}
         </Button>
