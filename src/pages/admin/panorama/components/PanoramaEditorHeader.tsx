@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,9 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ArrowLeft, Save, Trash2, Eye } from "lucide-react";
-import type { PointPanoramaResponse } from "@/types";
+} from '@/components/ui/alert-dialog';
+import { ArrowLeft, Save, Trash2, Eye } from 'lucide-react';
+import type { PointPanoramaResponse } from '@/types';
 
 interface PanoramaEditorHeaderProps {
   panorama: PointPanoramaResponse | null;
@@ -44,7 +44,7 @@ export default function PanoramaEditorHeader({
         </Button>
         <div>
           <h1 className="text-xl font-bold">
-            {panorama ? "Edit" : "Create"} Panorama for: {panorama?.name && `${panorama.name}`}
+            {panorama ? 'Edit' : 'Create'} Panorama for: {panorama?.name && `${panorama.name}`}
           </h1>
           <p className="text-sm text-muted-foreground">
             {entityLabel} · {targetId}
@@ -57,7 +57,7 @@ export default function PanoramaEditorHeader({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/panorama/${targetId}`, "_blank")}
+            onClick={() => window.open(`/panorama/${targetId}`, '_blank')}
             className="gap-1"
           >
             <Eye className="h-4 w-4" />
@@ -77,13 +77,15 @@ export default function PanoramaEditorHeader({
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Panorama?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently remove the panorama image and all hot spots for this{" "}
-                  {entityLabel.toLowerCase()}. This action cannot be undone.
+                  This will permanently remove the panorama image and all hot spots for this {entityLabel.toLowerCase()}
+                  . This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-white hover:bg-destructive/90">
+                  Delete
+                </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -91,7 +93,7 @@ export default function PanoramaEditorHeader({
 
         <Button onClick={onSave} disabled={saving} size="sm" className="gap-1">
           <Save className="h-4 w-4" />
-          {saving ? "Saving…" : "Save Panorama"}
+          {saving ? 'Saving…' : 'Save Panorama'}
         </Button>
       </div>
     </div>
