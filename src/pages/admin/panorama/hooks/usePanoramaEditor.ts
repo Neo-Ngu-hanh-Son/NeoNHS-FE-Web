@@ -3,15 +3,22 @@ import { useParams } from "react-router-dom";
 import { adminPanoramaService } from "@/services/api/panoramaService";
 import type { PointPanoramaResponse, PanoramaRequest } from "@/types";
 import { message } from "antd";
-import axios from "axios";
 
-export function usePanoramaEditor() {
-  const { pointId, checkinPointId } = useParams<{
+/** Khi `embedPointId` có giá trị (nhúng trong modal POI), bỏ qua `pointId`/`checkinPointId` trên URL. */
+export interface UsePanoramaEditorOptions {
+  embedPointId?: string;
+}
+
+export function usePanoramaEditor(options?: UsePanoramaEditorOptions) {
+  const params = useParams<{
     pointId: string;
     checkinPointId?: string;
   }>();
 
-  const isCheckinPoint = !!checkinPointId;
+  const pointId = options?.embedPointId ?? params.pointId;
+  const checkinPointId = options?.embedPointId ? undefined : params.checkinPointId;
+
+  const isCheckinPoint = Boolean(checkinPointId);
   const targetId = isCheckinPoint ? checkinPointId! : pointId!;
 
   const [panorama, setPanorama] = useState<PointPanoramaResponse | null>(null);
@@ -20,6 +27,11 @@ export function usePanoramaEditor() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchPanorama = useCallback(async () => {
+    if (!targetId) {
+      setPanorama(null);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const data = isCheckinPoint
@@ -31,8 +43,8 @@ export function usePanoramaEditor() {
         setPanorama(null);
       } else {
         console.log("[usePanoramaEditor] Error fetching panorama: ", error);
-        message.error("Failed to load panorama");
-        setError("An error occurred while fetching panorama data, please try again");
+        message.error("Tải panorama thất bại");
+        setError("Đã xảy ra lỗi khi tải dữ liệu panorama. Vui lòng thử lại.");
       }
       setPanorama(null);
     } finally {
@@ -57,9 +69,9 @@ export function usePanoramaEditor() {
           data
         );
       setPanorama(saved);
-      message.success("Panorama saved successfully");
+      message.success("Đã lưu panorama");
     } catch (error) {
-      message.error("Failed to save panorama");
+      message.error("Lưu panorama thất bại");
       throw error;
     } finally {
       setSaving(false);
@@ -74,9 +86,9 @@ export function usePanoramaEditor() {
         await adminPanoramaService.deletePointPanorama(targetId);
       }
       setPanorama(null);
-      message.success("Panorama deleted successfully");
+      message.success("Đã xóa panorama");
     } catch {
-      message.error("Failed to delete panorama");
+      message.error("Xóa panorama thất bại");
     }
   };
 

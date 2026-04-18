@@ -31,20 +31,20 @@ export default function ChatSidebar({
       <div className="p-4 border-b border-[#d3e4da] dark:border-white/10">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <img src={currentUserAvatar} alt="Current User" className="w-10 h-10 rounded-full border-2 border-primary/20 object-cover" />
-            <h2 className="text-xl font-bold text-[#101914] dark:text-white">Messages</h2>
+            <img src={currentUserAvatar} alt="Ảnh đại diện của bạn" className="w-10 h-10 rounded-full border-2 border-primary/20 object-cover" />
+            <h2 className="text-xl font-bold text-[#101914] dark:text-white">Tin nhắn</h2>
           </div>
           <div
             className={`w-3 h-3 rounded-full ${isConnected ? 'bg-primary' : 'bg-red-400 opacity-50'} shadow-sm`}
-            title={isConnected ? 'Connected' : 'Disconnected'}
+            title={isConnected ? 'Đã kết nối' : 'Mất kết nối'}
           />
-        </div>
+        </div>  
 
         <div className="relative">
           <SearchOutlined className="absolute left-3 top-1/2 -translate-y-1/2 text-[#588d70]" />
           <input
             type="text"
-            placeholder="Search conversations..."
+            placeholder="Tìm cuộc trò chuyện..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-white dark:bg-white/5 border border-[#d3e4da] dark:border-white/10 rounded-lg text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all dark:text-white"
@@ -56,14 +56,14 @@ export default function ChatSidebar({
         {isLoadingRooms ? (
           <div className="p-6 text-center text-muted-foreground flex flex-col items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
-            <p>Loading chats...</p>
+            <p>Đang tải cuộc trò chuyện...</p>
           </div>
         ) : filteredRooms.length === 0 ? (
           <div className="p-6 text-center text-muted-foreground flex flex-col items-center justify-center">
             <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-2">
               <SearchOutlined className="text-xl" />
             </div>
-            <p>No conversations found</p>
+            <p>Không tìm thấy cuộc trò chuyện</p>
           </div>
         ) : (
           <div className="flex flex-col">
@@ -95,12 +95,12 @@ export default function ChatSidebar({
                     </span>
                   </div>
                   <p className={`text-sm truncate w-[190px] ${(room.unreadCount && room.unreadCount > 0) ? 'text-[#101914] dark:text-white font-medium' : 'text-muted-foreground'}`}>
-                    {room.lastMessageSenderId === currentUserId ? 'You: ' : ''}
+                    {room.lastMessageSenderId === currentUserId ? 'Bạn: ' : ''}
                     {room.lastMessagePreview
                       ? room.lastMessagePreview
                       : room.lastMessageAt
-                        ? "📷 Image"
-                        : "No messages yet"}
+                        ? "📷 Ảnh"
+                        : "Chưa có tin nhắn"}
                   </p>
                 </div>
               </button>

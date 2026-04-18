@@ -8,7 +8,7 @@ import {
 import { SessionForm } from "./session-form"
 import { WorkshopSessionFormData, UpdateWorkshopSessionRequest, WorkshopSessionResponse, SessionStatus } from "../types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Pencil } from "lucide-react"
 import { WorkshopSessionService } from "@/services/api/workshopSessionService"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
 import { WorkshopTemplateResponse } from "../../WorkshopTemplates/types"
@@ -58,10 +58,10 @@ export function EditSessionDialog({
       const updatedSession = await WorkshopSessionService.updateSession(session.id, updateRequest)
       
       notification.success({
-        message: 'Session Updated',
+        message: 'Cập Nhật Thành Công',
         description: updatedSession?.workshopTemplate?.name
-          ? `Session for "${updatedSession.workshopTemplate.name}" has been updated successfully.`
-          : 'Workshop session has been updated successfully.'
+          ? `Đã cập nhật phiên cho "${updatedSession.workshopTemplate.name}".`
+          : 'Đã cập nhật phiên workshop thành công.'
       })
       
       // Close dialog and refresh
@@ -70,8 +70,8 @@ export function EditSessionDialog({
     } catch (error: any) {
       console.error('Update failed:', error)
       notification.error({
-        message: 'Update Failed',
-        description: error.message || 'Failed to update session. Please try again.',
+        message: 'Cập Nhật Thất Bại',
+        description: error.message || 'Không thể cập nhật phiên. Vui lòng thử lại.',
       })
     } finally {
       setSubmitting(false)
@@ -84,24 +84,33 @@ export function EditSessionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Workshop Session</DialogTitle>
-          <DialogDescription>
-            Update the schedule, pricing, or capacity for this session.
-          </DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto sm:rounded-2xl border-slate-100 p-0">
+        <DialogHeader className="p-6 pb-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center">
+              <Pencil className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Chỉnh Sửa Phiên Workshop</DialogTitle>
+              <DialogDescription className="text-xs pt-1">
+                Cập nhật lịch trình, mức giá hoặc số lượng người tham gia của phiên này.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         
-        {!canEdit ? (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Cannot Edit Session</AlertTitle>
-            <AlertDescription>
-              Only SCHEDULED sessions can be edited. This session is {session.status}.
-            </AlertDescription>
-          </Alert>
-        ) : (
+        <div className="px-6 pb-6 pt-4">
+          {!canEdit ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Không Thể Chỉnh Sửa</AlertTitle>
+              <AlertDescription>
+                Chỉ những phiên có trạng thái "Đã lên lịch" (SCHEDULED) mới có thể chỉnh sửa. Phiên hiện tại đang ở trạng thái {session.status}.
+              </AlertDescription>
+            </Alert>
+          ) : (
           <SessionForm
+            key={session.id}
             defaultValues={session}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
@@ -110,6 +119,7 @@ export function EditSessionDialog({
             template={template}
           />
         )}
+        </div>
       </DialogContent>
     </Dialog>
   )

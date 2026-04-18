@@ -75,7 +75,7 @@ export default function HotSpotFormModal({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? `Edit Hot Spot #${editIndex! + 1}` : "Add Hot Spot"}
+            {isEditing ? `Sửa điểm nóng #${editIndex! + 1}` : "Thêm điểm nóng"}
           </DialogTitle>
         </DialogHeader>
 
@@ -88,7 +88,7 @@ export default function HotSpotFormModal({
                 name="yaw"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Yaw (horizontal angle)</FormLabel>
+                    <FormLabel className="text-xs">Yaw (góc ngang)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -106,7 +106,7 @@ export default function HotSpotFormModal({
                 name="pitch"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Pitch (vertical angle)</FormLabel>
+                    <FormLabel className="text-xs">Pitch (góc dọc)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -128,10 +128,10 @@ export default function HotSpotFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">
-                    Tooltip <span className="text-red-500">*</span>
+                    Chú thích (tooltip) <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Short hover label (max 100 chars)" {...field} />
+                    <Input placeholder="Nhãn ngắn khi di chuột (tối đa 100 ký tự)" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,10 +145,10 @@ export default function HotSpotFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">
-                    Title <span className="text-red-500">*</span>
+                    Tiêu đề <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Info panel heading" {...field} />
+                    <Input placeholder="Tiêu đề trong bảng thông tin" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,11 +162,11 @@ export default function HotSpotFormModal({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">
-                    Description <span className="text-red-500">*</span>
+                    Mô tả <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Full description shown when visitor clicks this hot spot..."
+                      placeholder="Nội dung đầy đủ hiển thị khi khách chọn điểm nóng này…"
                       rows={3}
                       {...field}
                     />
@@ -182,7 +182,7 @@ export default function HotSpotFormModal({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs">Image URL (optional)</FormLabel>
+                  <FormLabel className="text-xs">URL ảnh (tùy chọn)</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -202,7 +202,7 @@ export default function HotSpotFormModal({
               name="orderIndex"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs">Order Index</FormLabel>
+                  <FormLabel className="text-xs">Thứ tự hiển thị</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -218,9 +218,9 @@ export default function HotSpotFormModal({
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Hủy
               </Button>
-              <Button type="submit">{isEditing ? "Update" : "Add"}</Button>
+              <Button type="submit">{isEditing ? "Cập nhật" : "Thêm"}</Button>
             </DialogFooter>
           </form>
         </Form>

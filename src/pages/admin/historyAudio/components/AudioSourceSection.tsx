@@ -47,24 +47,30 @@ export default function AudioSourceSection({
     event.target.value = "";
   };
 
+  const sourceLabel = hasAudio
+    ? mode === "generate"
+      ? "Đã tạo từ văn bản"
+      : "Đã tải lên"
+    : "Chưa có";
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">2. Audio Source</CardTitle>
+        <CardTitle className="text-lg">2. Nguồn âm thanh</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="space-y-3 rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <WandSparkles className="h-4 w-4 text-primary" />
-              Generate From Text
+              Tạo từ văn bản
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs">Model</Label>
+              <Label className="text-xs">Mô hình</Label>
               <Select value={modelId} onValueChange={onModelChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select model" />
+                  <SelectValue placeholder="Chọn mô hình" />
                 </SelectTrigger>
                 <SelectContent>
                   {ELEVEN_LABS_MODELS.map((model) => (
@@ -77,10 +83,10 @@ export default function AudioSourceSection({
             </div>
 
             <div className="space-y-2">
-              <Label className="text-xs">Voice</Label>
+              <Label className="text-xs">Giọng</Label>
               <Select value={voiceId} onValueChange={onVoiceChange}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select voice" />
+                  <SelectValue placeholder="Chọn giọng" />
                 </SelectTrigger>
                 <SelectContent>
                   {ELEVEN_LABS_VOICES.map((voice) => (
@@ -94,17 +100,17 @@ export default function AudioSourceSection({
 
             <Button onClick={onGenerateAudio} disabled={generatingAudio || !text.trim()}>
               <WandSparkles className="mr-2 h-4 w-4" />
-              {generatingAudio ? "Generating..." : "Generate Audio"}
+              {generatingAudio ? "Đang tạo…" : "Tạo âm thanh"}
             </Button>
           </div>
 
           <div className="space-y-3 rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <Upload className="h-4 w-4 text-primary" />
-              Upload Audio
+              Tải lên âm thanh
             </div>
             <p className="text-xs text-muted-foreground">
-              Upload your own narration file for this history text.
+              Tải lên file thuyết minh của bạn cho nội dung lịch sử này.
             </p>
 
             <input
@@ -116,14 +122,12 @@ export default function AudioSourceSection({
             />
             <Button variant="outline" onClick={() => uploadInputRef.current?.click()}>
               <Upload className="mr-2 h-4 w-4" />
-              Choose Audio File
+              Chọn file âm thanh
             </Button>
           </div>
         </div>
 
-        <div className="text-xs text-muted-foreground">
-          Current source: {hasAudio ? (mode === "generate" ? "Generated" : "Uploaded") : "None"}
-        </div>
+        <div className="text-xs text-muted-foreground">Nguồn hiện tại: {sourceLabel}</div>
       </CardContent>
     </Card>
   );

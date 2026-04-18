@@ -1,11 +1,16 @@
 import { StarFilled, StarOutlined, PictureOutlined } from "@ant-design/icons"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Image as AntImage, Tag } from "antd"
-import { WorkshopStatus, WorkshopTemplateResponse } from "../types"
-import { formatDateTime } from "../utils/formatters"
+import { WorkshopTemplateResponse } from "../types"
+import { WorkshopSessionResponse } from "../../WorkshopSessions/types"
+import { formatPrice } from "../utils/formatters"
+import { CalendarOutlined, ClockCircleOutlined, InfoCircleOutlined, TeamOutlined, RightOutlined } from "@ant-design/icons"
+import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
 
 interface TemplateDetailContentProps {
   template: WorkshopTemplateResponse;
+  sessions?: WorkshopSessionResponse[];
   displayImage?: string;
   selectedImage: string | undefined;
   setSelectedImage: (val: string) => void;
@@ -13,10 +18,13 @@ interface TemplateDetailContentProps {
 
 export const TemplateDetailContent = ({
   template,
+  sessions = [],
   displayImage,
   selectedImage,
   setSelectedImage
 }: TemplateDetailContentProps) => {
+  const navigate = useNavigate()
+
   return (
     <div className="lg:col-span-2 space-y-6">
       {/* Image Gallery */}
@@ -57,7 +65,7 @@ export const TemplateDetailContent = ({
                       className="!absolute top-1 left-1 !m-0 !text-[10px] !px-1 !leading-4"
                       icon={<PictureOutlined />}
                     >
-                      Thumbnail
+                      Ảnh bìa
                     </Tag>
                   )}
                 </div>
@@ -68,9 +76,16 @@ export const TemplateDetailContent = ({
       )}
 
       {/* Full Description */}
-      <Card className="rounded-2xl border-[#d3e4da] dark:border-white/10 shadow-sm">
-        <CardHeader>
-          <CardTitle>Full Description</CardTitle>
+      <Card className="rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 flex items-center justify-center">
+              <InfoCircleOutlined className="text-xl text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <div>
+              <CardTitle className="text-base font-semibold">Mô Tả Chi Tiết</CardTitle>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
@@ -79,39 +94,65 @@ export const TemplateDetailContent = ({
         </CardContent>
       </Card>
 
-      {/* Approval Info for ACTIVE templates */}
-      {template.status === WorkshopStatus.ACTIVE && template.reviewedAt && (
-        <Card className="rounded-2xl border-green-200 bg-green-50 dark:bg-green-950/20 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-green-700 dark:text-green-400">Approval Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm">
-              <span className="font-medium">Approved at:</span> {formatDateTime(template.reviewedAt)}
-            </p>
-            {template.averageRating != null && (
-              <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
-                <div className="flex items-center gap-0.5">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span key={star} className="text-base">
-                      {template.averageRating! >= star ? (
-                        <StarFilled className="text-amber-500" />
-                      ) : template.averageRating! >= star - 0.5 ? (
-                        <StarFilled className="text-amber-300" />
-                      ) : (
-                        <StarOutlined className="text-gray-300 dark:text-gray-600" />
-                      )}
-                    </span>
-                  ))}
-                </div>
-                <span className="font-bold text-lg text-amber-700 dark:text-amber-400">
-                  {template.averageRating.toFixed(1)}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  ({template.totalReview} reviews)
-                </span>
+      {/* Workshop Sessions */}
+      {sessions.length > 0 && (
+        <Card className="rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <CardHeader className="pb-4 flex flex-row items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center">
+                <CalendarOutlined className="text-xl text-blue-600 dark:text-blue-400" />
               </div>
-            )}
+              <div>
+                <CardTitle className="text-base font-semibold">Các Phiên Workshop Sắp Tới</CardTitle>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" className="gap-2 text-primary" onClick={() => navigate("/vendor/workshop-sessions")}>
+              Xem tất cả <RightOutlined className="text-xs" />
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {sessions.map((session) => (
+              <div key={session.id} className="group relative flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-700/50 hover:border-primary/30 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden border border-slate-100 dark:border-slate-700">
+                    <img
+                      src={session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl || session.workshopTemplate?.images?.[0]?.imageUrl || displayImage}
+                      alt="Thumbnail"
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/150?text=No+Image" }}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-primary transition-colors">
+                      {template.name}
+                    </h3>
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <CalendarOutlined />
+                        {new Date(session.startTime).toLocaleDateString('vi-VN')}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <ClockCircleOutlined />
+                        {new Date(session.startTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <TeamOutlined />
+                        {session.currentEnrollments}/{session.maxParticipants} chỗ
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
+                  <div className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 text-xs font-semibold">
+                    Workshop
+                  </div>
+                  <div className="font-bold text-primary">
+                    {formatPrice(session.price)}
+                  </div>
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       )}

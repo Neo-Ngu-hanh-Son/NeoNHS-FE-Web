@@ -15,7 +15,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Calendar } from 'antd';
+import { Calendar, ConfigProvider } from 'antd';
+import viVN from 'antd/locale/vi_VN';
 import dayjs, { type Dayjs } from 'dayjs';
 
 interface DaySessionItem {
@@ -71,53 +72,55 @@ export function WorkshopSessionsCard({
     return (
         <Card className="h-full flex flex-col">
             <CardHeader className="pb-2">
-                <CardTitle className="text-base">Workshop Sessions</CardTitle>
-                <CardDescription>Click a highlighted day to open that day&apos;s session list</CardDescription>
+                <CardTitle className="text-base">Phiên workshop</CardTitle>
+                <CardDescription>Nhấn ngày có chấm xanh để xem danh sách phiên trong ngày</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 overflow-auto pb-4">
-                <Calendar
-                    fullscreen={false}
-                    value={selectedDate ? dayjs(selectedDate) : undefined}
-                    onSelect={(date) => {
-                        const nextDate = date?.toDate();
-                        onDateSelect(nextDate);
+                <ConfigProvider locale={viVN}>
+                    <Calendar
+                        fullscreen={false}
+                        value={selectedDate ? dayjs(selectedDate) : undefined}
+                        onSelect={(date) => {
+                            const nextDate = date?.toDate();
+                            onDateSelect(nextDate);
 
-                        if (!nextDate) {
-                            setIsModalOpen(false);
-                            return;
-                        }
+                            if (!nextDate) {
+                                setIsModalOpen(false);
+                                return;
+                            }
 
-                        const clickedDay = dayjs(nextDate).format('YYYY-MM-DD');
-                        setIsModalOpen(sessionDateSet.has(clickedDay));
-                    }}
-                    fullCellRender={(current) => {
-                        const isSelected = selectedDate && current.isSame(dayjs(selectedDate), 'day');
-                        return (
-                            <div
-                                style={{
-                                    position: 'relative',
-                                    textAlign: 'center',
-                                    padding: '4px 0',
-                                    borderRadius: 4,
-                                    background: isSelected ? 'hsl(221,83%,53%)' : undefined,
-                                    color: isSelected ? '#fff' : undefined,
-                                }}
-                            >
-                                {current.date()}
-                                {cellRender(current)}
-                            </div>
-                        );
-                    }}
-                />
+                            const clickedDay = dayjs(nextDate).format('YYYY-MM-DD');
+                            setIsModalOpen(sessionDateSet.has(clickedDay));
+                        }}
+                        fullCellRender={(current) => {
+                            const isSelected = selectedDate && current.isSame(dayjs(selectedDate), 'day');
+                            return (
+                                <div
+                                    style={{
+                                        position: 'relative',
+                                        textAlign: 'center',
+                                        padding: '4px 0',
+                                        borderRadius: 4,
+                                        background: isSelected ? 'hsl(221,83%,53%)' : undefined,
+                                        color: isSelected ? '#fff' : undefined,
+                                    }}
+                                >
+                                    {current.date()}
+                                    {cellRender(current)}
+                                </div>
+                            );
+                        }}
+                    />
+                </ConfigProvider>
 
                 <p className="mt-4 border-t pt-3 text-center text-xs text-muted-foreground">
                     {selectedDate
-                        ? `Selected: ${new Date(selectedDate).toLocaleDateString('en-US', {
+                        ? `Đang chọn: ${new Date(selectedDate).toLocaleDateString('vi-VN', {
                             weekday: 'short',
                             month: 'short',
                             day: 'numeric',
                         })}`
-                        : 'Select a day'}
+                        : 'Chọn một ngày trên lịch'}
                 </p>
 
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -125,25 +128,25 @@ export function WorkshopSessionsCard({
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 text-base">
                                 <CalendarDays className="h-4 w-4" />
-                                Sessions on{' '}
+                                Phiên trong ngày{' '}
                                 {selectedDate
-                                    ? new Date(selectedDate).toLocaleDateString('en-US', {
+                                    ? new Date(selectedDate).toLocaleDateString('vi-VN', {
                                         weekday: 'long',
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric',
                                     })
-                                    : 'selected day'}
+                                    : 'đã chọn'}
                             </DialogTitle>
                             <DialogDescription>
-                                Total sessions: {selectedDaySessions.length}
+                                Tổng số phiên: {selectedDaySessions.length}
                             </DialogDescription>
                         </DialogHeader>
 
                         <div className="max-h-[50vh] space-y-2 overflow-y-auto pr-1">
                             {selectedDaySessions.length === 0 ? (
                                 <p className="py-4 text-center text-sm text-muted-foreground">
-                                    No sessions available for this day.
+                                    Không có phiên nào trong ngày này.
                                 </p>
                             ) : (
                                 selectedDaySessions.map((session, index) => (
@@ -156,7 +159,7 @@ export function WorkshopSessionsCard({
                                         </div>
                                         <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
                                             <span>{session.time}</span>
-                                            <Badge variant="outline">{session.slots} slots</Badge>
+                                            <Badge variant="outline">{session.slots} chỗ trống</Badge>
                                         </div>
                                     </div>
                                 ))

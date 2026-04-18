@@ -80,10 +80,10 @@ export default function HotSpotManager({
   return (
     <Card className="p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-base font-semibold">Hot Spots ({hotSpots.length})</h2>
+        <h2 className="text-base font-semibold">Điểm Hot ({hotSpots.length})</h2>
         <Button type="button" variant="outline" size="sm" onClick={handleAdd} className="gap-1">
           <Plus className="h-4 w-4" />
-          Add Hot Spot
+          Thêm điểm Hot
         </Button>
       </div>
 

@@ -170,6 +170,13 @@ export const formatPrice = (price: number) => {
   // Kết quả ví dụ: 100.000 ₫
 }
 
+/** Hiển thị số tiền kiểu 1,234,567 VND (dấu phẩy ngăn cách hàng nghìn). */
+export function formatVndCommaAmount(price: number): string {
+  return `${new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 0,
+  }).format(price)} VND`
+}
+
 // Duration Formatting (in minutes)
 export const formatDuration = (minutes: number) => {
   const hours = Math.floor(minutes / 60)

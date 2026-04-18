@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   MenuOutlined,
@@ -16,9 +16,19 @@ import { LayoutDashboard, SquareChartGantt, User } from 'lucide-react';
 
 const Header: FunctionComponent = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+
+  // Glassmorphism scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -70,41 +80,42 @@ const Header: FunctionComponent = () => {
   ];
 
   const navLinks = [
-    { label: 'Landing Page', href: '/' },
-    { label: 'About Us', href: '/about-us' },
-    { label: 'Contact Us', href: '/contact-us' },
+    { label: 'Trang chủ', href: '/' },
+    { label: 'Về chúng tôi', href: '/about-us' },
   ];
 
   const isActiveLink = (href: string) => {
     return location.pathname === href;
   };
 
-  console.log('Header render - user:', user);
-  console.log('Header render - isAuthenticated:', isAuthenticated);
-
   return (
-    <header className="w-full bg-white text-gray-900 font-[Poppins] sticky top-0 z-50">
-      <div className="mx-auto px-6">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+    <header
+      className={`w-full font-[Inter] sticky top-0 z-50 transition-all duration-300 ${isScrolled
+        ? 'glass-nav shadow-sm'
+        : 'glass-nav-transparent bg-transparent'
+        }`}
+    >
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center justify-between h-16 lg:h-[72px]">
           {/* Logo Section - Left */}
-          <Link to="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">N</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-emerald-200 transition-shadow duration-300">
+              <span className="text-white font-bold text-lg">N</span>
             </div>
-            <span className="text-2xl font-bold tracking-tight">NeoNHS</span>
+            <span className="text-xl font-bold tracking-tight text-slate-900">NeoNHS</span>
           </Link>
 
-          {/* Desktop Navigation - Right */}
+          {/* Desktop Navigation - Center + Right */}
           <nav className="hidden lg:flex items-center gap-8">
             {/* Nav Links */}
-            <ul className="flex items-center gap-6">
+            <ul className="flex items-center gap-1">
               {navLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`text-base transition-colors duration-300 ${isActiveLink(link.href)
-                        ? 'text-emerald-400 font-semibold'
-                        : 'text-gray-900 hover:text-emerald-400'
+                    className={`text-[15px] px-4 py-2 rounded-lg transition-all duration-300 ${isActiveLink(link.href)
+                      ? 'text-emerald-600 font-semibold bg-emerald-50'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                       }`}
                   >
                     {link.label}
@@ -119,10 +130,10 @@ const Header: FunctionComponent = () => {
                 <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" trigger={['click']}>
                   <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity">
                     <Avatar
-                      size={40}
+                      size={38}
                       src={user?.avatarUrl}
                       icon={!user?.avatarUrl && <UserOutlined />}
-                      className="bg-emerald-500"
+                      className="bg-emerald-500 ring-2 ring-emerald-100"
                     />
                   </div>
                 </Dropdown>
@@ -131,14 +142,14 @@ const Header: FunctionComponent = () => {
                   <Link to="/login">
                     <Button
                       variant="ghost"
-                      className="text-gray-900 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
+                      className="text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-all duration-300 text-[15px]"
                     >
-                      Sign In
+                      Đăng nhập
                     </Button>
                   </Link>
                   <Link to="/register">
-                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
-                      Register
+                    <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-6 h-10 text-[15px] font-semibold shadow-md hover:shadow-lg transition-all duration-300">
+                      Đăng ký miễn phí
                     </Button>
                   </Link>
                 </>
@@ -148,7 +159,7 @@ const Header: FunctionComponent = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2 text-gray-300 hover:text-emerald-400 transition-colors duration-300"
+            className="lg:hidden p-2 text-slate-600 hover:text-emerald-600 transition-colors duration-300"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -158,15 +169,15 @@ const Header: FunctionComponent = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <nav className="lg:hidden pb-6 border-t border-gray-800">
-            <ul className="flex flex-col gap-4 pt-4">
+          <nav className="lg:hidden pb-6 border-t border-slate-100 bg-white/95 backdrop-blur-lg">
+            <ul className="flex flex-col gap-1 pt-4">
               {navLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`block text-base transition-colors duration-300 ${isActiveLink(link.href)
-                        ? 'text-emerald-400 font-semibold'
-                        : 'text-gray-300 hover:text-emerald-400'
+                    className={`block text-base px-4 py-3 rounded-xl transition-all duration-300 ${isActiveLink(link.href)
+                      ? 'text-emerald-600 font-semibold bg-emerald-50'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                       }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
@@ -177,7 +188,7 @@ const Header: FunctionComponent = () => {
             </ul>
 
             {/* Mobile Auth Buttons / User Menu */}
-            <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-gray-800">
+            <div className="flex flex-col gap-3 mt-6 pt-4 border-t border-slate-100">
               {isAuthenticated ? (
                 <>
                   <div className="flex items-center gap-3 px-2 py-2">
@@ -187,15 +198,15 @@ const Header: FunctionComponent = () => {
                       icon={!user?.avatarUrl && <UserOutlined />}
                       className="bg-emerald-500"
                     />
-                    <span className="text-gray-900 font-medium">{user?.fullname || 'User'}</span>
+                    <span className="text-slate-900 font-medium">{user?.fullname || 'User'}</span>
                   </div>
                   <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
-                      className="w-full justify-start text-gray-700 hover:text-emerald-400 hover:bg-gray-100 transition-colors duration-300"
+                      className="w-full justify-start text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-300"
                     >
                       <ProfileOutlined className="mr-2" />
-                      Profile
+                      Hồ sơ
                     </Button>
                   </Link>
                   <Button
@@ -207,7 +218,7 @@ const Header: FunctionComponent = () => {
                     }}
                   >
                     <LogoutOutlined className="mr-2" />
-                    Logout
+                    Đăng xuất
                   </Button>
                 </>
               ) : (
@@ -215,14 +226,14 @@ const Header: FunctionComponent = () => {
                   <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                     <Button
                       variant="ghost"
-                      className="w-full text-gray-300 hover:text-emerald-400 hover:bg-gray-800 transition-colors duration-300"
+                      className="w-full text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 transition-colors duration-300"
                     >
-                      Sign In
+                      Đăng nhập
                     </Button>
                   </Link>
                   <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white transition-colors duration-300">
-                      Register
+                    <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-full transition-colors duration-300">
+                      Đăng ký miễn phí
                     </Button>
                   </Link>
                 </>

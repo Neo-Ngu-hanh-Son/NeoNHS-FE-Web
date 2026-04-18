@@ -38,18 +38,18 @@ export interface WorkshopTemplateResponse {
   maxParticipants: number
   status: WorkshopStatus
   isPublished: boolean
-  averageRating: number | null
-  totalReview: number
+  averageRating: number
+  totalRatings: number
   vendorId: string // UUID
   vendorName: string
   createdAt: string // ISO DateTime
   updatedAt: string // ISO DateTime
-  
+
   // Approval tracking
   adminNote: string | null
   reviewedBy: string | null // UUID
   reviewedAt: string | null // ISO DateTime
-  
+
   images: WorkshopImageResponse[]
   tags: WTagResponse[]
 }
@@ -105,29 +105,28 @@ export const workshopTemplateSchema = z.object({
   name: z.string()
     .min(3, "Name must be at least 3 characters")
     .max(255, "Name must not exceed 255 characters"),
-  
+
   shortDescription: z.string()
     .max(500, "Short description must not exceed 500 characters")
     .optional(),
-  
+
   fullDescription: z.string().optional(),
-  
+
   estimatedDuration: z.number()
     .positive("Duration must be positive")
     .int("Duration must be a whole number"),
-  
+
   defaultPrice: z.number()
-    .positive("Price must be greater than 0")
-    .min(1, "Price must be at least 1 VND"),
-  
+    .min(0, "Giá phải lớn hơn hoặc bằng 0 đ"),
+
   minParticipants: z.number()
     .positive("Must be at least 1")
     .int("Must be a whole number"),
-  
+
   maxParticipants: z.number()
     .positive("Must be at least 1")
     .int("Must be a whole number"),
-  
+
   imageUrls: z.array(
     z.union([
       z.string().url("Must be a valid URL"),
@@ -135,10 +134,10 @@ export const workshopTemplateSchema = z.object({
       z.custom<File>((val) => val instanceof File, "Must be a file")
     ])
   ).min(1, "At least one image is required"),
-  
+
   thumbnailIndex: z.number()
     .min(0, "Invalid thumbnail index"),
-  
+
   tagIds: z.array(z.string())
     .min(1, "At least one tag is required")
 })

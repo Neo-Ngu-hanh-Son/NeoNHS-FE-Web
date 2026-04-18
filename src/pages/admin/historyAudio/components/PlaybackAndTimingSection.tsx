@@ -26,14 +26,14 @@ export default function PlaybackAndTimingSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Audio Preview & Word Tracking</CardTitle>
+        <CardTitle>Nghe thử & theo dõi từ</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <audio ref={audioRef} src={audioUrl} controls className="w-full" />
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Clock className="h-3 w-3" />
-          {currentTime.toFixed(2)}s
+          {currentTime.toFixed(2)} giây
         </div>
 
         <Button variant="outline" onClick={onGenerateWordTiming} disabled={aligningWords}>
@@ -42,7 +42,7 @@ export default function PlaybackAndTimingSection({
           ) : (
             <WandSparkles className="mr-2 h-4 w-4" />
           )}
-          Generate Word Timing
+          Tạo lời thoại
         </Button>
 
         {alignedWords.length > 0 && (
