@@ -14,21 +14,30 @@ import { useHistoryAudios } from "../../../../hooks/historyAudio/useHistoryAudio
 import type { CreateHistoryAudioRequest } from "@/types/historyAudio";
 import HistoryAudioDeleteDialog from "./HistoryAudioDeleteDialog";
 import AudioSourceSection from "./AudioSourceSection.tsx";
-import TimingSection from "../../destinations/components/historyAudio/TimingSection.tsx";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/components/ui/spinner";
 import HistoryAudiosTable from "./HistoryAudiosTable.tsx";
 import HistoryTextSection from "./HistoryTextSection.tsx";
 import { clearEmtpyLines } from "../helpers.ts";
+import TimingSection from "./TimingSection.tsx";
 
 interface HistoryAudioPanelProps {
   pointId: string;
   pointName?: string;
+  /** `embedded`: dùng trong modal POI — nút quay lại gọi onBackToParent thay vì navigate(-1) */
+  variant?: "page" | "embedded";
+  onBackToParent?: () => void;
 }
 
-export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPanelProps) {
+export default function HistoryAudioPanel({
+  pointId,
+  pointName,
+  variant = "page",
+  onBackToParent,
+}: HistoryAudioPanelProps) {
   const ELEVEN_LABS_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY;
   const navigate = useNavigate();
+  const embedded = variant === "embedded";
 
   const { audios, loading, createAudio, updateAudio, deleteAudio, refetch } =
     useHistoryAudios(pointId);
@@ -139,11 +148,11 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
   const handleGenerateAudio = async () => {
     if (!text.trim()) {
-      message.warning("Enter text first");
+      message.warning("Vui lòng nhập nội dung trước");
       return;
     }
     if (!ELEVEN_LABS_KEY) {
-      message.error("Missing ElevenLabs API key");
+      message.error("Thiếu khóa API ElevenLabs");
       return;
     }
 
@@ -168,10 +177,10 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
       setAlignedWords([]);
       resetTracking();
 
-      message.success("Audio generated");
+      message.success("Đã tạo âm thanh");
     } catch (error) {
       console.error(error);
-      message.error("Audio generation failed");
+      message.error("Tạo âm thanh thất bại");
     } finally {
       setGeneratingAudio(false);
     }
@@ -179,7 +188,7 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
   const handleUploadAudio = (file: File) => {
     if (!file.type.startsWith("audio/")) {
-      message.warning("Invalid audio file");
+      message.warning("File âm thanh không hợp lệ");
       return;
     }
 
@@ -193,12 +202,12 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
     setAlignedWords([]);
     resetTracking();
 
-    message.success("Audio uploaded");
+    message.success("Đã tải lên âm thanh");
   };
 
   const handleUploadCoverImage = async (file: File) => {
     if (!file.type.startsWith("image/")) {
-      message.warning("Invalid image file");
+      message.warning("File ảnh không hợp lệ");
       return;
     }
 
@@ -206,15 +215,15 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
     try {
       const uploadedUrl = await uploadImageToCloudinary(file);
       if (!uploadedUrl) {
-        message.error("Failed to upload cover image");
+        message.error("Tải ảnh bìa lên thất bại");
         return;
       }
 
       setCoverImage(uploadedUrl);
-      message.success("Cover image uploaded");
+      message.success("Đã tải ảnh bìa lên");
     } catch (error) {
       console.error(error);
-      message.error("Failed to upload cover image");
+      message.error("Tải ảnh bìa lên thất bại");
     } finally {
       setUploadingCoverImage(false);
     }
@@ -222,11 +231,11 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
   const handleGenerateWordTiming = async () => {
     if (!mode) {
-      message.warning("Choose a mode first");
+      message.warning("Vui lòng chọn chế độ trước");
       return;
     }
     if (!selectedAudioBlob) {
-      message.warning("Provide an audio file first");
+      message.warning("Vui lòng cung cấp file âm thanh trước");
       return;
     }
 
@@ -240,16 +249,16 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
       const words = response.words ?? [];
       if (!words.length) {
-        message.warning("No alignment returned");
+        message.warning("Không nhận được dữ liệu căn chỉnh từ");
         return;
       }
 
       setAlignedWords(words);
       resetTracking();
-      message.success(`Generated timing for ${words.length} words`);
+      message.success(`Đã tạo thời điểm cho ${words.length} từ`);
     } catch (error) {
       console.error(error);
-      message.error("Forced alignment failed");
+      message.error("Căn chỉnh thời điểm thất bại");
     } finally {
       setAligningWords(false);
     }
@@ -257,7 +266,7 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
   const handleSave = async () => {
     if (!text.trim() && !hasAudio) {
-      message.warning("Provide history text or audio before saving");
+      message.warning("Vui lòng nhập nội dung lịch sử hoặc âm thanh trước khi lưu");
       return;
     }
 
@@ -268,7 +277,7 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
       if (selectedAudioBlob) {
         const cloudinaryUrl = await uploadVideoToCloudinary(selectedAudioBlob);
         if (!cloudinaryUrl) {
-          message.error("Failed to upload audio to Cloudinary");
+          message.error("Tải âm thanh lên Cloudinary thất bại");
           return;
         }
         audioUrl = cloudinaryUrl;
@@ -315,18 +324,18 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
       if (activeAudioId) {
         await updateAudio(activeAudioId, payload);
-        message.success("History audio updated successfully");
+        message.success("Cập nhật âm thanh lịch sử thành công");
       } else {
         const created = await createAudio(payload);
         setActiveAudioId(created.id);
-        message.success("History audio created successfully");
+        message.success("Tạo âm thanh lịch sử thành công");
       }
     } catch (error) {
       console.error(error);
-      message.error("Failed to save history audio");
+      message.error("Lưu âm thanh lịch sử thất bại");
     } finally {
       setSavingGuide(false);
-      // Trigger a refetch to get the latest data, including any server-generated fields
+      // Tải lại dữ liệu mới nhất từ máy chủ
       refetch();
     }
   };
@@ -338,10 +347,10 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
       await deleteAudio(activeAudioId);
       resetFormForNew();
       setOpenDelete(false);
-      message.success("History audio deleted");
+      message.success("Đã xóa âm thanh lịch sử");
     } catch (error) {
       console.error(error);
-      message.error("Failed to delete history audio");
+      message.error("Xóa âm thanh lịch sử thất bại");
     } finally {
       setDeletingGuide(false);
       refetch();
@@ -350,23 +359,40 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
 
   if (loading && !audios.length) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-32">
+      <div className={`flex flex-col items-center justify-center gap-4 ${embedded ? "py-12" : "py-32"}`}>
         <Spinner className="h-8 w-8 text-primary" />
-        <p className="text-sm text-muted-foreground">Loading history audio…</p>
+        <p className="text-sm text-muted-foreground">Đang tải âm thanh lịch sử…</p>
       </div>
     );
   }
 
+  const handleBack = () => {
+    if (embedded && onBackToParent) {
+      onBackToParent();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex gap-3 items-center">
-          <Button variant={"ghost"} size={"icon"} onClick={() => navigate(-1)}>
-            <ArrowLeft />
+    <div className={embedded ? "space-y-4" : "space-y-6"}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            size={embedded ? "sm" : "icon"}
+            className={embedded ? "shrink-0 gap-2 px-2" : ""}
+            onClick={handleBack}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {embedded ? <span className="text-sm font-medium">Về thông tin điểm</span> : null}
           </Button>
-          <div className="flex flex-col">
-            <h2 className="text-2xl font-bold">Manage History Audios</h2>
-            <span className="text-sm text-muted-foreground">{pointName && pointName}</span>
+          <div className="min-w-0 flex flex-col">
+            <h2 className={embedded ? "text-lg font-semibold tracking-tight text-slate-900 dark:text-white" : "text-2xl font-bold"}>
+              {embedded ? "Âm thanh lịch sử" : "Quản lý âm thanh lịch sử"}
+            </h2>
+            {pointName ? <span className="truncate text-sm text-muted-foreground">{pointName}</span> : null}
           </div>
         </div>
 
@@ -374,12 +400,12 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
           {activeAudioId && (
             <Button variant="outline" onClick={() => setOpenDelete(true)} disabled={deletingGuide}>
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              Xóa
             </Button>
           )}
           <Button onClick={handleSave} disabled={savingGuide || loading}>
             <Save className="mr-2 h-4 w-4" />
-            {savingGuide ? "Saving..." : activeAudioId ? "Update" : "Create"}
+            {savingGuide ? "Đang lưu…" : activeAudioId ? "Cập nhật" : "Tạo mới"}
           </Button>
         </div>
       </div>
@@ -433,12 +459,12 @@ export default function HistoryAudioPanel({ pointId, pointName }: HistoryAudioPa
       <div className="flex items-center gap-2">
         <Button onClick={handleSave} disabled={savingGuide || loading}>
           <Save className="mr-2 h-4 w-4" />
-          {savingGuide ? "Saving..." : activeAudioId ? "Update" : "Create"}
+          {savingGuide ? "Đang lưu…" : activeAudioId ? "Cập nhật" : "Tạo mới"}
         </Button>
         {activeAudioId && (
           <Button variant="outline" onClick={() => setOpenDelete(true)} disabled={deletingGuide}>
             <Trash2 className="mr-2 h-4 w-4" />
-            Delete
+            Xóa
           </Button>
         )}
       </div>

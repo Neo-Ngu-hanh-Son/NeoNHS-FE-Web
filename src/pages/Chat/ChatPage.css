@@ -1,4 +1,4 @@
-/* Chat page specific custom styles that go beyond utility classes */
+/* Kiểu tùy chỉnh riêng trang Chat (bổ sung ngoài utility Tailwind) */
 
 .chat-scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -25,7 +25,7 @@
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Subtle background pattern for chat area mimicking standard messaging apps */
+/* Nền khu vực chat nhẹ, tương tự ứng dụng nhắn tin phổ biến */
 .chat-bg {
   background-color: rgba(246, 248, 247, 0.5);
   background-image: radial-gradient(rgba(88, 141, 112, 0.05) 1px, transparent 1px);

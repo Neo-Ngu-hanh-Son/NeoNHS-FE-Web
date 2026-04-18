@@ -17,8 +17,8 @@ export function WorkshopReviewsCard({ reviews }: WorkshopReviewsCardProps) {
     return (
         <Card className="h-full flex flex-col">
             <CardHeader className="pb-2">
-                <CardTitle className="text-base">Workshop Reviews</CardTitle>
-                <CardDescription>Review summary per workshop</CardDescription>
+                <CardTitle className="text-base">Đánh giá workshop</CardTitle>
+                <CardDescription>Tóm tắt đánh giá theo từng mẫu</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 overflow-auto pb-4 space-y-4">
                 {reviews.map((wr) => (
@@ -33,7 +33,7 @@ export function WorkshopReviewsCard({ reviews }: WorkshopReviewsCardProps) {
                         <div className="flex items-center gap-3">
                             <Progress value={(wr.avgRating / 5) * 100} className="h-2 flex-1" />
                             <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                {wr.totalReviews} reviews
+                                {wr.totalReviews} đánh giá
                             </span>
                         </div>
                         <p className="text-xs text-emerald-600 font-medium">{wr.recent}</p>

@@ -5,7 +5,9 @@ import { WorkshopStatus, WorkshopTemplateResponse } from "./types"
 import { DeleteTemplateDialog } from "./components/delete-template-dialog"
 import { SubmitApprovalDialog } from "./components/submit-approval-dialog"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
+import { WorkshopSessionService } from "@/services/api/workshopSessionService"
 import { notification } from "antd"
+import { WorkshopSessionResponse } from "../WorkshopSessions/types"
 
 import { TemplateDetailHeader } from "./DetailPage/TemplateDetailHeader"
 import { TemplateDetailAlerts } from "./DetailPage/TemplateDetailAlerts"
@@ -16,6 +18,7 @@ export default function WorkshopTemplateDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [template, setTemplate] = useState<WorkshopTemplateResponse | null>(null)
+  const [sessions, setSessions] = useState<WorkshopSessionResponse[]>([])
   const [loading, setLoading] = useState(true)
 
   const [deleteDialog, setDeleteDialog] = useState(false)
@@ -39,11 +42,19 @@ export default function WorkshopTemplateDetailPage() {
       setLoading(true)
       const data = await WorkshopTemplateService.getTemplateById(id)
       setTemplate(data)
+
+      // Get up to 10 upcoming sessions for this template
+      try {
+        const sessionData = await WorkshopSessionService.getSessionsByTemplate(id, { page: 0, size: 10 })
+        setSessions(sessionData.content || [])
+      } catch (e) {
+        console.error('Failed to fetch sessions:', e)
+      }
     } catch (error: any) {
       console.error('Failed to fetch template:', error)
       notification.error({
-        message: 'Failed to Load Template',
-        description: error.message || 'Unable to fetch template details.',
+        message: 'Tải Mẫu Thất Bại',
+        description: error.message || 'Không thể lấy thông tin chi tiết của mẫu.',
       })
     } finally {
       setLoading(false)
@@ -54,7 +65,7 @@ export default function WorkshopTemplateDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        <p className="text-muted-foreground">Loading template...</p>
+        <p className="text-muted-foreground">Đang tải mẫu...</p>
       </div>
     )
   }
@@ -62,10 +73,10 @@ export default function WorkshopTemplateDetailPage() {
   if (!template) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <h2 className="text-2xl font-bold">Template Not Found</h2>
-        <p className="text-muted-foreground">The workshop template you're looking for doesn't exist.</p>
+        <h2 className="text-2xl font-bold">Không Tìm Thấy Mẫu</h2>
+        <p className="text-muted-foreground">Mẫu workshop bạn đang tìm kiếm không tồn tại.</p>
         <Button onClick={() => navigate("/vendor/workshop-templates")}>
-          Back to Templates
+          Về Danh Sách Mẫu
         </Button>
       </div>
     )
@@ -82,16 +93,16 @@ export default function WorkshopTemplateDetailPage() {
       await WorkshopTemplateService.deleteTemplate(template.id)
 
       notification.success({
-        message: 'Template Deleted',
-        description: `Template "${template.name}" has been deleted successfully.`
+        message: 'Đã Xóa Mẫu',
+        description: `Mẫu "${template.name}" đã được xóa thành công.`
       })
 
       navigate("/vendor/workshop-templates")
     } catch (error: any) {
       console.error('Delete failed:', error)
       notification.error({
-        message: 'Delete Failed',
-        description: error.message || 'Failed to delete template. Please try again.',
+        message: 'Xóa Thất Bại',
+        description: error.message || 'Không thể xóa mẫu. Vui lòng thử lại.',
       })
     }
   }
@@ -103,8 +114,8 @@ export default function WorkshopTemplateDetailPage() {
       await WorkshopTemplateService.submitForApproval(template.id)
 
       notification.success({
-        message: 'Submitted for Approval',
-        description: `Template "${template.name}" has been submitted for admin review.`
+        message: 'Đã Gửi Phê Duyệt',
+        description: `Mẫu "${template.name}" đã được gửi cho admin xem xét.`
       })
 
       // Refresh the template to show updated status
@@ -112,8 +123,8 @@ export default function WorkshopTemplateDetailPage() {
     } catch (error: any) {
       console.error('Submit failed:', error)
       notification.error({
-        message: 'Submission Failed',
-        description: error.message || 'Failed to submit template. Please try again.',
+        message: 'Gửi Thất Bại',
+        description: error.message || 'Không thể gửi mẫu. Vui lòng thử lại.',
       })
     }
   }
@@ -125,10 +136,10 @@ export default function WorkshopTemplateDetailPage() {
       await WorkshopTemplateService.togglePublish(template.id)
 
       notification.success({
-        message: template.isPublished ? 'Template Unpublished' : 'Template Published',
+        message: template.isPublished ? 'Đã Ẩn Khỏi Danh Mục' : 'Đã Xuất Bản',
         description: template.isPublished
-          ? `Template "${template.name}" has been unpublished and is now hidden from the public catalog.`
-          : `Template "${template.name}" is now published and visible to tourists!`
+          ? `Mẫu "${template.name}" đã bị ẩn và sẽ không hiển thị trên danh mục chung.`
+          : `Mẫu "${template.name}" hiện đã được xuất bản và hiển thị cho khách du lịch!`
       })
 
       // Refresh the template to show updated status
@@ -136,14 +147,14 @@ export default function WorkshopTemplateDetailPage() {
     } catch (error: any) {
       console.error('Toggle publish failed:', error)
       notification.error({
-        message: 'Toggle Publish Failed',
-        description: error.message || 'Failed to toggle publish status. Please try again.',
+        message: 'Thay Đổi Liên Kết Thất Bại',
+        description: error.message || 'Không thể thay đổi trạng thái xuất bản. Vui lòng thử lại.',
       })
     }
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-6 max-w-6xl mx-auto py-8 px-4">
       <TemplateDetailHeader
         template={template}
         canEdit={canEdit}
@@ -160,6 +171,7 @@ export default function WorkshopTemplateDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <TemplateDetailContent
           template={template}
+          sessions={sessions}
           displayImage={displayImage}
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}

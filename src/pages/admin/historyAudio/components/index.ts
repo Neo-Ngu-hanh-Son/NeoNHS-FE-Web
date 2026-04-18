@@ -5,4 +5,4 @@ export { default as HistoryAudioDeleteDialog } from "./HistoryAudioDeleteDialog"
 export { default as HistoryAudiosTable } from "./HistoryAudiosTable";
 export { default as HistoryTextSection } from "./HistoryTextSection";
 export { default as AudioSourceSection } from "./AudioSourceSection";
-export { default as TimingSection } from "../../destinations/components/historyAudio/TimingSection";
+export { default as TimingSection } from "./TimingSection";

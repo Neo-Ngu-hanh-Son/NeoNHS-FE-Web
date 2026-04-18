@@ -236,7 +236,7 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
         setSelectedPoint({
           lat,
           lng,
-          name: 'Dropped Pin',
+          name: 'Điểm đánh dấu',
           address: result.formatted_address,
           placeId: result.place_id,
         });
@@ -320,10 +320,10 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
               </div>
               <div>
                 <DialogTitle className="text-xl font-black tracking-tight text-slate-800">
-                  Interactive Location Discoverer
+                  Công cụ chọn địa điểm trên bản đồ
                 </DialogTitle>
                 <DialogDescription className="text-slate-500 font-medium">
-                  Native Google Maps Hub • Boundary Restricted
+                  Google Maps Hub • Ranh giới Ngũ Hành Sơn
                 </DialogDescription>
               </div>
             </div>

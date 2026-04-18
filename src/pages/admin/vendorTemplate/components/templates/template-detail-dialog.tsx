@@ -392,7 +392,7 @@ export function TemplateDetailDialog({
                           {template.averageRating.toFixed(1)}
                         </span>
                         <span className="text-muted-foreground">
-                          ({template.totalReview} reviews)
+                          ({template.totalRatings} đánh giá)
                         </span>
                       </div>
                     )}

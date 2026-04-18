@@ -35,22 +35,22 @@ export default function GenerateAudioSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Generate Audio From Text (AI)</CardTitle>
+        <CardTitle>Tạo âm thanh từ văn bản (AI)</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
           rows={8}
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
-          placeholder="Enter the historical narration text here. This will be used for audio generation and word alignment."
+          placeholder="Nhập kịch bản thuyết minh lịch sử tại đây. Nội dung này dùng để tạo âm thanh và căn chỉnh từng từ."
         />
 
         <div className="flex flex-col items-start gap-2">
-          <p className="text-sm font-medium">Select voice type</p>
+          <p className="text-sm font-medium">Chọn loại giọng</p>
           <div className="flex justify-between w-full gap-4">
             <Select value={modelId} onValueChange={onModelChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select model" />
+                <SelectValue placeholder="Chọn mô hình" />
               </SelectTrigger>
               <SelectContent>
                 {ELEVEN_LABS_MODELS.map((model) => (
@@ -63,7 +63,7 @@ export default function GenerateAudioSection({
 
             <Select value={voiceId} onValueChange={onVoiceChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select voice" />
+                <SelectValue placeholder="Chọn giọng" />
               </SelectTrigger>
               <SelectContent>
                 {ELEVEN_LABS_VOICES.map((voice) => (
@@ -82,7 +82,7 @@ export default function GenerateAudioSection({
           ) : (
             <Volume2 className="mr-2 h-4 w-4" />
           )}
-          Generate Audio
+          Tạo âm thanh
         </Button>
       </CardContent>
     </Card>

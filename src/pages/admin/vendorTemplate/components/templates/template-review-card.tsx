@@ -179,7 +179,7 @@ export function TemplateReviewCard({
             <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
             <span className="font-medium">{template.averageRating.toFixed(1)}</span>
             <span className="text-muted-foreground">
-              ({template.totalReview} reviews)
+              ({template.totalRatings} đánh giá)
             </span>
           </div>
         )}

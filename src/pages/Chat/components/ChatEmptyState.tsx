@@ -8,11 +8,11 @@ export default function ChatEmptyState({ isLoadingRooms }: ChatEmptyStateProps) 
       <div className="w-20 h-20 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center mb-4">
         <span className="material-symbols-outlined text-4xl opacity-50">chat</span>
       </div>
-      <h3 className="text-xl font-medium text-[#101914] dark:text-white mb-2">Your Messages</h3>
-      <p>
+      <h3 className="text-xl font-medium text-[#101914] dark:text-white mb-2">Tin nhắn của bạn</h3>
+      <p className="text-center px-4">
         {isLoadingRooms
-          ? 'Loading your conversations...'
-          : 'Select a conversation from the sidebar to start chatting'}
+          ? 'Đang tải danh sách cuộc trò chuyện...'
+          : 'Chọn một cuộc trò chuyện ở cột bên để bắt đầu nhắn tin'}
       </p>
     </div>
   );

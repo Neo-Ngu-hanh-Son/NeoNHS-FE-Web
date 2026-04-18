@@ -63,7 +63,7 @@ export default function PanoramaPreview({
         defaultYaw: defaultYaw ?? 0,
         defaultPitch: defaultPitch ?? 0,
         canvasBackground: "#1a1a1a",
-        loadingTxt: "Loading preview…",
+        loadingTxt: "Đang tải xem trước…",
       });
 
       const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
@@ -73,7 +73,7 @@ export default function PanoramaPreview({
         markersPlugin.addMarker({
           id: `preview-${i}`,
           position: { yaw: hs.yaw, pitch: hs.pitch },
-          tooltip: hs.tooltip || `Hot spot #${i + 1}`,
+          tooltip: hs.tooltip || `Điểm nóng #${i + 1}`,
           anchor: "bottom center",
           size: { width: 24, height: 24 },
           html: getNormalMarkerHTML(),
@@ -113,9 +113,7 @@ export default function PanoramaPreview({
   if (!imageUrl) {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 h-[400px] flex items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Enter a panorama image URL to see a preview.
-        </p>
+        <p className="text-sm text-muted-foreground">Vui lòng tải lên ảnh panorama để xem trước.</p>
       </div>
     );
   }
@@ -124,8 +122,8 @@ export default function PanoramaPreview({
     <div className="space-y-2">
       <p className="text-xs text-muted-foreground">
         {viewSelectionMode
-          ? "Rotate the view to the angle visitors should see first, then confirm."
-          : "Click anywhere on the preview to place a new hot spot."}
+          ? "Xoay khung hình đến góc khách cần thấy trước, rồi xác nhận."
+          : "Bấm bất kỳ đâu trên ảnh xem trước để đặt điểm nóng mới."}
       </p>
       <div className="relative">
         <div
@@ -155,7 +153,7 @@ export default function PanoramaPreview({
                 onClick={onCancelViewSelection}
               >
                 <X className="h-4 w-4 mr-1" />
-                Cancel
+                Hủy
               </Button>
               <Button
                 size="sm"
@@ -163,7 +161,7 @@ export default function PanoramaPreview({
                 onClick={handleCaptureView}
               >
                 <Check className="h-4 w-4 mr-1" />
-                Confirm View
+                Xác nhận góc nhìn
               </Button>
             </div>
           </>

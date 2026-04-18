@@ -1,10 +1,10 @@
-export const DEFAULT_TEXT = `Welcome to the Marble Mountains, a cluster of five limestone and marble hills located in Ngu Hanh Son District, Da Nang, Vietnam. These mountains are named after five elements: Kim (metal), Thuy (water), Moc (wood), Hoa (fire), and Tho (earth). The largest and most famous is Thuy Son, which houses several Buddhist pagodas and Hindu grottoes.`;
+export const DEFAULT_TEXT = `Chào mừng đến với Ngũ Hành Sơn — cụm năm ngọn núi đá vôi và đá cẩm thạch tại quận Ngũ Hành Sơn, Đà Nẵng, Việt Nam. Năm ngọn được đặt theo ngũ hành: Kim, Thủy, Mộc, Hỏa, Thổ. Ngọn lớn và nổi tiếng nhất là Thủy Sơn, nơi có nhiều chùa Phật giáo và hang động.`;
 
 export const ELEVEN_LABS_MODELS = [
   {
     id: "eleven_multilingual_v2",
-    name: "Eleven Multilingual v2",
-    language: "Multilingual",
+    name: "Eleven đa ngôn ngữ v2",
+    language: "Đa ngôn ngữ",
   },
 ] as const;
 
@@ -23,15 +23,14 @@ export const ELEVEN_LABS_VOICES = [
   // },
   {
     id: "pNInz6obpgDQGcFmaJgB",
-    name: "Adam (Male, EN)",
+    name: "Adam (Nam, tiếng Anh)",
     gender: "Male",
-    language: "en", // Deep, grounded documentary tone
+    language: "en", // Giọng trầm, phù hợp phim tài liệu
   },
   {
     id: "21m00Tcm4TlvDq8ikWAM",
-    name: "Rachel (Female, EN)",
+    name: "Rachel (Nữ, tiếng Anh)",
     gender: "Female",
-    language: "en", // Calm, clear, great for nature/history
+    language: "en", // Giọng điềm, rõ ràng, phù hợp thiên nhiên/lịch sử
   },
 ] as const;
-

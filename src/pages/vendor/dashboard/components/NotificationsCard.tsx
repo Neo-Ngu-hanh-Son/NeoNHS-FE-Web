@@ -37,11 +37,11 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
             <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="text-base">Notifications</CardTitle>
-                        <CardDescription>System & activity alerts</CardDescription>
+                        <CardTitle className="text-base">Thông báo</CardTitle>
+                        <CardDescription>Hệ thống & hoạt động</CardDescription>
                     </div>
                     <Badge variant="secondary" className="text-[10px]">
-                        {unread.length} new
+                        {unread.length} mới
                     </Badge>
                 </div>
             </CardHeader>
@@ -49,10 +49,10 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
                 <Tabs defaultValue="all">
                     <TabsList className="w-full h-8">
                         <TabsTrigger value="all" className="text-xs flex-1">
-                            All
+                            Tất cả
                         </TabsTrigger>
                         <TabsTrigger value="unread" className="text-xs flex-1">
-                            Unread
+                            Chưa đọc
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="all" className="mt-3 space-y-2">
@@ -78,24 +78,30 @@ export function NotificationsCard({ notifications }: NotificationsCardProps) {
                         ))}
                     </TabsContent>
                     <TabsContent value="unread" className="mt-3 space-y-2">
-                        {unread.map((n) => (
-                            <div
-                                key={n.id}
-                                className="flex items-start gap-3 rounded-lg p-2.5 bg-primary/5 border border-primary/10"
-                            >
-                                <div className="mt-0.5 shrink-0">
-                                    <NotificationIcon type={n.type} />
+                        {unread.length === 0 ? (
+                            <p className="py-4 text-center text-xs text-muted-foreground">
+                                Không có thông báo chưa đọc
+                            </p>
+                        ) : (
+                            unread.map((n) => (
+                                <div
+                                    key={n.id}
+                                    className="flex items-start gap-3 rounded-lg p-2.5 bg-primary/5 border border-primary/10"
+                                >
+                                    <div className="mt-0.5 shrink-0">
+                                        <NotificationIcon type={n.type} />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-xs leading-relaxed">{n.message}</p>
+                                        <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
+                                            <Clock className="h-2.5 w-2.5" />
+                                            {n.time}
+                                        </p>
+                                    </div>
+                                    <div className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-xs leading-relaxed">{n.message}</p>
-                                    <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                                        <Clock className="h-2.5 w-2.5" />
-                                        {n.time}
-                                    </p>
-                                </div>
-                                <div className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </TabsContent>
                 </Tabs>
             </CardContent>

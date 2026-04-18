@@ -107,10 +107,7 @@ export function ImageUploader({
       {contextHolder}
       <div className="space-y-4">
         <div>
-          <Label>Workshop Images *</Label>
-          <p className="text-sm text-muted-foreground mt-1">
-            Add at least 1 image. Click the star to set as thumbnail.
-          </p>
+          <Label>Hình ảnh Workshop *</Label>
         </div>
 
         {/* Upload Button */}
@@ -125,7 +122,7 @@ export function ImageUploader({
             <Button type="button" variant="outline" disabled={disabled}>
               <>
                 <UploadOutlined className="mr-2" />
-                Select Images
+                Chọn ảnh
               </>
             </Button>
           </Upload>
@@ -141,7 +138,7 @@ export function ImageUploader({
               return (
                 <Card key={index} className="relative group overflow-hidden">
                   <div className="relative aspect-square">
-                    
+
                     {/* Ant Design Image */}
                     <AntImage
                       src={url}
@@ -150,7 +147,7 @@ export function ImageUploader({
                       rootClassName="absolute inset-0 w-full h-full"
                       fallback="https://via.placeholder.com/400x400?text=Invalid"
                       // Tắt mask preview mặc định của Ant để không bị đè với UI hover của bạn
-                      preview={{ mask: <div className="hidden"></div> }} 
+                      preview={{ mask: <div className="hidden"></div> }}
                     />
 
                     {/* Thumbnail Badge */}
@@ -199,7 +196,7 @@ export function ImageUploader({
           <div className="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center">
             <PictureOutlined className="text-4xl text-gray-400 mb-3" />
             <p className="text-sm text-muted-foreground">
-              No images added yet. Upload an image above.
+              Chưa có ảnh. Vui lòng chọn ảnh ở trên.
             </p>
           </div>
         )}

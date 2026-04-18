@@ -15,7 +15,7 @@ export default function PanoramaImageUpload({ value, onChange, error }: Panorama
         onUpload={onChange}
         onError={(msg) => message.error(msg)}
         maxSizeMB={10}
-        placeholder="Drag & drop a 360° panorama image, or click to browse"
+        placeholder="Kéo thả ảnh panorama 360°, hoặc bấm để chọn"
         minHeight={160}
         imageClassName="object-cover h-[160px]"
       />
