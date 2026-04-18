@@ -43,7 +43,7 @@ export default function ChatComposer({
           onClick={() => fileInputRef.current?.click()}
           disabled={!isConnected || isUploadingImage}
           className="w-10 h-10 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-none outline-none"
-          title="Send image"
+          title="Gửi ảnh"
         >
           {isUploadingImage ? <LoadingOutlined className="text-xl" /> : <CameraOutlined className="text-xl" />}
         </button>
@@ -52,7 +52,7 @@ export default function ChatComposer({
           type="text"
           value={newMessage}
           onChange={(e) => onChange(e.target.value)}
-          placeholder={isConnected ? 'Type a message...' : 'Connecting...'}
+          placeholder={isConnected ? 'Nhập tin nhắn...' : 'Đang kết nối...'}
           disabled={!isConnected || isUploadingImage}
           className="flex-1 bg-background-light dark:bg-white/5 border border-[#d3e4da] dark:border-white/10 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all dark:text-white disabled:opacity-50"
         />

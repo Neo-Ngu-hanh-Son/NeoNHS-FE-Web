@@ -25,7 +25,7 @@ export interface ChatRoom {
 }
 
 // Current logged in user (matches the mock user in AuthContext for testing)
-export const CURRENT_USER_ID = "1"; 
+export const CURRENT_USER_ID = "1";
 
 export const mockChatRooms: ChatRoom[] = [
   {
@@ -34,7 +34,7 @@ export const mockChatRooms: ChatRoom[] = [
     participants: ["1", "user-2"],
     createdAt: "2026-03-25T10:00:00",
     lastMessageAt: "2026-03-28T20:45:00",
-    lastMessagePreview: "That sounds like a great plan. See you tomorrow!",
+    lastMessagePreview: "Nghe có vẻ hay đấy. Mai gặp nhé!",
     lastMessageSenderId: "1",
     otherUser: {
       id: "user-2",
@@ -49,7 +49,7 @@ export const mockChatRooms: ChatRoom[] = [
     participants: ["1", "user-3"],
     createdAt: "2026-03-27T14:30:00",
     lastMessageAt: "2026-03-28T21:00:00",
-    lastMessagePreview: "Can we reschedule the workshop validation to next week?",
+    lastMessagePreview: "Mình có thể dời lịch kiểm duyệt workshop sang tuần sau không?",
     lastMessageSenderId: "user-3",
     otherUser: {
       id: "user-3",
@@ -64,7 +64,7 @@ export const mockChatRooms: ChatRoom[] = [
     participants: ["1", "user-4"],
     createdAt: "2026-03-20T09:15:00",
     lastMessageAt: "2026-03-26T11:20:00",
-    lastMessagePreview: "Thanks for the help with the ticket verification, much appreciated.",
+    lastMessagePreview: "Cảm ơn bạn đã hỗ trợ xác minh vé, rất biết ơn.",
     lastMessageSenderId: "1",
     otherUser: {
       id: "user-4",
@@ -79,7 +79,7 @@ export const mockChatRooms: ChatRoom[] = [
     participants: ["1", "user-5"],
     createdAt: "2026-03-15T16:45:00",
     lastMessageAt: "2026-03-21T08:10:00",
-    lastMessagePreview: "I've uploaded the new branding assets for the platform.",
+    lastMessagePreview: "Mình đã tải lên bộ nhận diện thương hiệu mới cho nền tảng.",
     lastMessageSenderId: "user-5",
     otherUser: {
       id: "user-5",
@@ -96,7 +96,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-1",
       chatRoomId: "room-1",
       senderId: "user-2",
-      content: "Hi there! I was looking at your new pottery workshop template.",
+      content: "Chào bạn! Mình đang xem mẫu workshop gốm mới của bạn.",
       timestamp: "2026-03-28T20:30:00",
       status: "READ"
     },
@@ -104,7 +104,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-2",
       chatRoomId: "room-1",
       senderId: "1",
-      content: "Hello Alex! Yes, we just submitted it for approval yesterday. Do you have any questions about it?",
+      content: "Chào Alex! Đúng rồi, hôm qua mình vừa gửi duyệt. Bạn có thắc mắc gì về mẫu không?",
       timestamp: "2026-03-28T20:32:00",
       status: "READ"
     },
@@ -112,7 +112,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-3",
       chatRoomId: "room-1",
       senderId: "user-2",
-      content: "Just wondering if materials are fully included in the price, or if participants need to bring anything?",
+      content: "Mình chỉ muốn hỏi vật liệu đã gồm hết trong giá chưa, hay người tham gia cần mang thêm gì không?",
       timestamp: "2026-03-28T20:35:00",
       status: "READ"
     },
@@ -120,7 +120,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-4",
       chatRoomId: "room-1",
       senderId: "1",
-      content: "Everything is included! Clay, tools, glazing, and firing. They just need to bring clothes they don't mind getting a bit dirty.",
+      content: "Đã gồm hết nhé! Đất sét, dụng cụ, men và nung. Họ chỉ cần mang quần áo không ngại bẩn thôi.",
       timestamp: "2026-03-28T20:38:00",
       status: "READ"
     },
@@ -128,7 +128,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-5",
       chatRoomId: "room-1",
       senderId: "user-2",
-      content: "Perfect. I'll pass that info along to the marketing team to highlight in the newsletter.",
+      content: "Tuyệt. Mình sẽ chuyển thông tin này cho team marketing để nhấn mạnh trong bản tin.",
       timestamp: "2026-03-28T20:42:00",
       status: "READ"
     },
@@ -136,7 +136,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-1-6",
       chatRoomId: "room-1",
       senderId: "1",
-      content: "That sounds like a great plan. See you tomorrow!",
+      content: "Nghe có vẻ hay đấy. Mai gặp nhé!",
       timestamp: "2026-03-28T20:45:00",
       status: "READ"
     }
@@ -146,7 +146,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-1",
       chatRoomId: "room-2",
       senderId: "user-3",
-      content: "Hey, do you have a moment to review the upcoming session schedule?",
+      content: "Bạn rảnh xem lịch phiên sắp tới giúp mình được không?",
       timestamp: "2026-03-28T19:15:00",
       status: "READ"
     },
@@ -154,7 +154,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-2",
       chatRoomId: "room-2",
       senderId: "1",
-      content: "Sure, I was just looking at it. What's up?",
+      content: "Được, mình vừa xem. Có chuyện gì thế?",
       timestamp: "2026-03-28T19:20:00",
       status: "READ"
     },
@@ -162,7 +162,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-3",
       chatRoomId: "room-2",
       senderId: "user-3",
-      content: "I noticed a clash on Friday afternoon between the Cooking class and the Wine Tasting session in the same venue.",
+      content: "Mình thấy chiều thứ Sáu lớp Nấu ăn và phiên Thử rượu bị trùng địa điểm.",
       timestamp: "2026-03-28T19:25:00",
       status: "READ"
     },
@@ -170,7 +170,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-4",
       chatRoomId: "room-2",
       senderId: "1",
-      content: "Oh! Good catch. The Wine Tasting should have been in Venue B. I'll update that right away in the system.",
+      content: "Ồ hay đấy! Phiên Thử rượu phải ở địa điểm B. Mình cập nhật ngay trong hệ thống.",
       timestamp: "2026-03-28T19:30:00",
       status: "READ"
     },
@@ -178,7 +178,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-5",
       chatRoomId: "room-2",
       senderId: "user-3",
-      content: "Great, thanks! Also...",
+      content: "Cảm ơn nhé! À mà...",
       timestamp: "2026-03-28T20:58:00",
       status: "DELIVERED"
     },
@@ -186,7 +186,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-2-6",
       chatRoomId: "room-2",
       senderId: "user-3",
-      content: "Can we reschedule the workshop validation to next week?",
+      content: "Mình có thể dời lịch kiểm duyệt workshop sang tuần sau không?",
       timestamp: "2026-03-28T21:00:00",
       status: "DELIVERED"
     }
@@ -196,7 +196,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-1",
       chatRoomId: "room-3",
       senderId: "user-4",
-      content: "Hey, having some trouble with the QR scanner on the new tablets.",
+      content: "Mình gặp lỗi với máy quét QR trên máy tính bảng mới.",
       timestamp: "2026-03-26T10:05:00",
       status: "READ"
     },
@@ -204,7 +204,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-2",
       chatRoomId: "room-3",
       senderId: "1",
-      content: "What's the issue? Is it not reading the codes or throwing an error?",
+      content: "Lỗi kiểu gì? Không đọc được mã hay báo lỗi?",
       timestamp: "2026-03-26T10:15:00",
       status: "READ"
     },
@@ -212,7 +212,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-3",
       chatRoomId: "room-3",
       senderId: "user-4",
-      content: "Camera isn't focusing on the smaller ticket stub formats.",
+      content: "Camera không lấy nét được với cỡ vé nhỏ.",
       timestamp: "2026-03-26T10:20:00",
       status: "READ"
     },
@@ -220,7 +220,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-4",
       chatRoomId: "room-3",
       senderId: "1",
-      content: "Ah, go to the scanner settings and enable 'Macro mode'. That fixed it for me yesterday.",
+      content: "À, vào cài đặt máy quét và bật 'Chế độ macro'. Hôm qua mình làm vậy là được.",
       timestamp: "2026-03-26T10:25:00",
       status: "READ"
     },
@@ -228,7 +228,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-5",
       chatRoomId: "room-3",
       senderId: "user-4",
-      content: "Works perfectly now. You saved the morning rush!",
+      content: "Giờ chạy ngon rồi. Cứu cả ca sáng đông!",
       timestamp: "2026-03-26T11:15:00",
       status: "READ"
     },
@@ -236,7 +236,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-3-6",
       chatRoomId: "room-3",
       senderId: "1",
-      content: "Thanks for the help with the ticket verification, much appreciated.",
+      content: "Cảm ơn bạn đã hỗ trợ xác minh vé, rất biết ơn.",
       timestamp: "2026-03-26T11:20:00",
       status: "READ"
     }
@@ -246,7 +246,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-4-1",
       chatRoomId: "room-4",
       senderId: "1",
-      content: "Do we have the new promotional banners for next month's campaign?",
+      content: "Mình có banner quảng cáo cho chiến dịch tháng tới chưa?",
       timestamp: "2026-03-20T14:20:00",
       status: "READ"
     },
@@ -254,7 +254,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-4-2",
       chatRoomId: "room-4",
       senderId: "user-5",
-      content: "Almost done, just waiting on final approval for the copy.",
+      content: "Gần xong rồi, đang chờ duyệt nội dung cuối.",
       timestamp: "2026-03-20T15:10:00",
       status: "READ"
     },
@@ -262,7 +262,7 @@ export const mockMessages: Record<string, ChatMessage[]> = {
       id: "msg-4-3",
       chatRoomId: "room-4",
       senderId: "user-5",
-      content: "I've uploaded the new branding assets for the platform.",
+      content: "Mình đã tải lên bộ nhận diện thương hiệu mới cho nền tảng.",
       timestamp: "2026-03-21T08:10:00",
       status: "READ"
     }

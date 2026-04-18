@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RegistrationTrendPoint } from '@/types/adminDashboard';
@@ -41,50 +40,50 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
     };
 
     return (
-        <Card className="shadow-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 h-full flex flex-col overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-4 bg-gradient-to-r from-slate-50/60 to-white dark:from-white/5 dark:to-transparent border-b border-slate-100 dark:border-white/10">
-                <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600">
-                        <BarChartOutlined className="text-xl" />
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-card shadow-sm dark:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-700">
+                <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                        <BarChartOutlined className="text-lg" />
                     </div>
-                    <div>
-                        <CardTitle className="text-lg font-black text-slate-900 dark:text-white">Registration Growth</CardTitle>
-                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60 text-slate-500 dark:text-slate-400">System Growth Metrics</CardDescription>
+                    <div className="min-w-0">
+                        <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Tăng trưởng đăng ký</CardTitle>
+                        <CardDescription className="text-xs text-muted-foreground">Tài khoản mới theo thời gian</CardDescription>
                     </div>
                 </div>
                 <Select value={regType} onValueChange={(v: any) => setRegType(v)}>
-                    <SelectTrigger className="w-40 bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 shadow-sm hover:border-indigo-400 transition-colors">
-                        <SelectValue placeholder="Select type" />
+                    <SelectTrigger className="h-8 w-[140px] shrink-0 bg-background text-xs transition-colors hover:border-primary">
+                        <SelectValue placeholder="Chọn loại" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="USER">User Growth</SelectItem>
-                        <SelectItem value="VENDOR">Vendor Growth</SelectItem>
+                        <SelectItem value="USER">Người dùng</SelectItem>
+                        <SelectItem value="VENDOR">Nhà cung cấp</SelectItem>
                     </SelectContent>
                 </Select>
             </CardHeader>
-            <CardContent className="pt-8 flex-grow pb-10">
+            <CardContent className="flex-grow pb-6 pt-4">
                 {summary && (
-                    <div className="grid grid-cols-3 gap-4 mb-10">
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                    <div className="mb-8 grid grid-cols-3 gap-3">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <UserOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Total Joined</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Tổng tham gia</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate">{summary.totalJoined}</p>
+                            <p className="truncate text-lg font-bold tabular-nums leading-none text-slate-900 dark:text-white">{summary.totalJoined}</p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <TeamOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Growth</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Tăng trưởng</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-emerald-600 leading-none truncate">+{summary.growthRate}%</p>
+                            <p className="truncate text-lg font-bold tabular-nums leading-none text-emerald-600">+{summary.growthRate}%</p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <SafetyCertificateOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Active Rate</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Tỷ lệ hoạt động</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate">{summary.activePercentage}%</p>
+                            <p className="truncate text-lg font-bold tabular-nums leading-none text-slate-900 dark:text-white">{summary.activePercentage}%</p>
                         </div>
                     </div>
                 )}
@@ -94,8 +93,8 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
                     {/* Y-Axis Labels & Grid Lines */}
                     {yAxisLabels.map((l, i) => (
                         <div key={i} className="absolute inset-x-0" style={{ top: `${(l.y / 200) * 100}%` }}>
-                            <span className="absolute -left-18 -top-2 w-16 text-[10px] font-bold text-gray-400 text-right tabular-nums truncate">{l.label}</span>
-                            <div className="w-full h-px bg-gray-100 border-t border-dashed border-gray-200/50" />
+                            <span className="absolute -left-18 -top-2 w-16 text-right text-[10px] font-medium tabular-nums text-muted-foreground truncate">{l.label}</span>
+                            <div className="h-px w-full border-t border-dashed border-border bg-muted/30" />
                         </div>
                     ))}
 
@@ -114,10 +113,7 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
                                     fill="url(#reg-gradient)"
                                 />
 
-                                <motion.path
-                                    initial={{ pathLength: 0 }}
-                                    animate={{ pathLength: 1 }}
-                                    transition={{ duration: 1, ease: "linear" }}
+                                <path
                                     d={getPathData(registrations.map(r => r.count))}
                                     fill="none"
                                     stroke="#6366f1"
@@ -125,28 +121,24 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
                                     strokeLinecap="round"
                                 />
 
-                                <motion.path
-                                    initial={{ pathLength: 0, opacity: 0 }}
-                                    animate={{ pathLength: 1, opacity: 0.5 }}
-                                    transition={{ duration: 1, ease: "linear", delay: 0.2 }}
+                                <path
                                     d={getPathData(registrations.map(r => r.breakdown.individual))}
                                     fill="none"
                                     stroke="#818cf8"
                                     strokeWidth="2"
                                     strokeDasharray="4 4"
                                     strokeLinecap="round"
+                                    opacity={0.5}
                                 />
 
-                                <motion.path
-                                    initial={{ pathLength: 0, opacity: 0 }}
-                                    animate={{ pathLength: 1, opacity: 0.5 }}
-                                    transition={{ duration: 1, ease: "linear", delay: 0.4 }}
+                                <path
                                     d={getPathData(registrations.map(r => r.breakdown.organization))}
                                     fill="none"
                                     stroke="#a855f7"
                                     strokeWidth="2"
                                     strokeDasharray="4 4"
                                     strokeLinecap="round"
+                                    opacity={0.5}
                                 />
 
                                 {registrations.map((p, i) => {
@@ -160,20 +152,20 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
                                         <g key={i} className="group/point">
                                             <circle cx={cx} cy={cy} r="6" fill="#6366f1" className="cursor-pointer shadow-lg" />
                                             <circle cx={cx} cy={cy} r="3" fill="white" className="pointer-events-none" />
-                                            <foreignObject x={cx - 90} y={tooltipY} width="180" height="130" className="opacity-0 group-hover/point:opacity-100 transition-all duration-200 pointer-events-none backdrop-blur-sm">
-                                                <div className="bg-gray-900/95 text-white p-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-col gap-1.5 translate-y-2 group-hover/point:translate-y-0 transition-transform">
+                                            <foreignObject x={cx - 90} y={tooltipY} width="180" height="130" className="pointer-events-none opacity-0 transition-opacity duration-200 group-hover/point:opacity-100">
+                                                <div className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-slate-900/95 p-3.5 text-white shadow-lg">
                                                     <div className="text-[10px] font-black uppercase tracking-tighter opacity-60 text-indigo-400 text-center">{p.period}</div>
                                                     <div className="flex justify-between items-center border-b border-white/10 pb-1 mb-1">
-                                                        <span className="text-[10px] opacity-70">Total:</span>
-                                                        <span className="text-sm font-black text-white tabular-nums">{p.count}</span>
+                                                        <span className="text-[10px] opacity-70">Tổng:</span>
+                                                        <span className="text-sm font-bold tabular-nums text-white">{p.count}</span>
                                                     </div>
                                                     <div className="flex flex-col gap-1">
                                                         <div className="flex justify-between items-center text-[10px]">
-                                                            <span className="opacity-70">Individual:</span>
+                                                            <span className="opacity-70">Cá nhân:</span>
                                                             <span className="font-bold tabular-nums text-indigo-200">{p.breakdown.individual}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center text-[10px]">
-                                                            <span className="opacity-70">Organization:</span>
+                                                            <span className="opacity-70">Tổ chức:</span>
                                                             <span className="font-bold tabular-nums text-purple-200">{p.breakdown.organization}</span>
                                                         </div>
                                                     </div>
@@ -192,8 +184,8 @@ export function RegistrationTrendsChart({ registrations, summary, regType, setRe
                     <div className="flex justify-between">
                         {registrations.map((p, idx) => (
                             <div key={idx} className="flex flex-col items-center gap-1.5 group/label w-[60px]">
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter tabular-nums group-hover/label:text-indigo-600 transition-colors text-center truncate px-1">{p.period}</span>
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover/label:bg-indigo-300 transition-colors" />
+                                <span className="truncate px-1 text-center text-[9px] font-semibold uppercase tracking-tight text-muted-foreground tabular-nums transition-colors group-hover/label:text-indigo-600">{p.period}</span>
+                                <div className="h-1.5 w-1.5 rounded-full bg-muted transition-colors group-hover/label:bg-indigo-400" />
                             </div>
                         ))}
                     </div>

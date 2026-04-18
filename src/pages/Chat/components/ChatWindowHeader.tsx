@@ -24,7 +24,7 @@ export default function ChatWindowHeader({ partnerAvatar, partnerName }: ChatWin
         <div>
           <h2 className="font-bold text-[#101914] dark:text-white">{partnerName}</h2>
           <p className="text-xs text-muted-foreground flex items-center gap-1">
-            Participant
+            Người tham gia
           </p>
         </div>
       </div>
@@ -37,13 +37,13 @@ export default function ChatWindowHeader({ partnerAvatar, partnerName }: ChatWin
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem className="text-red-500 hover:text-red-600 focus:text-red-600 cursor-pointer">
-            <DeleteOutlined className="mr-2" /> Delete conversation
+            <DeleteOutlined className="mr-2" /> Xóa cuộc trò chuyện
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <StopOutlined className="mr-2" /> Block user
+            <StopOutlined className="mr-2" /> Chặn người dùng
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <WarningOutlined className="mr-2" /> Report
+            <WarningOutlined className="mr-2" /> Báo cáo
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

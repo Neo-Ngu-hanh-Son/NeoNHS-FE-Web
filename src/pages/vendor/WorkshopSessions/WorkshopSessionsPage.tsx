@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar as CalendarIcon, PlusCircle, Search, List, CalendarDays } from 'lucide-react'
+import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays } from 'lucide-react'
 import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
@@ -20,7 +20,7 @@ export default function WorkshopSessionsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
-  
+
   const [createDialog, setCreateDialog] = useState(false)
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>()
   const [editDialog, setEditDialog] = useState<{ open: boolean; session: WorkshopSessionResponse | null }>({
@@ -69,7 +69,7 @@ export default function WorkshopSessionsPage() {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(s => 
+      filtered = filtered.filter(s =>
         s.workshopTemplate.name.toLowerCase().includes(query) ||
         s.workshopTemplate.shortDescription.toLowerCase().includes(query)
       )
@@ -129,14 +129,14 @@ export default function WorkshopSessionsPage() {
     if (cancelDialog.session) {
       try {
         await WorkshopSessionService.cancelSession(cancelDialog.session.id)
-        
+
         // Update local state
-        setSessions(prev => prev.map(s => 
-          s.id === cancelDialog.session!.id 
+        setSessions(prev => prev.map(s =>
+          s.id === cancelDialog.session!.id
             ? { ...s, status: SessionStatus.CANCELLED }
             : s
         ))
-        
+
         setCancelDialog({ open: false, session: null })
         notification.success({
           message: 'Đã Hủy Phiên',
@@ -214,19 +214,21 @@ export default function WorkshopSessionsPage() {
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Danh Sách Các Phiên</h1>
-          <p className="text-muted-foreground">Quản lý lịch trình hoạt động Workshop của bạn</p>
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-b from-slate-50 to-white dark:from-white/5 dark:to-transparent p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Danh Sách Các Phiên</h1>
+            <p className="mt-1 text-slate-500 dark:text-slate-400">Quản lý lịch trình hoạt động Workshop của bạn</p>
+          </div>
+          <Button
+            size="lg"
+            onClick={() => handleCreateSession()}
+            className="gap-2 rounded-xl"
+          >
+            <Plus className="w-5 h-5" />
+            Hẹn Lịch Phiên Mới
+          </Button>
         </div>
-        <Button
-          size="lg"
-          onClick={() => handleCreateSession()}
-          className="gap-2 rounded-xl"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Hẹn Lịch Phiên Mới
-        </Button>
       </div>
 
       {/* Filters and View Toggle */}
@@ -304,7 +306,7 @@ export default function WorkshopSessionsPage() {
                   <div className="flex-1 h-px bg-border" />
                   <span className="text-sm text-muted-foreground font-medium">{dateSessions.length} phiên</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {dateSessions.map((session) => (
                     <SessionCard
                       key={session.id}

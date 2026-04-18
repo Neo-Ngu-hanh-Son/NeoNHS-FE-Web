@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RevenueTrendPoint } from '@/types/adminDashboard';
@@ -50,61 +49,61 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
     };
 
     return (
-        <Card className="shadow-sm border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 h-full flex flex-col overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between pb-4 bg-gradient-to-r from-slate-50/60 to-white dark:from-white/5 dark:to-transparent border-b border-slate-100 dark:border-white/10">
-                <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                        <LineChartOutlined className="text-xl" />
+        <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-card shadow-sm dark:border-slate-700">
+            <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-slate-700">
+                <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        <LineChartOutlined className="text-lg" />
                     </div>
-                    <div>
-                        <CardTitle className="text-lg font-black text-slate-900 dark:text-white">Revenue Trends</CardTitle>
-                        <CardDescription className="text-xs uppercase tracking-wider font-semibold opacity-60 text-slate-500 dark:text-slate-400">Financial Performance Analytics</CardDescription>
+                    <div className="min-w-0">
+                        <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">Xu hướng doanh thu</CardTitle>
+                        <CardDescription className="text-xs text-muted-foreground">Hiệu quả tài chính theo thời gian</CardDescription>
                     </div>
                 </div>
                 <Select value={revenuePeriod} onValueChange={(v: any) => setRevenuePeriod(v)}>
-                    <SelectTrigger className="w-40 bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 shadow-sm hover:border-primary transition-colors">
-                        <SelectValue placeholder="Select period" />
+                    <SelectTrigger className="h-8 w-[140px] shrink-0 bg-background text-xs transition-colors hover:border-primary">
+                        <SelectValue placeholder="Chọn kỳ" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="MONTHLY">Monthly View</SelectItem>
-                        <SelectItem value="WEEKLY">Weekly View</SelectItem>
+                        <SelectItem value="MONTHLY">Theo tháng</SelectItem>
+                        <SelectItem value="WEEKLY">Theo tuần</SelectItem>
                     </SelectContent>
                 </Select>
             </CardHeader>
-            <CardContent className="pt-8 flex-grow pb-10">
+            <CardContent className="flex-grow pb-6 pt-4">
                 {summary && (
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                    <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <DollarOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Current Total</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Tổng hiện tại</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white mb-1 truncate px-1" title={summary.currentTotal.toLocaleString()}>
+                            <p className="mb-1 truncate px-1 text-lg font-bold tabular-nums text-slate-900 dark:text-white" title={summary.currentTotal.toLocaleString()}>
                                 {formatCompactNumber(summary.currentTotal)}
                             </p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <RiseOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Growth Rate</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Tăng trưởng</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-emerald-600 leading-none">+{summary.growthRate}%</p>
+                            <p className="text-lg font-bold tabular-nums leading-none text-emerald-600">+{summary.growthRate}%</p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <TransactionOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Peak Revenue</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Đỉnh doanh thu</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate px-1" title={summary.peakValue.toLocaleString()}>
+                            <p className="truncate px-1 text-lg font-bold tabular-nums leading-none text-slate-900 dark:text-white" title={summary.peakValue.toLocaleString()}>
                                 {formatCompactNumber(summary.peakValue)}
                             </p>
                         </div>
-                        <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/5 p-4 text-center">
-                            <div className="flex items-center justify-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+                        <div className="rounded-2xl border border-slate-100 bg-muted/30 p-4 text-center dark:border-slate-700 dark:bg-muted/20">
+                            <div className="mb-2 flex items-center justify-center gap-2 text-muted-foreground">
                                 <LineChartOutlined className="text-lg" />
-                                <p className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 opacity-70">Average</p>
+                                <p className="text-[10px] font-semibold uppercase tracking-wide">Trung bình</p>
                             </div>
-                            <p className="mt-1 text-lg font-black tabular-nums text-slate-900 dark:text-white leading-none truncate px-1" title={Math.round(summary.averageValue).toLocaleString()}>
+                            <p className="truncate px-1 text-lg font-bold tabular-nums leading-none text-slate-900 dark:text-white" title={Math.round(summary.averageValue).toLocaleString()}>
                                 {formatCompactNumber(Math.round(summary.averageValue))}
                             </p>
                         </div>
@@ -116,8 +115,8 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
                     {/* Y-Axis Labels & Grid Lines */}
                     {yAxisLabels.map((l, i) => (
                         <div key={i} className="absolute inset-x-0" style={{ top: `${(l.y / 200) * 100}%` }}>
-                            <span className="absolute -left-22 -top-2 w-20 text-[10px] font-bold text-gray-400 text-right tabular-nums truncate">{l.label}</span>
-                            <div className="w-full h-px bg-gray-100 border-t border-dashed border-gray-200/50" />
+                            <span className="absolute -left-22 -top-2 w-20 text-right text-[10px] font-medium tabular-nums text-muted-foreground truncate">{l.label}</span>
+                            <div className="h-px w-full border-t border-dashed border-border bg-muted/30" />
                         </div>
                     ))}
 
@@ -135,10 +134,7 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
                                     fill="url(#gradient-revenue)"
                                 />
 
-                                <motion.path
-                                    initial={{ pathLength: 0 }}
-                                    animate={{ pathLength: 1 }}
-                                    transition={{ duration: 1, ease: "linear" }}
+                                <path
                                     d={getPathData(revenueTrends.map(r => r.revenue))}
                                     fill="none"
                                     stroke="#3b82f6"
@@ -157,15 +153,15 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
                                         <g key={i} className="group/point">
                                             <circle cx={cx} cy={cy} r="6" fill="#3b82f6" className="shadow-lg cursor-pointer" />
                                             <circle cx={cx} cy={cy} r="3" fill="white" className="pointer-events-none" />
-                                            <foreignObject x={cx - 90} y={tooltipY} width="180" height="115" className="opacity-0 group-hover/point:opacity-100 transition-all duration-200 pointer-events-none">
-                                                <div className="bg-gray-900/95 text-white p-3.5 rounded-2xl shadow-2xl border border-white/10 flex flex-col gap-1.5 translate-y-2 group-hover/point:translate-y-0 transition-transform">
+                                            <foreignObject x={cx - 90} y={tooltipY} width="180" height="115" className="pointer-events-none opacity-0 transition-opacity duration-200 group-hover/point:opacity-100">
+                                                <div className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-slate-900/95 p-3.5 text-white shadow-lg">
                                                     <div className="text-[10px] font-black uppercase tracking-tighter opacity-60 text-blue-400 text-center">{p.period}</div>
                                                     <div className="flex flex-col border-b border-white/10 pb-1 mb-1">
-                                                        <span className="text-[9px] opacity-70 leading-none uppercase tracking-widest font-bold">Revenue</span>
-                                                        <span className="text-sm font-black tabular-nums">{p.revenue.toLocaleString()} VND</span>
+                                                        <span className="text-[9px] font-bold uppercase leading-none tracking-widest opacity-70">Doanh thu</span>
+                                                        <span className="text-sm font-bold tabular-nums">{p.revenue.toLocaleString('vi-VN')} VNĐ</span>
                                                     </div>
                                                     <div className="flex justify-between items-center text-[10px]">
-                                                        <span className="opacity-70">Transactions:</span>
+                                                        <span className="opacity-70">Giao dịch:</span>
                                                         <span className="font-bold text-blue-200">{p.transactionCount}</span>
                                                     </div>
                                                 </div>
@@ -183,8 +179,8 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
                     <div className="flex justify-between">
                         {revenueTrends.map((p, idx) => (
                             <div key={idx} className="flex flex-col items-center gap-1.5 group/label w-[60px]">
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter tabular-nums group-hover/label:text-blue-600 transition-colors text-center truncate px-1">{p.period}</span>
-                                <div className="w-1.5 h-1.5 rounded-full bg-gray-200 group-hover/label:bg-blue-300 transition-colors" />
+                                <span className="truncate px-1 text-center text-[9px] font-semibold uppercase tracking-tight text-muted-foreground tabular-nums transition-colors group-hover/label:text-blue-600">{p.period}</span>
+                                <div className="h-1.5 w-1.5 rounded-full bg-muted transition-colors group-hover/label:bg-blue-400" />
                             </div>
                         ))}
                     </div>

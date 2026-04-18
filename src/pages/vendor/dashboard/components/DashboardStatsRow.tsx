@@ -26,7 +26,7 @@ export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
         <>
             <Col xs={24} sm={12} md={6}>
                 <StatCard
-                    title="Revenue"
+                    title="Doanh thu"
                     value={formatCurrency(revenue?.value, revenue?.currency)}
                     icon={DollarSign}
                     trend={revenue ? { value: revenue.trendPercent, isPositive: revenue.trendDirection === 'up' } : undefined}
@@ -36,7 +36,7 @@ export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
 
             <Col xs={24} sm={12} md={6}>
                 <StatCard
-                    title="Workshops"
+                    title="Tổng workshop"
                     value={workshops?.value?.toString() ?? '--'}
                     icon={Briefcase}
                     trend={workshops ? { value: workshops.trendPercent, isPositive: workshops.trendDirection === 'up' } : undefined}
@@ -46,7 +46,7 @@ export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
 
             <Col xs={24} sm={12} md={6}>
                 <StatCard
-                    title="Bookings"
+                    title="Đặt chỗ"
                     value={bookings?.value?.toString() ?? '--'}
                     icon={CalendarCheck}
                     trend={bookings ? { value: bookings.trendPercent, isPositive: bookings.trendDirection === 'up' } : undefined}
@@ -56,7 +56,7 @@ export function DashboardStatsRow({ stats }: DashboardStatsRowProps) {
 
             <Col xs={24} sm={12} md={6}>
                 <StatCard
-                    title="Vouchers"
+                    title="Voucher"
                     value={vouchers?.value?.toString() ?? '--'}
                     icon={Ticket}
                     trend={vouchers ? { value: vouchers.trendPercent, isPositive: vouchers.trendDirection === 'up' } : undefined}
