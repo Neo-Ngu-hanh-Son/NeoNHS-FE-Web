@@ -1,11 +1,11 @@
 import { useState, useCallback, useEffect } from "react";
 import { message } from "antd";
-import { usePanoramaEditor } from "./usePanoramaEditor";
+import { usePanoramaEditor, type UsePanoramaEditorOptions } from "./usePanoramaEditor";
 import type { HotSpotFormValues } from "../schema";
 import type { PanoramaRequest } from "@/types";
 
-export function usePanoramaForm() {
-  const editor = usePanoramaEditor();
+export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
+  const editor = usePanoramaEditor(editorOptions);
   const { panorama, savePanorama, deletePanorama } = editor;
 
   // ─── Local form state ───
@@ -46,14 +46,14 @@ export function usePanoramaForm() {
   // ─── Save ───
   const handleSave = async () => {
     if (!panoramaImageUrl.trim()) {
-      setImageError("Panorama image URL is required");
+      setImageError("Vui lòng tải lên ảnh panorama để xem trước.");
       return;
     }
     try {
       new URL(panoramaImageUrl);
       setImageError("");
     } catch {
-      setImageError("Must be a valid URL");
+      setImageError("Phải là URL hợp lệ");
       return;
     }
 
@@ -103,13 +103,13 @@ export function usePanoramaForm() {
     setDefaultPitch(pitch);
     setHasCustomView(true);
     setViewSelectionMode(false);
-    message.success("Default starting view saved");
+    message.success("Đã lưu góc nhìn mặc định");
   };
   const resetDefaultView = () => {
     setDefaultYaw(0);
     setDefaultPitch(0);
     setHasCustomView(false);
-    message.success("Default view reset to center");
+    message.success("Đã đặt lại góc nhìn về trung tâm");
   };
 
   // ─── Hot spot CRUD ───
@@ -123,7 +123,7 @@ export function usePanoramaForm() {
 
   const deleteHotSpot = (index: number) => {
     setHotSpots((prev) => prev.filter((_, i) => i !== index));
-    message.success("Hot spot removed");
+    message.success("Đã xóa điểm nóng");
   };
 
   const reorderHotSpots = (fromIndex: number, toIndex: number) => {
@@ -144,7 +144,7 @@ export function usePanoramaForm() {
   const handlePreviewClick = useCallback((yaw: number, pitch: number) => {
     const roundedYaw = Math.round(yaw * 100) / 100;
     const roundedPitch = Math.round(pitch * 100) / 100;
-    message.info(`Position captured: yaw=${roundedYaw}, pitch=${roundedPitch}`);
+    message.info(`Đã lấy vị trí: yaw=${roundedYaw}, pitch=${roundedPitch}`);
     setClickedPosition({ yaw: roundedYaw, pitch: roundedPitch });
   }, []);
 

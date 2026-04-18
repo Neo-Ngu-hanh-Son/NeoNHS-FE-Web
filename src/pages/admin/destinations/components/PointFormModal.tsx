@@ -7,16 +7,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { MapPin, Upload, Loader2, AudioLines, AlertTriangle, ImageIcon } from 'lucide-react';
+import { MapPin, Upload, Loader2, AlertTriangle, ImageIcon } from 'lucide-react';
 import { Destination, Point } from '../types';
 import { PointRequest, PointType } from '@/types/point';
 import * as turf from '@turf/turf';
 import { NGU_HANH_SON_GEOJSON_POLYGON } from '../constants';
 import { message } from 'antd';
-import { useNavigate } from 'react-router-dom';
 import { pointTypeLabel } from '../pointTypeLabels';
 import HistoryAudioPanel from '@/pages/admin/historyAudio/components/HistoryAudioPanel';
+import PanoramaEditorPanel from '@/pages/admin/panorama/components/PanoramaEditorPanel';
 
 function isPointInBoundary(lat: number, lng: number): boolean {
     const point = turf.point([lng, lat]);
@@ -44,7 +43,7 @@ interface PointFormModalProps {
 
 const POINT_TYPES = Object.values(PointType);
 
-type TabValue = 'point' | 'audio';
+type TabValue = 'point' | 'audio' | 'panorama';
 
 export function PointFormModal({
     open,
@@ -70,8 +69,6 @@ export function PointFormModal({
         attractionId: '',
     });
     const [activeTab, setActiveTab] = useState<TabValue>('point');
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         setActiveTab('point');
@@ -148,7 +145,7 @@ export function PointFormModal({
     };
 
     const pointId = editingPoint?.id;
-    const canUseAudioTab = Boolean(pointId);
+    const canUseMediaTabs = Boolean(pointId);
 
     const tabPanelClass =
         'mt-0 max-h-[min(520px,calc(92vh-220px))] min-h-0 flex-1 overflow-y-auto px-6 py-4 focus-visible:outline-none';
@@ -161,7 +158,8 @@ export function PointFormModal({
                         {editingPoint?.id ? 'Sửa điểm tham quan (POI)' : 'Thêm điểm tham quan (POI)'}
                     </DialogTitle>
                     <DialogDescription className="text-sm text-muted-foreground">
-                        Tab <strong>Thông tin điểm</strong> để chỉnh sửa; tab <strong>Âm thanh lịch sử</strong> khi điểm đã có mã (đã lưu).
+                        Tab <strong>Thông tin điểm</strong> để chỉnh sửa. Tab <strong>Âm thanh lịch sử</strong> và{' '}
+                        <strong>Panorama 360°</strong> chỉ dùng được sau khi điểm đã có mã (đã lưu).
                     </DialogDescription>
                 </DialogHeader>
 
@@ -171,10 +169,13 @@ export function PointFormModal({
                     className="flex min-h-0 flex-1 flex-col"
                 >
                     <div className="shrink-0 border-b border-slate-100 px-6 pb-3 pt-1 dark:border-slate-700">
-                        <TabsList className="grid w-full max-w-md grid-cols-2">
+                        <TabsList className="grid w-full max-w-2xl grid-cols-3 gap-1">
                             <TabsTrigger value="point">Thông tin điểm</TabsTrigger>
-                            <TabsTrigger value="audio" disabled={!canUseAudioTab}>
+                            <TabsTrigger value="audio" disabled={!canUseMediaTabs}>
                                 Âm thanh lịch sử
+                            </TabsTrigger>
+                            <TabsTrigger value="panorama" disabled={!canUseMediaTabs}>
+                                Panorama 360°
                             </TabsTrigger>
                         </TabsList>
                     </div>
@@ -329,8 +330,8 @@ export function PointFormModal({
                                                 variant="outline"
                                                 size="sm"
                                                 className="w-full justify-start gap-2 transition-colors"
-                                                disabled={!canUseAudioTab}
-                                                onClick={() => canUseAudioTab && setActiveTab('audio')}
+                                                disabled={!canUseMediaTabs}
+                                                onClick={() => canUseMediaTabs && setActiveTab('audio')}
                                             >
                                                 <AudioLines className="h-4 w-4 shrink-0" />
                                                 Mở tab cấu hình âm thanh
@@ -462,6 +463,21 @@ export function PointFormModal({
                         ) : (
                             <div className="rounded-2xl border border-dashed border-slate-200 py-12 text-center dark:border-slate-700">
                                 <p className="text-sm text-muted-foreground">Lưu điểm trước để cấu hình âm thanh lịch sử.</p>
+                            </div>
+                        )}
+                    </TabsContent>
+
+                    <TabsContent value="panorama" forceMount className={`${tabPanelClass} data-[state=inactive]:hidden`}>
+                        {pointId ? (
+                            <PanoramaEditorPanel
+                                variant="embedded"
+                                embedPointId={pointId}
+                                pointName={formData.name}
+                                onBackToParent={() => setActiveTab('point')}
+                            />
+                        ) : (
+                            <div className="rounded-2xl border border-dashed border-slate-200 py-12 text-center dark:border-slate-700">
+                                <p className="text-sm text-muted-foreground">Lưu điểm trước để chỉnh panorama 360°.</p>
                             </div>
                         )}
                     </TabsContent>
