@@ -7,20 +7,129 @@ interface RecentActivitiesTimelineProps {
     activities: RecentActivity[];
 }
 
-/** Hiển thị nhãn hành động tiếng Việt khi khớp mã từ API */
+const ACTION_LABEL_VI: Record<string, string> = {
+    TICKET_SELL: 'Bán vé',
+    TICKET_SOLD: 'Vé Đã Bán',
+    SELL_TICKET: 'Bán vé',
+    WORKSHOP_APPROVE: 'Duyệt workshop',
+    WORKSHOP_CREATE: 'Tạo workshop',
+    WORKSHOP_UPDATE: 'Cập nhật workshop',
+    WORKSHOP_DELETE: 'Xóa workshop',
+    WORKSHOP_REJECT: 'Từ chối workshop',
+    EVENT_CREATE: 'Tạo sự kiện',
+    EVENT_APPROVE: 'Duyệt sự kiện',
+    EVENT_UPDATE: 'Cập nhật sự kiện',
+    EVENT_DELETE: 'Xóa sự kiện',
+    EVENT_REJECT: 'Từ chối sự kiện',
+    VENDOR_APPROVE: 'Duyệt nhà cung cấp',
+    VENDOR_REGISTER: 'Đăng ký nhà cung cấp',
+    VENDOR_REJECT: 'Từ chối nhà cung cấp',
+    USER_REGISTER: 'Đăng ký người dùng',
+    USER_UPDATE: 'Cập nhật người dùng',
+};
+
+/** Từ khóa ENTITY_VERB / VERB_ENTITY → tiếng Việt khi API trả mã chưa có trong map cố định */
+const ENTITY_VI: Record<string, string> = {
+    TICKET: 'vé',
+    TICKETS: 'vé',
+    WORKSHOP: 'workshop',
+    WORKSHOPS: 'workshop',
+    EVENT: 'sự kiện',
+    EVENTS: 'sự kiện',
+    VENDOR: 'nhà cung cấp',
+    VENDORS: 'nhà cung cấp',
+    USER: 'người dùng',
+    USERS: 'người dùng',
+    BLOG: 'bài viết',
+    DESTINATION: 'điểm đến',
+    VOUCHER: 'mã giảm giá',
+    ORDER: 'đơn hàng',
+    PAYMENT: 'thanh toán',
+    REFUND: 'hoàn tiền',
+    SESSION: 'buổi học',
+    TEMPLATE: 'mẫu',
+    REGISTRATION: 'đăng ký',
+    REVIEW: 'đánh giá',
+    NOTIFICATION: 'thông báo',
+};
+
+const VERB_VI: Record<string, string> = {
+    SELL: 'Bán',
+    SOLD: 'Đã bán',
+    CREATE: 'Tạo',
+    CREATED: 'Đã tạo',
+    UPDATE: 'Cập nhật',
+    UPDATED: 'Đã cập nhật',
+    DELETE: 'Xóa',
+    DELETED: 'Đã xóa',
+    APPROVE: 'Duyệt',
+    APPROVED: 'Đã duyệt',
+    REJECT: 'Từ chối',
+    REJECTED: 'Đã từ chối',
+    REGISTER: 'Đăng ký',
+    LOGIN: 'Đăng nhập',
+    LOGOUT: 'Đăng xuất',
+    SUBMIT: 'Gửi',
+    PUBLISH: 'Xuất bản',
+    UNPUBLISH: 'Gỡ xuất bản',
+    CANCEL: 'Hủy',
+    COMPLETE: 'Hoàn thành',
+    PURCHASE: 'Mua',
+    ASSIGN: 'Gán',
+};
+
+function formatSnakeCaseToVi(normalized: string): string {
+    const parts = normalized.split('_').filter(Boolean);
+    if (parts.length === 0) return normalized;
+
+    if (parts.length === 1) {
+        return VERB_VI[parts[0]] ?? ENTITY_VI[parts[0]] ?? normalized;
+    }
+
+    const [a, b, ...rest] = parts;
+    const restVi = rest.map((p) => ENTITY_VI[p] ?? VERB_VI[p] ?? p.toLowerCase());
+
+    if (ENTITY_VI[a] && VERB_VI[b]) {
+        const tail = [ENTITY_VI[a], ...restVi].filter(Boolean).join(' ');
+        return `${VERB_VI[b]} ${tail}`.trim();
+    }
+    if (VERB_VI[a] && (ENTITY_VI[b] ?? VERB_VI[b])) {
+        const obj = ENTITY_VI[b] ?? VERB_VI[b] ?? b.toLowerCase();
+        return [VERB_VI[a], obj, ...restVi].join(' ').trim();
+    }
+
+    return parts.map((p) => VERB_VI[p] ?? ENTITY_VI[p] ?? p.toLowerCase()).join(' · ');
+}
+
+/** Chuẩn hóa mã/ chuỗi từ API → khóa tra map */
+function normalizeActionKey(action: string): string {
+    return action
+        .trim()
+        .replace(/[\s-]+/g, '_')
+        .replace(/_+/g, '_')
+        .toUpperCase();
+}
+
+/** Hiển thị nhãn hành động tiếng Việt (map + suy luận từ SNAKE_CASE) */
 function formatActionLabel(action: string): string {
-    const normalized = action.trim().toUpperCase();
-    const map: Record<string, string> = {
-        TICKET_SELL: 'Bán vé',
-        WORKSHOP_APPROVE: 'Duyệt workshop',
-        WORKSHOP_CREATE: 'Tạo workshop',
-        EVENT_CREATE: 'Tạo sự kiện',
-        EVENT_APPROVE: 'Duyệt sự kiện',
-        VENDOR_APPROVE: 'Duyệt nhà cung cấp',
-        USER_REGISTER: 'Đăng ký người dùng',
-    };
-    if (map[normalized]) return map[normalized];
-    return action.replace(/_/g, ' ');
+    const raw = action.trim();
+    if (!raw) return '';
+
+    const normalized = normalizeActionKey(raw);
+    if (ACTION_LABEL_VI[normalized]) return ACTION_LABEL_VI[normalized];
+
+    if (normalized.includes('_')) {
+        return formatSnakeCaseToVi(normalized);
+    }
+
+    // Chuỗi tự do (không có _) — tránh in nguyên tiếng Anh nếu khớp kiểu Title Case
+    const asKey = normalizeActionKey(raw.replace(/([a-z])([A-Z])/g, '$1_$2'));
+    if (asKey.includes('_') && asKey !== normalized) {
+        if (ACTION_LABEL_VI[asKey]) return ACTION_LABEL_VI[asKey];
+        return formatSnakeCaseToVi(asKey);
+    }
+
+    return raw;
 }
 
 export function RecentActivitiesTimeline({ activities }: RecentActivitiesTimelineProps) {

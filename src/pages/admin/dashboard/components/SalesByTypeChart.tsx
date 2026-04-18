@@ -80,7 +80,6 @@ export function SalesByTypeChart({ salesByType, activityStatus }: SalesByTypeCha
                             )}
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-lg font-bold leading-none text-slate-800 dark:text-white">Tỉ lệ</span>
                         </div>
                     </div>
                 </div>
@@ -119,7 +118,6 @@ export function SalesByTypeChart({ salesByType, activityStatus }: SalesByTypeCha
                             )}
                         </svg>
                         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Tổng</span>
                             <span className="text-lg font-bold leading-none text-slate-800 dark:text-white">{totalAct > 1 ? totalAct : 0}</span>
                         </div>
                     </div>

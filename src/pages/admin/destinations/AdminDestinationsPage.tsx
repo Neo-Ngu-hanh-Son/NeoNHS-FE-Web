@@ -18,7 +18,6 @@ import { MapPin } from 'lucide-react';
 
 export default function AdminDestinationsPage() {
     const {
-        // State
         filteredDestinations,
         allPoints,
         pointsLoading,
@@ -47,8 +46,6 @@ export default function AdminDestinationsPage() {
         setPickerCoord,
         previewPos,
         setPreviewPos,
-
-        // Actions
         handleFileUpload,
         handleFocus,
         handleSavePoint,
@@ -62,29 +59,26 @@ export default function AdminDestinationsPage() {
     const handleFocusWithScroll = (lat: number, lng: number) => {
         handleFocus(lat, lng);
         if (mapSectionRef.current) {
-            mapSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            mapSectionRef.current.scrollIntoView({ behavior: 'auto', block: 'start' });
         }
     };
 
-    // Delete Confirmation State
-    const [deleteTarget, setDeleteTarget] = useState<{ id: string, type: 'point' } | null>(null);
-
+    const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'point' } | null>(null);
 
     const onConfirmCoord = (geocodedData?: { name?: string; address?: string; googlePlaceId?: string; photoUrl?: string }) => {
         setPreviewPos(pickerCoord);
 
         if (geocodedData) {
-            setEditingPoint(prev => ({
+            setEditingPoint((prev) => ({
                 ...(prev || {
                     name: '',
                     description: '',
                     orderIndex: allPoints.length + 1,
                     type: 'GENERAL',
-                    attractionId: currentPointDestination?.id || ''
+                    attractionId: currentPointDestination?.id || '',
                 }),
                 latitude: pickerCoord[0],
                 longitude: pickerCoord[1],
-                // Only overwrite name/description if they are empty or if we explicitly want to (here we overwrite to be helpful)
                 name: geocodedData.name || prev?.name || '',
                 description: geocodedData.address || prev?.description || '',
                 googlePlaceId: geocodedData.googlePlaceId || prev?.googlePlaceId || '',
@@ -102,98 +96,96 @@ export default function AdminDestinationsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] text-slate-900">
-            {/* Header Section */}
-            <div className="bg-white border-b border-slate-200/60 px-8 py-5 flex items-center justify-between">
-                <div className="flex items-center gap-6">
-                    <div className="flex flex-col">
-                        <h1 className="text-2xl font-black tracking-tight text-slate-800 flex items-center gap-2">
-                            Point Management Hub
-                        </h1>
-                        <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">
-                            Geo-Location & Global POI Control
+        <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
+            <div className="rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm dark:border-white/10 dark:from-white/5 dark:to-transparent">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Quản lý điểm đến</h1>
+                        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                            Bản đồ và các điểm quan tâm (POI) gắn với điểm đến trên hệ thống
                         </p>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2 text-xs font-medium text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/20">
+                            <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <span>Xem và chỉnh sửa trực tiếp trên bản đồ</span>
                     </div>
                 </div>
             </div>
 
-            <div className="px-8 pb-8 max-w-[1800px] mx-auto">
-                <div className="grid grid-cols-12 gap-8 items-start">
-                    {/* Operational Panel - Map Visualizer */}
-                    <div className="col-span-12 xl:col-span-5 sticky top-6 self-start">
-                        <div className="w-full h-[700px] shadow-2xl rounded-3xl border border-white/50 overflow-hidden relative group" ref={mapSectionRef}>
-                            <DestinationMap
-                                destinations={filteredDestinations}
-                                allPoints={allPoints}
-                                currentPointDestination={currentPointDestination}
-                                mapCenter={mapCenter}
-                                mapZoom={mapZoom}
-                                previewPos={previewPos}
-                                onMapClick={(lat, lng) => {
-                                    if (isPointModalVisible) {
-                                        const roundedLat = Number(lat.toFixed(6));
-                                        const roundedLng = Number(lng.toFixed(6));
-                                        setPickerCoord([roundedLat, roundedLng]);
-                                        setPreviewPos([roundedLat, roundedLng]);
-                                    }
-                                }}
-                                onViewPoint={(p) => {
-                                    setEditingPoint(p);
-                                    setIsPointModalVisible(true);
-                                }}
-                                onPointClick={(lat, lng) => {
-                                    handleFocus(lat, lng);
-                                }}
-                            />
-                            <div className="absolute top-4 left-4 z-10 pointer-events-none">
-                                <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-xl border border-white/20 flex items-center gap-3">
-                                    <div className="p-1.5 bg-primary/10 rounded-lg">
-                                        <MapPin className="w-4 h-4 text-primary" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-700">Live Spatial Distribution</span>
+            <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8">
+                <div className="lg:col-span-5 lg:sticky lg:top-6 lg:self-start" ref={mapSectionRef}>
+                    <div className="relative h-[min(640px,75vh)] w-full overflow-hidden rounded-2xl border border-slate-100 bg-card shadow-sm dark:border-slate-700">
+                        <DestinationMap
+                            destinations={filteredDestinations}
+                            allPoints={allPoints}
+                            currentPointDestination={currentPointDestination}
+                            mapCenter={mapCenter}
+                            mapZoom={mapZoom}
+                            previewPos={previewPos}
+                            onMapClick={(lat, lng) => {
+                                if (isPointModalVisible) {
+                                    const roundedLat = Number(lat.toFixed(6));
+                                    const roundedLng = Number(lng.toFixed(6));
+                                    setPickerCoord([roundedLat, roundedLng]);
+                                    setPreviewPos([roundedLat, roundedLng]);
+                                }
+                            }}
+                            onViewPoint={(p) => {
+                                setEditingPoint(p);
+                                setIsPointModalVisible(true);
+                            }}
+                            onPointClick={(lat, lng) => {
+                                handleFocus(lat, lng);
+                            }}
+                        />
+                        <div className="pointer-events-none absolute left-4 top-4 z-10">
+                            <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm dark:border-slate-600 dark:bg-slate-800">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-500/20">
+                                    <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                 </div>
+                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">Phân bố trên bản đồ</span>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Inventory Table Panel */}
-                    <div className="col-span-12 xl:col-span-7">
-                        <div className="min-h-[700px]">
-                            <PointManagement
-                                currentDestination={currentPointDestination}
-                                allPoints={allPoints}
-                                loading={pointsLoading}
-                                onAddPoint={() => {
-                                    setEditingPoint(null);
-                                    setPreviewPos(null);
-                                    setIsDiscoveryModalVisible(true);
-                                }}
-                                onEditPoint={(point) => {
-                                    setEditingPoint(point);
-                                    setPreviewPos(null);
-                                    setIsPointModalVisible(true);
-                                }}
-                                onDeletePoint={(id) => setDeleteTarget({ id, type: 'point' })}
-                                onFocus={handleFocusWithScroll}
-                                onImportPoints={handleImportPoints}
-                                pagination={{
-                                    currentPage,
-                                    pageSize,
-                                    totalElements: totalPoints,
-                                    onPageChange: setCurrentPage,
-                                    onPageSizeChange: setPageSize
-                                }}
-                                searchText={searchText}
-                                onSearchChange={setSearchText}
-                                destinations={filteredDestinations}
-                                onDestinationChange={setCurrentPointDestination}
-                            />
-                        </div>
+                <div className="lg:col-span-7">
+                    <div className="min-h-[min(640px,75vh)]">
+                        <PointManagement
+                            currentDestination={currentPointDestination}
+                            allPoints={allPoints}
+                            loading={pointsLoading}
+                            onAddPoint={() => {
+                                setEditingPoint(null);
+                                setPreviewPos(null);
+                                setIsDiscoveryModalVisible(true);
+                            }}
+                            onEditPoint={(point) => {
+                                setEditingPoint(point);
+                                setPreviewPos(null);
+                                setIsPointModalVisible(true);
+                            }}
+                            onDeletePoint={(id) => setDeleteTarget({ id, type: 'point' })}
+                            onFocus={handleFocusWithScroll}
+                            onImportPoints={handleImportPoints}
+                            pagination={{
+                                currentPage,
+                                pageSize,
+                                totalElements: totalPoints,
+                                onPageChange: setCurrentPage,
+                                onPageSizeChange: setPageSize,
+                            }}
+                            searchText={searchText}
+                            onSearchChange={setSearchText}
+                            destinations={filteredDestinations}
+                            onDestinationChange={setCurrentPointDestination}
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Modals Orchestration */}
             <PointFormModal
                 open={isPointModalVisible}
                 onOpenChange={setIsPointModalVisible}
@@ -203,7 +195,13 @@ export default function AdminDestinationsPage() {
                 onSave={handleSavePoint}
                 onOpenMapPicker={() => {
                     setMapPickerTarget('point');
-                    setPickerCoord(editingPoint ? [editingPoint.latitude, editingPoint.longitude] : (currentPointDestination ? [currentPointDestination.latitude, currentPointDestination.longitude] : mapCenter));
+                    setPickerCoord(
+                        editingPoint
+                            ? [editingPoint.latitude, editingPoint.longitude]
+                            : currentPointDestination
+                              ? [currentPointDestination.latitude, currentPointDestination.longitude]
+                              : mapCenter,
+                    );
                     setIsMapPickerVisible(true);
                 }}
                 previewPos={previewPos}
@@ -224,7 +222,7 @@ export default function AdminDestinationsPage() {
                             name: result.name,
                             address: result.address,
                             googlePlaceId: result.googlePlaceId,
-                            photoUrl: result.photoUrl
+                            photoUrl: result.photoUrl,
                         });
                     } else {
                         handleSelectDiscovery(result);
@@ -232,19 +230,24 @@ export default function AdminDestinationsPage() {
                 }}
             />
 
-            {/* Verification Dialogs */}
             <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-                <AlertDialogContent className="rounded-3xl border-none shadow-2xl overflow-hidden">
-                    <AlertDialogHeader className="p-2 pt-4">
-                        <AlertDialogTitle className="text-2xl font-bold text-slate-800">Confirm Deletion</AlertDialogTitle>
-                        <AlertDialogDescription className="text-slate-500 font-medium text-base">
-                            Warning: This action will permanently remove the <span className="text-destructive font-bold underline underline-offset-4">point</span> from the central database. This cannot be undone.
+                <AlertDialogContent className="rounded-2xl border border-slate-200 bg-card shadow-sm dark:border-slate-700">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+                            Xác nhận xóa điểm
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm text-muted-foreground">
+                            Thao tác này sẽ{' '}
+                            <span className="font-semibold text-destructive">xóa vĩnh viễn</span> điểm khỏi cơ sở dữ liệu. Không thể hoàn tác.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter className="p-4 bg-slate-50/50 flex gap-3">
-                        <AlertDialogCancel className="rounded-xl border-slate-200 font-bold hover:bg-white">Abort Operation</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl font-bold shadow-lg shadow-destructive/20 px-8">
-                            Confirm Delete
+                    <AlertDialogFooter className="gap-2 sm:gap-0">
+                        <AlertDialogCancel className="transition-colors">Hủy</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                            Xóa
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

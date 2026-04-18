@@ -2,6 +2,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RevenueTrendPoint } from '@/types/adminDashboard';
 import { DollarOutlined, RiseOutlined, LineChartOutlined, TransactionOutlined } from '@ant-design/icons';
+import { Column } from '@ant-design/charts';
+import { BarChart2 } from 'lucide-react';
 
 interface RevenueTrendsChartProps {
     revenueTrends: RevenueTrendPoint[];
@@ -18,7 +20,8 @@ interface RevenueTrendsChartProps {
 }
 
 export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setRevenuePeriod }: RevenueTrendsChartProps) {
-    const maxRevenue = Math.max(...revenueTrends.map(x => x.revenue), 1);
+    const hasData = revenueTrends.length > 0;
+    const crowdedX = revenueTrends.length > 10;
 
     const formatCompactNumber = (number: number) => {
         if (number >= 1000000000) return `${(number / 1000000000).toFixed(1)}B`;
@@ -27,25 +30,52 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
         return number.toString();
     };
 
-    const yAxisLevels = [1, 0.66, 0.33, 0];
-    const yAxisLabels = yAxisLevels.map(p => ({
-        label: p === 0 ? "0" : formatCompactNumber(maxRevenue * p),
-        y: 200 - (p * 170)
+    const chartData = revenueTrends.map((r) => ({
+        period: r.period,
+        revenue: r.revenue,
+        transactionCount: r.transactionCount,
     }));
 
-    // Use L for 100% dot-to-line accuracy
-    const getPathData = (data: number[]) => {
-        if (data.length === 0) return "";
-        const points = data.map((val, i) => ({
-            x: (i / (data.length - 1)) * 500,
-            y: 200 - (val / maxRevenue) * 170
-        }));
+    const isMonthly = revenuePeriod === 'MONTHLY';
 
-        let d = `M ${points[0].x},${points[0].y}`;
-        for (let i = 1; i < points.length; i++) {
-            d += ` L ${points[i].x},${points[i].y}`;
-        }
-        return d;
+    const config = {
+        data: chartData,
+        xField: 'period',
+        yField: 'revenue',
+        color: '#3b82f6',
+        style: { maxWidth: isMonthly ? 80 : 50 },
+        axis: {
+            x: isMonthly || crowdedX
+                ? {
+                      labelAutoRotate: true,
+                      labelAutoHide: false,
+                      style: { labelTransform: 'rotate(-20)' },
+                  }
+                : undefined,
+            y: {
+                labelFormatter: (v: number) => {
+                    const n = Number(v);
+                    if (!Number.isFinite(n)) return '';
+                    if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toFixed(1)}B`;
+                    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+                    if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`;
+                    return String(Math.round(n));
+                },
+                nice: true,
+            },
+        },
+        tooltip: {
+            items: [
+                (d: (typeof chartData)[number]) => ({
+                    name: 'Doanh thu',
+                    value: new Intl.NumberFormat('vi-VN').format(d.revenue) + ' VNĐ',
+                }),
+                (d: (typeof chartData)[number]) => ({
+                    name: 'Giao dịch',
+                    value: String(d.transactionCount),
+                }),
+            ],
+        },
     };
 
     return (
@@ -110,80 +140,17 @@ export function RevenueTrendsChart({ revenueTrends, summary, revenuePeriod, setR
                     </div>
                 )}
 
-                {/* Fixed height box ONLY for the SVG chart area */}
-                <div className="h-[300px] relative mt-4 pl-24 pr-8">
-                    {/* Y-Axis Labels & Grid Lines */}
-                    {yAxisLabels.map((l, i) => (
-                        <div key={i} className="absolute inset-x-0" style={{ top: `${(l.y / 200) * 100}%` }}>
-                            <span className="absolute -left-22 -top-2 w-20 text-right text-[10px] font-medium tabular-nums text-muted-foreground truncate">{l.label}</span>
-                            <div className="h-px w-full border-t border-dashed border-border bg-muted/30" />
+                <div className="mt-4 h-[300px] w-full min-h-[200px]">
+                    {hasData ? (
+                        <div className="h-full w-full">
+                            <Column {...config} />
                         </div>
-                    ))}
-
-                    <svg className="w-full h-full relative z-20 overflow-visible" preserveAspectRatio="none" viewBox="0 0 500 200">
-                        <defs>
-                            <linearGradient id="gradient-revenue" x1="0%" x2="0%" y1="0%" y2="100%">
-                                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"></stop>
-                                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0"></stop>
-                            </linearGradient>
-                        </defs>
-                        {revenueTrends.length > 0 && (
-                            <>
-                                <path
-                                    d={getPathData(revenueTrends.map(r => r.revenue)) + " V 200 H 0 Z"}
-                                    fill="url(#gradient-revenue)"
-                                />
-
-                                <path
-                                    d={getPathData(revenueTrends.map(r => r.revenue))}
-                                    fill="none"
-                                    stroke="#3b82f6"
-                                    strokeWidth="4"
-                                    strokeLinecap="round"
-                                />
-
-                                {revenueTrends.map((p, i) => {
-                                    const cx = (i / (revenueTrends.length - 1)) * 500;
-                                    const cy = 200 - (p.revenue / maxRevenue) * 170;
-
-                                    const isTopHalf = cy < 100;
-                                    const tooltipY = isTopHalf ? cy + 15 : cy - 125;
-
-                                    return (
-                                        <g key={i} className="group/point">
-                                            <circle cx={cx} cy={cy} r="6" fill="#3b82f6" className="shadow-lg cursor-pointer" />
-                                            <circle cx={cx} cy={cy} r="3" fill="white" className="pointer-events-none" />
-                                            <foreignObject x={cx - 90} y={tooltipY} width="180" height="115" className="pointer-events-none opacity-0 transition-opacity duration-200 group-hover/point:opacity-100">
-                                                <div className="flex flex-col gap-1.5 rounded-2xl border border-white/10 bg-slate-900/95 p-3.5 text-white shadow-lg">
-                                                    <div className="text-[10px] font-black uppercase tracking-tighter opacity-60 text-blue-400 text-center">{p.period}</div>
-                                                    <div className="flex flex-col border-b border-white/10 pb-1 mb-1">
-                                                        <span className="text-[9px] font-bold uppercase leading-none tracking-widest opacity-70">Doanh thu</span>
-                                                        <span className="text-sm font-bold tabular-nums">{p.revenue.toLocaleString('vi-VN')} VNĐ</span>
-                                                    </div>
-                                                    <div className="flex justify-between items-center text-[10px]">
-                                                        <span className="opacity-70">Giao dịch:</span>
-                                                        <span className="font-bold text-blue-200">{p.transactionCount}</span>
-                                                    </div>
-                                                </div>
-                                            </foreignObject>
-                                        </g>
-                                    );
-                                })}
-                            </>
-                        )}
-                    </svg>
-                </div>
-
-                {/* MONTHS: Move OUTSIDE fixed box to let Card wrap them */}
-                <div className="pl-24 pr-8 mt-6">
-                    <div className="flex justify-between">
-                        {revenueTrends.map((p, idx) => (
-                            <div key={idx} className="flex flex-col items-center gap-1.5 group/label w-[60px]">
-                                <span className="truncate px-1 text-center text-[9px] font-semibold uppercase tracking-tight text-muted-foreground tabular-nums transition-colors group-hover/label:text-blue-600">{p.period}</span>
-                                <div className="h-1.5 w-1.5 rounded-full bg-muted transition-colors group-hover/label:bg-blue-400" />
-                            </div>
-                        ))}
-                    </div>
+                    ) : (
+                        <div className="flex h-full flex-col items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+                            <BarChart2 className="h-8 w-8 opacity-30" />
+                            <p>Chưa có dữ liệu doanh thu trong kỳ này</p>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
