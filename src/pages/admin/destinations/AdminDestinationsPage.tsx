@@ -50,6 +50,7 @@ export default function AdminDestinationsPage() {
         handleFocus,
         handleSavePoint,
         handleDeletePoint,
+        handleRestorePoint,
         handleImportPoints,
         handleSelectDiscovery,
     } = useAdminDestinations();

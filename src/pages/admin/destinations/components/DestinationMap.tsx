@@ -213,25 +213,25 @@ export function DestinationMap({
             const lat = Number(p.latitude);
             const lng = Number(p.longitude);
 
-            if (!markersRef.current[p.id]) {
-                const el = document.createElement('div');
-                el.className = 'custom-point-marker cursor-pointer transition-transform hover:scale-110';
-                el.innerHTML = `
-                    <div class="relative flex flex-col items-center -translate-y-[21px]">
-                        <div class="w-8 h-8 rounded-full border-2 border-white shadow-xl flex items-center justify-center overflow-hidden" style="background-color: ${config.color}">
-                            <span class="material-symbols-outlined text-white text-[18px]">${config.icon}</span>
-                        </div>
-                        <div class="w-0.5 h-1.5" style="background-color: ${config.color}"></div>
-                        <div class="w-1.5 h-1.5 rounded-full border border-white shadow-sm" style="background-color: ${config.color}"></div>
+            const el = document.createElement('div');
+            el.className = `custom-point-marker cursor-pointer transition-transform hover:scale-110 ${p.deletedAt ? 'opacity-50 grayscale' : ''}`;
+            el.innerHTML = `
+                <div class="relative flex flex-col items-center -translate-y-[21px]">
+                    <div class="w-8 h-8 rounded-full border-2 border-white shadow-xl flex items-center justify-center overflow-hidden" style="background-color: ${config.color}">
+                        <span class="material-symbols-outlined text-white text-[18px]">${config.icon}</span>
                     </div>
-                `;
+                    <div class="w-0.5 h-1.5" style="background-color: ${config.color}"></div>
+                    <div class="w-1.5 h-1.5 rounded-full border border-white shadow-sm" style="background-color: ${config.color}"></div>
+                </div>
+            `;
 
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    setSelectedPoint(p);
-                    onPointClick?.(lat, lng);
-                });
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                setSelectedPoint(p);
+                onPointClick?.(lat, lng);
+            });
 
+            if (!markersRef.current[p.id]) {
                 markersRef.current[p.id] = new google.maps.marker.AdvancedMarkerElement({
                     map,
                     position: { lat, lng },
@@ -239,8 +239,9 @@ export function DestinationMap({
                     zIndex: 900
                 });
             } else {
-                // Just update position in case it changed
+                // Update position and content
                 markersRef.current[p.id].position = { lat, lng };
+                markersRef.current[p.id].content = el;
             }
         });
     };
