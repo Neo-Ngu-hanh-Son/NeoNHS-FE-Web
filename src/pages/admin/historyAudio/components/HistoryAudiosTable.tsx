@@ -12,6 +12,12 @@ import {
 import { Plus } from "lucide-react";
 import type { HistoryAudioResponse } from "@/types/historyAudio";
 
+function formatAudioSource(mode: string): string {
+  if (mode === "generate") return "Tạo từ văn bản";
+  if (mode === "upload") return "Tải lên";
+  return mode;
+}
+
 interface HistoryAudiosTableProps {
   audios: HistoryAudioResponse[];
   activeAudioId: string | null;
@@ -33,7 +39,7 @@ export default function HistoryAudiosTable({
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Audio Entries</CardTitle>
+          <CardTitle className="text-base">Danh sách âm thanh</CardTitle>
           <Button
             size="sm"
             variant="outline"
@@ -41,14 +47,14 @@ export default function HistoryAudiosTable({
             disabled={!activeAudioId && !text && !hasAudio}
           >
             <Plus className="mr-1.5 h-3.5 w-3.5" />
-            New Audio
+            Thêm mới
           </Button>
         </div>
       </CardHeader>
       <CardContent className="pt-0">
         {audios.length === 0 ? (
           <p className="py-2 text-sm text-muted-foreground">
-            No history audios yet. Use the form below to create one.
+            Chưa có âm thanh lịch sử. Dùng biểu mẫu bên dưới để tạo mới.
           </p>
         ) : (
           <div className="max-h-[220px] overflow-y-auto rounded-md border">
@@ -56,13 +62,13 @@ export default function HistoryAudiosTable({
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[40px]">#</TableHead>
-                  <TableHead className="w-[90px]">Cover</TableHead>
-                  <TableHead className="w-[180px]">Title</TableHead>
-                  <TableHead className="w-[160px]">Artist</TableHead>
-                  <TableHead>Text Preview</TableHead>
-                  <TableHead className="w-[100px]">Language</TableHead>
-                  <TableHead className="w-[90px]">Source</TableHead>
-                  <TableHead className="w-[70px]">Audio</TableHead>
+                  <TableHead className="w-[90px]">Ảnh bìa</TableHead>
+                  <TableHead className="w-[180px]">Tiêu đề</TableHead>
+                  <TableHead className="w-[160px]">Tác giả</TableHead>
+                  <TableHead>Xem trước nội dung</TableHead>
+                  <TableHead className="w-[100px]">Ngôn ngữ</TableHead>
+                  <TableHead className="w-[90px]">Nguồn</TableHead>
+                  <TableHead className="w-[70px]">Âm thanh</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -91,7 +97,7 @@ export default function HistoryAudiosTable({
                         {coverImage ? (
                           <img
                             src={coverImage}
-                            alt={title !== "-" ? `${title} cover` : "Cover image"}
+                            alt={title !== "-" ? `Ảnh bìa: ${title}` : "Ảnh bìa"}
                             className="h-10 w-10 rounded object-cover border"
                           />
                         ) : (
@@ -106,17 +112,17 @@ export default function HistoryAudiosTable({
                           {lang}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-xs capitalize text-muted-foreground">
-                        {source}
+                      <TableCell className="text-xs text-muted-foreground">
+                        {source === "-" ? "-" : formatAudioSource(source)}
                       </TableCell>
                       <TableCell>
                         {hasEntryAudio ? (
                           <Badge variant="default" className="text-xs">
-                            Yes
+                            Có
                           </Badge>
                         ) : (
                           <Badge variant="outline" className="text-xs">
-                            No
+                            Không
                           </Badge>
                         )}
                       </TableCell>

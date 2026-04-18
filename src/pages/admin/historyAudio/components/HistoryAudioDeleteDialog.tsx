@@ -26,19 +26,19 @@ export default function HistoryAudioDeleteDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete history audio?</AlertDialogTitle>
+          <AlertDialogTitle>Xóa âm thanh lịch sử?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action permanently deletes the history audio and cannot be undone.
+            Thao tác này sẽ xóa vĩnh viễn âm thanh lịch sử và không thể hoàn tác.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleting}>Hủy</AlertDialogCancel>
           <AlertDialogAction
             disabled={deleting}
             onClick={onConfirmDelete}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {deleting ? "Deleting..." : "Delete"}
+            {deleting ? "Đang xóa…" : "Xóa"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

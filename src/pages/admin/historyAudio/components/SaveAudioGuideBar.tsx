@@ -16,7 +16,7 @@ export default function SaveAudioGuideBar({ disabled, saving, onSave }: SaveAudi
         ) : (
           <Save className="mr-2 h-4 w-4" />
         )}
-        Save
+        Lưu
       </Button>
     </div>
   );

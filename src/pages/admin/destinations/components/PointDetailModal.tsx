@@ -73,29 +73,6 @@ export function PointDetailModal({ open, onOpenChange, point }: PointDetailModal
             </div>
           )}
 
-          {/* {point.history && (
-                        <div className="space-y-2">
-                            <h3 className="text-sm font-bold flex items-center gap-2 text-gray-700">
-                                <History className="w-4 h-4 text-emerald-500" />
-                                Historical Context
-                            </h3>
-                            <div className="bg-muted/30 p-4 rounded-lg border italic text-sm text-gray-700">
-                                {point.history}
-                            </div>
-                        </div>
-                    )}
-
-                    {point.historyAudioUrl && (
-                        <div className="mt-2 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 shadow-sm">
-                            <div className="text-[10px] font-bold uppercase text-emerald-600 mb-2 tracking-widest flex items-center gap-2">
-                                <AudioLines className="w-4 h-4" /> Audio History Guide
-                            </div>
-                            <audio key={point.id} controls className="w-full h-10 mt-1">
-                                <source src={point.historyAudioUrl} />
-                            </audio>
-                        </div>
-                    )} */}
-
           <div className="bg-blue-50/50 p-3 rounded-lg flex items-center gap-2 border border-blue-100/50">
             <MapPin className="w-4 h-4 text-blue-500" />
             <span className="text-blue-700 text-xs font-semibold">
