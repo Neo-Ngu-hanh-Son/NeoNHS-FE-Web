@@ -86,7 +86,7 @@ export function TemplateFiltersToolbar({
             <SelectValue placeholder="Xác minh" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Mọi mức xác minh</SelectItem>
+            <SelectItem value="all">Xác minh</SelectItem>
             <SelectItem value="verified">Đã xác minh</SelectItem>
             <SelectItem value="unverified">Chưa xác minh</SelectItem>
           </SelectContent>

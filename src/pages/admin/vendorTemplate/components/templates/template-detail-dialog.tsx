@@ -31,7 +31,10 @@ import { adminWorkshopService } from "@/services/api/adminWorkshopService"
 import type { WorkshopTemplateResponse } from "@/pages/vendor/WorkshopTemplates/types"
 import type { VendorProfileResponse } from "@/pages/admin/vendors/types"
 import { PictureOutlined } from "@ant-design/icons"
-import { Image as AntImage, Tag } from "antd"
+import { Tag } from "antd"
+
+const MAIN_IMAGE_FALLBACK =
+  "https://via.placeholder.com/800x400?text=Workshop+Template"
 interface TemplateDetailDialogProps {
   template: AdminWorkshopTemplateResponse | null
   open: boolean
@@ -217,20 +220,20 @@ export function TemplateDetailDialog({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Images Gallery — same Ant Design Image + PreviewGroup pattern as vendor WorkshopTemplateDetailPage */}
+          {/* Images Gallery */}
           <div className="space-y-3">
             {images.length > 0 ? (
               <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-muted shadow-sm dark:border-slate-700">
-                <AntImage.PreviewGroup items={images.map((img) => img.imageUrl)}>
-                  <div className="relative [&>.ant-image]:w-full">
-                    <AntImage
-                      src={displayImage}
-                      alt={name}
-                      className="!w-full !h-[400px] object-cover"
-                      fallback="https://via.placeholder.com/800x400?text=No+Image"
-                    />
-                  </div>
-                </AntImage.PreviewGroup>
+                <div className="relative w-full">
+                  <img
+                    src={displayImage}
+                    alt={name}
+                    className="h-[400px] w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = MAIN_IMAGE_FALLBACK
+                    }}
+                  />
+                </div>
                 {images.length > 1 && (
                   <div className="grid grid-cols-4 gap-2 p-4">
                     {images.map((img, idx) => (
@@ -267,12 +270,14 @@ export function TemplateDetailDialog({
               </Card>
             ) : (
               <Card className="overflow-hidden rounded-2xl border border-slate-200 bg-muted shadow-sm dark:border-slate-700">
-                <div className="relative [&>.ant-image]:w-full">
-                  <AntImage
+                <div className="relative w-full">
+                  <img
                     src={displayImage}
                     alt={name}
-                    className="!w-full !h-[400px] object-cover"
-                    fallback="https://via.placeholder.com/800x400?text=Workshop+Template"
+                    className="h-[400px] w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = MAIN_IMAGE_FALLBACK
+                    }}
                   />
                 </div>
               </Card>
