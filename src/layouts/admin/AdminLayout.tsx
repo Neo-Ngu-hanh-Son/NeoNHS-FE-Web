@@ -142,6 +142,7 @@ export function AdminLayout() {
       ],
     },
     { label: 'Messages', path: '/admin/messages', icon: <MessageSquare className="w-6 h-6" /> },
+    { label: 'Knowledge Base', path: '/admin/knowledge-base', icon: <BookOpen className="w-6 h-6" /> },
   ];
 
   // Helper to get breadcrumb from path
@@ -198,8 +199,7 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ''}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${
-                      isCollapsed ? 'justify-center' : ''
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
                     } ${isActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
                   }
                 >
@@ -218,9 +218,8 @@ export function AdminLayout() {
         >
           <div
             onClick={handleLogout}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-all ${isCollapsed ? 'justify-center' : ''
+              }`}
             title={isCollapsed ? 'Logout' : ''}
           >
             <LogOut className="w-6 h-6 shrink-0" />
