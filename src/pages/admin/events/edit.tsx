@@ -10,8 +10,8 @@ export default function EventEditPage() {
     const { event, loading: fetchLoading } = useEvent(id!);
     const { updateEvent, loading: submitLoading } = useUpdateEvent();
 
-    const handleSubmit = async (data: UpdateEventRequest) => {
-        const result = await updateEvent(id!, data);
+    const handleSubmit = async (data: UpdateEventRequest, file?: File) => {
+        const result = await updateEvent(id!, data, file);
         if (result) {
             navigate(`/admin/events/${id}`);
         }
