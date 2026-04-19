@@ -10,10 +10,10 @@ export default function ManageHistoryAudioPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>History Audio</CardTitle>
+          <CardTitle>Âm thanh lịch sử</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Missing point identifier in URL.
+          Thiếu mã định danh điểm trong URL.
         </CardContent>
       </Card>
     );

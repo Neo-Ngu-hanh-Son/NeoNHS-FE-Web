@@ -32,7 +32,7 @@ export default function ChatMessages({
           <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl">
             👋
           </div>
-          <p>Start the conversation with {partnerName?.split(' ')[0]}</p>
+          <p>Bắt đầu trò chuyện với {partnerName?.split(' ')[0]?.trim() || 'đối tác'}</p>
         </div>
       ) : (
         messages.map((msg, index) => {
@@ -117,13 +117,13 @@ export default function ChatMessages({
                       <div className="rounded-xl overflow-hidden shadow-sm relative" key="uploading">
                         <img
                           src={(msg as any)._localPreview}
-                          alt="Uploading..."
+                          alt="Đang tải lên..."
                           className="max-w-[200px] max-h-[300px] object-cover opacity-40 blur-[1px]"
                         />
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-xl">
                           <div className="flex flex-col items-center gap-2">
                             <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
-                            <span className="text-white text-xs font-medium drop-shadow">Uploading...</span>
+                            <span className="text-white text-xs font-medium drop-shadow">Đang tải lên...</span>
                           </div>
                         </div>
                       </div>
@@ -132,7 +132,7 @@ export default function ChatMessages({
                         <div className="rounded-xl overflow-hidden shadow-sm flex" key={`image-${msg.id}`}>
                           <AntImage
                             src={msg.mediaUrl}
-                            alt="Sent image"
+                            alt="Ảnh đã gửi"
                             rootClassName="max-w-[200px] max-h-[300px]"
                             className="object-cover"
                           />
@@ -146,7 +146,7 @@ export default function ChatMessages({
                           onClick={() => window.open(`/vendor/workshop-templates/${msg.metadata?.workshopId}`, '_blank')}
                         >
                           {msg.metadata.thumbnailUrl && (
-                            <img src={msg.metadata.thumbnailUrl} alt="Thumbnail" className="w-12 h-12 rounded object-cover" />
+                            <img src={msg.metadata.thumbnailUrl} alt="Ảnh thu nhỏ" className="w-12 h-12 rounded object-cover" />
                           )}
                           <div className="flex flex-col">
                             <span className="font-semibold text-sm line-clamp-1">{msg.metadata.title}</span>

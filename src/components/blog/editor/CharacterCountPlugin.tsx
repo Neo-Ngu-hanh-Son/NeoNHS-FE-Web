@@ -22,5 +22,5 @@ export default function CharacterCountPlugin({ onChangeCount }: Props) {
     });
   }, [editor, onChangeCount]);
 
-  return <div className="text-xs text-muted-foreground text-right m-4">{count} characters</div>;
+  return <div className="text-xs text-muted-foreground text-right m-4">{count} ký tự</div>;
 }

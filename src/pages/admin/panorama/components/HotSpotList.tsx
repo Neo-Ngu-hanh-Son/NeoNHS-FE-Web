@@ -15,7 +15,11 @@ export default function HotSpotList({ hotSpots, onEdit, onDelete }: HotSpotListP
     return (
       <div className="rounded-lg border border-dashed border-gray-300 p-8 text-center">
         <p className="text-sm text-muted-foreground">
-          No hot spots yet. Click "Add Hot Spot" to create one.
+          Chưa có điểm Hot.
+          <br />
+          <span className="text-xs text-muted-foreground italic">
+            *Đây là nơi để cấu hình các điểm thông tin cần chú ý trên panorama.
+          </span>
         </p>
       </div>
     );

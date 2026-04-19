@@ -166,7 +166,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                         ) : (
                             <>
                                 <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                                {loading ? "Searching..." : "Search for a place on Google Maps..."}
+                                {loading ? "Tìm kiếm..." : "Tìm kiếm địa điểm trên Google Maps..."}
                             </>
                         )}
                     </Button>
@@ -177,7 +177,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                 >
                     <Command shouldFilter={false}>
                         <CommandInput
-                            placeholder="Type to search..."
+                            placeholder="Nhập tên địa điểm để tìm kiếm..."
                             value={inputValue}
                             onValueChange={handleInputChange}
                         />
@@ -189,7 +189,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                                 </div>
                             )}
                             {!loading && predictions.length === 0 && (
-                                <CommandEmpty>No places found.</CommandEmpty>
+                                <CommandEmpty>Không tìm thấy địa điểm.</CommandEmpty>
                             )}
                             <CommandGroup>
                                 {predictions.map((prediction: any) => (

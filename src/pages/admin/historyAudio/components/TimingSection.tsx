@@ -27,10 +27,10 @@ export default function TimingSection({
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">3. Timing</CardTitle>
+          <CardTitle className="text-lg">3. Thời điểm (timing)</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
-          Add or generate an audio file first if you want to create word timing.
+          Hãy thêm hoặc tạo file âm thanh trước nếu bạn muốn tạo thời điểm theo từng từ.
         </CardContent>
       </Card>
     );
@@ -39,7 +39,7 @@ export default function TimingSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">3. Timing</CardTitle>
+        <CardTitle className="text-lg">3. Thời điểm (timing)</CardTitle>
       </CardHeader>
       <CardContent>
         <HistoryAudioPlayer

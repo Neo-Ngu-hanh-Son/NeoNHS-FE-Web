@@ -51,13 +51,13 @@ export const TemplateDetailHeader = ({
         {canEdit && (
           <Button onClick={onEdit} className="gap-2">
             <EditOutlined />
-            Edit
+            Chỉnh sửa
           </Button>
         )}
         {canSubmit && (
           <Button onClick={onSubmit} variant="default" className="gap-2">
             <SendOutlined />
-            Submit for Approval
+            Gửi phê duyệt
           </Button>
         )}
         {template.status === WorkshopStatus.ACTIVE && (
@@ -67,16 +67,16 @@ export const TemplateDetailHeader = ({
             className="gap-2"
           >
             {template.isPublished ? (
-              <><EyeInvisibleOutlined /> Unpublish</>
+              <><EyeInvisibleOutlined /> Ẩn danh mục</>
             ) : (
-              <><GlobalOutlined /> Publish</>
+              <><GlobalOutlined /> Xuất bản</>
             )}
           </Button>
         )}
         {canDelete && (
           <Button onClick={onDelete} variant="destructive" className="gap-2">
             <DeleteOutlined />
-            Delete
+            Xóa
           </Button>
         )}
       </div>

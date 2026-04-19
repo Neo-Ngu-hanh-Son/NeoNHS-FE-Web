@@ -104,25 +104,29 @@ export default function AdminCheckinPointsPage() {
   };
 
   const handleRestoreCheckinPoint = async (id: string) => {
-    messageApi.loading('Restoring checkin point...');
+    messageApi.loading('Đang khôi phục điểm check-in...');
     const success = await restoreCheckinPoint(id);
     if (success) {
       // Handle successful restore (e.g., refresh the list)
-      messageApi.success('Checkin point restored successfully.');
+      messageApi.success('Đã khôi phục điểm check-in thành công.');
     }
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-5">
+    <div className="mx-auto max-w-7xl px-4 md:px-6 py-6 md:p-8 space-y-4">
       {contextHolder}
-      <Card>
-        <CardHeader>
-          <CardTitle>Checkin Point Management</CardTitle>
-          <CardDescription>
-            Manage point check-in records. Select a parent point before creating a new checkin point.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-5">
+
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-b from-slate-50 to-white dark:from-white/5 dark:to-transparent p-6 shadow-sm">
+        <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+          Quản lý điểm Check-in
+        </h1>
+        <p className="mt-1 text-slate-600 dark:text-slate-300">
+          Quản lý các điểm để người dùng check-in. Vui lòng chọn một địa điểm chính trước khi tạo mới điểm check-in.
+        </p>
+      </div>
+
+      <Card className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl shadow-sm">
+        <CardContent className="space-y-6 pt-6">
           <CheckinPointFilters
             search={search}
             onSearchChange={(value) => {
@@ -174,21 +178,24 @@ export default function AdminCheckinPointsPage() {
       />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white dark:bg-slate-800 rounded-2xl border-slate-100 dark:border-slate-700">
           <AlertDialogHeader>
-            <AlertDialogTitle>Soft Delete Checkin Point</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will soft-delete "{deleteTarget?.name}". The record can still be listed when include deleted is
-              enabled.
+            <AlertDialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+              Xóa điểm Check-in
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-slate-500 dark:text-slate-400">
+              Bạn sắp xóa mềm điểm "{deleteTarget?.name}". Dữ liệu này vẫn có thể tìm thấy khi bật bộ lọc bao gồm các mục đã xóa.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300">
+              Hủy
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground shadow hover:bg-destructive/90 transition-colors"
             >
-              Soft Delete
+              Xóa (Soft Delete)
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

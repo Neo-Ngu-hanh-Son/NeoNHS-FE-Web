@@ -34,21 +34,21 @@ export function TagTableErrorState({ error, onRetry }: TagTableErrorStateProps) 
         onClick={onRetry}
         className="bg-primary text-primary-foreground hover:bg-primary/90"
       >
-        Try Again
+        Thử lại
       </Button>
     </div>
   );
 }
 
 export function TagTableEmptyState({
-  message = "Create a new tag to get started.",
+  message = "Thêm nhãn mới để bắt đầu.",
 }: TagTableEmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-16 rounded-xl border border-gray-200 bg-white">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-4">
         <Tags className="h-7 w-7 text-gray-400" />
       </div>
-      <h3 className="text-base font-semibold text-gray-900 mb-1">No tags found.</h3>
+      <h3 className="text-base font-semibold text-gray-900 mb-1">Chưa có nhãn nào.</h3>
       <p className="text-sm text-gray-500">{message}</p>
     </div>
   );
@@ -60,14 +60,14 @@ export function TagTableLoadingState({ kind }: TagTableLoadingStateProps) {
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-            <TableHead className="font-semibold text-gray-600">Name</TableHead>
-            <TableHead className="font-semibold text-gray-600">Description</TableHead>
-            <TableHead className="font-semibold text-gray-600">Color</TableHead>
-            <TableHead className="font-semibold text-gray-600">Icon</TableHead>
+            <TableHead className="font-semibold text-gray-600">Tên</TableHead>
+            <TableHead className="font-semibold text-gray-600">Mô tả</TableHead>
+            <TableHead className="font-semibold text-gray-600">Màu</TableHead>
+            <TableHead className="font-semibold text-gray-600">Biểu tượng</TableHead>
             {kind === "event" && (
-              <TableHead className="font-semibold text-gray-600">Status</TableHead>
+              <TableHead className="font-semibold text-gray-600">Trạng thái</TableHead>
             )}
-            <TableHead className="font-semibold text-gray-600 text-right">Actions</TableHead>
+            <TableHead className="font-semibold text-gray-600 text-right">Thao tác</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

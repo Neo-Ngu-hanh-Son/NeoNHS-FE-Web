@@ -24,7 +24,7 @@ export default function LinkInlineEditor({
         type="url"
         value={editUrl}
         onChange={(e) => setEditUrl(e.target.value)}
-        placeholder="Enter URL..."
+        placeholder="Nhập URL..."
         autoFocus
         onKeyDown={(e) => {
           if (e.key === "Enter") onConfirm()
@@ -49,7 +49,7 @@ export default function LinkInlineEditor({
         size="icon"
         variant="outline"
         onClick={onCancel}
-        title="Cancel"
+        title="Hủy"
         className="h-9 w-9"
       >
         <X className="h-4 w-4" />

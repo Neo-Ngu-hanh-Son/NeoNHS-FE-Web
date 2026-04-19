@@ -136,8 +136,8 @@ export default function AdminVendorsPage() {
     try {
       await adminVendorService.updateVendor(id, data)
       notification.success({
-        message: 'Success',
-        description: 'Vendor account updated successfully.',
+        message: 'Thành công',
+        description: 'Đã cập nhật tài khoản Đối tác thành công.',
       })
       fetchVendors()
       fetchStats()
@@ -148,8 +148,8 @@ export default function AdminVendorsPage() {
       }
     } catch (error) {
       notification.error({
-        message: 'Error',
-        description: 'Failed to update vendor account.',
+        message: 'Lỗi',
+        description: 'Vui lòng thử lại sau, cập nhật tài khoản Đối tác thất bại.',
       })
       throw error // Re-throw to keep dialog open/handle in component
     }
@@ -165,15 +165,15 @@ export default function AdminVendorsPage() {
         await adminVendorService.banVendor(banDialog.vendor.id, { reason })
         setBanDialog({ open: false, vendor: null })
         notification.warning({
-          message: 'Vendor Banned',
-          description: `${banDialog.vendor.businessName} has been banned.`,
+          message: 'Đã cấm Đối tác',
+          description: `Đối tác ${banDialog.vendor.businessName} đã bị cấm.`,
         })
         fetchVendors()
         fetchStats()
       } catch (error) {
         notification.error({
-          message: 'Error',
-          description: 'Failed to ban vendor.',
+          message: 'Lỗi',
+          description: 'Cấm Đối tác thất bại.',
         })
       }
     }
@@ -189,15 +189,15 @@ export default function AdminVendorsPage() {
         await adminVendorService.unbanVendor(unbanDialog.vendor.id)
         setUnbanDialog({ open: false, vendor: null })
         notification.success({
-          message: 'Vendor Unbanned',
-          description: `${unbanDialog.vendor.businessName} has been unbanned.`,
+          message: 'Đã bỏ cấm Đối tác',
+          description: `Đối tác ${unbanDialog.vendor.businessName} đã được bỏ cấm.`,
         })
         fetchVendors()
         fetchStats()
       } catch (error) {
         notification.error({
-          message: 'Error',
-          description: 'Failed to unban vendor.',
+          message: 'Lỗi',
+          description: 'Bỏ cấm Đối tác thất bại.',
         })
       }
     }
@@ -211,8 +211,8 @@ export default function AdminVendorsPage() {
     try {
       await adminVendorService.createVendor(data)
       notification.success({
-        message: 'Vendor Created',
-        description: 'Vendor account created successfully. A setup email has been sent.',
+        message: 'Tạo Đối tác thành công',
+        description: 'Tài khoản Đối tác đã được tạo. Mã xác nhận đã được gửi đến email.',
       })
       fetchVendors()
       fetchStats()
@@ -220,9 +220,9 @@ export default function AdminVendorsPage() {
       const errorMessage =
         error?.message && error.message !== 'API request failed'
           ? error.message
-          : 'Failed to create vendor account. Please try again.'
+          : 'Tạo tài khoản Đối tác thất bại. Vui lòng thử lại sau.'
       notification.error({
-        message: 'Create Vendor Failed',
+        message: 'Tạo Đối tác thất bại',
         description: errorMessage,
         duration: 6,
       })
@@ -239,8 +239,8 @@ export default function AdminVendorsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Vendor Management</h1>
-          <p className="text-muted-foreground">Manage and monitor all vendor accounts</p>
+          <h1 className="text-2xl font-bold">Quản lý Đối tác</h1>
+          <p className="text-muted-foreground">Quản lý và giám sát tất cả tài khoản Đối tác</p>
         </div>
         <Button
           size="lg"
@@ -248,7 +248,7 @@ export default function AdminVendorsPage() {
           className="gap-2"
         >
           <PlusCircle className="w-5 h-5" />
-          Create Vendor
+          Tạo Đối tác
         </Button>
       </div>
 
@@ -258,7 +258,7 @@ export default function AdminVendorsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Vendors</p>
+                <p className="text-sm text-muted-foreground">Tổng số Đối tác</p>
                 <p className="text-3xl font-bold">{stats.total}</p>
               </div>
               <Users className="w-8 h-8 text-primary" />
@@ -270,7 +270,7 @@ export default function AdminVendorsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Active Vendors</p>
+                <p className="text-sm text-muted-foreground">Đối tác hoạt động</p>
                 <p className="text-3xl font-bold text-green-600">{stats.active}</p>
               </div>
               <CheckCircle2 className="w-8 h-8 text-green-600" />
@@ -282,7 +282,7 @@ export default function AdminVendorsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Verified</p>
+                <p className="text-sm text-muted-foreground">Đã xác minh</p>
                 <p className="text-3xl font-bold text-blue-600">{stats.verified}</p>
               </div>
               <UserCheck className="w-8 h-8 text-blue-600" />
@@ -294,7 +294,7 @@ export default function AdminVendorsPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Banned</p>
+                <p className="text-sm text-muted-foreground">Bị cấm</p>
                 <p className="text-3xl font-bold text-red-600">{stats.banned}</p>
               </div>
               <BanIcon className="w-8 h-8 text-red-600" />
@@ -309,7 +309,7 @@ export default function AdminVendorsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search by name, business, or email..."
+            placeholder="Tìm kiếm bằng tên, cửa hàng hoặc email..."
             value={searchQuery}
             onChange={handleSearch}
             className="pl-10"
@@ -319,25 +319,25 @@ export default function AdminVendorsPage() {
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="Trạng thái" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
-            <SelectItem value="banned">Banned</SelectItem>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="active">Đang hoạt động</SelectItem>
+            <SelectItem value="inactive">Không hoạt động</SelectItem>
+            <SelectItem value="banned">Bị cấm</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Verification Filter */}
         <Select value={verificationFilter} onValueChange={setVerificationFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="Verification" />
+            <SelectValue placeholder="Xác thực" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Vendors</SelectItem>
-            <SelectItem value="verified">Verified</SelectItem>
-            <SelectItem value="unverified">Not Verified</SelectItem>
+            <SelectItem value="all">Tất cả Đối tác</SelectItem>
+            <SelectItem value="verified">Đã xác thực</SelectItem>
+            <SelectItem value="unverified">Chưa xác thực</SelectItem>
           </SelectContent>
         </Select>
 
@@ -345,20 +345,20 @@ export default function AdminVendorsPage() {
         <div className="flex items-center gap-2">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder="Sắp xếp theo" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="updatedAt">Recently Updated</SelectItem>
-              <SelectItem value="createdAt">Recently Created</SelectItem>
-              <SelectItem value="name">Name</SelectItem>
-              <SelectItem value="businessName">Business Name</SelectItem>
+              <SelectItem value="updatedAt">Cập nhật gần đây</SelectItem>
+              <SelectItem value="createdAt">Tạo gần đây</SelectItem>
+              <SelectItem value="name">Tên</SelectItem>
+              <SelectItem value="businessName">Tên doanh nghiệp</SelectItem>
             </SelectContent>
           </Select>
           <Button
             variant="outline"
             size="icon"
             onClick={toggleSortDirection}
-            title={sortDirection === 'ASC' ? 'Ascending' : 'Descending'}
+            title={sortDirection === 'ASC' ? 'Tăng dần' : 'Giảm dần'}
           >
             {sortDirection === 'ASC' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
           </Button>
@@ -368,7 +368,7 @@ export default function AdminVendorsPage() {
       {/* Results Count */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Showing <strong>{vendors.length}</strong> of <strong>{totalElements}</strong> vendors
+          Đang hiển thị <strong>{vendors.length}</strong> / <strong>{totalElements}</strong> Đối tác
         </p>
         {(searchQuery || statusFilter !== 'all' || verificationFilter !== 'all') && (
           <Button
@@ -380,7 +380,7 @@ export default function AdminVendorsPage() {
               setVerificationFilter('all')
             }}
           >
-            Clear Filters
+            Xóa bộ lọc
           </Button>
         )}
       </div>
@@ -416,7 +416,7 @@ export default function AdminVendorsPage() {
                 setPageSize(size)
               }}
               showSizeChanger
-              showTotal={(total) => `Total ${total} vendors`}
+              showTotal={(total) => `Tổng ${total} Đối tác`}
             />
           </div>
         </div>
@@ -425,16 +425,16 @@ export default function AdminVendorsPage() {
         <Card>
           <CardContent className="p-12 text-center">
             <Users className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No vendors found</h3>
+            <h3 className="text-lg font-semibold mb-2">Không tìm thấy Đối tác nào</h3>
             <p className="text-muted-foreground mb-4">
               {searchQuery || statusFilter !== 'all' || verificationFilter !== 'all'
-                ? "Try adjusting your filters"
-                : "Get started by creating your first vendor account"}
+                ? "Thử điều chỉnh bộ lọc của bạn"
+                : "Bắt đầu bằng cách tạo tài khoản Đối tác đầu tiên của bạn"}
             </p>
             {!searchQuery && statusFilter === 'all' && verificationFilter === 'all' && (
               <Button onClick={handleCreateVendor}>
                 <PlusCircle className="w-4 h-4 mr-2" />
-                Create Vendor
+                Tạo Đối tác
               </Button>
             )}
           </CardContent>

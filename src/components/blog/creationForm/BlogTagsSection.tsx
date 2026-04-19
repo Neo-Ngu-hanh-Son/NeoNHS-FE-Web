@@ -9,7 +9,7 @@ export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Tags</CardTitle>
+        <CardTitle>Thẻ</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FieldGroup>
@@ -18,15 +18,15 @@ export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="tags">Tags</FieldLabel>
+                <FieldLabel htmlFor="tags">Thẻ</FieldLabel>
                 <Input
                   {...field}
                   id="tags"
-                  placeholder="Travel, Guides, Tips"
+                  placeholder="Du lịch, Hướng dẫn, Mẹo hay"
                   aria-invalid={fieldState.invalid}
                   className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
                 />
-                <p className="text-xs text-muted-foreground mt-2">Comma separated tags.</p>
+                <p className="text-xs text-muted-foreground mt-2">Các thẻ cách nhau bằng dấu phẩy.</p>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}

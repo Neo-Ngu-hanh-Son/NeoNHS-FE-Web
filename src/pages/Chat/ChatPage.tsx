@@ -11,7 +11,9 @@ import './ChatPage.css';
 
 const createFallbackUser = (userId: string): ChatUserDTO => ({
   id: userId,
-  fullname: `User ${userId.substring(0, 4)}`,
+  fullname: userId.startsWith('__')
+    ? 'Người dùng không xác định'
+    : `Người dùng ${userId.substring(0, 4)}`,
   avatarUrl: 'https://ui-avatars.com/api/?name=U&background=random',
   role: 'TOURIST'
 });
@@ -21,11 +23,11 @@ const enrichRoomWithUserData = async (
   currentUserId: string,
   userCache: Map<string, ChatUserDTO>
 ): Promise<ChatRoom> => {
-  const otherParticipantId = room.participants.find(p => p !== currentUserId) || 'Unknown';
+  const otherParticipantId = room.participants.find(p => p !== currentUserId) || '__unknown__';
 
   let otherUser = userCache.get(otherParticipantId);
 
-  if (!otherUser && otherParticipantId !== 'Unknown') {
+  if (!otherUser && otherParticipantId !== '__unknown__') {
     try {
       otherUser = await ChatRestService.getChatUserInfo(otherParticipantId);
       userCache.set(otherParticipantId, otherUser);

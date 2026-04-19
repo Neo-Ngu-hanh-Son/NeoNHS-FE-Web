@@ -227,28 +227,28 @@ export default function ToolbarPlugin({
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
           isActive={isBold}
-          title="Bold (Ctrl+B)"
+          title="In đậm (Ctrl+B)"
         >
           <Bold className="size-4" />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
           isActive={isItalic}
-          title="Italic (Ctrl+I)"
+          title="In nghiêng (Ctrl+I)"
         >
           <Italic className="size-4" />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")}
           isActive={isUnderline}
-          title="Underline (Ctrl+U)"
+          title="Gạch chân (Ctrl+U)"
         >
           <Underline className="size-4" />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")}
           isActive={isStrikethrough}
-          title="Strikethrough"
+          title="Gạch ngang"
         >
           <Strikethrough className="size-4" />
         </ToolbarButton>
@@ -266,13 +266,13 @@ export default function ToolbarPlugin({
         <ToolbarButton
           onClick={handleInsertLink}
           isActive={isLink}
-          title={isLink ? "Remove Link" : "Insert Link"}
+          title={isLink ? "Bỏ liên kết" : "Chèn liên kết"}
         >
           <Link className="size-4" />
         </ToolbarButton>
 
         {/* Image upload */}
-        <ToolbarButton onClick={triggerFileInput} title="Insert Image">
+        <ToolbarButton onClick={triggerFileInput} title="Chèn ảnh">
           <ImagePlus className="size-4" />
         </ToolbarButton>
         <input
@@ -288,7 +288,7 @@ export default function ToolbarPlugin({
         {/* Text alignment */}
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")}
-          title="Align Left"
+          title="Căn trái"
           isActive={align === "left"}
         >
           <AlignLeft className="size-4" />
@@ -302,14 +302,14 @@ export default function ToolbarPlugin({
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")}
-          title="Align Right"
+          title="Căn phải"
           isActive={align === "right"}
         >
           <AlignRight className="size-4" />
         </ToolbarButton>
         <ToolbarButton
           onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")}
-          title="Justify"
+          title="Căn đều"
           isActive={align === "justify"}
         >
           <AlignJustify className="size-4" />
@@ -322,7 +322,7 @@ export default function ToolbarPlugin({
               setModalOpen(true);
             }
           }}
-          title="Insert Table"
+          title="Chèn bảng"
         >
           <Table className="size-4" />
         </ToolbarButton>

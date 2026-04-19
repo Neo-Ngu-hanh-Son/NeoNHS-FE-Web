@@ -14,7 +14,6 @@ import { ProfilePage } from '@/pages/ProfilePage';
 import UserProfilePage from '@/pages/ProfilePage/UserProfilePage';
 import VendorProfilePage from '@/pages/ProfilePage/VendorProfilePage';
 import { AboutUs } from '@/pages/AboutUs';
-import { ContactUs } from '@/pages/ContactUs';
 import { AdminLayout } from '@/layouts/admin/AdminLayout';
 import { VendorLayout } from '@/layouts/vendor/VendorLayout';
 // Dashboard Pages
@@ -51,7 +50,6 @@ import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPag
 import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage';
 import VendorDeletedVouchersPage from '@/pages/vendor/Vouchers/DeletedVouchersPage';
 import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage';
-import SimpleMapView from '@/pages/SimpleMapView';
 import ManageBlogPage from '@/pages/admin/blog/ManageBlogPage';
 import BlogCreationPage from '@/pages/admin/blog/BlogCreationPage';
 import AdminBlogDetailPage from '@/pages/admin/blog/AdminBlogDetailPage';
@@ -84,7 +82,6 @@ export const router = createBrowserRouter([
           { path: '/verify-otp', element: <VerifyOTP /> },
           { path: '/new-password', element: <NewPassword /> },
           { path: '/set-password', element: <SetPasswordPage /> },
-          { path: '/simple-map', element: <SimpleMapView /> },
           { path: '/places/:placeId/panorama', element: <PanoramaScreen /> },
           {
             path: '/places/:pointId/checkin-points/:checkinPointId/panorama',
@@ -102,7 +99,6 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <HomePage /> },
           { path: '/about-us', element: <AboutUs /> },
-          { path: '/contact-us', element: <ContactUs /> },
           { path: '/blog/:id', element: <BlogDetailsPage /> },
 
           // Profile Routes - Auto-redirect based on role

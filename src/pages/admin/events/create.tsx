@@ -7,8 +7,8 @@ export default function EventCreatePage() {
     const navigate = useNavigate();
     const { createEvent, loading } = useCreateEvent();
 
-    const handleSubmit = async (data: CreateEventRequest) => {
-        const result = await createEvent(data);
+    const handleSubmit = async (data: CreateEventRequest, file?: File) => {
+        const result = await createEvent(data, file);
         if (result) {
             navigate('/admin/events');
         }

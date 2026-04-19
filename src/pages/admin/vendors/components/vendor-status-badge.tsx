@@ -20,7 +20,7 @@ export function VendorStatusBadge({
   const getStatusConfig = () => {
     if (isBanned) {
       return {
-        label: 'Banned',
+        label: 'Bị cấm',
         variant: 'destructive' as const,
         icon: Ban,
         className: 'bg-red-500 hover:bg-red-600 text-white'
@@ -29,7 +29,7 @@ export function VendorStatusBadge({
     
     if (!isActive) {
       return {
-        label: 'Inactive',
+        label: 'Không hoạt động',
         variant: 'secondary' as const,
         icon: XCircle,
         className: 'bg-gray-500 hover:bg-gray-600 text-white'
@@ -38,7 +38,7 @@ export function VendorStatusBadge({
     
     if (isVerified) {
       return {
-        label: 'Active & Verified',
+        label: 'Đang hoạt động & Đã xác thực',
         variant: 'default' as const,
         icon: CheckCircle2,
         className: 'bg-green-500 hover:bg-green-600 text-white'
@@ -46,7 +46,7 @@ export function VendorStatusBadge({
     }
     
     return {
-      label: 'Active',
+      label: 'Đang hoạt động',
       variant: 'outline' as const,
       icon: AlertCircle,
       className: 'bg-yellow-500 hover:bg-yellow-600 text-white'
@@ -110,12 +110,12 @@ export function VerificationBadge({
       {isVerified ? (
         <>
           <CheckCircle2 className="w-3 h-3" />
-          Verified
+          Đã xác thực
         </>
       ) : (
         <>
           <AlertCircle className="w-3 h-3" />
-          Not Verified
+          Chưa xác thực
         </>
       )}
     </Badge>

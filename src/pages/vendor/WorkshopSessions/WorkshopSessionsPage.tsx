@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar as CalendarIcon, PlusCircle, Search, List, CalendarDays } from 'lucide-react'
+import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays } from 'lucide-react'
 import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
@@ -20,7 +20,7 @@ export default function WorkshopSessionsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
-  
+
   const [createDialog, setCreateDialog] = useState(false)
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>()
   const [editDialog, setEditDialog] = useState<{ open: boolean; session: WorkshopSessionResponse | null }>({
@@ -54,8 +54,8 @@ export default function WorkshopSessionsPage() {
     } catch (error: any) {
       console.error('Failed to fetch sessions:', error)
       notification.error({
-        message: 'Failed to Load Sessions',
-        description: error.message || 'Unable to fetch workshop sessions. Please try again.',
+        message: 'Tải Dữ Liệu Thất Bại',
+        description: error.message || 'Không thể tải danh sách phiên. Vui lòng thử lại.',
       })
     } finally {
       setLoading(false)
@@ -69,7 +69,7 @@ export default function WorkshopSessionsPage() {
     // Search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(s => 
+      filtered = filtered.filter(s =>
         s.workshopTemplate.name.toLowerCase().includes(query) ||
         s.workshopTemplate.shortDescription.toLowerCase().includes(query)
       )
@@ -129,24 +129,24 @@ export default function WorkshopSessionsPage() {
     if (cancelDialog.session) {
       try {
         await WorkshopSessionService.cancelSession(cancelDialog.session.id)
-        
+
         // Update local state
-        setSessions(prev => prev.map(s => 
-          s.id === cancelDialog.session!.id 
+        setSessions(prev => prev.map(s =>
+          s.id === cancelDialog.session!.id
             ? { ...s, status: SessionStatus.CANCELLED }
             : s
         ))
-        
+
         setCancelDialog({ open: false, session: null })
         notification.success({
-          message: 'Session Cancelled',
-          description: `Session for "${cancelDialog.session.workshopTemplate.name}" has been cancelled.`
+          message: 'Đã Hủy Phiên',
+          description: `Phiên "${cancelDialog.session.workshopTemplate.name}" đã được hủy thành công.`
         })
       } catch (error: any) {
         console.error('Cancel failed:', error)
         notification.error({
-          message: 'Cancellation Failed',
-          description: error.message || 'Failed to cancel session. Please try again.',
+          message: 'Hủy Thất Bại',
+          description: error.message || 'Không thể hủy phiên. Vui lòng thử lại.',
         })
       }
     }
@@ -159,13 +159,13 @@ export default function WorkshopSessionsPage() {
         s.id === session.id ? { ...s, status: SessionStatus.ONGOING } : s
       ))
       notification.success({
-        message: 'Session Started',
-        description: `"${session.workshopTemplate.name}" is now ongoing.`,
+        message: 'Bắt Đầu Phiên',
+        description: `"${session.workshopTemplate.name}" hiện đang diễn ra.`,
       })
     } catch (error: any) {
       notification.error({
-        message: 'Failed to Start Session',
-        description: error.message || 'Please try again.',
+        message: 'Bắt Đầu Thất Bại',
+        description: error.message || 'Vui lòng thử lại.',
       })
     }
   }
@@ -177,13 +177,13 @@ export default function WorkshopSessionsPage() {
         s.id === session.id ? { ...s, status: SessionStatus.COMPLETED } : s
       ))
       notification.success({
-        message: 'Session Completed',
-        description: `"${session.workshopTemplate.name}" has been marked as completed.`,
+        message: 'Hoàn Thành Phiên',
+        description: `"${session.workshopTemplate.name}" đã được đánh dấu hoàn thành.`,
       })
     } catch (error: any) {
       notification.error({
-        message: 'Failed to Complete Session',
-        description: error.message || 'Please try again.',
+        message: 'Hoàn Thành Thất Bại',
+        description: error.message || 'Vui lòng thử lại.',
       })
     }
   }
@@ -214,19 +214,21 @@ export default function WorkshopSessionsPage() {
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Workshop Sessions</h1>
-          <p className="text-muted-foreground">Manage your scheduled workshop sessions</p>
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-b from-slate-50 to-white dark:from-white/5 dark:to-transparent p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Danh Sách Các Phiên</h1>
+            <p className="mt-1 text-slate-500 dark:text-slate-400">Quản lý lịch trình hoạt động Workshop của bạn</p>
+          </div>
+          <Button
+            size="lg"
+            onClick={() => handleCreateSession()}
+            className="gap-2 rounded-xl"
+          >
+            <Plus className="w-5 h-5" />
+            Hẹn Lịch Phiên Mới
+          </Button>
         </div>
-        <Button
-          size="lg"
-          onClick={() => handleCreateSession()}
-          className="gap-2"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Create New Session
-        </Button>
       </div>
 
       {/* Filters and View Toggle */}
@@ -235,7 +237,7 @@ export default function WorkshopSessionsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search sessions..."
+            placeholder="Tìm kiếm phiên workshop..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -245,43 +247,43 @@ export default function WorkshopSessionsPage() {
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value={SessionStatus.SCHEDULED}>Scheduled</SelectItem>
-            <SelectItem value={SessionStatus.ONGOING}>Ongoing</SelectItem>
-            <SelectItem value={SessionStatus.COMPLETED}>Completed</SelectItem>
-            <SelectItem value={SessionStatus.CANCELLED}>Cancelled</SelectItem>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value={SessionStatus.SCHEDULED}>Đã lên lịch</SelectItem>
+            <SelectItem value={SessionStatus.ONGOING}>Đang diễn ra</SelectItem>
+            <SelectItem value={SessionStatus.COMPLETED}>Đã hoàn thành</SelectItem>
+            <SelectItem value={SessionStatus.CANCELLED}>Đã hủy</SelectItem>
           </SelectContent>
         </Select>
 
         {/* View Toggle */}
-        <div className="flex gap-2 bg-secondary rounded-lg p-1">
+        <div className="flex gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           <Button
             size="sm"
             variant={view === 'list' ? 'default' : 'ghost'}
             onClick={() => setView('list')}
-            className="gap-1"
+            className="gap-1 rounded-md"
           >
             <List className="w-4 h-4" />
-            List
+            Danh Sách
           </Button>
           <Button
             size="sm"
             variant={view === 'calendar' ? 'default' : 'ghost'}
             onClick={() => setView('calendar')}
-            className="gap-1"
+            className="gap-1 rounded-md"
           >
             <CalendarDays className="w-4 h-4" />
-            Calendar
+            Lịch
           </Button>
         </div>
       </div>
 
       {/* Results count */}
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredSessions.length} of {sessions.length} session{sessions.length !== 1 ? 's' : ''}
+      <div className="text-sm text-muted-foreground font-medium">
+        Hiển thị {filteredSessions.length} / {sessions.length} phiên
       </div>
 
       {/* Sessions Display */}
@@ -289,7 +291,7 @@ export default function WorkshopSessionsPage() {
         <div className="flex items-center justify-center p-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading sessions...</p>
+            <p className="text-muted-foreground">Đang tải danh sách phiên...</p>
           </div>
         </div>
       ) : filteredSessions.length > 0 ? (
@@ -299,12 +301,12 @@ export default function WorkshopSessionsPage() {
             {Object.entries(groupedSessions).map(([date, dateSessions]) => (
               <div key={date} className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="w-5 h-5 text-primary" />
+                  <CalendarIcon className="w-5 h-5 text-blue-500" />
                   <h2 className="text-lg font-semibold">{date}</h2>
                   <div className="flex-1 h-px bg-border" />
-                  <span className="text-sm text-muted-foreground">{dateSessions.length} session{dateSessions.length !== 1 ? 's' : ''}</span>
+                  <span className="text-sm text-muted-foreground font-medium">{dateSessions.length} phiên</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {dateSessions.map((session) => (
                     <SessionCard
                       key={session.id}
@@ -349,19 +351,19 @@ export default function WorkshopSessionsPage() {
         )
       ) : (
         // Empty State
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <CalendarIcon className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No sessions found</h3>
-          <p className="text-muted-foreground mb-4">
+        <div className="text-center py-16 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900">
+          <CalendarIcon className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Không tìm thấy phiên nào</h3>
+          <p className="text-muted-foreground mb-6">
             {searchQuery || statusFilter !== 'all'
-              ? "Try adjusting your filters"
-              : "Get started by creating your first workshop session"
+              ? "Vui lòng thử điều chỉnh bộ lọc của bạn"
+              : "Bắt đầu bằng cách tạo lịch trình phiên đầu tiên"
             }
           </p>
           {!searchQuery && statusFilter === 'all' && (
-            <Button onClick={() => handleCreateSession()}>
+            <Button onClick={() => handleCreateSession()} className="rounded-xl">
               <PlusCircle className="w-4 h-4 mr-2" />
-              Create Session
+              Tạo Phiên Mới
             </Button>
           )}
         </div>

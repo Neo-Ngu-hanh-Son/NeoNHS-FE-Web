@@ -38,6 +38,7 @@ const transformSessionResponse = (apiSession: any): WorkshopSessionResponse => {
       minParticipants: apiSession.minParticipants || 1,
       averageRating: apiSession.averageRating,
       totalReview: apiSession.totalReview,
+      totalRatings: apiSession.totalRatings,
       images: apiSession.images || [],
       tags: apiSession.tags || [],
     },
@@ -127,6 +128,26 @@ export const WorkshopSessionService = {
       return transformed;
     } catch (error) {
       console.error('createSession error:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Create multiple new sessions (batch)
+   * POST /api/workshops/sessions/batch
+   */
+  async createBatchSessions(data: CreateWorkshopSessionRequest[]): Promise<WorkshopSessionResponse[]> {
+    try {
+      console.log('Creating batch sessions with data:', data);
+      const res = await apiClient.post<ApiResponse<any>>('/workshops/sessions/batch', data);
+      const created = (res?.data ?? res) as any[] | { content?: any[] };
+      console.log('createBatchSessions raw response:', created);
+
+      const sessionsArray = Array.isArray(created) ? created : (created.content ?? []);
+      const transformed = sessionsArray.map((session: any) => transformSessionResponse(session));
+      return transformed;
+    } catch (error) {
+      console.error('createBatchSessions error:', error);
       throw error;
     }
   },

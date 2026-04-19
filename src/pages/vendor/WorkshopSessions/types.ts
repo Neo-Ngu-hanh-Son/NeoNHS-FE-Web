@@ -33,6 +33,7 @@ export interface WorkshopSessionResponse {
     minParticipants: number
     averageRating: number | null
     totalReview: number
+    totalRatings: number
     images: WorkshopImageResponse[]
     tags: WTagResponse[]
   }

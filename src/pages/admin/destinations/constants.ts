@@ -65,3 +65,36 @@ export const POINT_TYPE_CONFIG: Record<string, { color: string, icon: string }> 
 export const NGU_HANH_SON_GEOJSON_POLYGON = [
     NGU_HANH_SON_BOUNDARY.map(([lat, lng]) => [lng, lat])
 ];
+
+/** Nhãn loại điểm (POI) — dùng chung admin destinations */
+export const POINT_TYPE_LABEL_VI: Record<string, string> = {
+    PAGODA: 'Chùa',
+    CAVE: 'Hang động',
+    VIEWPOINT: 'Điểm ngắm cảnh',
+    GENERAL: 'Điểm chung',
+    CHECKIN: 'Check-in',
+    STATUE: 'Tượng',
+    GATE: 'Cổng',
+    SHOP: 'Cửa hàng',
+    ELEVATOR: 'Thang máy',
+    EVENT: 'Sự kiện',
+    WORKSHOP: 'Workshop',
+    ATTRACTION: 'Điểm tham quan',
+    DEFAULT: 'Khác',
+};
+
+export function getPointTypeLabelVi(type: string): string {
+    return POINT_TYPE_LABEL_VI[type] ?? type;
+}
+
+/** Trạng thái điểm đến */
+export const DESTINATION_STATUS_LABEL_VI: Record<string, string> = {
+    OPEN: 'Đang mở',
+    CLOSED: 'Đóng cửa',
+    TEMPORARILY_CLOSED: 'Tạm đóng',
+    MAINTENANCE: 'Bảo trì',
+};
+
+export function getDestinationStatusLabelVi(status: string): string {
+    return DESTINATION_STATUS_LABEL_VI[status] ?? status;
+}

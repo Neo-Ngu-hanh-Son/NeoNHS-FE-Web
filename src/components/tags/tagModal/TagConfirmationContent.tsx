@@ -9,7 +9,7 @@ export function TagConfirmationContent({ kind, mode, subtitle, tag }: TagConfirm
       </div>
 
       <h3 className="text-lg font-bold text-foreground mb-1">
-        {mode === "restore" ? "Restore this tag?" : "Delete this tag?"}
+        {mode === "restore" ? "Khôi phục nhãn này?" : "Xóa nhãn này?"}
       </h3>
       <p className="text-sm text-muted-foreground mb-3">{subtitle}</p>
 
@@ -20,13 +20,13 @@ export function TagConfirmationContent({ kind, mode, subtitle, tag }: TagConfirm
         <div className="text-left">
           <p className="text-sm font-semibold text-foreground">{tag.name}</p>
           <p className="text-xs text-muted-foreground">
-            {tag.description || "No description provided."}
+            {tag.description || "Không có mô tả."}
           </p>
         </div>
       </div>
 
       {kind === "workshop" && mode === "delete" && (
-        <p className="text-xs text-destructive mt-3">This action CANNOT be undone.</p>
+        <p className="text-xs text-destructive mt-3">Không thể hoàn tác thao tác này.</p>
       )}
     </div>
   );

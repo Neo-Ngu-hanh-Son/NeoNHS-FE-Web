@@ -54,22 +54,22 @@ const MODAL_CONFIG: Record<
   create: {
     icon: <Tags className="h-4 w-4 text-primary" />,
     iconBg: 'bg-primary/15',
-    title: 'Add Blog Category',
-    subtitle: 'Create a new category for your blog posts',
+    title: 'Thêm danh mục blog',
+    subtitle: 'Tạo danh mục mới cho bài viết blog',
     maxWidth: 'max-w-lg',
   },
   edit: {
     icon: <Pencil className="h-4 w-4 text-chart-3" />,
     iconBg: 'bg-chart-3/15',
-    title: 'Edit Blog Category',
-    subtitle: 'Update the category information below',
+    title: 'Sửa danh mục blog',
+    subtitle: 'Cập nhật thông tin danh mục bên dưới',
     maxWidth: 'max-w-lg',
   },
   view: {
     icon: <Info className="h-4 w-4 text-chart-4" />,
     iconBg: 'bg-chart-4/15',
-    title: 'Category Details',
-    subtitle: 'Viewing detailed information about this category',
+    title: 'Chi tiết danh mục',
+    subtitle: 'Xem thông tin chi tiết danh mục này',
     maxWidth: 'max-w-xl',
   },
   delete: {
@@ -118,15 +118,15 @@ export default function BlogCategoryModal({
     const name = formValues.name.trim();
 
     if (!name) {
-      errors.name = 'Please enter a category name';
+      errors.name = 'Vui lòng nhập tên danh mục';
     } else if (name.length < 2) {
-      errors.name = 'Name must be at least 2 characters';
+      errors.name = 'Tên phải có ít nhất 2 ký tự';
     } else if (name.length > 100) {
-      errors.name = 'Name must be at most 100 characters';
+      errors.name = 'Tên không được vượt quá 100 ký tự';
     }
 
     if (formValues.description && formValues.description.length > 500) {
-      errors.description = 'Description must be at most 500 characters';
+      errors.description = 'Mô tả không được vượt quá 500 ký tự';
     }
 
     setFormErrors(errors);
@@ -146,7 +146,7 @@ export default function BlogCategoryModal({
         .getCategoryById(category.id)
         .then((res) => setFetchedCategory(res.data))
         .catch((err: unknown) =>
-          message.error(getApiErrorMessage(err, 'Failed to load category details.')),
+          message.error(getApiErrorMessage(err, 'Không tải được chi tiết danh mục.')),
         )
         .finally(() => setFetching(false));
     }
@@ -164,7 +164,7 @@ export default function BlogCategoryModal({
           });
         })
         .catch((err: unknown) =>
-          message.error(getApiErrorMessage(err, 'Failed to load category data.')),
+          message.error(getApiErrorMessage(err, 'Không tải được dữ liệu danh mục.')),
         )
         .finally(() => setFetching(false));
     }
@@ -200,10 +200,10 @@ export default function BlogCategoryModal({
 
       if (mode === 'create') {
         await blogCategoryService.createCategory(payload);
-        message.success('Blog category created successfully!');
+        message.success('Đã tạo danh mục blog.');
       } else if (mode === 'edit' && category) {
         await blogCategoryService.updateCategory(category.id, payload);
-        message.success('Blog category updated successfully!');
+        message.success('Đã cập nhật danh mục blog.');
       }
 
       onSuccess();
@@ -212,8 +212,8 @@ export default function BlogCategoryModal({
         getApiErrorMessage(
           error,
           mode === 'create'
-            ? 'Failed to create blog category. Please try again.'
-            : 'Failed to update blog category. Please try again.',
+            ? 'Không tạo được danh mục. Vui lòng thử lại.'
+            : 'Không cập nhật được danh mục. Vui lòng thử lại.',
         ),
       );
     } finally {
@@ -226,11 +226,11 @@ export default function BlogCategoryModal({
     try {
       setSubmitting(true);
       await blogCategoryService.deleteCategory(category.id);
-      message.success(`Category "${category.name}" has been deleted.`);
+      message.success(`Đã xóa danh mục «${category.name}».`);
       onSuccess();
     } catch (error: unknown) {
       message.error(
-        getApiErrorMessage(error, 'Failed to delete blog category. Please try again.'),
+        getApiErrorMessage(error, 'Không xóa được danh mục. Vui lòng thử lại.'),
       );
     } finally {
       setSubmitting(false);
@@ -312,7 +312,7 @@ export default function BlogCategoryModal({
       return (
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
-            Close
+            Đóng
           </Button>
         </DialogFooter>
       );
@@ -322,7 +322,7 @@ export default function BlogCategoryModal({
       return (
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onCancel} disabled={submitting}>
-            Cancel
+            Hủy
           </Button>
           <Button
             onClick={handleCreateOrEdit}
@@ -330,7 +330,7 @@ export default function BlogCategoryModal({
             className="bg-primary hover:bg-primary/90 text-primary-foreground"
           >
             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mode === 'create' ? 'Create Category' : 'Save Changes'}
+            {mode === 'create' ? 'Tạo danh mục' : 'Lưu thay đổi'}
           </Button>
         </DialogFooter>
       );
@@ -340,7 +340,7 @@ export default function BlogCategoryModal({
       return (
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onCancel} disabled={submitting}>
-            Cancel
+            Hủy
           </Button>
           <Button
             variant="destructive"
@@ -349,7 +349,7 @@ export default function BlogCategoryModal({
             className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete
+            Xóa
           </Button>
         </DialogFooter>
       );
@@ -366,9 +366,9 @@ export default function BlogCategoryModal({
         {/* Hidden title for modal when in delete mode */}
         {mode === 'delete' && (
           <>
-            <DialogTitle className="sr-only">Delete Category</DialogTitle>
+            <DialogTitle className="sr-only">Xóa danh mục</DialogTitle>
             <DialogDescription className="sr-only">
-              Confirm category deletion
+              Xác nhận xóa danh mục blog
             </DialogDescription>
           </>
         )}

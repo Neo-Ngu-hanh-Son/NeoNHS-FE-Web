@@ -31,16 +31,16 @@ export default function WorkshopTemplateCreatePage() {
       const newTemplate = await WorkshopTemplateService.createTemplate(createRequest)
 
       notification.success({
-        message: 'Template Created',
-        description: `Template "${newTemplate.name}" has been created as DRAFT.`
+        message: 'Tạo Mẫu Thành Công',
+        description: `Mẫu "${newTemplate.name}" đã được tạo dưới dạng BẢN NHÁP.`
       })
 
       navigate(`/vendor/workshop-templates/${newTemplate.id}`)
     } catch (error: any) {
       console.error('Create failed:', error)
       notification.error({
-        message: 'Creation Failed',
-        description: error.message || 'Failed to create template. Please try again.',
+        message: 'Tạo Thất Bại',
+        description: error.message || 'Không thể tạo mẫu. Vui lòng thử lại.',
       })
     } finally {
       setSubmitting(false)
@@ -64,9 +64,9 @@ export default function WorkshopTemplateCreatePage() {
           <ArrowLeftOutlined />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Create New Template</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Tạo Mẫu Workshop Mới</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Fill in the details below. Your template will be saved as a draft.
+            Điền thông tin chi tiết dưới đây. Mẫu của bạn sẽ được lưu dưới dạng bản nháp.
           </p>
         </div>
       </div>
@@ -75,8 +75,8 @@ export default function WorkshopTemplateCreatePage() {
       <div className="flex items-start gap-3 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 px-4 py-3">
         <Lightbulb className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Tip:</strong> Your template will be saved as a <strong>DRAFT</strong>.
-          You can edit it anytime before submitting for admin approval.
+          <strong>Mẹo:</strong> Mẫu của bạn sẽ được lưu dưới dạng <strong>BẢN NHÁP</strong>.
+          Bạn có thể chỉnh sửa bất cứ lúc nào trước khi gửi cho admin phê duyệt.
         </p>
       </div>
 

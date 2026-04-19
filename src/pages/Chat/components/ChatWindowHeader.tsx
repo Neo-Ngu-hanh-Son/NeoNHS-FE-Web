@@ -57,7 +57,7 @@ export default function ChatWindowHeader({ partnerAvatar, partnerName, isTyping,
             </p>
           ) : (
             <p className="text-xs text-muted-foreground flex items-center gap-1">
-              {isAiRoom ? 'Trợ lý ảo NeoNHS' : 'Participant'}
+              {isAiRoom ? 'Trợ lý ảo NeoNHS' : 'Người tham gia'}
             </p>
           )}
         </div>
@@ -71,13 +71,13 @@ export default function ChatWindowHeader({ partnerAvatar, partnerName, isTyping,
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem className="text-red-500 hover:text-red-600 focus:text-red-600 cursor-pointer">
-            <DeleteOutlined className="mr-2" /> Delete conversation
+            <DeleteOutlined className="mr-2" /> Xóa cuộc trò chuyện
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <StopOutlined className="mr-2" /> Block user
+            <StopOutlined className="mr-2" /> Chặn người dùng
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <WarningOutlined className="mr-2" /> Report
+            <WarningOutlined className="mr-2" /> Báo cáo
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

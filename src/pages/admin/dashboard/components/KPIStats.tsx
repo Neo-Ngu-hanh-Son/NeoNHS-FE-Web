@@ -1,5 +1,4 @@
-import { motion } from 'framer-motion';
-import { UserOutlined, ShopOutlined, TagOutlined, DollarOutlined } from '@ant-design/icons';
+import { Users, Store, Ticket, DollarSign } from 'lucide-react';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AdminKPIs } from '@/types/adminDashboard';
 import { formatCurrency, formatCompactNumber } from '@/utils/helpers';
@@ -9,46 +8,33 @@ interface KPIStatsProps {
 }
 
 export function KPIStats({ kpis }: KPIStatsProps) {
-    const itemVariants = {
-        hidden: { y: 20, opacity: 0 },
-        visible: { y: 0, opacity: 1 }
-    };
-
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <motion.div variants={itemVariants}>
-                <StatsCard
-                    title="Total Users"
-                    value={kpis?.totalUsers?.toLocaleString() || "0"}
-                    icon={<UserOutlined className="text-xl" />}
-                    gradientFrom="border-blue-500 text-blue-600"
-                />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-                <StatsCard
-                    title="Active Vendors"
-                    value={kpis?.activeVendors?.toLocaleString() || "0"}
-                    icon={<ShopOutlined className="text-xl" />}
-                    gradientFrom="border-emerald-500 text-emerald-600"
-                />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-                <StatsCard
-                    title="Tickets Sold"
-                    value={kpis?.ticketsSold?.toLocaleString() || "0"}
-                    icon={<TagOutlined className="text-xl" />}
-                    gradientFrom="border-amber-500 text-amber-600"
-                />
-            </motion.div>
-            <motion.div variants={itemVariants}>
-                <StatsCard
-                    title="Total Revenue"
-                    value={kpis?.revenue ? formatCompactNumber(kpis.revenue) : "0"}
-                    icon={<DollarOutlined className="text-xl" />}
-                    gradientFrom="border-primary text-primary"
-                    subtitle={kpis?.revenue ? formatCurrency(kpis.revenue) : ""}
-                />
-            </motion.div>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <StatsCard
+                title="Tổng người dùng"
+                value={kpis?.totalUsers?.toLocaleString('vi-VN') ?? '0'}
+                icon={<Users className="h-6 w-6 text-white" />}
+                iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
+            />
+            <StatsCard
+                title="Đối tác hoạt động"
+                value={kpis?.activeVendors?.toLocaleString('vi-VN') ?? '0'}
+                icon={<Store className="h-6 w-6 text-white" />}
+                iconBg="bg-gradient-to-br from-emerald-500 to-green-600"
+            />
+            <StatsCard
+                title="Vé đã bán"
+                value={kpis?.ticketsSold?.toLocaleString('vi-VN') ?? '0'}
+                icon={<Ticket className="h-6 w-6 text-white" />}
+                iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
+            />
+            <StatsCard
+                title="Tổng doanh thu"
+                value={kpis?.revenue ? formatCompactNumber(kpis.revenue) : '0'}
+                icon={<DollarSign className="h-6 w-6 text-white" />}
+                iconBg="bg-gradient-to-br from-purple-500 to-violet-600"
+                subtitle={kpis?.revenue ? formatCurrency(kpis.revenue) : undefined}
+            />
         </div>
     );
 }

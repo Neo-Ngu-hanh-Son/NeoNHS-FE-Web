@@ -33,15 +33,15 @@ interface BlogTableProps {
 
 const STATUS_STYLES: Record<BlogStatus, { label: string; className: string }> = {
   DRAFT: {
-    label: 'Draft',
+    label: 'Bản nháp',
     className: 'bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200 rounded-full',
   },
   PUBLISHED: {
-    label: 'Published',
+    label: 'Công khai',
     className: 'bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full',
   },
   ARCHIVED: {
-    label: 'Archived',
+    label: 'Lưu trữ',
     className: 'bg-secondary text-muted-foreground hover:bg-secondary border-border rounded-full',
   },
 };
@@ -77,7 +77,7 @@ export function BlogTable({
         </div>
         <p className="text-sm font-medium text-gray-700 mb-4">{error}</p>
         <Button size="sm" onClick={onRetry} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          Try Again
+          Thử lại
         </Button>
       </div>
     );
@@ -90,8 +90,8 @@ export function BlogTable({
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-4">
           <FileText className="h-7 w-7 text-gray-400" />
         </div>
-        <h3 className="text-base font-semibold text-gray-900 mb-1">No blogs found.</h3>
-        <p className="text-sm text-gray-500">Try adjusting your search or filters.</p>
+        <h3 className="text-base font-semibold text-gray-900 mb-1">Không tìm thấy bài viết.</h3>
+        <p className="text-sm text-gray-500">Hãy thử điều chỉnh từ khóa hoặc bộ lọc.</p>
       </div>
     );
   }
@@ -112,7 +112,7 @@ export function BlogTable({
             disabled={emptyingArchived || totalElements === 0}
           >
             {emptyingArchived ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            Empty All Archived Blogs
+            Xóa tất cả bài đã lưu trữ
           </Button>
         </div>
       )}
@@ -121,12 +121,12 @@ export function BlogTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-              <TableHead className="font-semibold text-gray-600">Blog</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px]">Category</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[100px]">Status</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[80px] text-center">Views</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[130px]">Created</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Actions</TableHead>
+              <TableHead className="font-semibold text-gray-600">Bài viết</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px]">Danh mục</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[100px]">Trạng thái</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[80px] text-center">Lượt xem</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[130px]">Ngày tạo</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Thao tác</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -209,7 +209,7 @@ export function BlogTable({
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>View blog</TooltipContent>
+                          <TooltipContent>Xem bài viết</TooltipContent>
                         </Tooltip>
 
                         <Tooltip>
@@ -223,7 +223,7 @@ export function BlogTable({
                               <Pencil className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent>Edit blog</TooltipContent>
+                          <TooltipContent>Sửa bài viết</TooltipContent>
                         </Tooltip>
 
                         {!isArchivedFilter && blog.status !== 'ARCHIVED' && (
@@ -238,7 +238,7 @@ export function BlogTable({
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Archive blog</TooltipContent>
+                            <TooltipContent>Lưu trữ bài viết</TooltipContent>
                           </Tooltip>
                         )}
 
@@ -254,7 +254,7 @@ export function BlogTable({
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Delete permanently</TooltipContent>
+                            <TooltipContent>Xóa vĩnh viễn</TooltipContent>
                           </Tooltip>
                         )}
                       </div>
@@ -271,7 +271,7 @@ export function BlogTable({
       {totalElements > 0 && (
         <div className="flex items-center justify-between px-1">
           <p className="text-sm text-gray-500">
-            Showing {rangeStart} to {rangeEnd} of {totalElements} results
+            Hiển thị {rangeStart}–{rangeEnd} trong tổng số {totalElements} kết quả
           </p>
           <div className="flex items-center gap-1.5">
             <Button
@@ -281,7 +281,7 @@ export function BlogTable({
               onClick={() => onPageChange(currentPage - 1)}
               className="h-8 px-3 text-xs"
             >
-              Previous
+              Trước
             </Button>
             {Array.from({ length: totalPages }).map((_, i) => (
               <Button
@@ -301,7 +301,7 @@ export function BlogTable({
               onClick={() => onPageChange(currentPage + 1)}
               className="h-8 px-3 text-xs"
             >
-              Next
+              Sau
             </Button>
           </div>
         </div>

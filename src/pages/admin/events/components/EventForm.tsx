@@ -4,7 +4,6 @@ import { message } from 'antd';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,15 +12,17 @@ import {
 } from '@/components/ui/select';
 import { Loader2, MapPin, Upload, X } from 'lucide-react';
 import { TagCombobox } from './TagCombobox';
-import { MapPickerModal } from './MapPickerModal';
+import { GoogleMapPickerModal } from '@/pages/admin/destinations/components/GoogleMapPickerModal';
 import { EVENT_STATUS_OPTIONS } from '../constants';
 import { uploadImageToCloudinary, validateImageFile } from '@/utils/cloudinary';
 import type { EventResponse, CreateEventRequest, UpdateEventRequest } from '@/types/event';
+import BlogEditor from '@/components/blog/BlogEditor';
+import { BlogEditorRef, EditorSaveResult } from '@/components/blog/type';
 
 interface EventFormProps {
     mode: 'create' | 'edit';
     initialData?: EventResponse | null;
-    onSubmit: (data: CreateEventRequest | UpdateEventRequest) => Promise<void>;
+    onSubmit: (data: CreateEventRequest | UpdateEventRequest, file?: File) => Promise<void>;
     loading: boolean;
 }
 
@@ -72,11 +73,34 @@ function toLocalDateTimeString(isoString: string): string {
 
 export function EventForm({ mode, initialData, onSubmit, loading }: EventFormProps) {
     const navigate = useNavigate();
-    const [form, setForm] = useState<FormData>(emptyForm);
+    const [form, setForm] = useState<FormData>(() => {
+        if (initialData) {
+            return {
+                name: initialData.name || '',
+                shortDescription: initialData.shortDescription || '',
+                fullDescription: initialData.fullDescription || '',
+                startTime: toLocalDateTimeString(initialData.startTime),
+                endTime: toLocalDateTimeString(initialData.endTime),
+                locationName: initialData.locationName || '',
+                latitude: initialData.latitude || '',
+                longitude: initialData.longitude || '',
+                isTicketRequired: initialData.isTicketRequired || false,
+                price: initialData.price ? String(initialData.price) : '',
+                maxParticipants: initialData.maxParticipants ? String(initialData.maxParticipants) : '',
+                thumbnailUrl: initialData.thumbnailUrl || '',
+                tagIds: initialData.tags?.map((t) => t.id) || [],
+                status: initialData.status || 'UPCOMING',
+            };
+        }
+        return emptyForm;
+    });
     const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const [mapPickerOpen, setMapPickerOpen] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+    const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const editorRef = useRef<BlogEditorRef>(null);
 
     useEffect(() => {
         if (initialData) {
@@ -104,11 +128,12 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
     };
 
-    const handleMapConfirm = (lat: number, lng: number) => {
+    const handleMapLocationSelect = (result: any) => {
         setForm((prev) => ({
             ...prev,
-            latitude: String(lat),
-            longitude: String(lng),
+            latitude: String(result.latitude),
+            longitude: String(result.longitude),
+            locationName: result.name || result.address || '',
         }));
     };
 
@@ -119,20 +144,9 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
             return;
         }
 
-        setUploading(true);
-        try {
-            const url = await uploadImageToCloudinary(file);
-            if (url) {
-                handleChange('thumbnailUrl', url);
-                message.success('Image uploaded successfully!');
-            } else {
-                message.error('Image upload failed.');
-            }
-        } catch (error) {
-            message.error('Image upload error.');
-        } finally {
-            setUploading(false);
-        }
+        const previewUrl = URL.createObjectURL(file);
+        setThumbnailPreview(previewUrl);
+        setThumbnailFile(file);
     };
 
     const handleDrop = (e: React.DragEvent) => {
@@ -149,8 +163,11 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         const e: Partial<Record<keyof FormData, string>> = {};
         const now = new Date();
 
-        if (!form.name.trim()) e.name = 'Event name is required';
-        else if (form.name.length > 255) e.name = 'Max 255 characters';
+        if (form.name.trim()) {
+            if (form.name.length > 255) e.name = 'Max 255 characters';
+        } else {
+            e.name = 'Event name is required';
+        }
 
         if (form.shortDescription.length > 255) e.shortDescription = 'Max 255 characters';
         if (form.locationName.length > 255) e.locationName = 'Max 255 characters';
@@ -165,7 +182,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
             e.endTime = 'End time must be after start time';
         }
 
-        if (mode === 'create' && !form.thumbnailUrl.trim()) {
+        if (!thumbnailFile && !form.thumbnailUrl.trim()) {
             e.thumbnailUrl = 'Thumbnail is required';
         }
         if (form.thumbnailUrl && form.thumbnailUrl.length > 255) e.thumbnailUrl = 'Max 255 characters';
@@ -180,13 +197,23 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         return Object.keys(e).length === 0;
     };
 
-    const handleSubmit = async () => {
-        if (!validate()) return;
+    const handleEditorSave = async (result: EditorSaveResult) => {
+        // Clear previous fullDescription error
+        setErrors(prev => {
+            const next = { ...prev };
+            delete next.fullDescription;
+            return next;
+        });
+
+        if (result.charCount > 1000) {
+            setErrors(prev => ({ ...prev, fullDescription: `Description is too long (${result.charCount}/1000 characters)` }));
+            return;
+        }
 
         const data: CreateEventRequest | UpdateEventRequest = {
             name: form.name.trim(),
             shortDescription: form.shortDescription.trim() || undefined,
-            fullDescription: form.fullDescription.trim() || undefined,
+            fullDescription: result.html.trim() || undefined,
             startTime: new Date(form.startTime).toISOString(),
             endTime: new Date(form.endTime).toISOString(),
             locationName: form.locationName.trim() || undefined,
@@ -195,15 +222,43 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
             isTicketRequired: form.isTicketRequired,
             price: form.price ? Number(form.price) : undefined,
             maxParticipants: form.maxParticipants ? Number(form.maxParticipants) : undefined,
-            thumbnailUrl: form.thumbnailUrl.trim() || undefined,
+            thumbnailUrl: thumbnailFile ? 'placeholder_for_validation' : undefined,
             tagIds: form.tagIds.length > 0 ? form.tagIds : undefined,
+            status: mode === 'edit' ? (form.status as any) : undefined,
         };
 
-        if (mode === 'edit') {
-            (data as UpdateEventRequest).status = form.status as any;
-        }
+        await onSubmit(data, thumbnailFile || undefined);
+    };
 
-        await onSubmit(data);
+    const handleSubmit = async () => {
+        if (!validate()) return;
+
+        if (editorRef.current) {
+            editorRef.current.save();
+        } else {
+            // Fallback if editor not ready (should not happen normally)
+            const data: CreateEventRequest | UpdateEventRequest = {
+                name: form.name.trim(),
+                shortDescription: form.shortDescription.trim() || undefined,
+                fullDescription: form.fullDescription.trim() || undefined,
+                startTime: new Date(form.startTime).toISOString(),
+                endTime: new Date(form.endTime).toISOString(),
+                locationName: form.locationName.trim() || undefined,
+                latitude: form.latitude.trim() || undefined,
+                longitude: form.longitude.trim() || undefined,
+                isTicketRequired: form.isTicketRequired,
+                price: form.price ? Number(form.price) : undefined,
+                maxParticipants: form.maxParticipants ? Number(form.maxParticipants) : undefined,
+                thumbnailUrl: thumbnailFile ? 'placeholder_for_validation' : undefined,
+                tagIds: form.tagIds.length > 0 ? form.tagIds : undefined,
+            };
+
+            if (mode === 'edit') {
+                (data as UpdateEventRequest).status = form.status as any;
+            }
+
+            await onSubmit(data, thumbnailFile || undefined);
+        }
     };
 
     const mapInitialPos = form.latitude && form.longitude
@@ -228,9 +283,17 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                             <Input id="shortDescription" value={form.shortDescription} onChange={(e) => handleChange('shortDescription', e.target.value)} placeholder="Brief description for card display" maxLength={255} />
                             {errors.shortDescription && <p className="text-xs text-destructive mt-1">{errors.shortDescription}</p>}
                         </div>
-                        <div>
-                            <Label htmlFor="fullDescription">Full Description</Label>
-                            <Textarea id="fullDescription" value={form.fullDescription} onChange={(e) => handleChange('fullDescription', e.target.value)} placeholder="Detailed description..." className="min-h-[200px]" />
+                         <div>
+                            <Label className="mb-2 block">Full Description</Label>
+                            <div className="border rounded-md overflow-hidden bg-white">
+                                <BlogEditor 
+                                    ref={editorRef}
+                                    onSave={handleEditorSave}
+                                    initialHtml={form.fullDescription}
+                                    placeholder="Enter detailed event description..."
+                                />
+                            </div>
+                            {errors.fullDescription && <p className="text-xs text-destructive mt-1">{errors.fullDescription}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -373,13 +436,25 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                 <Card>
                     <CardHeader><CardTitle>Thumbnail {mode === 'create' && '*'}</CardTitle></CardHeader>
                     <CardContent className="space-y-3">
-                        {form.thumbnailUrl ? (
-                            <div className="relative aspect-video rounded-lg overflow-hidden border group">
-                                <img src={form.thumbnailUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                        {thumbnailPreview || form.thumbnailUrl ? (
+                            <div 
+                                className="relative aspect-video rounded-lg overflow-hidden border group cursor-pointer"
+                                onClick={() => fileInputRef.current?.click()}
+                            >
+                                <img src={thumbnailPreview || form.thumbnailUrl} alt="Thumbnail" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <span className="text-white text-sm font-medium">Click to change image</span>
+                                </div>
                                 <button
                                     type="button"
-                                    onClick={() => handleChange('thumbnailUrl', '')}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setThumbnailPreview('');
+                                        setThumbnailFile(null);
+                                        handleChange('thumbnailUrl', '');
+                                    }}
                                     className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+                                    title="Remove image"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>
@@ -421,16 +496,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                             }}
                         />
 
-                        {/* Or enter URL manually */}
-                        <div>
-                            <Label className="text-xs text-muted-foreground">Or enter URL</Label>
-                            <Input
-                                value={form.thumbnailUrl}
-                                onChange={(e) => handleChange('thumbnailUrl', e.target.value)}
-                                placeholder="https://..."
-                                className="h-8 text-xs"
-                            />
-                        </div>
+
                         {errors.thumbnailUrl && <p className="text-xs text-destructive">{errors.thumbnailUrl}</p>}
                     </CardContent>
                 </Card>
@@ -454,11 +520,11 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
             </div>
 
             {/* Map Picker Modal */}
-            <MapPickerModal
+            <GoogleMapPickerModal
                 open={mapPickerOpen}
                 onOpenChange={setMapPickerOpen}
-                initialPosition={mapInitialPos}
-                onConfirm={handleMapConfirm}
+                initialCoord={mapInitialPos ? [mapInitialPos.lat, mapInitialPos.lng] : undefined}
+                onSelect={handleMapLocationSelect}
             />
         </div>
     );

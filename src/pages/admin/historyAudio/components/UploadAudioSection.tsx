@@ -38,14 +38,14 @@ export default function UploadAudioSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Upload History Audio And Scripts</CardTitle>
+        <CardTitle>Tải lên âm thanh lịch sử và kịch bản</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Textarea
           rows={8}
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
-          placeholder="Enter the script for the historical narration. This will be used along with the uploaded audio for word alignment."
+          placeholder="Nhập kịch bản thuyết minh lịch sử. Kịch bản này dùng cùng file âm thanh đã tải lên để căn chỉnh từng từ."
         />
 
         <input
@@ -91,13 +91,13 @@ export default function UploadAudioSection({
 
           {fileName ? (
             <>
-              <p className="px-4 text-center text-sm text-muted-foreground">Uploaded file</p>
+              <p className="px-4 text-center text-sm text-muted-foreground">File đã chọn</p>
               <p className="text-xs px-4 text-center text-muted-foreground">{fileName}</p>
             </>
           ) : (
             <>
               <p className="px-4 text-center text-sm text-muted-foreground">
-                Drag & drop audio here, or click to browse
+                Kéo thả file âm thanh vào đây, hoặc bấm để chọn
               </p>
               <p className="text-xs text-muted-foreground">MP3, WAV, M4A, OGG</p>
             </>

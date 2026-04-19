@@ -97,8 +97,8 @@ export default function WorkshopTemplatesPage() {
     } catch (error: any) {
       console.error('Failed to fetch templates:', error)
       notification.error({
-        message: 'Failed to Load Templates',
-        description: error.message || 'Unable to fetch workshop templates. Please try again.',
+        message: 'Không thể tải mẫu',
+        description: error.message || 'Không thể tải danh sách mẫu workshop. Vui lòng thử lại.',
       })
       setTemplates([])
       setTotalElements(0)
@@ -119,8 +119,8 @@ export default function WorkshopTemplatesPage() {
   const handleDeleteClick = (template: WorkshopTemplateResponse) => {
     if (template.status === WorkshopStatus.ACTIVE) {
       notification.error({
-        message: 'Cannot Deleted',
-        description: "Cannot delete an active template. Please contact admin if you need to remove this template."
+        message: 'Không thể xoá',
+        description: 'Không thể xoá mẫu đang hoạt động. Vui lòng liên hệ quản trị viên nếu cần gỡ mẫu này.'
       })
       return
     }
@@ -134,8 +134,8 @@ export default function WorkshopTemplatesPage() {
 
         setDeleteDialog({ open: false, template: null })
         notification.success({
-          message: 'Template Deleted',
-          description: `Template "${deleteDialog.template.name}" has been deleted.`
+          message: 'Đã xoá mẫu',
+          description: `Mẫu "${deleteDialog.template.name}" đã được xoá thành công.`
         })
 
         // Refresh the list
@@ -143,8 +143,8 @@ export default function WorkshopTemplatesPage() {
       } catch (error: any) {
         console.error('Delete failed:', error)
         notification.error({
-          message: 'Delete Failed',
-          description: error.message || 'Failed to delete template. Please try again.',
+          message: 'Xoá thất bại',
+          description: error.message || 'Không thể xoá mẫu. Vui lòng thử lại.',
         })
       }
     }
@@ -161,8 +161,8 @@ export default function WorkshopTemplatesPage() {
 
         setSubmitDialog({ open: false, template: null })
         notification.success({
-          message: 'Template Submitted',
-          description: `Template "${submitDialog.template.name}" has been submitted for approval.`
+          message: 'Đã gửi duyệt',
+          description: `Mẫu "${submitDialog.template.name}" đã được gửi để phê duyệt.`
         })
 
         // Refresh the list
@@ -170,8 +170,8 @@ export default function WorkshopTemplatesPage() {
       } catch (error: any) {
         console.error('Submit failed:', error)
         notification.error({
-          message: 'Submission Failed',
-          description: error.message || 'Failed to submit template for approval. Please try again.',
+          message: 'Gửi duyệt thất bại',
+          description: error.message || 'Không thể gửi mẫu để phê duyệt. Vui lòng thử lại.',
         })
       }
     }
@@ -182,10 +182,10 @@ export default function WorkshopTemplatesPage() {
       await WorkshopTemplateService.togglePublish(template.id)
 
       notification.success({
-        message: template.isPublished ? 'Template Unpublished' : 'Template Published',
+        message: template.isPublished ? 'Đã ẩn mẫu' : 'Đã xuất bản mẫu',
         description: template.isPublished
-          ? `Template "${template.name}" is now hidden from the public catalog.`
-          : `Template "${template.name}" is now visible to tourists!`
+          ? `Mẫu "${template.name}" đã được ẩn khỏi danh mục công khai.`
+          : `Mẫu "${template.name}" hiện đã hiển thị với du khách!`
       })
 
       // Refresh the list
@@ -193,8 +193,8 @@ export default function WorkshopTemplatesPage() {
     } catch (error: any) {
       console.error('Toggle publish failed:', error)
       notification.error({
-        message: 'Toggle Publish Failed',
-        description: error.message || 'Failed to toggle publish status. Please try again.',
+        message: 'Thao tác thất bại',
+        description: error.message || 'Không thể thay đổi trạng thái xuất bản. Vui lòng thử lại.',
       })
     }
   }
@@ -211,44 +211,35 @@ export default function WorkshopTemplatesPage() {
     const maxVisible = 5
 
     if (totalPages <= maxVisible) {
-      // Show all pages if total is small
       for (let i = 0; i < totalPages; i++) {
         pages.push(i)
       }
     } else {
-      // Always show first page
       pages.push(0)
 
-      // Calculate range around current page
       let start = Math.max(1, currentPage - 1)
       let end = Math.min(totalPages - 2, currentPage + 1)
 
-      // Adjust if we're near the start
       if (currentPage <= 2) {
         end = 3
       }
 
-      // Adjust if we're near the end
       if (currentPage >= totalPages - 3) {
         start = totalPages - 4
       }
 
-      // Add ellipsis after first page if needed
       if (start > 1) {
         pages.push('ellipsis')
       }
 
-      // Add middle pages
       for (let i = start; i <= end; i++) {
         pages.push(i)
       }
 
-      // Add ellipsis before last page if needed
       if (end < totalPages - 2) {
         pages.push('ellipsis')
       }
 
-      // Always show last page
       pages.push(totalPages - 1)
     }
 
@@ -276,16 +267,16 @@ export default function WorkshopTemplatesPage() {
           <div className="text-sm text-muted-foreground">
             {templates.length > 0 ? (
               <>
-                Showing {currentPage * PAGE_SIZE + 1}-{Math.min((currentPage + 1) * PAGE_SIZE, totalElements)} of {totalElements} template{totalElements !== 1 ? 's' : ''}
-                {(keyword || statusFilter !== 'all') && ' (filtered)'}
+                Hiển thị {currentPage * PAGE_SIZE + 1}-{Math.min((currentPage + 1) * PAGE_SIZE, totalElements)} trong tổng số {totalElements} mẫu
+                {(keyword || statusFilter !== 'all') && ' (đã lọc)'}
               </>
             ) : (
-              'No templates found'
+              'Không tìm thấy mẫu nào'
             )}
           </div>
           {totalPages > 1 && (
             <div className="text-sm text-muted-foreground">
-              Page {currentPage + 1} of {totalPages}
+              Trang {currentPage + 1} / {totalPages}
             </div>
           )}
         </div>
