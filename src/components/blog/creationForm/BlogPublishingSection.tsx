@@ -18,7 +18,7 @@ export default function BlogPublishingSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Publishing</CardTitle>
+        <CardTitle>Công khai</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Status */}
@@ -28,15 +28,15 @@ export default function BlogPublishingSection({
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="status">Status</FieldLabel>
+                <FieldLabel htmlFor="status">Trạng thái</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger id="status" aria-invalid={fieldState.invalid}>
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={BlogStatus.DRAFT}>Draft</SelectItem>
-                    <SelectItem value={BlogStatus.PUBLISHED}>Published</SelectItem>
-                    {!isCreating && <SelectItem value={BlogStatus.ARCHIVED}>Archived</SelectItem>}
+                    <SelectItem value={BlogStatus.DRAFT}>Bản nháp</SelectItem>
+                    <SelectItem value={BlogStatus.PUBLISHED}>Công khai</SelectItem>
+                    {!isCreating && <SelectItem value={BlogStatus.ARCHIVED}>Lưu trữ</SelectItem>}
                   </SelectContent>
                 </Select>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
@@ -54,9 +54,9 @@ export default function BlogPublishingSection({
               <div className="flex items-center justify-between space-x-2 border p-3 rounded-md">
                 <div className="space-y-0.5">
                   <Label htmlFor="featured" className="text-base cursor-pointer">
-                    Featured
+                    Nổi bật
                   </Label>
-                  <p className="text-xs text-muted-foreground">Pin this blog to the top</p>
+                  <p className="text-xs text-muted-foreground">Ghim bài viết lên đầu danh sách</p>
                 </div>
                 <Switch id="featured" checked={field.value} onCheckedChange={field.onChange} />
               </div>

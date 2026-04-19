@@ -26,7 +26,7 @@ export function BlogCategoryPage() {
   } = useBlogCategories();
 
   const handleExport = () => {
-    const header = "Category Name,Status,Number of Posts,Created Date\n";
+    const header = "Tên danh mục,Trạng thái,Số bài viết,Ngày tạo\n";
     const rows = categories.map(
       (c) => `"${c.name}","${c.status}",${c.postCount},"${formatShortDate(c.createdAt)}"`,
     );

@@ -41,22 +41,22 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
   const isCreate = mode === "create";
 
   const title = useMemo(() => {
-    if (mode === "create") return `Create ${kind === "event" ? "Event" : "Workshop"} Tag`;
-    if (mode === "edit") return `Edit ${kind === "event" ? "Event" : "Workshop"} Tag`;
-    if (mode === "delete") return "Delete Tag";
-    if (mode === "restore") return "Restore Tag";
+    if (mode === "create") return kind === "event" ? "Thêm nhãn sự kiện" : "Thêm nhãn workshop";
+    if (mode === "edit") return kind === "event" ? "Sửa nhãn sự kiện" : "Sửa nhãn workshop";
+    if (mode === "delete") return "Xóa nhãn";
+    if (mode === "restore") return "Khôi phục nhãn";
     return "";
   }, [kind, mode]);
 
   const subtitle = useMemo(() => {
-    if (mode === "create") return "Fill in the information to create a new tag.";
-    if (mode === "edit") return "Update only the fields you want to change.";
+    if (mode === "create") return "Điền thông tin để tạo nhãn mới.";
+    if (mode === "edit") return "Cập nhật các trường bạn muốn thay đổi.";
     if (mode === "delete") {
       return kind === "event"
-        ? "This tag will be deactivated and can be restored later."
-        : "This action permanently deletes the tag and cannot be undone.";
+        ? "Nhãn sẽ bị vô hiệu hóa và có thể khôi phục sau."
+        : "Thao tác này xóa vĩnh viễn nhãn workshop và không thể hoàn tác.";
     }
-    if (mode === "restore") return "This tag will be active again immediately.";
+    if (mode === "restore") return "Nhãn sẽ được kích hoạt lại ngay.";
     return "";
   }, [kind, mode]);
 
@@ -89,27 +89,27 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
     const trimmedName = formValues.name.trim();
 
     if (isCreate && !trimmedName) {
-      errors.name = "Tag name is required";
+      errors.name = "Tên nhãn là bắt buộc";
     }
 
     if (isEdit && tag && formValues.name !== (tag.name ?? "") && !trimmedName) {
-      errors.name = "Name cannot be empty if provided";
+      errors.name = "Nếu nhập tên thì không được để trống";
     }
 
     if (kind === "workshop") {
       if (trimmedName.length > 100) {
-        errors.name = "Tag name must not exceed 100 characters";
+        errors.name = "Tên nhãn không được vượt quá 100 ký tự";
       }
       if (formValues.description.length > 255) {
-        errors.description = "Description must not exceed 255 characters";
+        errors.description = "Mô tả không được vượt quá 255 ký tự";
       }
       if (formValues.tagColor.length > 20) {
-        errors.tagColor = "Tag color must not exceed 20 characters";
+        errors.tagColor = "Mã màu không được vượt quá 20 ký tự";
       }
     }
 
     if (formValues.iconUrl && !isValidUrl(formValues.iconUrl)) {
-      errors.iconUrl = "Icon URL must be a valid URL";
+      errors.iconUrl = "URL biểu tượng không hợp lệ";
     }
 
     setFormErrors(errors);
@@ -161,7 +161,7 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
           await workshopTagService.createWorkshopTag(payload);
         }
 
-        message.success(`${kind === "event" ? "Event" : "Workshop"} tag created successfully.`);
+        message.success(kind === "event" ? "Đã tạo nhãn sự kiện." : "Đã tạo nhãn workshop.");
         onSuccess();
         return;
       }
@@ -169,7 +169,7 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
       if (isEdit && tag) {
         const payload = buildUpdatePayload();
         if (Object.keys(payload).length === 0) {
-          message.info("No changes detected.");
+          message.info("Không có thay đổi nào.");
           onCancel();
           return;
         }
@@ -180,7 +180,7 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
           await workshopTagService.updateWorkshopTag(tag.id, payload);
         }
 
-        message.success(`${kind === "event" ? "Event" : "Workshop"} tag updated successfully.`);
+        message.success(kind === "event" ? "Đã cập nhật nhãn sự kiện." : "Đã cập nhật nhãn workshop.");
         onSuccess();
       }
     } catch (error: unknown) {
@@ -188,8 +188,8 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
         getApiErrorMessage(
           error,
           isCreate
-            ? "Failed to create tag. Please try again."
-            : "Failed to update tag. Please try again.",
+            ? "Không tạo được nhãn. Vui lòng thử lại."
+            : "Không cập nhật được nhãn. Vui lòng thử lại.",
         ),
       );
     } finally {
@@ -208,11 +208,11 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
         await workshopTagService.deleteWorkshopTag(tag.id);
       }
       message.success(
-        kind === "event" ? "Tag deleted successfully." : "Workshop tag deleted successfully.",
+        kind === "event" ? "Đã xóa nhãn sự kiện." : "Đã xóa nhãn workshop.",
       );
       onSuccess();
     } catch (error: unknown) {
-      message.error(getApiErrorMessage(error, "Failed to delete tag. Please try again."));
+      message.error(getApiErrorMessage(error, "Không xóa được nhãn. Vui lòng thử lại."));
     } finally {
       setSubmitting(false);
     }
@@ -224,10 +224,10 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
     try {
       setSubmitting(true);
       await tagService.restoreTag(tag.id);
-      message.success("Tag restored successfully.");
+      message.success("Đã khôi phục nhãn.");
       onSuccess();
     } catch (error: unknown) {
-      message.error(getApiErrorMessage(error, "Failed to restore tag. Please try again."));
+      message.error(getApiErrorMessage(error, "Không khôi phục được nhãn. Vui lòng thử lại."));
     } finally {
       setSubmitting(false);
     }
@@ -274,7 +274,7 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
             onFieldChange={handleFieldChange}
             onNameBlur={() => {
               if (!formValues.name.trim()) {
-                setFormErrors((prev) => ({ ...prev, name: "Tag name is required" }));
+                setFormErrors((prev) => ({ ...prev, name: "Tên nhãn là bắt buộc" }));
               }
             }}
           />
@@ -282,27 +282,27 @@ export function TagModal({ kind, mode, tag, onCancel, onSuccess }: TagModalProps
 
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} disabled={submitting}>
-            Cancel
+            Hủy
           </Button>
 
           {isDelete && (
             <Button variant="destructive" onClick={handleDelete} disabled={submitting}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Delete
+              Xóa
             </Button>
           )}
 
           {isRestore && (
             <Button onClick={handleRestore} disabled={submitting}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              Restore
+              Khôi phục
             </Button>
           )}
 
           {(isCreate || isEdit) && (
             <Button onClick={handleCreateOrEdit} disabled={submitting}>
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isCreate ? "Create Tag" : "Save Changes"}
+              {isCreate ? "Tạo nhãn" : "Lưu thay đổi"}
             </Button>
           )}
         </DialogFooter>

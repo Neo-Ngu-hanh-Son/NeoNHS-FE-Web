@@ -134,7 +134,7 @@ const RevenuePage = () => {
             ),
         },
         {
-            title: 'Nhà cung cấp',
+            title: 'Đối tác',
             dataIndex: 'vendor',
             key: 'vendor',
             render: (text: string) => <span className="font-medium text-slate-900 dark:text-slate-100">{text}</span>,
@@ -200,7 +200,7 @@ const RevenuePage = () => {
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Báo cáo doanh thu</h1>
                         <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                            Theo dõi doanh thu gộp, thu nhập quản trị, chi trả nhà cung cấp và giao dịch.
+                            Theo dõi doanh thu gộp, thu nhập quản trị, chi trả Đối tác và giao dịch.
                         </p>
                         <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-sm text-slate-600 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
                             <ClockCircleOutlined className="text-primary" />
@@ -294,7 +294,7 @@ const RevenuePage = () => {
                         </Col>
                         <Col xs={24} sm={12} xl={6}>
                             <StatsCard
-                                title="Chi trả nhà cung cấp"
+                                title="Chi trả Đối tác"
                                 value={formatCompactNumber(data.summary.vendorPayouts)}
                                 subtitle={formatCurrency(data.summary.vendorPayouts)}
                                 icon={<Users className="h-6 w-6 text-white" />}
@@ -326,7 +326,7 @@ const RevenuePage = () => {
                                         </div>
                                         <div className="min-w-0">
                                             <CardTitle className="text-base font-semibold text-slate-900 dark:text-white">
-                                                Đóng góp theo nhà cung cấp
+                                                Đóng góp theo Đối tác
                                             </CardTitle>
                                             <CardDescription className="text-xs text-muted-foreground">Top 5 theo doanh thu</CardDescription>
                                         </div>
@@ -382,7 +382,7 @@ const RevenuePage = () => {
                                     <div className="relative flex-1 sm:max-w-xs">
                                         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <Input
-                                            placeholder="Tìm theo nhà cung cấp, mục hoặc mã..."
+                                            placeholder="Tìm theo Đối tác, mục hoặc mã..."
                                             className="h-9 pl-9"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.target.value)}

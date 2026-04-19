@@ -9,12 +9,12 @@ export default function BlogCategoryTableSkeleton({ }: Props) {
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50/80">
-            <TableHead className="font-semibold text-gray-600">Category Name</TableHead>
+            <TableHead className="font-semibold text-gray-600">Tên danh mục</TableHead>
             <TableHead className="font-semibold text-gray-600">Slug</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[100px]">Status</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[120px] text-center">Posts</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[140px]">Created Date</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Actions</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[100px]">Trạng thái</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[120px] text-center">Bài viết</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[140px]">Ngày tạo</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[120px] text-right">Thao tác</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

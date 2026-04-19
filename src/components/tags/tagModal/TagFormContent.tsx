@@ -25,11 +25,11 @@ export function TagFormContent({
     <div className="space-y-5 pt-2">
       <div className="space-y-2">
         <Label htmlFor="tag-name" className="text-sm font-medium text-gray-700">
-          Tag Name <span className="text-red-500">*</span>
+          Tên nhãn <span className="text-red-500">*</span>
         </Label>
         <Input
           id="tag-name"
-          placeholder="e.g. Health, Cooking..."
+          placeholder="Ví dụ: Sức khỏe, Nấu ăn…"
           value={values.name}
           onChange={(e) => onFieldChange("name", e.target.value)}
           onBlur={onNameBlur}
@@ -44,11 +44,11 @@ export function TagFormContent({
 
       <div className="space-y-2">
         <Label htmlFor="tag-description" className="text-sm font-medium text-gray-700">
-          Description
+          Mô tả
         </Label>
         <Textarea
           id="tag-description"
-          placeholder="Describe this tag..."
+          placeholder="Mô tả ngắn gọn về nhãn…"
           value={values.description}
           onChange={(e) => onFieldChange("description", e.target.value)}
           maxLength={kind === "workshop" ? 255 : 500}
@@ -69,7 +69,7 @@ export function TagFormContent({
 
       <div className="space-y-2">
         <Label htmlFor="tag-color" className="text-sm font-medium text-gray-700">
-          Tag Color
+          Màu nhãn
         </Label>
         <div className="flex flex-wrap items-center gap-2">
           <Input
@@ -101,7 +101,7 @@ export function TagFormContent({
                     aria-label={`Select color ${color}`}
                     title={color}
                     onClick={() => onFieldChange("tagColor", color)}
-                    className={`h-6 w-6 rounded-full border transition-all ${
+                    className={`h-6 w-6 rounded-full border transition-colors ${
                       isSelected
                         ? "border-foreground ring-2 ring-offset-1 ring-foreground/20"
                         : "border-border"
@@ -120,7 +120,7 @@ export function TagFormContent({
 
       <div className="space-y-2">
         <Label htmlFor="tag-icon" className="text-sm font-medium text-gray-700">
-          Icon URL
+          URL biểu tượng
         </Label>
         <Input
           id="tag-icon"
@@ -132,7 +132,7 @@ export function TagFormContent({
         {errors.iconUrl && <p className="text-xs text-red-500">{errors.iconUrl}</p>}
 
         <div className="space-y-1">
-          <p className="text-xs text-muted-foreground">Quick pick from Lucide icons</p>
+          <p className="text-xs text-muted-foreground">Chọn nhanh biểu tượng Lucide</p>
 
           <Popover open={isIconPickerOpen} onOpenChange={setIsIconPickerOpen}>
             <PopoverTrigger asChild>
@@ -148,7 +148,7 @@ export function TagFormContent({
                       {selectedIconOption.label}
                     </>
                   ) : (
-                    "Choose an icon"
+                    "Chọn biểu tượng"
                   )}
                 </span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
@@ -166,12 +166,12 @@ export function TagFormContent({
                       key={item.key}
                       type="button"
                       title={item.label}
-                      aria-label={`Select ${item.label} icon`}
+                      aria-label={`Chọn biểu tượng ${item.label}`}
                       onClick={() => {
                         onFieldChange("iconUrl", item.iconUrl);
                         setIsIconPickerOpen(false);
                       }}
-                      className={`h-8 w-8 rounded-md border flex items-center justify-center transition-all ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-md border transition-colors ${
                         isSelected
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border text-muted-foreground hover:border-primary/40 hover:text-primary"

@@ -100,7 +100,7 @@ export function UserFilter({
             <SelectContent>
               <SelectItem value="all">Tất cả vai trò</SelectItem>
               <SelectItem value="ADMIN">Quản trị</SelectItem>
-              <SelectItem value="VENDOR">Nhà cung cấp</SelectItem>
+              <SelectItem value="VENDOR">Đối tác</SelectItem>
               <SelectItem value="TOURIST">Du khách</SelectItem>
             </SelectContent>
           </Select>

@@ -19,15 +19,15 @@ export default function BlogTableSkeleton() {
       <Table>
         <TableHeader>
           <TableRow className="bg-gray-50/80">
-            <TableHead className="font-semibold text-gray-600">Blog</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[120px]">Category</TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[100px]">Status</TableHead>
+            <TableHead className="font-semibold text-gray-600">Bài viết</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[120px]">Danh mục</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[100px]">Trạng thái</TableHead>
             <TableHead className="font-semibold text-gray-600 w-[80px] text-center">
-              Views
+              Lượt xem
             </TableHead>
-            <TableHead className="font-semibold text-gray-600 w-[130px]">Created</TableHead>
+            <TableHead className="font-semibold text-gray-600 w-[130px]">Ngày tạo</TableHead>
             <TableHead className="font-semibold text-gray-600 w-[120px] text-right">
-              Actions
+              Thao tác
             </TableHead>
           </TableRow>
         </TableHeader>

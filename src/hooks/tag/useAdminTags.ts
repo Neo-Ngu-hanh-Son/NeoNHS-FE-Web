@@ -66,7 +66,11 @@ export function useAdminTags({ kind }: UseAdminTagsOptions): UseAdminTagsReturn 
       setTotalElements(page.totalElements);
       setTotalPages(page.totalPages);
     } catch {
-      setError(`Unable to load ${kind === 'event' ? 'event tags' : 'workshop tags'}. Please try again later.`);
+      setError(
+        kind === 'event'
+          ? 'Không tải được danh sách nhãn sự kiện. Vui lòng thử lại sau.'
+          : 'Không tải được danh sách nhãn workshop. Vui lòng thử lại sau.',
+      );
       setTags([]);
       setTotalElements(0);
       setTotalPages(0);

@@ -14,7 +14,7 @@ export default function BlogDetailsSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Blog Details</CardTitle>
+        <CardTitle>Chi tiết bài viết</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FieldGroup>
@@ -24,12 +24,12 @@ export default function BlogDetailsSection({
             render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="title">Title</FieldLabel>
+                  <FieldLabel htmlFor="title">Tiêu đề</FieldLabel>
                   <Input
                     {...field}
                     id="title"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Enter blog title"
+                    placeholder="Nhập tiêu đề bài viết"
                     autoComplete="off"
                     className={`${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   />
@@ -48,12 +48,12 @@ export default function BlogDetailsSection({
             render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="summary">Summary</FieldLabel>
+                  <FieldLabel htmlFor="summary">Tóm tắt</FieldLabel>
                   <Textarea
                     {...field}
                     id="summary"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Enter a brief summary..."
+                    placeholder="Nhập tóm tắt ngắn..."
                     className={`min-h-[100px] ${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

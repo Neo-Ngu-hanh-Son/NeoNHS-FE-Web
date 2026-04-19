@@ -21,56 +21,65 @@ const getStatusBadge = (status: WorkshopStatus) => {
     case WorkshopStatus.PENDING:
       return (
         <Badge className="bg-amber-500 text-white">
-          <Clock className="w-3 h-3 mr-1" />
-          Pending
+          <Clock className="mr-1 h-3 w-3" />
+          Chờ duyệt
         </Badge>
       )
     case WorkshopStatus.ACTIVE:
       return (
         <Badge className="bg-green-500 text-white">
-          <CheckCircle className="w-3 h-3 mr-1" />
-          Approved
+          <CheckCircle className="mr-1 h-3 w-3" />
+          Đã duyệt
         </Badge>
       )
     case WorkshopStatus.REJECTED:
       return (
         <Badge className="bg-red-500 text-white">
-          <AlertCircle className="w-3 h-3 mr-1" />
-          Rejected
+          <AlertCircle className="mr-1 h-3 w-3" />
+          Đã từ chối
         </Badge>
       )
     case WorkshopStatus.DRAFT:
       return (
         <Badge variant="outline" className="bg-gray-100 text-gray-700">
-          Draft
+          Bản nháp
         </Badge>
       )
   }
 }
 
+/** Cột «Mẫu workshop» rộng nhất bảng; các % cộng lại = 100% (table-fixed). */
+const colTemplate = "w-[28%] min-w-[14rem] p-3 align-top"
+const colVendor = "w-[18%] min-w-0 p-3 align-top"
+const colDuration = "w-[12%] min-w-[5.5rem] whitespace-nowrap p-3 align-top"
+const colPrice = "w-[10%] min-w-[6.5rem] whitespace-nowrap p-3 align-top"
+const colStatus = "w-[11%] min-w-[7.5rem] p-3 align-top"
+const colDate = "w-[12%] min-w-[6.5rem] whitespace-nowrap p-3 align-top"
+const colActions = "w-[9%] min-w-[10.5rem] p-3 align-top"
+
 function SkeletonRow() {
   return (
-    <tr className="border-b">
-      <td className="p-3">
+    <tr className="border-b border-slate-100 dark:border-slate-800">
+      <td className={colTemplate}>
         <div className="flex items-start gap-3">
-          <Skeleton className="w-16 h-12 rounded shrink-0" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-3/4" />
-            <Skeleton className="h-3 w-1/2" />
+          <Skeleton className="h-12 w-16 shrink-0 rounded" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <Skeleton className="h-4 w-3/4 max-w-[14rem]" />
+            <Skeleton className="h-3 w-1/2 max-w-[12rem]" />
           </div>
         </div>
       </td>
-      <td className="p-3">
+      <td className={colVendor}>
         <div className="space-y-2">
-          <Skeleton className="h-4 w-28" />
-          <Skeleton className="h-3 w-36" />
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-3 w-52" />
         </div>
       </td>
-      <td className="p-3"><Skeleton className="h-4 w-16" /></td>
-      <td className="p-3"><Skeleton className="h-4 w-20" /></td>
-      <td className="p-3"><Skeleton className="h-6 w-20 rounded-full" /></td>
-      <td className="p-3"><Skeleton className="h-4 w-24" /></td>
-      <td className="p-3">
+      <td className={colDuration}><Skeleton className="h-4 w-14" /></td>
+      <td className={colPrice}><Skeleton className="h-4 w-20" /></td>
+      <td className={colStatus}><Skeleton className="h-6 w-20 rounded-full" /></td>
+      <td className={colDate}><Skeleton className="h-4 w-24" /></td>
+      <td className={colActions}>
         <div className="flex justify-end gap-2">
           <Skeleton className="h-8 w-16 rounded-md" />
         </div>
@@ -91,50 +100,44 @@ export function TemplatesTable({
 }: TemplatesTableProps) {
   const hasTemplates = templates.length > 0
 
-  return (
-    <div className="border rounded-lg overflow-hidden">
-      {loading ? (
-        <div className="max-h-[600px] overflow-auto">
-          <table className="w-full">
-            <thead className="bg-muted/50 sticky top-0 z-10">
-              <tr className="border-b">
-                <th className="text-left p-3 font-semibold text-sm">Template</th>
-                <th className="text-left p-3 font-semibold text-sm">Vendor</th>
-                <th className="text-left p-3 font-semibold text-sm">Duration</th>
-                <th className="text-left p-3 font-semibold text-sm">Price</th>
-                <th className="text-left p-3 font-semibold text-sm">Status</th>
-                <th className="text-left p-3 font-semibold text-sm">Created</th>
-                <th className="text-right p-3 font-semibold text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <SkeletonRow key={i} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : hasTemplates ? (
-        <div className="max-h-[600px] overflow-auto">
-          <table className="w-full">
-            <thead className="bg-muted/50 sticky top-0 z-10">
-              <tr className="border-b">
-                <th className="text-left p-3 font-semibold text-sm">Template</th>
-                <th className="text-left p-3 font-semibold text-sm">Vendor</th>
-                <th className="text-left p-3 font-semibold text-sm">Duration</th>
-                <th className="text-left p-3 font-semibold text-sm">Price</th>
-                <th className="text-left p-3 font-semibold text-sm">Status</th>
-                <th className="text-left p-3 font-semibold text-sm">Created</th>
-                <th className="text-right p-3 font-semibold text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {templates.map((template) => (
+  const tableShell = (
+    <div className="max-h-[600px] overflow-auto">
+      <table className="w-full table-fixed">
+        <thead className="sticky top-0 z-10 border-b border-slate-200 bg-slate-50/90 dark:border-slate-700 dark:bg-slate-900/50">
+          <tr>
+            <th className={`${colTemplate} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Mẫu workshop
+            </th>
+            <th className={`${colVendor} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Đối tác
+            </th>
+            <th className={`${colDuration} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Thời lượng
+            </th>
+            <th className={`${colPrice} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Giá
+            </th>
+            <th className={`${colStatus} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Trạng thái
+            </th>
+            <th className={`${colDate} text-left text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Ngày tạo
+            </th>
+            <th className={`${colActions} text-right text-sm font-semibold text-slate-600 dark:text-slate-300`}>
+              Thao tác
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading
+            ? Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+            : hasTemplates
+              ? templates.map((template) => (
                 <tr
                   key={template.id}
-                  className="border-b hover:bg-muted/30 transition-colors"
+                  className="border-b border-slate-100 transition-colors hover:bg-slate-50/80 dark:border-slate-800 dark:hover:bg-slate-900/40"
                 >
-                  <td className="p-3">
+                  <td className={colTemplate}>
                     <div className="flex items-start gap-3">
                       <img
                         src={
@@ -142,31 +145,31 @@ export function TemplatesTable({
                           "https://via.placeholder.com/60x40?text=No+Image"
                         }
                         alt={template.name}
-                        className="w-16 h-12 rounded object-cover shrink-0"
+                        className="h-12 w-16 shrink-0 rounded object-cover"
                         onError={(e) => {
                           e.currentTarget.src =
                             "https://via.placeholder.com/60x40?text=No+Image"
                         }}
                       />
-                      <div className="min-w-0">
-                        <p className="font-medium line-clamp-1">
+                      <div className="min-w-0 flex-1">
+                        <p className="line-clamp-1 font-medium">
                           {template.name}
                         </p>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
+                        <p className="line-clamp-1 text-sm text-muted-foreground">
                           {template.shortDescription}
                         </p>
                       </div>
                     </div>
                   </td>
-                  <td className="p-3 text-sm">
+                  <td className={`${colVendor} text-sm`}>
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-2">
-                        <Building2 className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="font-medium line-clamp-1">
+                        <Building2 className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                        <span className="line-clamp-1 font-medium">
                           {template.vendorName}
                         </span>
                         {template.vendorVerified === true && (
-                          <CheckCircle className="w-3 h-3 text-green-600" />
+                          <CheckCircle className="h-3 w-3 shrink-0 text-green-600" />
                         )}
                       </div>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -175,91 +178,101 @@ export function TemplatesTable({
                       {template.vendorVerified === false && (
                         <Badge
                           variant="outline"
-                          className="mt-1 text-xs bg-amber-50 text-amber-700 border-amber-300 inline-flex items-center gap-1 w-fit"
+                          className="mt-1 inline-flex w-fit items-center gap-1 border-amber-300 bg-amber-50 text-xs text-amber-700"
                         >
-                          <AlertCircle className="w-3 h-3" />
-                          Unverified Vendor
+                          <AlertCircle className="h-3 w-3" />
+                          Chưa xác minh
                         </Badge>
                       )}
                     </div>
                   </td>
-                  <td className="p-3 text-sm">
+                  <td className={`${colDuration} text-sm`}>
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{formatDuration(template.estimatedDuration)}</span>
+                      <Clock className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="truncate">{formatDuration(template.estimatedDuration)}</span>
                     </div>
                   </td>
-                  <td className="p-3 text-sm font-medium">
+                  <td className={`${colPrice} text-sm font-medium`}>
                     <div className="flex items-center gap-1.5">
-                      <DollarSign className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{formatPrice(template.defaultPrice)}</span>
+                      <DollarSign className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="truncate">{formatPrice(template.defaultPrice)}</span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className={colStatus}>
                     {getStatusBadge(template.status)}
                   </td>
-                  <td className="p-3 text-sm text-muted-foreground">
+                  <td className={`${colDate} text-sm text-muted-foreground`}>
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{formatDate(template.createdAt)}</span>
+                      <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="truncate">{formatDate(template.createdAt)}</span>
                     </div>
                   </td>
-                  <td className="p-3">
+                  <td className={colActions}>
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"
                         variant="outline"
+                        className="transition-colors"
                         onClick={() => onView(template.id)}
                       >
-                        View
+                        Xem
                       </Button>
                       {template.status === WorkshopStatus.PENDING && (
                         <>
                           <Button
                             size="sm"
-                            className="bg-green-600 hover:bg-green-700"
+                            className="bg-green-600 transition-colors hover:bg-green-700"
                             onClick={() => onApproveClick(template)}
                           >
-                            Approve
+                            Duyệt
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
+                            className="transition-colors"
                             onClick={() => onRejectClick(template)}
                           >
-                            Reject
+                            Từ chối
                           </Button>
                         </>
                       )}
                     </div>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+              : null}
+        </tbody>
+      </table>
+    </div>
+  )
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+      {loading ? (
+        tableShell
+      ) : hasTemplates ? (
+        tableShell
       ) : (
         <div className="flex flex-col items-center justify-center p-12 text-center">
-          <FileText className="w-16 h-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-          <p className="text-muted-foreground mb-2">
+          <FileText className="mb-4 h-16 w-16 text-muted-foreground" />
+          <h3 className="mb-2 text-lg font-semibold">Không có mẫu</h3>
+          <p className="mb-2 text-muted-foreground">
             {hasActiveFilters
-              ? "Try adjusting your filters"
-              : "There are no templates to review yet"}
+              ? "Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm."
+              : "Hiện chưa có mẫu workshop để xem."}
           </p>
           {hasActiveFilters && (
-            <Button variant="outline" size="sm" onClick={onClearFilters}>
-              Clear Filters
+            <Button variant="outline" size="sm" className="transition-colors" onClick={onClearFilters}>
+              Xóa bộ lọc
             </Button>
           )}
         </div>
       )}
 
       {!loading && (
-        <div className="border-t px-4 py-2 text-xs text-muted-foreground flex items-center justify-between">
+        <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2 text-xs text-muted-foreground dark:border-slate-700">
           <span>
-            Showing <strong>{templates.length}</strong> of{" "}
-            <strong>{totalCount}</strong> templates
+            Hiển thị <strong>{templates.length}</strong> / <strong>{totalCount}</strong> mẫu
           </span>
         </div>
       )}

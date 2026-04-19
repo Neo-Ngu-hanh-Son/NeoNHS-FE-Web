@@ -52,15 +52,15 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
     const name = formValues.name.trim();
 
     if (!name) {
-      errors.name = 'Please enter a category name';
+      errors.name = 'Vui lòng nhập tên danh mục';
     } else if (name.length < 2) {
-      errors.name = 'Name must be at least 2 characters';
+      errors.name = 'Tên cần ít nhất 2 ký tự';
     } else if (name.length > 100) {
-      errors.name = 'Name must be at most 100 characters';
+      errors.name = 'Tên không được vượt quá 100 ký tự';
     }
 
     if (formValues.description && formValues.description.length > 500) {
-      errors.description = 'Description must be at most 500 characters';
+      errors.description = 'Mô tả không được vượt quá 500 ký tự';
     }
 
     setFormErrors(errors);
@@ -93,7 +93,7 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
       };
 
       await blogCategoryService.createCategory(payload);
-      messageApi.success('Blog category created successfully!');
+      messageApi.success('Đã tạo danh mục blog thành công!');
       onCategoryCreationSuccess();
     } catch (error: unknown) {
       messageApi.error(getApiErrorMessage(error, 'Failed to create blog category. Please try again.'));
@@ -119,7 +119,7 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
     <Card>
       {contextHolder}
       <CardHeader>
-        <CardTitle>Category</CardTitle>
+        <CardTitle>Danh mục</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FieldGroup>
@@ -128,9 +128,9 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="category">Blog Category</FieldLabel>
+                <FieldLabel htmlFor="category">Danh mục blog</FieldLabel>
 
-                <Popover onOpenChange={setOpenPopover} open={openPopover} aria-expanded={open}>
+                <Popover onOpenChange={setOpenPopover} open={openPopover} aria-expanded={openPopover}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
@@ -141,13 +141,13 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
                         fieldState.invalid && 'border-destructive',
                       )}
                     >
-                      {field.value ? categories.find((cat) => cat.id === field.value)?.name : 'Select category...'}
+                      {field.value ? categories.find((cat) => cat.id === field.value)?.name : 'Chọn danh mục...'}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                     <Command>
-                      <CommandInput placeholder="Search category..." />
+                      <CommandInput placeholder="Tìm danh mục..." />
                       <CommandList>
                         <CommandGroup>
                           <CommandItem
@@ -158,11 +158,11 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
                             className="cursor-pointer"
                           >
                             <CirclePlus />
-                            Create new category
+                            Tạo danh mục mới
                           </CommandItem>
                         </CommandGroup>
                         <CommandSeparator />
-                        <CommandEmpty>No category found.</CommandEmpty>
+                        <CommandEmpty>Không tìm thấy danh mục.</CommandEmpty>
                         <CommandGroup>
                           {categories.map((cat) => (
                             <CommandItem
@@ -193,7 +193,7 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
         </FieldGroup>
         {isCreatingCategory && (
           <>
-            <h1 className="text-xl font-semibold">Create new category</h1>
+            <h1 className="text-xl font-semibold">Tạo danh mục mới</h1>
             <BlogCategoryForm
               mode="create"
               values={formValues}
