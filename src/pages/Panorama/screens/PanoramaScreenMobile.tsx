@@ -34,18 +34,18 @@ export default function PanoramaScreenMobile() {
     const handleMessage = (event: MessageEvent) => {
       try {
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        console.log('Parsed message data:', data);
+        //console.log('Parsed message data:', data);
         if (data?.type === 'SET_PLACE_ID') {
           // If placeId is the same as current, do nothing to avoid unnecessary re-fetch and viewer update
           if (data.payload === placeId) {
-            console.log('Received placeId is the same as current, ignoring:', data.payload);
+            //console.log('Received placeId is the same as current, ignoring:', data.payload);
             return;
           }
-          console.log('Setting placeId to:', data.payload);
+          //console.log('Setting placeId to:', data.payload);
           setPlaceId(data.payload);
         }
       } catch (err) {
-        console.error('Error parsing message data:', err);
+        //console.error('Error parsing message data:', err);
       }
     };
     window.addEventListener('message', handleMessage);
@@ -74,7 +74,7 @@ export default function PanoramaScreenMobile() {
   // ─── Viewer refs ───
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
-  console.log('Web viewer ref on render:', viewerRef.current);
+  //console.log('Web viewer ref on render:', viewerRef.current);
 
   const isMobile = navigator.userAgent.includes('NeoNHS-Mobile');
 
@@ -86,9 +86,9 @@ export default function PanoramaScreenMobile() {
     (async () => {
       try {
         setIsLoading(true);
-        console.log('Fetching panorama data for placeId:', placeId);
+        //console.log('Fetching panorama data for placeId:', placeId);
         const data = await panoramaService.getPointPanorama(placeId);
-        console.log('Fetched panorama data:', data);
+        //console.log('Fetched panorama data:', data);
         if (!cancelled) setPlace(data);
       } catch (err: any) {
         if (!cancelled) setError(err.message);
@@ -104,14 +104,14 @@ export default function PanoramaScreenMobile() {
 
   // --- Init viewer with no data for later dynamic updates ---
   useLayoutEffect(() => {
-    console.log(
+    //console.log(
       'Initializing viewer in useLayoutEffect, viewer ref:',
       viewerRef.current,
       'container ref:',
       containerRef.current,
     );
     if (!containerRef.current || viewerRef.current) return;
-    console.log('Initializing panorama viewer with empty data');
+    //console.log('Initializing panorama viewer with empty data');
     const viewer = new Viewer({
       container: containerRef.current,
       navbar: [
@@ -171,8 +171,8 @@ export default function PanoramaScreenMobile() {
 
   // ─── Dynamic update the viewer base on the place id and place received and fetched ───
   useEffect(() => {
-    console.log('Place data changed, updating viewer if needed. Place:', place);
-    console.log('Viewer ref:', viewerRef.current);
+    //console.log('Place data changed, updating viewer if needed. Place:', place);
+    //console.log('Viewer ref:', viewerRef.current);
 
     if (!place || !viewerRef.current) return;
 
@@ -180,7 +180,7 @@ export default function PanoramaScreenMobile() {
     const viewer = viewerRef.current;
 
     (async () => {
-      console.log('Updating panorama viewer with new place data:', place);
+      //console.log('Updating panorama viewer with new place data:', place);
       await viewer.setPanorama(place.panoramaImageUrl, {
         transition: true,
         showLoader: true,

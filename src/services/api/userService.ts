@@ -13,13 +13,13 @@ export const userService = {
   async getProfile(): Promise<User> {
     try {
       const res = await apiClient.get('/users/profile');
-      console.log('getProfile raw response:', res);
+      //console.log('getProfile raw response:', res);
 
       const data = (res?.data ?? res) as User;
-      console.log('getProfile normalized data:', data);
+      //console.log('getProfile normalized data:', data);
       return data;
     } catch (error) {
-      console.error('getProfile error:', error);
+      //console.error('getProfile error:', error);
       throw error;
     }
   },

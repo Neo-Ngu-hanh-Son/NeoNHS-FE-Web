@@ -21,13 +21,13 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
       const resultUrl = await uploadImageToCloudinary(file);
-      console.log("Result url: " + resultUrl);
+      //console.log("Result url: " + resultUrl);
       if (!resultUrl) {
         messageApi.error("Tải ảnh lên thất bại, vui lòng thử lại");
       }
       return resultUrl || "";
     } catch (error) {
-      console.error("[BlogEditorSection] Error uploading image:", error);
+      //console.error("[BlogEditorSection] Error uploading image:", error);
       messageApi.error("Tải ảnh lên thất bại, vui lòng thử lại");
       return "";
     }

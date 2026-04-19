@@ -48,7 +48,7 @@ export const adminUserService = {
             );
             return res; // res chính là data
         } catch (error) {
-            console.error('getAllUsers error:', error);
+            //console.error('getAllUsers error:', error);
             throw error;
         }
     },
@@ -61,7 +61,7 @@ export const adminUserService = {
             const res = await apiClient.get<ApiResponse<UserStats>>('/admin/users/stats');
             return res;
         } catch (error) {
-            console.error('getUserStats error:', error);
+            //console.error('getUserStats error:', error);
             throw error;
         }
     },
@@ -77,7 +77,7 @@ export const adminUserService = {
             );
             return res; // res chính là data
         } catch (error) {
-            console.error('toggleBan error:', error);
+            //console.error('toggleBan error:', error);
             throw error;
         }
     },

@@ -26,7 +26,7 @@ export function WTagSelector({ selectedTagIds, onChange, error, disabled }: WTag
       const data = await WTagService.getAllTags()
       setTags(data)
     } catch (error: any) {
-      console.error('Failed to fetch tags:', error)
+      //console.error('Failed to fetch tags:', error)
       notification.error({
         message: 'Failed to Load Tags',
         description: error.message || 'Unable to fetch workshop tags. Please try again.',

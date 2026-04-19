@@ -80,7 +80,7 @@ export default function AdminVendorTemplatesPage() {
           )
           setRawTemplates(visibleTemplates)
         } else {
-          console.error("Failed to load templates", templatesRes.reason)
+          //console.error("Failed to load templates", templatesRes.reason)
           notification.error({
             message: "Không tải được mẫu workshop",
             description: "Đã xảy ra lỗi khi tải danh sách mẫu workshop. Vui lòng thử lại.",
@@ -90,7 +90,7 @@ export default function AdminVendorTemplatesPage() {
         if (vendorsRes.status === "fulfilled") {
           setVendors(vendorsRes.value)
         } else {
-          console.error("Failed to load vendors", vendorsRes.reason)
+          //console.error("Failed to load vendors", vendorsRes.reason)
         }
       } finally {
         setLoading(false)
@@ -197,7 +197,7 @@ export default function AdminVendorTemplatesPage() {
     try {
       setApproveDialog({ open: false, template: null })
       const approvedTemplate = await adminWorkshopService.approveTemplate(templateId, adminNote)
-      console.log("[approveTemplate] Response from BE:", approvedTemplate)
+      //console.log("[approveTemplate] Response from BE:", approvedTemplate)
 
       setRawTemplates((prev) =>
         prev.map((t) =>

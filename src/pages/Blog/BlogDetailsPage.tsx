@@ -60,7 +60,7 @@ export default function BlogDetailsPage() {
     if (!id) return;
     const timer = setTimeout(() => {
       incrementBlogView(id);
-      console.log(`[BlogDetailsPage] Incremented view count for blog ID: ${id}`);
+      //console.log(`[BlogDetailsPage] Incremented view count for blog ID: ${id}`);
     }, 30000);
 
     return () => clearTimeout(timer);

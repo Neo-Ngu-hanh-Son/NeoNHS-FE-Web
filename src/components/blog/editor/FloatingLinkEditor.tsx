@@ -69,7 +69,7 @@ export default function FloatingLinkEditor() {
       const linkNode = $isLinkNode(node) ? node : node.getParent();
 
       if (linkNode && $isLinkNode(linkNode)) {
-        console.log("[FloatingLinkEditor] Adding a trailing space to link:", linkNode.getURL());
+        //console.log("[FloatingLinkEditor] Adding a trailing space to link:", linkNode.getURL());
         const spaceNode = $createTextNode(" ");
         linkNode.insertAfter(spaceNode);
         spaceNode.selectNext();

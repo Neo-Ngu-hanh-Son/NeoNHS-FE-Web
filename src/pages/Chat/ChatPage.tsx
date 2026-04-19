@@ -32,7 +32,7 @@ const enrichRoomWithUserData = async (
       otherUser = await ChatRestService.getChatUserInfo(otherParticipantId);
       userCache.set(otherParticipantId, otherUser);
     } catch (error) {
-      console.error(`Failed to fetch chat user info for ${otherParticipantId}:`, error);
+      //console.error(`Failed to fetch chat user info for ${otherParticipantId}:`, error);
       otherUser = createFallbackUser(otherParticipantId);
     }
   }
@@ -88,7 +88,7 @@ export default function ChatPage() {
           setActiveRoomId(enrichedRooms[0].id);
         }
       } catch (error) {
-        console.error('Failed to load chat rooms:', error);
+        //console.error('Failed to load chat rooms:', error);
       } finally {
         setIsLoadingRooms(false);
       }
@@ -138,7 +138,9 @@ export default function ChatPage() {
     ws.connect(
       handleIncomingMessage,
       () => setIsConnected(true),
-      (err) => console.error('Websocket Error', err)
+      (err) => {
+        // console.error('Websocket Error', err);
+      }
     );
 
     return () => {
@@ -160,7 +162,7 @@ export default function ChatPage() {
           room.id === activeRoomId ? { ...room, unreadCount: 0 } : room
         ));
       } catch (error) {
-        console.error(`Failed to fetch history for room ${activeRoomId}`, error);
+        //console.error(`Failed to fetch history for room ${activeRoomId}`, error);
       }
     };
 
@@ -211,7 +213,7 @@ export default function ChatPage() {
       setMessages(prev => prev.filter(m => m.id !== placeholderId));
       wsServiceRef.current.sendMessage(activeRoomId, '', 'IMAGE', response.mediaUrl);
     } catch (error) {
-      console.error('Failed to upload and send image:', error);
+      //console.error('Failed to upload and send image:', error);
       // Remove placeholder on failure
       setMessages(prev => prev.filter(m => m.id !== placeholderId));
     } finally {

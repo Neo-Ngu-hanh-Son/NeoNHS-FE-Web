@@ -22,7 +22,7 @@ export const TemplateDetailReviews = ({ templateId }: TemplateDetailReviewsProps
         const data = await ReviewService.getWorkshopReviews(templateId, 0, 50)
         setReviews(data.content || [])
       } catch (error) {
-        console.error("Failed to fetch reviews:", error)
+        //console.error("Failed to fetch reviews:", error)
       } finally {
         setLoading(false)
       }

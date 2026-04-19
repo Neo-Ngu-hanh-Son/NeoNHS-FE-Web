@@ -64,7 +64,7 @@ export default function AdminReportsPage() {
             // Mute the 404/400 errors visually for search not found, only log them
             const status = error?.response?.status;
             if (!status || status >= 500) {
-                console.error('Failed to fetch reports:', error);
+                //console.error('Failed to fetch reports:', error);
             }
         } finally {
             setLoading(false);

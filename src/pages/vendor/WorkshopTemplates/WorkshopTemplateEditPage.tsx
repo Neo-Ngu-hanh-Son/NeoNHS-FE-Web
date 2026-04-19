@@ -34,7 +34,7 @@ export default function WorkshopTemplateEditPage() {
       const data = await WorkshopTemplateService.getTemplateById(id)
       setTemplate(data)
     } catch (error: any) {
-      console.error('Failed to fetch template:', error)
+      //console.error('Failed to fetch template:', error)
       notification.error({
         message: 'Tải Mẫu Thất Bại',
         description: error.message || 'Không thể lấy thông tin chi tiết của mẫu.',
@@ -138,7 +138,7 @@ export default function WorkshopTemplateEditPage() {
 
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
-      console.error('Update failed:', error)
+      //console.error('Update failed:', error)
       notification.error({
         message: 'Cập Nhật Thất Bại',
         description: error.message || 'Không thể cập nhật mẫu. Vui lòng thử lại.',
@@ -165,7 +165,7 @@ export default function WorkshopTemplateEditPage() {
 
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
-      console.error('Submit failed:', error)
+      //console.error('Submit failed:', error)
       notification.error({
         message: 'Gửi Thất Bại',
         description: error.message || 'Không thể gửi mẫu. Vui lòng thử lại.',

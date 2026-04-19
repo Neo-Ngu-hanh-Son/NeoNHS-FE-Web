@@ -11,13 +11,13 @@ export const VendorService = {
     try {
       // apiClient.get returns parsed JSON
       const res = await apiClient.get('/vendors/profile');
-      console.log('getVendorProfile raw response:', res);
+      //console.log('getVendorProfile raw response:', res);
       // Normalize response: it may be either { data } or direct object
       const data = (res?.data ?? res) as VendorProfile;
-      console.log('getVendorProfile normalized data:', data);
+      //console.log('getVendorProfile normalized data:', data);
       return data;
     } catch (error) {
-      console.error('getVendorProfile error:', error);
+      //console.error('getVendorProfile error:', error);
       throw error;
     }
   },
@@ -45,13 +45,13 @@ export const VendorService = {
         bankAccountName: data.bankAccountName,
       };
 
-      console.log('Updating vendor profile with payload:', payload);
+      //console.log('Updating vendor profile with payload:', payload);
       const res = await apiClient.put(`/vendors/${data.id}`, payload);
       const updated = (res?.data ?? res) as VendorProfile;
-      console.log('Vendor profile updated successfully:', updated);
+      //console.log('Vendor profile updated successfully:', updated);
       return updated;
     } catch (error) {
-      console.error('updateVendorProfile error:', error);
+      //console.error('updateVendorProfile error:', error);
       throw error;
     }
   },

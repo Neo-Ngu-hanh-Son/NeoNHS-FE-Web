@@ -95,7 +95,7 @@ export default function WorkshopTemplatesPage() {
       setTotalElements(response.totalElements)
       setTotalPages(response.totalPages)
     } catch (error: any) {
-      console.error('Failed to fetch templates:', error)
+      //console.error('Failed to fetch templates:', error)
       notification.error({
         message: 'Không thể tải mẫu',
         description: error.message || 'Không thể tải danh sách mẫu workshop. Vui lòng thử lại.',
@@ -141,7 +141,7 @@ export default function WorkshopTemplatesPage() {
         // Refresh the list
         fetchTemplates()
       } catch (error: any) {
-        console.error('Delete failed:', error)
+        //console.error('Delete failed:', error)
         notification.error({
           message: 'Xoá thất bại',
           description: error.message || 'Không thể xoá mẫu. Vui lòng thử lại.',
@@ -168,7 +168,7 @@ export default function WorkshopTemplatesPage() {
         // Refresh the list
         fetchTemplates()
       } catch (error: any) {
-        console.error('Submit failed:', error)
+        //console.error('Submit failed:', error)
         notification.error({
           message: 'Gửi duyệt thất bại',
           description: error.message || 'Không thể gửi mẫu để phê duyệt. Vui lòng thử lại.',
@@ -191,7 +191,7 @@ export default function WorkshopTemplatesPage() {
       // Refresh the list
       fetchTemplates()
     } catch (error: any) {
-      console.error('Toggle publish failed:', error)
+      //console.error('Toggle publish failed:', error)
       notification.error({
         message: 'Thao tác thất bại',
         description: error.message || 'Không thể thay đổi trạng thái xuất bản. Vui lòng thử lại.',

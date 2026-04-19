@@ -68,7 +68,7 @@ export function EditSessionDialog({
       onOpenChange(false)
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Update failed:', error)
+      //console.error('Update failed:', error)
       notification.error({
         message: 'Cập Nhật Thất Bại',
         description: error.message || 'Không thể cập nhật phiên. Vui lòng thử lại.',

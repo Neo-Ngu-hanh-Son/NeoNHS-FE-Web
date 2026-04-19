@@ -75,7 +75,7 @@ export const WorkshopSessionService = {
       const res = await apiClient.get<ApiResponse<PageResponse<any>>>(endpoint);
       
       const data = (res?.data ?? res) as PageResponse<any>;
-      console.log('getMySessions raw response:', data);
+      //console.log('getMySessions raw response:', data);
       
       // Transform flat structure to nested structure
       const transformedData: PageResponse<WorkshopSessionResponse> = {
@@ -83,10 +83,10 @@ export const WorkshopSessionService = {
         content: (data.content || []).map(transformSessionResponse),
       };
       
-      console.log('getMySessions transformed:', transformedData);
+      //console.log('getMySessions transformed:', transformedData);
       return transformedData;
     } catch (error) {
-      console.error('getMySessions error:', error);
+      //console.error('getMySessions error:', error);
       throw error;
     }
   },
@@ -99,14 +99,14 @@ export const WorkshopSessionService = {
     try {
       const res = await apiClient.get<ApiResponse<any>>(`/workshops/sessions/${id}`);
       const data = (res?.data ?? res) as any;
-      console.log('getSessionById raw response:', data);
+      //console.log('getSessionById raw response:', data);
       
       // Transform flat structure to nested structure
       const transformed = transformSessionResponse(data);
-      console.log('getSessionById transformed:', transformed);
+      //console.log('getSessionById transformed:', transformed);
       return transformed;
     } catch (error) {
-      console.error('getSessionById error:', error);
+      //console.error('getSessionById error:', error);
       throw error;
     }
   },
@@ -117,17 +117,17 @@ export const WorkshopSessionService = {
    */
   async createSession(data: CreateWorkshopSessionRequest): Promise<WorkshopSessionResponse> {
     try {
-      console.log('Creating session with data:', data);
+      //console.log('Creating session with data:', data);
       const res = await apiClient.post<ApiResponse<any>>('/workshops/sessions', data);
       const created = (res?.data ?? res) as any;
-      console.log('createSession raw response:', created);
+      //console.log('createSession raw response:', created);
       
       // Transform response
       const transformed = transformSessionResponse(created);
-      console.log('createSession transformed:', transformed);
+      //console.log('createSession transformed:', transformed);
       return transformed;
     } catch (error) {
-      console.error('createSession error:', error);
+      //console.error('createSession error:', error);
       throw error;
     }
   },
@@ -138,16 +138,16 @@ export const WorkshopSessionService = {
    */
   async createBatchSessions(data: CreateWorkshopSessionRequest[]): Promise<WorkshopSessionResponse[]> {
     try {
-      console.log('Creating batch sessions with data:', data);
+      //console.log('Creating batch sessions with data:', data);
       const res = await apiClient.post<ApiResponse<any>>('/workshops/sessions/batch', data);
       const created = (res?.data ?? res) as any[] | { content?: any[] };
-      console.log('createBatchSessions raw response:', created);
+      //console.log('createBatchSessions raw response:', created);
 
       const sessionsArray = Array.isArray(created) ? created : (created.content ?? []);
       const transformed = sessionsArray.map((session: any) => transformSessionResponse(session));
       return transformed;
     } catch (error) {
-      console.error('createBatchSessions error:', error);
+      //console.error('createBatchSessions error:', error);
       throw error;
     }
   },
@@ -158,17 +158,17 @@ export const WorkshopSessionService = {
    */
   async updateSession(id: string, data: UpdateWorkshopSessionRequest): Promise<WorkshopSessionResponse> {
     try {
-      console.log('Updating session', id, 'with data:', data);
+      //console.log('Updating session', id, 'with data:', data);
       const res = await apiClient.put<ApiResponse<any>>(`/workshops/sessions/${id}`, data);
       const updated = (res?.data ?? res) as any;
-      console.log('updateSession raw response:', updated);
+      //console.log('updateSession raw response:', updated);
       
       // Transform response
       const transformed = transformSessionResponse(updated);
-      console.log('updateSession transformed:', transformed);
+      //console.log('updateSession transformed:', transformed);
       return transformed;
     } catch (error) {
-      console.error('updateSession error:', error);
+      //console.error('updateSession error:', error);
       throw error;
     }
   },
@@ -183,7 +183,7 @@ export const WorkshopSessionService = {
       const data = (res?.data ?? res) as any;
       return transformSessionResponse(data);
     } catch (error) {
-      console.error('updateSessionStatus error:', error);
+      //console.error('updateSessionStatus error:', error);
       throw error;
     }
   },
@@ -194,17 +194,17 @@ export const WorkshopSessionService = {
    */
   async cancelSession(id: string): Promise<WorkshopSessionResponse> {
     try {
-      console.log('Cancelling session:', id);
+      //console.log('Cancelling session:', id);
       const res = await apiClient.post<ApiResponse<any>>(`/workshops/sessions/${id}/cancel`, {});
       const cancelled = (res?.data ?? res) as any;
-      console.log('cancelSession raw response:', cancelled);
+      //console.log('cancelSession raw response:', cancelled);
       
       // Transform response
       const transformed = transformSessionResponse(cancelled);
-      console.log('cancelSession transformed:', transformed);
+      //console.log('cancelSession transformed:', transformed);
       return transformed;
     } catch (error) {
-      console.error('cancelSession error:', error);
+      //console.error('cancelSession error:', error);
       throw error;
     }
   },
@@ -215,11 +215,11 @@ export const WorkshopSessionService = {
    */
   async deleteSession(id: string): Promise<void> {
     try {
-      console.log('Deleting session:', id);
+      //console.log('Deleting session:', id);
       await apiClient.delete(`/workshops/sessions/${id}`);
-      console.log('Session deleted successfully');
+      //console.log('Session deleted successfully');
     } catch (error) {
-      console.error('deleteSession error:', error);
+      //console.error('deleteSession error:', error);
       throw error;
     }
   },
@@ -246,7 +246,7 @@ export const WorkshopSessionService = {
       const data = (res?.data ?? res) as PageResponse<WorkshopSessionResponse>;
       return data;
     } catch (error) {
-      console.error('getAllSessions error:', error);
+      //console.error('getAllSessions error:', error);
       throw error;
     }
   },
@@ -269,7 +269,7 @@ export const WorkshopSessionService = {
       const data = (res?.data ?? res) as PageResponse<WorkshopSessionResponse>;
       return data;
     } catch (error) {
-      console.error('getSessionsByTemplate error:', error);
+      //console.error('getSessionsByTemplate error:', error);
       throw error;
     }
   },
@@ -314,7 +314,7 @@ export const WorkshopSessionService = {
       const data = (res?.data ?? res) as PageResponse<WorkshopSessionResponse>;
       return data;
     } catch (error) {
-      console.error('filterSessions error:', error);
+      //console.error('filterSessions error:', error);
       throw error;
     }
   },

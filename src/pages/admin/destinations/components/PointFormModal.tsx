@@ -139,7 +139,7 @@ export function PointFormModal({
                 return;
             }
         } catch (error) {
-            console.error('Boundary validation error:', error);
+            //console.error('Boundary validation error:', error);
         }
         onSave(safeFormData as PointRequest);
     };

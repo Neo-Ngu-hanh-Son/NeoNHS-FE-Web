@@ -48,10 +48,10 @@ export default function WorkshopTemplateDetailPage() {
         const sessionData = await WorkshopSessionService.getSessionsByTemplate(id, { page: 0, size: 10 })
         setSessions(sessionData.content || [])
       } catch (e) {
-        console.error('Failed to fetch sessions:', e)
+        //console.error('Failed to fetch sessions:', e)
       }
     } catch (error: any) {
-      console.error('Failed to fetch template:', error)
+      //console.error('Failed to fetch template:', error)
       notification.error({
         message: 'Tải Mẫu Thất Bại',
         description: error.message || 'Không thể lấy thông tin chi tiết của mẫu.',
@@ -99,7 +99,7 @@ export default function WorkshopTemplateDetailPage() {
 
       navigate("/vendor/workshop-templates")
     } catch (error: any) {
-      console.error('Delete failed:', error)
+      //console.error('Delete failed:', error)
       notification.error({
         message: 'Xóa Thất Bại',
         description: error.message || 'Không thể xóa mẫu. Vui lòng thử lại.',
@@ -121,7 +121,7 @@ export default function WorkshopTemplateDetailPage() {
       // Refresh the template to show updated status
       await fetchTemplate()
     } catch (error: any) {
-      console.error('Submit failed:', error)
+      //console.error('Submit failed:', error)
       notification.error({
         message: 'Gửi Thất Bại',
         description: error.message || 'Không thể gửi mẫu. Vui lòng thử lại.',
@@ -145,7 +145,7 @@ export default function WorkshopTemplateDetailPage() {
       // Refresh the template to show updated status
       await fetchTemplate()
     } catch (error: any) {
-      console.error('Toggle publish failed:', error)
+      //console.error('Toggle publish failed:', error)
       notification.error({
         message: 'Thay Đổi Liên Kết Thất Bại',
         description: error.message || 'Không thể thay đổi trạng thái xuất bản. Vui lòng thử lại.',

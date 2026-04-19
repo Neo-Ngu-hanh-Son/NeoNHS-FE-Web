@@ -64,7 +64,7 @@ function BlogEditPageInner() {
       try {
         setLoading(true);
         const res = await blogService.getBlogById(id);
-        console.log("Fetched blog data: ", res);
+        //console.log("Fetched blog data: ", res);
         if (res.data) {
           const b = res.data;
           setBlog(b);
@@ -142,7 +142,7 @@ function BlogEditPageInner() {
   const handlePublish = form.handleSubmit(
     (data) => submitHandler(data),
     (errors) => {
-      console.log("Blog form validation errors:", errors);
+      //console.log("Blog form validation errors:", errors);
     },
   );
 

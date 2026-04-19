@@ -52,7 +52,7 @@ export default function WorkshopSessionsPage() {
       })
       setSessions(response.content || [])
     } catch (error: any) {
-      console.error('Failed to fetch sessions:', error)
+      //console.error('Failed to fetch sessions:', error)
       notification.error({
         message: 'Tải Dữ Liệu Thất Bại',
         description: error.message || 'Không thể tải danh sách phiên. Vui lòng thử lại.',
@@ -143,7 +143,7 @@ export default function WorkshopSessionsPage() {
           description: `Phiên "${cancelDialog.session.workshopTemplate.name}" đã được hủy thành công.`
         })
       } catch (error: any) {
-        console.error('Cancel failed:', error)
+        //console.error('Cancel failed:', error)
         notification.error({
           message: 'Hủy Thất Bại',
           description: error.message || 'Không thể hủy phiên. Vui lòng thử lại.',

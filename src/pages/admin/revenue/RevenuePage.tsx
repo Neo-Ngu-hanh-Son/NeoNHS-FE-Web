@@ -90,7 +90,7 @@ const RevenuePage = () => {
                 vendorBreakdown,
             });
         } catch (error) {
-            console.error('Error fetching revenue report:', error);
+            //console.error('Error fetching revenue report:', error);
             setFetchError('Không tải được báo cáo doanh thu. Vui lòng thử lại sau.');
             setData(null);
         } finally {

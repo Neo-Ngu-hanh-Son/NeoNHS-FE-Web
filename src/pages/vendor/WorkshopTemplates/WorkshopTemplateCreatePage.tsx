@@ -37,7 +37,7 @@ export default function WorkshopTemplateCreatePage() {
 
       navigate(`/vendor/workshop-templates/${newTemplate.id}`)
     } catch (error: any) {
-      console.error('Create failed:', error)
+      //console.error('Create failed:', error)
       notification.error({
         message: 'Tạo Thất Bại',
         description: error.message || 'Không thể tạo mẫu. Vui lòng thử lại.',

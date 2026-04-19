@@ -36,7 +36,7 @@ export default function AdminReportDetailPage() {
             setReport(data);
             if (data.handleNote) setHandleNote(data.handleNote);
         } catch (error) {
-            console.error('Failed to fetch report detail:', error);
+            //console.error('Failed to fetch report detail:', error);
             message.error('Failed to load report details');
         } finally {
             setLoading(false);
@@ -59,7 +59,7 @@ export default function AdminReportDetailPage() {
             message.success(`Report ${status === 'RESOLVED' ? 'resolved' : 'rejected'} successfully`);
             navigate('/admin/reports');
         } catch (error) {
-            console.error('Action failed:', error);
+            //console.error('Action failed:', error);
             message.error('Failed to update report status');
         } finally {
             setSubmitting(false);

@@ -42,7 +42,7 @@ export const publicBlogService = {
     try {
       await apiClient.post<null>(`${BASE}/${id}/view`, {});
     } catch (error) {
-      console.error("Failed to track blog view", error);
+      //console.error("Failed to track blog view", error);
     }
   },
 }

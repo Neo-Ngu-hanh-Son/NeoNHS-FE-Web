@@ -65,7 +65,7 @@ export function AdminDashboardPage() {
             setRegistrationsData(regData);
             setRecentActivities(recentData);
         } catch (error) {
-            console.error('Failed to load dashboard data:', error);
+            //console.error('Failed to load dashboard data:', error);
         } finally {
             setLoading(false);
         }
@@ -77,7 +77,7 @@ export function AdminDashboardPage() {
                 const data = await adminDashboardService.getRevenueTrends(revenuePeriod);
                 setRevenueTrendsData(data);
             } catch (error) {
-                console.error('Error reloading revenue:', error);
+                //console.error('Error reloading revenue:', error);
             }
         };
         if (!loading) reloadRevenue();
@@ -89,7 +89,7 @@ export function AdminDashboardPage() {
                 const data = await adminDashboardService.getRegistrations(regType);
                 setRegistrationsData(data);
             } catch (error) {
-                console.error('Error reloading registrations:', error);
+                //console.error('Error reloading registrations:', error);
             }
         };
         if (!loading) reloadReg();

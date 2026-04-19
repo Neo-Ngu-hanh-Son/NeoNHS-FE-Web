@@ -54,7 +54,7 @@ export default function PanoramaScreen() {
     const injectedData = (window as any).preLoadedPanoramaData;
 
     if (injectedData) {
-      console.log("Using injected data from Native side ", injectedData);
+      //console.log("Using injected data from Native side ", injectedData);
       setPlace(injectedData);
       setIsLoading(false);
 
@@ -68,7 +68,7 @@ export default function PanoramaScreen() {
     (async () => {
       try {
         setIsLoading(true);
-        console.log("Fetching panorama data for placeId:", placeId);
+        //console.log("Fetching panorama data for placeId:", placeId);
         const data = await panoramaService.getPointPanorama(placeId);
         if (!cancelled) setPlace(data);
       } catch (err: any) {

@@ -83,7 +83,7 @@ export default function AdminVendorsPage() {
       // For now, let's use the totals from the pagination if available
       // or fetch separate stats if we implement that.
     } catch (error) {
-      console.error('Failed to fetch vendors:', error)
+      //console.error('Failed to fetch vendors:', error)
       notification.error({
         message: 'Error',
         description: 'Failed to load vendors list.',
@@ -103,7 +103,7 @@ export default function AdminVendorsPage() {
       const statsData = await adminVendorService.getVendorStats()
       setStats(statsData)
     } catch (error) {
-      console.error('Failed to fetch vendor stats:', error)
+      //console.error('Failed to fetch vendor stats:', error)
       // Fallback to basic total if endpoint fails
     }
   }, [])

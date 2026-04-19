@@ -42,7 +42,7 @@ export function usePanoramaEditor(options?: UsePanoramaEditorOptions) {
       if (error?.status === 400) {
         setPanorama(null);
       } else {
-        console.log("[usePanoramaEditor] Error fetching panorama: ", error);
+        //console.log("[usePanoramaEditor] Error fetching panorama: ", error);
         message.error("Tải panorama thất bại");
         setError("Đã xảy ra lỗi khi tải dữ liệu panorama. Vui lòng thử lại.");
       }

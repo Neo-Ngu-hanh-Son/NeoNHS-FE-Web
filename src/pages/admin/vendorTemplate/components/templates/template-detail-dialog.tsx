@@ -115,7 +115,7 @@ export function TemplateDetailDialog({
           }
         }
       } catch (e) {
-        console.error("Failed to load template/vendor detail", e)
+        //console.error("Failed to load template/vendor detail", e)
         if (!cancelled) {
           setError("Không tải được chi tiết mẫu")
         }

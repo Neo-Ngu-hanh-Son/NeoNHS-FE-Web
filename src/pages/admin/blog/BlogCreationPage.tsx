@@ -39,7 +39,7 @@ function BlogCreationPageInner() {
   const editorRef = useRef<BlogEditorRef>(null);
   const navigate = useNavigate();
   const handleSaveEditorState = async (content: EditorSaveResult) => {
-    console.log("Saving editor state: " + content);
+    //console.log("Saving editor state: " + content);
     if (content.charCount < 30) {
       messageApi.warning("Blog content must be at least 30 characters");
       return;
@@ -62,7 +62,7 @@ function BlogCreationPageInner() {
         messageApi.error(res.message || "Failed to create blog");
       }
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       messageApi.error((error as Error).message);
     } finally {
       setLoading(false);
@@ -71,10 +71,10 @@ function BlogCreationPageInner() {
 
   function submitHandler(data: z.infer<typeof formSchema>) {
     if (editorRef.current) {
-      console.log("Saving form data: " + data);
+      //console.log("Saving form data: " + data);
       editorRef.current.save();
     } else {
-      console.error("Editor ref not found");
+      //console.error("Editor ref not found");
     }
   }
 

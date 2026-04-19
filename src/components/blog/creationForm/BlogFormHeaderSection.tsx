@@ -21,12 +21,12 @@ export default function BlogFormHeaderSection({
   const navigate = useNavigate();
   const handlePublish = form.handleSubmit(
     (data) => {
-      console.log("Blog form submit: ", data);
+      //console.log("Blog form submit: ", data);
       onSubmit(data);
     },
     (errors) => {
       messageApi.error("Biểu mẫu còn lỗi. Vui lòng sửa trước khi gửi.");
-      console.log("Blog form error: ", errors);
+      //console.log("Blog form error: ", errors);
     },
   );
 

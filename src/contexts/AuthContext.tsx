@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
-    console.log('checkAuth - token exists:', !!token);
+    //console.log('checkAuth - token exists:', !!token);
 
     // If no token, just set loading to false and return
     if (!token) {
@@ -45,18 +45,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
-      console.log('checkAuth - fetching current user...');
+      //console.log('checkAuth - fetching current user...');
       const currentUser = await authService.getCurrentUser();
-      console.log('checkAuth - currentUser received:', currentUser);
+      //console.log('checkAuth - currentUser received:', currentUser);
       setUser(currentUser);
-      console.log("Current User", currentUser);
+      //console.log("Current User", currentUser);
     } catch (err: any) {
-      console.error('checkAuth - error:', err);
-      console.error('checkAuth - error response:', err?.response);
-      console.error('checkAuth - error status:', err?.response?.status);
+      //console.error('checkAuth - error:', err);
+      //console.error('checkAuth - error response:', err?.response);
+      //console.error('checkAuth - error status:', err?.response?.status);
       // If unauthorized (401), clear the invalid token
       if (err?.response?.status === 401 || err?.message === 'Unauthorized') {
-        console.log('checkAuth - clearing invalid token');
+        //console.log('checkAuth - clearing invalid token');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       await authService.logout();
     } catch (err) {
-      console.error('Logout failed:', err);
+      //console.error('Logout failed:', err);
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

@@ -43,7 +43,7 @@ export function TemplateSelector({ value, onChange, error, disabled }: TemplateS
       const activeTemplates = (response.content || []).filter(t => t.status === WorkshopStatus.ACTIVE)
       setTemplates(activeTemplates)
     } catch (error: any) {
-      console.error('Failed to fetch templates:', error)
+      //console.error('Failed to fetch templates:', error)
       notification.error({
         message: 'Failed to Load Templates',
         description: error.message || 'Unable to fetch workshop templates. Please try again.',

@@ -92,7 +92,7 @@ export function useImageInsert(onUpload?: ImageUploadHandler) {
         }
 
       } catch (error) {
-        console.error("Image upload failed:", error);
+        //console.error("Image upload failed:", error);
       }
 
       if (fileInputRef.current) {

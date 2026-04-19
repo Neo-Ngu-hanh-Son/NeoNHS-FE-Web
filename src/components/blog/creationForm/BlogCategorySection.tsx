@@ -104,7 +104,7 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
   };
 
   function toggleCreateCategory() {
-    console.log('Toggling create category form. Current state:', isCreatingCategory);
+    //console.log('Toggling create category form. Current state:', isCreatingCategory);
     setIsCreatingCategory((prev) => !prev);
     // Reset form values and errors when toggling
     setFormValues({

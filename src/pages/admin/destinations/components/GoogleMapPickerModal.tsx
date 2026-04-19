@@ -281,17 +281,17 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
     // If it's an external URL (not already on Cloudinary), move it to Cloudinary to shorten it
     if (selectedPoint.photoUrl && !selectedPoint.photoUrl.includes('cloudinary.com')) {
       setProcessingImage(true);
-      console.log('Shortening URL via Cloudinary:', selectedPoint.photoUrl);
+      //console.log('Shortening URL via Cloudinary:', selectedPoint.photoUrl);
       try {
         const cloudinaryUrl = await uploadImageToCloudinary(selectedPoint.photoUrl);
         if (cloudinaryUrl) {
           finalPhotoUrl = cloudinaryUrl;
-          console.log('Shortened URL:', cloudinaryUrl);
+          //console.log('Shortened URL:', cloudinaryUrl);
         } else {
           message.warning('Không thể tối ưu hóa ảnh qua Cloudinary. URL của Google có thể quá dài để lưu.');
         }
       } catch (err) {
-        console.error('Failed to shorten image URL via Cloudinary:', err);
+        //console.error('Failed to shorten image URL via Cloudinary:', err);
         message.error('Lỗi khi tải ảnh lên Cloudinary.');
       } finally {
         setProcessingImage(false);

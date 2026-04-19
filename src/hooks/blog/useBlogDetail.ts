@@ -59,7 +59,7 @@ export function useBlogDetail(id: string | undefined): UseBlogDetailReturn {
     try {
       await publicBlogService.incrementBlogView(id);
     } catch (error) {
-      console.error("Failed to track view", error);
+      //console.error("Failed to track view", error);
     }
   };
 

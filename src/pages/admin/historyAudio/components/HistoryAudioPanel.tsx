@@ -179,7 +179,7 @@ export default function HistoryAudioPanel({
 
       message.success("Đã tạo âm thanh");
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       message.error("Tạo âm thanh thất bại");
     } finally {
       setGeneratingAudio(false);
@@ -222,7 +222,7 @@ export default function HistoryAudioPanel({
       setCoverImage(uploadedUrl);
       message.success("Đã tải ảnh bìa lên");
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       message.error("Tải ảnh bìa lên thất bại");
     } finally {
       setUploadingCoverImage(false);
@@ -257,7 +257,7 @@ export default function HistoryAudioPanel({
       resetTracking();
       message.success(`Đã tạo thời điểm cho ${words.length} từ`);
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       message.error("Căn chỉnh thời điểm thất bại");
     } finally {
       setAligningWords(false);
@@ -331,7 +331,7 @@ export default function HistoryAudioPanel({
         message.success("Tạo âm thanh lịch sử thành công");
       }
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       message.error("Lưu âm thanh lịch sử thất bại");
     } finally {
       setSavingGuide(false);
@@ -349,7 +349,7 @@ export default function HistoryAudioPanel({
       setOpenDelete(false);
       message.success("Đã xóa âm thanh lịch sử");
     } catch (error) {
-      console.error(error);
+      //console.error(error);
       message.error("Xóa âm thanh lịch sử thất bại");
     } finally {
       setDeletingGuide(false);

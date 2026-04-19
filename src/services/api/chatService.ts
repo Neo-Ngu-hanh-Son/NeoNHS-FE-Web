@@ -113,7 +113,7 @@ export class ChatWebSocketService {
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
       debug: (str) => {
-        // console.log(str); 
+        // //console.log(str); 
       },
     });
 
@@ -129,7 +129,7 @@ export class ChatWebSocketService {
     };
 
     this.stompClient.onStompError = (frame) => {
-      console.error('STOMP Broker Error:', frame.headers['message'], frame.body);
+      //console.error('STOMP Broker Error:', frame.headers['message'], frame.body);
       if (onError) onError(frame);
     };
 
@@ -143,7 +143,7 @@ export class ChatWebSocketService {
         body: JSON.stringify({ chatRoomId, content, messageType, mediaUrl, metadata })
       });
     } else {
-      console.error('Cannot send message: STOMP client is not connected');
+      //console.error('Cannot send message: STOMP client is not connected');
       // Potential fail-safe: queue message or alert user
     }
   }

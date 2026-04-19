@@ -29,9 +29,9 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
 
   const onFinish = async (values: any) => {
     try {
-      console.log('=== FORM SUBMIT ===');
-      console.log('Form values:', values);
-      console.log('Initial user:', initialUser);
+      //console.log('=== FORM SUBMIT ===');
+      //console.log('Form values:', values);
+      //console.log('Initial user:', initialUser);
 
       // Merge form values with initial user data to ensure all fields are sent
       const payload: Partial<User> = {
@@ -41,17 +41,17 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
         avatarUrl: values.avatar, // Use the Cloudinary URL from form
       };
 
-      console.log('Merged payload:', payload);
+      //console.log('Merged payload:', payload);
 
       // Call update API with the avatar URL (already uploaded to Cloudinary)
       const updated = await userService.updateProfile(payload);
       message.success('Profile updated successfully.');
       onSaved?.(updated);
     } catch (err: any) {
-      console.error('=== FORM SUBMIT ERROR ===');
-      console.error('Error:', err);
-      console.error('Error response:', err?.response);
-      console.error('Error response data:', err?.response?.data);
+      //console.error('=== FORM SUBMIT ERROR ===');
+      //console.error('Error:', err);
+      //console.error('Error response:', err?.response);
+      //console.error('Error response data:', err?.response?.data);
       message.error(err?.response?.data?.message || err?.message || 'Failed to update profile.');
     }
   };

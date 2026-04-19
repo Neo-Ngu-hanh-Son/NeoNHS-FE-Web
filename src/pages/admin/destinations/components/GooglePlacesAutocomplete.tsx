@@ -58,7 +58,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
             sessionToken.current = new lib.AutocompleteSessionToken();
             setError(null);
         }).catch(e => {
-            console.error("Google Maps API initialization failed:", e);
+            //console.error("Google Maps API initialization failed:", e);
             setError("API Load Failed");
         });
     }, []);
@@ -87,7 +87,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                 // Map the new suggestion format back to a predictable structure for the UI
                 setPredictions(suggestions.map((s: any) => s.placePrediction));
             } catch (err) {
-                console.error("Autocomplete fetch failed:", err);
+                //console.error("Autocomplete fetch failed:", err);
                 setPredictions([]);
             } finally {
                 setLoading(false);
@@ -133,7 +133,7 @@ export function GooglePlacesAutocomplete({ onPlaceSelect, className }: GooglePla
                 sessionToken.current = new lib.AutocompleteSessionToken();
             });
         } catch (err) {
-            console.error("Place details fetch failed:", err);
+            //console.error("Place details fetch failed:", err);
         } finally {
             setLoading(false);
         }

@@ -108,7 +108,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       // Redirection handled by LoginPage via AuthContext
     } catch (err: any) {
-      console.error("Backend Google Login Error:", err);
+      //console.error("Backend Google Login Error:", err);
       const errorMessage =
         err.response?.data?.message || err.message || "Google login failed on server.";
       setError(errorMessage);

@@ -34,7 +34,7 @@ export function UnbanUserDialog({ user, isOpen, onClose, onConfirm }: UnbanUserD
       await onConfirm(user.id);
       onClose();
     } catch (err) {
-      console.error(err);
+      //console.error(err);
     } finally {
       setIsLoading(false);
     }

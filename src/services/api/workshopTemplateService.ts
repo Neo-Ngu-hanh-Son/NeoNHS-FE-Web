@@ -35,10 +35,10 @@ export const WorkshopTemplateService = {
 
       // Handle both response formats
       const data = (res?.data ?? res) as PageResponse<WorkshopTemplateResponse>;
-      console.log('getMyTemplates response:', data);
+      //console.log('getMyTemplates response:', data);
       return data;
     } catch (error) {
-      console.error('getMyTemplates error:', error);
+      //console.error('getMyTemplates error:', error);
       throw error;
     }
   },
@@ -51,10 +51,10 @@ export const WorkshopTemplateService = {
     try {
       const res = await apiClient.get<ApiResponse<WorkshopTemplateResponse>>(`/workshops/templates/${id}`);
       const data = (res?.data ?? res) as WorkshopTemplateResponse;
-      console.log('getTemplateById response:', data);
+      //console.log('getTemplateById response:', data);
       return data;
     } catch (error) {
-      console.error('getTemplateById error:', error);
+      //console.error('getTemplateById error:', error);
       throw error;
     }
   },
@@ -65,13 +65,13 @@ export const WorkshopTemplateService = {
    */
   async createTemplate(data: CreateWorkshopTemplateRequest): Promise<WorkshopTemplateResponse> {
     try {
-      console.log('Creating template with data:', data);
+      //console.log('Creating template with data:', data);
       const res = await apiClient.post<ApiResponse<WorkshopTemplateResponse>>('/workshops/templates', data);
       const created = (res?.data ?? res) as WorkshopTemplateResponse;
-      console.log('createTemplate response:', created);
+      //console.log('createTemplate response:', created);
       return created;
     } catch (error) {
-      console.error('createTemplate error:', error);
+      //console.error('createTemplate error:', error);
       throw error;
     }
   },
@@ -82,13 +82,13 @@ export const WorkshopTemplateService = {
    */
   async updateTemplate(id: string, data: UpdateWorkshopTemplateRequest): Promise<WorkshopTemplateResponse> {
     try {
-      console.log('Updating template', id, 'with data:', data);
+      //console.log('Updating template', id, 'with data:', data);
       const res = await apiClient.put<ApiResponse<WorkshopTemplateResponse>>(`/workshops/templates/${id}`, data);
       const updated = (res?.data ?? res) as WorkshopTemplateResponse;
-      console.log('updateTemplate response:', updated);
+      //console.log('updateTemplate response:', updated);
       return updated;
     } catch (error) {
-      console.error('updateTemplate error:', error);
+      //console.error('updateTemplate error:', error);
       throw error;
     }
   },
@@ -105,7 +105,7 @@ export const WorkshopTemplateService = {
       const data = (res?.data ?? res) as WorkshopTemplateResponse;
       return data;
     } catch (error) {
-      console.error('togglePublish error:', error);
+      //console.error('togglePublish error:', error);
       throw error;
     }
   },
@@ -116,13 +116,13 @@ export const WorkshopTemplateService = {
    */
   async submitForApproval(id: string): Promise<WorkshopTemplateResponse> {
     try {
-      console.log('Submitting template for approval:', id);
+      //console.log('Submitting template for approval:', id);
       const res = await apiClient.post<ApiResponse<WorkshopTemplateResponse>>(`/workshops/templates/${id}/register`, {});
       const submitted = (res?.data ?? res) as WorkshopTemplateResponse;
-      console.log('submitForApproval response:', submitted);
+      //console.log('submitForApproval response:', submitted);
       return submitted;
     } catch (error) {
-      console.error('submitForApproval error:', error);
+      //console.error('submitForApproval error:', error);
       throw error;
     }
   },
@@ -133,11 +133,11 @@ export const WorkshopTemplateService = {
    */
   async deleteTemplate(id: string): Promise<void> {
     try {
-      console.log('Deleting template:', id);
+      //console.log('Deleting template:', id);
       await apiClient.delete(`/workshops/templates/${id}`);
-      console.log('Template deleted successfully');
+      //console.log('Template deleted successfully');
     } catch (error) {
-      console.error('deleteTemplate error:', error);
+      //console.error('deleteTemplate error:', error);
       throw error;
     }
   },
@@ -174,7 +174,7 @@ export const WorkshopTemplateService = {
       const data = (res?.data ?? res) as PageResponse<WorkshopTemplateResponse>;
       return data;
     } catch (error) {
-      console.error('filterTemplates error:', error);
+      //console.error('filterTemplates error:', error);
       throw error;
     }
   },

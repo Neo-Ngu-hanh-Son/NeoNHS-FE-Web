@@ -15,10 +15,10 @@ export const WTagService = {
     try {
       const res = await apiClient.get<ApiResponse<WTagResponse[]>>('/wtags/all');
       const data = (res?.data ?? res) as WTagResponse[];
-      console.log('getAllTags response:', data);
+      //console.log('getAllTags response:', data);
       return data;
     } catch (error) {
-      console.error('getAllTags error:', error);
+      //console.error('getAllTags error:', error);
       throw error;
     }
   },
@@ -41,7 +41,7 @@ export const WTagService = {
       const data = (res?.data ?? res) as PageResponse<WTagResponse>;
       return data;
     } catch (error) {
-      console.error('getTags error:', error);
+      //console.error('getTags error:', error);
       throw error;
     }
   },
@@ -56,7 +56,7 @@ export const WTagService = {
       const data = (res?.data ?? res) as WTagResponse;
       return data;
     } catch (error) {
-      console.error('getTagById error:', error);
+      //console.error('getTagById error:', error);
       throw error;
     }
   },

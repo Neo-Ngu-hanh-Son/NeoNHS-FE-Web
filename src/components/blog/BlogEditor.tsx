@@ -70,7 +70,7 @@ function validateUrl(url: string): boolean {
 
 // --- Editor error handler ---
 function onError(error: Error) {
-  console.error("[BlogEditor] Lexical error:", error);
+  //console.error("[BlogEditor] Lexical error:", error);
 }
 
 // --- Placeholder component ---

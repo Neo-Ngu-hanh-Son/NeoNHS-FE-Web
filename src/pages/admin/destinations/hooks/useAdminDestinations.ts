@@ -52,7 +52,7 @@ export function useAdminDestinations() {
                 setDestinations(response.data as Destination[]);
             }
         } catch (error: any) {
-            console.error('Failed to fetch attractions:', error);
+            //console.error('Failed to fetch attractions:', error);
         }
     }, []);
 
@@ -138,8 +138,8 @@ export function useAdminDestinations() {
 
     const handleSavePoint = async (values: PointRequest) => {
         setPointsLoading(true);
-        console.log('--- ATTEMPTING TO SAVE POINT ---');
-        console.log('Payload:', values);
+        //console.log('--- ATTEMPTING TO SAVE POINT ---');
+        //console.log('Payload:', values);
 
         try {
             const sanitizedValues = {
@@ -150,15 +150,15 @@ export function useAdminDestinations() {
 
             let response;
             if (editingPoint && editingPoint.id) {
-                console.log('Action: Update - ID:', editingPoint.id);
+                //console.log('Action: Update - ID:', editingPoint.id);
                 response = await pointService.updatePoint(editingPoint.id, sanitizedValues);
             } else {
-                console.log('Action: Create');
+                //console.log('Action: Create');
                 response = await pointService.createPoint(sanitizedValues);
             }
 
-            console.log('Response Status:', response.success);
-            console.log('Full Response Data:', response);
+            //console.log('Response Status:', response.success);
+            //console.log('Full Response Data:', response);
 
             if (response.success) {
                 message.success(editingPoint ? 'Point updated successfully' : 'Point added successfully');
@@ -174,16 +174,16 @@ export function useAdminDestinations() {
             if (errorMsg && errorMsg.toLowerCase().includes('already exists')) {
                 message.warning('Địa điểm này đã tồn tại trong hệ thống!');
             } else {
-                console.error('--- SAVE POINT FAILED ---');
-                console.error('Error Object:', error);
+                //console.error('--- SAVE POINT FAILED ---');
+                //console.error('Error Object:', error);
                 if (error.response) {
-                    console.error('Server Response Error:', error.response.data);
-                    console.error('Status Code:', error.response.status);
+                    //console.error('Server Response Error:', error.response.data);
+                    //console.error('Status Code:', error.response.status);
                 }
                 message.error('Failed to save point: ' + errorMsg);
             }
         } finally {
-            console.log('--- SAVE OPERATION COMPLETE ---');
+            //console.log('--- SAVE OPERATION COMPLETE ---');
             setPointsLoading(false);
         }
     };

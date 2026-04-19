@@ -32,10 +32,10 @@ export const uploadImageToCloudinary = async (file: File | Blob | string): Promi
                 "Content-Type": "multipart/form-data"
             },
         });
-        console.log("Uploaded image to Cloudinary:", response.data.secure_url);
+        //console.log("Uploaded image to Cloudinary:", response.data.secure_url);
         return response.data.secure_url;
     } catch (error) {
-        console.error("Upload image failed:", error);
+        //console.error("Upload image failed:", error);
         return null;
     }
 };
@@ -63,10 +63,10 @@ export const uploadVideoToCloudinary = async (file: File | Blob): Promise<string
                 "Content-Type": "multipart/form-data"
             },
         });
-        console.log("Uploaded video to Cloudinary:", response.data.secure_url);
+        //console.log("Uploaded video to Cloudinary:", response.data.secure_url);
         return response.data.secure_url;
     } catch (error) {
-        console.error("Upload video failed:", error);
+        //console.error("Upload video failed:", error);
         return null;
     }
 };
@@ -92,11 +92,11 @@ export const uploadAudioToCloudinary = async (
             },
         });
 
-        console.log("Uploaded audio to Cloudinary:", response.data.secure_url);
+        //console.log("Uploaded audio to Cloudinary:", response.data.secure_url);
         return response.data.secure_url;
 
     } catch (error) {
-        console.error("Upload audio failed:", error);
+        //console.error("Upload audio failed:", error);
         return null;
     }
 };

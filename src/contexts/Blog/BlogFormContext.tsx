@@ -91,7 +91,7 @@ export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
           setCategories(res.data.content);
         }
       } catch (err) {
-        console.error("Failed to fetch categories", err);
+        //console.error("Failed to fetch categories", err);
       } finally {
         setLoadingCategories(false);
       }
@@ -169,10 +169,10 @@ export const BlogFormProvider = ({ children }: { children: ReactNode }) => {
           navigate("/admin/blog");
         } else {
           // Basic error handling
-          console.error(res.message);
+          //console.error(res.message);
         }
       } catch (error) {
-        console.error("Failed to submit blog", error);
+        //console.error("Failed to submit blog", error);
       } finally {
         setSubmitting(false);
       }

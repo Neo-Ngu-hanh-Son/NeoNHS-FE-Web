@@ -52,7 +52,7 @@ export function CreateSessionDialog({
       onOpenChange(false)
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Create failed:', error)
+      //console.error('Create failed:', error)
       notification.error({
         message: 'Tạo Thất Bại',
         description: error.message || 'Không thể tạo phiên workshop. Vui lòng thử lại.',
@@ -75,7 +75,7 @@ export function CreateSessionDialog({
       onOpenChange(false)
       if (onSuccess) onSuccess()
     } catch (error: any) {
-      console.error('Batch create failed:', error)
+      //console.error('Batch create failed:', error)
       notification.error({
         message: 'Tạo Thất Bại',
         description: error.message || 'Không thể tạo danh sách phiên workshop. Vui lòng thử lại.',

@@ -88,7 +88,7 @@ const fetchTemplates = async () => {
     
     setTemplates(filtered)
   } catch (error: any) {
-    console.error('Failed to fetch templates:', error)
+    //console.error('Failed to fetch templates:', error)
     notification.error({
       message: 'Failed to Load Templates',
       description: error.message || 'Unable to fetch workshop templates. Please try again.',
