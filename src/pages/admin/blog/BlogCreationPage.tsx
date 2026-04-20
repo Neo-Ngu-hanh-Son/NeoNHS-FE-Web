@@ -7,7 +7,7 @@ import BlogCategorySection from '@/components/blog/creationForm/BlogCategorySect
 import BlogTagsSection from '@/components/blog/creationForm/BlogTagsSection';
 import BlogMediaSection from '@/components/blog/creationForm/BlogMediaSection';
 import { useRef, useState } from 'react';
-import { BlogEditorRef, EditorSaveResult, blogFormSchema } from '@/components/blog/type';
+import { BlogEditorRef, EditorSaveResult, BlogFormSchema } from '@/components/blog/type';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -19,8 +19,8 @@ import { useNavigate } from 'react-router-dom';
 function BlogCreationPageInner() {
   const [messageApi, contextHolder] = message.useMessage();
 
-  const form = useForm<z.infer<typeof blogFormSchema>>({
-    resolver: zodResolver(blogFormSchema),
+  const form = useForm<z.infer<typeof BlogFormSchema>>({
+    resolver: zodResolver(BlogFormSchema),
     defaultValues: {
       title: '',
       slug: '',
@@ -71,7 +71,7 @@ function BlogCreationPageInner() {
     }
   };
 
-  function submitHandler(data: z.infer<typeof blogFormSchema>) {
+  function submitHandler(data: z.infer<typeof BlogFormSchema>) {
     if (editorRef.current) {
       console.log('Saving form data: ' + data);
       editorRef.current.save();

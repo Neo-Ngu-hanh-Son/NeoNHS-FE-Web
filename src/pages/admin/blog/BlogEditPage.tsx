@@ -27,7 +27,7 @@ import { blogService } from '@/services/api/blogService';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { BlogStatus } from '@/types/blog';
 import type { BlogResponse } from '@/types/blog';
-import { BlogEditorRef, EditorSaveResult, blogFormSchema } from '@/components/blog/type';
+import { BlogEditorRef, EditorSaveResult, BlogFormSchema } from '@/components/blog/type';
 import { Spinner } from '@/components/ui/spinner';
 
 function BlogEditPageInner() {
@@ -39,8 +39,8 @@ function BlogEditPageInner() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof blogFormSchema>>({
-    resolver: zodResolver(blogFormSchema),
+  const form = useForm<z.infer<typeof BlogFormSchema>>({
+    resolver: zodResolver(BlogFormSchema),
     defaultValues: {
       title: '',
       slug: '',
@@ -131,7 +131,7 @@ function BlogEditPageInner() {
     }
   };
 
-  function submitHandler(_data: z.infer<typeof blogFormSchema>) {
+  function submitHandler(_data: z.infer<typeof BlogFormSchema>) {
     if (editorRef.current) {
       editorRef.current.save();
     } else {

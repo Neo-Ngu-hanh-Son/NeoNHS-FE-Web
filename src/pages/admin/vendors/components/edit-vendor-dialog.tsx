@@ -82,9 +82,9 @@ export function EditVendorDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Edit Vendor Profile</DialogTitle>
+                    <DialogTitle>Sửa hồ sơ Đối tác</DialogTitle>
                     <DialogDescription>
-                        Update existing vendor and their business profile.
+                        Cập nhật Đối tác hiện tại và hồ sơ doanh nghiệp của họ.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -92,13 +92,13 @@ export function EditVendorDialog({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Account Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Vendor Contact</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Liên hệ Đối tác</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-fullname">Vendor Full Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="edit-fullname">Họ tên Đối tác <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="edit-fullname"
-                                    placeholder="e.g. John Doe"
+                                    placeholder="Ví dụ: Nguyễn Văn A"
                                     {...register("fullname")}
                                     className={errors.fullname ? "border-red-500" : ""}
                                 />
@@ -106,10 +106,10 @@ export function EditVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-phoneNumber">Phone Number</Label>
+                                <Label htmlFor="edit-phoneNumber">Số điện thoại</Label>
                                 <Input
                                     id="edit-phoneNumber"
-                                    placeholder="e.g. 0905123456"
+                                    placeholder="Ví dụ: 0905123456"
                                     {...register("phoneNumber")}
                                 />
                             </div>
@@ -117,13 +117,13 @@ export function EditVendorDialog({
 
                         {/* Business Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Business Profile</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Hồ sơ doanh nghiệp</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-businessName">Business Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="edit-businessName">Tên doanh nghiệp <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="edit-businessName"
-                                    placeholder="e.g. NeoNHS Pottery Studio"
+                                    placeholder="Ví dụ: Xưởng gốm NeoNHS"
                                     {...register("businessName")}
                                     className={errors.businessName ? "border-red-500" : ""}
                                 />
@@ -131,28 +131,28 @@ export function EditVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-taxCode">Tax Code</Label>
+                                <Label htmlFor="edit-taxCode">Mã số thuế</Label>
                                 <Input
                                     id="edit-taxCode"
-                                    placeholder="Optional"
+                                    placeholder="Tùy chọn"
                                     {...register("taxCode")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-address">Business Address</Label>
+                                <Label htmlFor="edit-address">Địa chỉ doanh nghiệp</Label>
                                 <Input
                                     id="edit-address"
-                                    placeholder="e.g. 123 Marble Mt, Da Nang"
+                                    placeholder="Ví dụ: 123 Ngũ Hành Sơn, Đà Nẵng"
                                     {...register("address")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="edit-bankName">Bank Name</Label>
+                                <Label htmlFor="edit-bankName">Tên ngân hàng</Label>
                                 <Input
                                     id="edit-bankName"
-                                    placeholder="e.g. Vietcombank"
+                                    placeholder="Ví dụ: Vietcombank"
                                     {...register("bankName")}
                                 />
                             </div>
@@ -160,10 +160,10 @@ export function EditVendorDialog({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="edit-description">Business Description</Label>
+                        <Label htmlFor="edit-description">Mô tả doanh nghiệp</Label>
                         <Textarea
                             id="edit-description"
-                            placeholder="Briefly describe the vendor's products or services..."
+                            placeholder="Mô tả ngắn gọn các sản phẩm hoặc dịch vụ của Đối tác..."
                             {...register("description")}
                             rows={3}
                         />
@@ -171,18 +171,18 @@ export function EditVendorDialog({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="edit-bankAccountNumber">Bank Account Number</Label>
+                            <Label htmlFor="edit-bankAccountNumber">Số tài khoản ngân hàng</Label>
                             <Input
                                 id="edit-bankAccountNumber"
-                                placeholder="Account digits"
+                                placeholder="Các chữ số tài khoản"
                                 {...register("bankAccountNumber")}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="edit-bankAccountName">Bank Account Holder Name</Label>
+                            <Label htmlFor="edit-bankAccountName">Tên chủ tài khoản</Label>
                             <Input
                                 id="edit-bankAccountName"
-                                placeholder="In ALL CAPS"
+                                placeholder="VIẾT IN HOA"
                                 {...register("bankAccountName")}
                             />
                         </div>
@@ -195,16 +195,16 @@ export function EditVendorDialog({
                             onClick={() => onOpenChange(false)}
                             disabled={isSubmitting}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Saving...
+                                    Đang lưu...
                                 </>
                             ) : (
-                                "Save Changes"
+                                "Lưu thay đổi"
                             )}
                         </Button>
                     </DialogFooter>

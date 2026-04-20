@@ -20,7 +20,20 @@ import {
 import { blogService } from "@/services/api/blogService";
 import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
 import { truncateText } from "@/utils/helpers";
-import type { BlogResponse } from "@/types/blog";
+import type { BlogResponse, BlogStatus } from "@/types/blog";
+
+function blogStatusLabelVi(status: BlogStatus | string): string {
+  switch (status) {
+    case "DRAFT":
+      return "Bản nháp";
+    case "PUBLISHED":
+      return "Công khai";
+    case "ARCHIVED":
+      return "Lưu trữ";
+    default:
+      return status;
+  }
+}
 
 interface BlogDeleteDialogProps {
   blog: BlogResponse | null;
@@ -38,10 +51,10 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
       setDeleting(true);
       const res = await blogService.deleteBlog(blog.id);
       if (res.success) {
-        message.success(res.message || "Blog archived successfully");
+        message.success(res.message || "Đã lưu trữ bài viết thành công");
         onSuccess();
       } else {
-        message.error(res.message || "Failed to archive blog");
+        message.error(res.message || "Không thể lưu trữ bài viết");
       }
     } catch (err: unknown) {
       message.error(getApiErrorMessage(err, "Failed to archive blog"));
@@ -58,9 +71,9 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 mb-4">
               <TriangleAlert className="h-7 w-7 text-destructive" />
             </div>
-            <AlertDialogTitle className="text-lg font-bold">Archive Blog</AlertDialogTitle>
+            <AlertDialogTitle className="text-lg font-bold">Lưu trữ bài viết</AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-muted-foreground mt-1">
-              Are you sure you want to archive this blog post?
+              Bạn có chắc muốn lưu trữ bài viết này không?
             </AlertDialogDescription>
           </div>
         </AlertDialogHeader>
@@ -81,18 +94,18 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
                 {truncateText(blog.title, 40)}
               </p>
               <p className="text-xs text-muted-foreground">
-                {blog.blogCategory?.name ?? "No category"} · {blog.status}
+                {blog.blogCategory?.name ?? "Chưa có danh mục"} · {blogStatusLabelVi(blog.status)}
               </p>
             </div>
           </div>
         )}
 
         <p className="text-xs text-destructive text-center">
-          You can restore archived blogs from the admin dashboard.
+          Bạn có thể khôi phục bài đã lưu trữ từ trang quản trị.
         </p>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleting}>Hủy</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={deleting}
@@ -101,10 +114,10 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
             {deleting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-1" />
-                Archiving...
+                Đang lưu trữ...
               </>
             ) : (
-              "Archive Blog"
+              "Lưu trữ"
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

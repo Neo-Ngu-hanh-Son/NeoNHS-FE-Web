@@ -17,7 +17,7 @@ import type { PointPanoramaResponse } from '@/types';
 interface PanoramaEditorHeaderProps {
   variant?: 'page' | 'embedded';
   panorama: PointPanoramaResponse | null;
-  targetId: string;
+  targetPointId: string;
   saving: boolean;
   hasImage: boolean;
   onSave: () => void;
@@ -30,7 +30,7 @@ interface PanoramaEditorHeaderProps {
 export default function PanoramaEditorHeader({
   variant = 'page',
   panorama,
-  targetId,
+  targetPointId,
   saving,
   hasImage,
   onSave,
@@ -64,7 +64,7 @@ export default function PanoramaEditorHeader({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/panorama/${targetId}`, '_blank')}
+            onClick={() => window.open(`/places/${targetPointId}/panorama`, '_blank')}
             className="gap-1"
           >
             <Eye className="h-4 w-4" />

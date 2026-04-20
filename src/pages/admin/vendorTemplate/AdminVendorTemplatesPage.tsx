@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
+import { LayoutTemplate } from "lucide-react"
 import { notification } from "antd"
 import {
   AdminWorkshopTemplateResponse,
-  AdminTemplateStats,
   WorkshopStatus,
 } from "./components/templates/types"
-import { TemplateStatsCards } from "./components/TemplateStatsCards"
 import {
   TemplateFiltersToolbar,
   TemplatesSortBy,
@@ -83,8 +82,8 @@ export default function AdminVendorTemplatesPage() {
         } else {
           console.error("Failed to load templates", templatesRes.reason)
           notification.error({
-            message: "Failed to load templates",
-            description: "An error occurred while loading workshop templates. Please try again.",
+            message: "Không tải được mẫu workshop",
+            description: "Đã xảy ra lỗi khi tải danh sách mẫu workshop. Vui lòng thử lại.",
           })
         }
 
@@ -101,7 +100,6 @@ export default function AdminVendorTemplatesPage() {
     fetchAll()
   }, [sortBy, sortDirection, statusFilter])
 
-  // Enrich templates with vendor data reactively (no extra API call)
   const templates = useMemo(() => {
     if (vendors.length === 0) return rawTemplates
 
@@ -134,11 +132,9 @@ export default function AdminVendorTemplatesPage() {
       })
     }
 
-    // Vendor filter (client-side since backend has no per-vendor endpoint)
     if (vendorIdFilter !== "all") {
       const selectedVendor = vendors.find((v) => v.id === vendorIdFilter)
       filtered = filtered.filter((t) => {
-        // Match by vendorId first, fallback to vendorName match
         if (t.vendorId === vendorIdFilter) return true
         if (selectedVendor) {
           return t.vendorName === selectedVendor.businessName ||
@@ -212,14 +208,14 @@ export default function AdminVendorTemplatesPage() {
       )
 
       notification.success({
-        message: "Template Approved",
-        description: `"${templateName}" has been approved and is now active.`,
+        message: "Đã duyệt mẫu",
+        description: `«${templateName}» đã được duyệt và đang hoạt động.`,
       })
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "An unexpected error occurred"
+        err instanceof Error ? err.message : "Đã xảy ra lỗi không xác định"
       notification.error({
-        message: "Failed to Approve",
+        message: "Duyệt thất bại",
         description: message,
       })
     }
@@ -247,14 +243,14 @@ export default function AdminVendorTemplatesPage() {
       )
 
       notification.warning({
-        message: "Template Rejected",
-        description: `"${templateName}" has been rejected.`,
+        message: "Đã từ chối mẫu",
+        description: `«${templateName}» đã bị từ chối.`,
       })
     } catch (err: unknown) {
       const message =
-        err instanceof Error ? err.message : "An unexpected error occurred"
+        err instanceof Error ? err.message : "Đã xảy ra lỗi không xác định"
       notification.error({
-        message: "Failed to Reject",
+        message: "Từ chối thất bại",
         description: message,
       })
     }
@@ -270,18 +266,25 @@ export default function AdminVendorTemplatesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Vendor Workshop Templates</h1>
-          <p className="text-muted-foreground">
-            Review and manage all workshop templates submitted by vendors
-          </p>
+    <div className="mx-auto max-w-7xl space-y-2 p-4 md:p-6">
+      <div className="rounded-2xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-5 shadow-sm dark:border-white/10 dark:from-white/5 dark:to-transparent">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 dark:bg-violet-500/20">
+              <LayoutTemplate className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Mẫu workshop Đối tác
+              </h1>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                Xem và quản lý mẫu workshop do Đối tác gửi lên.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Filters */}
       <TemplateFiltersToolbar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -298,7 +301,6 @@ export default function AdminVendorTemplatesPage() {
         onSortDirectionChange={setSortDirection}
       />
 
-      {/* Table */}
       <TemplatesTable
         templates={filteredTemplates}
         totalCount={templates.length}
@@ -317,7 +319,6 @@ export default function AdminVendorTemplatesPage() {
         onClearFilters={handleClearFilters}
       />
 
-      {/* Approve / Reject Dialogs */}
       <ApproveTemplateDialog
         template={approveDialog.template}
         open={approveDialog.open}

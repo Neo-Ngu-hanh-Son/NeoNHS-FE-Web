@@ -9,7 +9,7 @@ import { eventService } from '@/services/api/eventService';
 import type { UpdateEventRequest, EventResponse } from '@/types/event';
 
 interface UseUpdateEventReturn {
-    updateEvent: (id: string, data: UpdateEventRequest) => Promise<EventResponse | null>;
+    updateEvent: (id: string, data: UpdateEventRequest, file?: File) => Promise<EventResponse | null>;
     loading: boolean;
 }
 
@@ -18,11 +18,12 @@ export function useUpdateEvent(): UseUpdateEventReturn {
 
     const updateEvent = useCallback(async (
         id: string,
-        data: UpdateEventRequest
+        data: UpdateEventRequest,
+        file?: File
     ): Promise<EventResponse | null> => {
         setLoading(true);
         try {
-            const response = await eventService.updateEvent(id, data);
+            const response = await eventService.updateEvent(id, data, file);
             if (response.success) {
                 message.success('Event updated successfully');
                 return response.data;

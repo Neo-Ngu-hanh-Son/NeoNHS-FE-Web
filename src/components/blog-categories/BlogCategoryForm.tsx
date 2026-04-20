@@ -49,11 +49,11 @@ export default function BlogCategoryForm({
       {/* Category Name */}
       <div className="space-y-2">
         <Label htmlFor="category-name" className="text-sm font-medium text-gray-700">
-          Category Name <span className="text-red-500">*</span>
+          Tên danh mục <span className="text-red-500">*</span>
         </Label>
         <Input
           id="category-name"
-          placeholder="e.g. Travel Tips, Food & Culture..."
+          placeholder="Ví dụ: Mẹo du lịch, Ẩm thực & Văn hóa…"
           value={values.name}
           onChange={(e) => onChange('name', e.target.value)}
           maxLength={100}
@@ -72,11 +72,11 @@ export default function BlogCategoryForm({
       {/* Description */}
       <div className="space-y-2">
         <Label htmlFor="category-desc" className="text-sm font-medium text-gray-700">
-          Description
+          Mô tả
         </Label>
         <Textarea
           id="category-desc"
-          placeholder="Briefly describe what this category is about..."
+          placeholder="Mô tả ngắn gọn nội dung danh mục…"
           value={values.description || ''}
           onChange={(e) => onChange('description', e.target.value)}
           maxLength={500}
@@ -99,18 +99,18 @@ export default function BlogCategoryForm({
       {mode === 'edit' && (
         <div className="space-y-2">
           <Label htmlFor="category-status" className="text-sm font-medium text-gray-700">
-            Status
+            Trạng thái
           </Label>
           <Select
             value={values.status || 'ACTIVE'}
             onValueChange={(val) => onChange('status', val as BlogCategoryStatus)}
           >
             <SelectTrigger id="category-status">
-              <SelectValue placeholder="Select status" />
+              <SelectValue placeholder="Chọn trạng thái" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ACTIVE">Active</SelectItem>
-              <SelectItem value="ARCHIVED">Archived</SelectItem>
+              <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
+              <SelectItem value="ARCHIVED">Đã lưu trữ</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -122,7 +122,7 @@ export default function BlogCategoryForm({
               variant={mode === 'create' ? 'default' : 'outline'}
               onClick={onSubmit}
             >
-              {mode === 'create' ? 'Create Category' : 'Save Changes'}
+              {mode === 'create' ? 'Tạo danh mục' : 'Lưu thay đổi'}
             </Button>
           </div>
         )

@@ -71,7 +71,7 @@ export default function PanoramaEditorPanel({
       <PanoramaEditorHeader
         variant={variant}
         panorama={form.selectedPanorama}
-        targetId={form.targetPointId}
+        targetPointId={form.targetPointId}
         saving={form.isSaving}
         hasImage={!!form.panoramaImageUrl}
         onSave={form.handleSave}

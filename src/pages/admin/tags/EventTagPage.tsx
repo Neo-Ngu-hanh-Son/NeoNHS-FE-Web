@@ -28,7 +28,7 @@ export function EventTagPage() {
     overflow-hidden px-6 py-4"
     >
       <TagToolbar
-        title="Event Tags"
+        title="Nhãn sự kiện"
         sortIndex={sortIndex}
         onSortChange={setSortIndex}
         onAdd={() => openModal("create")}

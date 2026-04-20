@@ -37,13 +37,13 @@ export default function ToolbarModal({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Enter rows and columns</DialogTitle>
+          <DialogTitle>Nhập số hàng và cột</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <div className="space-y-1">
             <label htmlFor="rows" className="text-sm font-medium">
-              Rows
+              Hàng
             </label>
             <Input
               id="rows"
@@ -57,7 +57,7 @@ export default function ToolbarModal({ open, onOpenChange }: Props) {
 
           <div className="space-y-1">
             <label htmlFor="columns" className="text-sm font-medium">
-              Columns
+              Cột
             </label>
             <Input
               id="columns"
@@ -72,10 +72,10 @@ export default function ToolbarModal({ open, onOpenChange }: Props) {
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Hủy</Button>
           </DialogClose>
 
-          <Button onClick={handleCreate}>Create</Button>
+          <Button onClick={handleCreate}>Tạo</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

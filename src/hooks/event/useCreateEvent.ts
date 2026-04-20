@@ -9,17 +9,17 @@ import { eventService } from '@/services/api/eventService';
 import type { CreateEventRequest, EventResponse } from '@/types/event';
 
 interface UseCreateEventReturn {
-    createEvent: (data: CreateEventRequest) => Promise<EventResponse | null>;
+    createEvent: (data: CreateEventRequest, file?: File) => Promise<EventResponse | null>;
     loading: boolean;
 }
 
 export function useCreateEvent(): UseCreateEventReturn {
     const [loading, setLoading] = useState(false);
 
-    const createEvent = useCallback(async (data: CreateEventRequest): Promise<EventResponse | null> => {
+    const createEvent = useCallback(async (data: CreateEventRequest, file?: File): Promise<EventResponse | null> => {
         setLoading(true);
         try {
-            const response = await eventService.createEvent(data);
+            const response = await eventService.createEvent(data, file);
             if (response.success) {
                 message.success('Event created successfully');
                 return response.data;

@@ -46,7 +46,7 @@ export interface AdminTemplateStats {
 
 // Zod validation schema
 export const rejectTemplateSchema = z.object({
-  adminNote: z.string().min(10, "Please provide a detailed reason (minimum 10 characters)"),
+  adminNote: z.string().min(10, "Vui lòng nhập lý do chi tiết (tối thiểu 10 ký tự)."),
 })
 
 export type RejectTemplateFormData = z.infer<typeof rejectTemplateSchema>

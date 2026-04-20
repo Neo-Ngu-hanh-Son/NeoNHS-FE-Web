@@ -17,9 +17,9 @@ export default function DomExportDebugPlugin(): JSX.Element {
   }, [editor]);
 
   return (
-    <section className="blog-editor-debug-export" aria-label="DOM export debug panel">
-      <div className="blog-editor-debug-export-title">Exported DOM (HTML)</div>
-      <pre className="blog-editor-debug-export-content">{exportedHtml || "<empty>"}</pre>
+    <section className="blog-editor-debug-export" aria-label="Bảng gỡ lỗi xuất DOM">
+      <div className="blog-editor-debug-export-title">DOM đã xuất (HTML)</div>
+      <pre className="blog-editor-debug-export-content">{exportedHtml || "<trống>"}</pre>
     </section>
   );
 }

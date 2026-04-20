@@ -3,14 +3,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Controller, UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
-import { blogFormSchema } from '@/components/blog/type';
+import { BlogFormSchema } from '@/components/blog/type';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 
-export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.infer<typeof blogFormSchema>> }) {
+export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.infer<typeof BlogFormSchema>> }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Blog Details</CardTitle>
+        <CardTitle>Chi tiết bài viết</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <FieldGroup>
@@ -20,12 +20,12 @@ export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.inf
             render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="title">Title</FieldLabel>
+                  <FieldLabel htmlFor="title">Tiêu đề</FieldLabel>
                   <Input
                     {...field}
                     id="title"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Enter blog title"
+                    placeholder="Nhập tiêu đề bài viết"
                     autoComplete="off"
                     className={`${fieldState.invalid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
@@ -44,12 +44,12 @@ export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.inf
             render={({ field, fieldState }) => {
               return (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="summary">Summary</FieldLabel>
+                  <FieldLabel htmlFor="summary">Tóm tắt</FieldLabel>
                   <Textarea
                     {...field}
                     id="summary"
                     aria-invalid={fieldState.invalid}
-                    placeholder="Enter a brief summary..."
+                    placeholder="Nhập tóm tắt ngắn..."
                     className={`min-h-[100px] ${fieldState.invalid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

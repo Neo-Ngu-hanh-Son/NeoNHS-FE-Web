@@ -58,37 +58,37 @@ export default function BlogCategoryViewContent({
                 : 'mt-1.5 bg-secondary text-muted-foreground hover:bg-secondary border-border rounded-full'
             }
           >
-            {category.status === 'ACTIVE' ? 'Active' : 'Archived'}
+            {category.status === 'ACTIVE' ? 'Đang hoạt động' : 'Đã lưu trữ'}
           </Badge>
         </div>
       </div>
 
       {/* Details */}
       <div className="rounded-lg border border-border px-4 divide-y divide-border/60">
-        <DetailRow icon={<Link2 className="h-4 w-4" />} label="Slug">
+        <DetailRow icon={<Link2 className="h-4 w-4" />} label="Đường dẫn (slug)">
           <code className="text-xs bg-secondary px-2 py-0.5 rounded text-foreground/80">
             {category.slug}
           </code>
         </DetailRow>
 
-        <DetailRow icon={<FileText className="h-4 w-4" />} label="Description">
+        <DetailRow icon={<FileText className="h-4 w-4" />} label="Mô tả">
           {category.description || (
-            <span className="text-muted-foreground italic">No description provided</span>
+            <span className="text-muted-foreground italic">Không có mô tả</span>
           )}
         </DetailRow>
 
-        <DetailRow icon={<Tags className="h-4 w-4" />} label="Posts">
+        <DetailRow icon={<Tags className="h-4 w-4" />} label="Bài viết">
           <span className="font-semibold text-foreground">
             {category.postCount}
           </span>
         </DetailRow>
 
-        <DetailRow icon={<Calendar className="h-4 w-4" />} label="Created">
+        <DetailRow icon={<Calendar className="h-4 w-4" />} label="Ngày tạo">
           {formatShortDate(category.createdAt)}
         </DetailRow>
 
         {category.updatedAt && (
-          <DetailRow icon={<Calendar className="h-4 w-4" />} label="Last Updated">
+          <DetailRow icon={<Calendar className="h-4 w-4" />} label="Cập nhật lần cuối">
             {formatShortDate(category.updatedAt)}
           </DetailRow>
         )}

@@ -17,7 +17,7 @@ export function KPIStats({ kpis }: KPIStatsProps) {
                 iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
             />
             <StatsCard
-                title="Nhà cung cấp hoạt động"
+                title="Đối tác hoạt động"
                 value={kpis?.activeVendors?.toLocaleString('vi-VN') ?? '0'}
                 icon={<Store className="h-6 w-6 text-white" />}
                 iconBg="bg-gradient-to-br from-emerald-500 to-green-600"

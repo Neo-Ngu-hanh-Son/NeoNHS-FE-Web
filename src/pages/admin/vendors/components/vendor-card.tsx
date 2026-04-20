@@ -33,9 +33,9 @@ export function VendorCard({
   onUnban,
 }: VendorCardProps) {
   return (
-    <Card className="hover:shadow-lg transition-shadow duration-200">
-      <CardContent className="p-6">
-        <div className="space-y-4">
+    <Card className="hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
+      <CardContent className="p-6 flex flex-col h-full">
+        <div className="space-y-4 flex-1">
           {/* Header with Avatar and Name */}
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
@@ -66,26 +66,28 @@ export function VendorCard({
               </div>
             </div>
 
-            {/* Status Badges */}
-            <div className="flex flex-col gap-2 items-end">
-              <VendorStatusBadge
-                isActive={vendor.isActive}
-                isBanned={vendor.isBanned}
-                isVerified={vendor.isVerifiedVendor}
-                size="sm"
-              />
-            </div>
-          </div>
 
+          </div>
+          {/* Status Badges */}
+          <div className="flex flex-col gap-2 items-end">
+            <VendorStatusBadge
+              isActive={vendor.isActive}
+              isBanned={vendor.isBanned}
+              isVerified={vendor.isVerifiedVendor}
+              size="sm"
+            />
+          </div>
           {/* Description */}
           {vendor.description && (
             <p className="text-sm text-muted-foreground line-clamp-2">
               {vendor.description}
             </p>
           )}
+        </div>
 
+        <div className="mt-auto space-y-4 pt-4">
           {/* Contact Info */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 flex-none">
             <div className="flex items-center gap-2 text-sm">
               <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
               <span className="truncate">{vendor.email}</span>
@@ -103,19 +105,19 @@ export function VendorCard({
           </div>
 
           {/* Stats */}
-          <div className="flex gap-4 pt-2 border-t">
+          <div className="flex gap-4 pt-2 border-t mt-2">
             <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground">Templates</span>
+              <span className="text-xs text-muted-foreground">Mẫu thiết kế</span>
               <span className="text-sm font-semibold">
-                {vendor.totalTemplates || 0} ({vendor.activeTemplates || 0} active)
+                {vendor.totalTemplates || 0} ({vendor.activeTemplates || 0} hoạt động)
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground">Sessions</span>
+              <span className="text-xs text-muted-foreground">Phiên</span>
               <span className="text-sm font-semibold">{vendor.totalSessions || 0}</span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-muted-foreground">Joined</span>
+              <span className="text-xs text-muted-foreground">Tham gia</span>
               <span className="text-sm font-semibold">{formatDate(vendor.createdAt)}</span>
             </div>
           </div>
@@ -126,13 +128,13 @@ export function VendorCard({
             {vendor.taxCode && (
               <Badge variant="outline" className="text-xs">
                 <FileText className="w-3 h-3 mr-1" />
-                Tax: {vendor.taxCode}
+                Thuế: {vendor.taxCode}
               </Badge>
             )}
             {!vendor.taxCode && (
               <Badge variant="outline" className="text-xs text-amber-600 border-amber-600">
                 <FileText className="w-3 h-3 mr-1" />
-                No Tax Code
+                Không có mã số thuế
               </Badge>
             )}
           </div>
@@ -146,7 +148,7 @@ export function VendorCard({
               className="flex-1"
             >
               <Eye className="w-3.5 h-3.5 mr-1.5" />
-              View
+              Xem
             </Button>
             <Button
               size="sm"
@@ -156,7 +158,7 @@ export function VendorCard({
               disabled={vendor.isBanned}
             >
               <Edit className="w-3.5 h-3.5 mr-1.5" />
-              Edit
+              Sửa
             </Button>
 
             {/* Ban/Unban Button */}
@@ -168,7 +170,7 @@ export function VendorCard({
                 className="flex-1 text-green-600 hover:text-green-700 hover:bg-green-50"
               >
                 <CheckCircle className="w-3.5 h-3.5 mr-1.5" />
-                Unban
+                Khôi phục
               </Button>
             ) : (
               <Button
@@ -178,11 +180,9 @@ export function VendorCard({
                 className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
               >
                 <Ban className="w-3.5 h-3.5 mr-1.5" />
-                Ban
+                Cấm
               </Button>
             )}
-
-
           </div>
         </div>
       </CardContent>

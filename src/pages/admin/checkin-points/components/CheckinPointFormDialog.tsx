@@ -51,24 +51,24 @@ interface CheckinPointFormDialogProps {
 }
 
 const checkinPointSchema = z.object({
-  pointId: z.string().min(1, "Parent point is required"),
-  name: z.string().trim().min(1, "Name is required").max(255, "Name must be <= 255 characters"),
+  pointId: z.string().min(1, "Vui lòng chọn địa điểm chính"),
+  name: z.string().trim().min(1, "Tên không được để trống").max(255, "Tên không được vượt quá 255 ký tự"),
   description: z.string(),
-  position: z.string().max(255, "Position must be <= 255 characters"),
-  thumbnailUrl: z.string().max(255, "Thumbnail URL must be <= 255 characters"),
+  position: z.string().max(255, "Vị trí không được vượt quá 255 ký tự"),
+  thumbnailUrl: z.string().max(255, "Đường dẫn ảnh không được vượt quá 255 ký tự"),
   isActive: z.boolean(),
-  qrCode: z.string().max(255, "QR code must be <= 255 characters"),
+  qrCode: z.string().max(255, "Mã QR không được vượt quá 255 ký tự"),
   longitude: z
     .number()
-    .min(-180, "Longitude must be between -180 and 180")
-    .max(180, "Longitude must be between -180 and 180")
+    .min(-180, "Kinh độ phải từ -180 đến 180")
+    .max(180, "Kinh độ phải từ -180 đến 180")
     .optional(),
   latitude: z
     .number()
-    .min(-90, "Latitude must be between -90 and 90")
-    .max(90, "Latitude must be between -90 and 90")
+    .min(-90, "Vĩ độ phải từ -90 đến 90")
+    .max(90, "Vĩ độ phải từ -90 đến 90")
     .optional(),
-  rewardPoints: z.number().min(10, "Reward points must be at least 10"),
+  rewardPoints: z.number().min(10, "Điểm thưởng phải từ 10 trở lên"),
 });
 
 type CheckinPointFormValues = z.infer<typeof checkinPointSchema>;
@@ -180,14 +180,13 @@ export function CheckinPointFormDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-4xl">
+        <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-4xl bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700">
           <DialogHeader>
-            <DialogTitle>
-              {mode === "create" ? "Create Checkin Point" : "Edit Checkin Point"}
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white">
+              {mode === "create" ? "Tạo điểm Check-in mới" : "Chỉnh sửa điểm Check-in"}
             </DialogTitle>
-            <DialogDescription>
-              Checkin points must belong to a normal point. Select parent point first, then
-              configure content and coordinates.
+            <DialogDescription className="text-slate-500 dark:text-slate-400">
+              Điểm check-in phải thuộc một địa điểm chính. Vui lòng chọn địa điểm chính trước khi điền thông tin và tọa độ.
             </DialogDescription>
           </DialogHeader>
 
@@ -202,11 +201,11 @@ export function CheckinPointFormDialog({
                   name="pointId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Parent Point *</FormLabel>
+                      <FormLabel className="text-slate-900 dark:text-white">Địa điểm chính *</FormLabel>
                       <FormControl>
                         <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select parent point" />
+                          <SelectTrigger className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                            <SelectValue placeholder="Chọn địa điểm chính" />
                           </SelectTrigger>
                           <SelectContent>
                             {parentPoints.map((point) => (
@@ -227,9 +226,9 @@ export function CheckinPointFormDialog({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name *</FormLabel>
+                      <FormLabel className="text-slate-900 dark:text-white">Tên điểm *</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Main Gate Check-in" />
+                        <Input {...field} placeholder="Ví dụ: Cổng chính" className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" />
                       </FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -241,9 +240,9 @@ export function CheckinPointFormDialog({
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel className="text-slate-900 dark:text-white">Mô tả</FormLabel>
                       <FormControl>
-                        <Textarea rows={3} {...field} />
+                        <Textarea rows={3} {...field} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" placeholder="Chi tiết vị trí..." />
                       </FormControl>
                       <FormMessage className="text-xs" />
                     </FormItem>
@@ -256,9 +255,9 @@ export function CheckinPointFormDialog({
                     name="position"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Position</FormLabel>
+                        <FormLabel className="text-slate-900 dark:text-white">Vị trí chèn</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="North Entrance" />
+                          <Input {...field} placeholder="Ví dụ: Lối vào cửa Bắc" className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -269,9 +268,9 @@ export function CheckinPointFormDialog({
                     name="qrCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>QR Code</FormLabel>
+                        <FormLabel className="text-slate-900 dark:text-white">Mã QR</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="CHECKIN_MAIN_GATE_001" />
+                          <Input {...field} placeholder="CHECKIN_001" className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700" />
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
@@ -285,12 +284,13 @@ export function CheckinPointFormDialog({
                     name="rewardPoints"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Reward Points</FormLabel>
+                        <FormLabel className="text-slate-900 dark:text-white">Điểm thưởng</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
                             min={10}
                             value={field.value ?? ""}
+                            className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                             onChange={(e) =>
                               field.onChange(
                                 e.target.value === "" ? undefined : Number(e.target.value),
@@ -307,7 +307,7 @@ export function CheckinPointFormDialog({
                     name="isActive"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="mb-2 block">Active</FormLabel>
+                        <FormLabel className="mb-2 block text-slate-900 dark:text-white">Trạng thái hoạt động</FormLabel>
                         <FormControl>
                           <div className="flex h-10 items-center">
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -321,17 +321,18 @@ export function CheckinPointFormDialog({
               </div>
 
               <div className="space-y-4">
-                <div className="rounded-lg border p-4">
+                <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 p-5 mt-2 md:mt-0">
                   <div className="mb-3 flex items-center justify-between">
-                    <Label>Location</Label>
+                    <Label className="text-base font-semibold text-slate-900 dark:text-white">Tọa độ trên bản đồ</Label>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => setOpenMapPicker(true)}
+                      className="border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-sm"
                     >
-                      <MapPin className="mr-1 h-4 w-4" />
-                      Pick from map
+                      <MapPin className="mr-1.5 h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                      Chọn từ bản đồ
                     </Button>
                   </div>
 
@@ -341,13 +342,14 @@ export function CheckinPointFormDialog({
                       name="latitude"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Latitude</FormLabel>
+                          <FormLabel className="text-slate-900 dark:text-white">Vĩ độ (Latitude)</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               step="any"
                               placeholder="16.047"
                               value={field.value ?? ""}
+                              className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                               onChange={(e) =>
                                 field.onChange(
                                   e.target.value === "" ? undefined : Number(e.target.value),
@@ -364,12 +366,13 @@ export function CheckinPointFormDialog({
                       name="longitude"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Longitude</FormLabel>
+                          <FormLabel className="text-slate-900 dark:text-white">Kinh độ (Longitude)</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
                               step="any"
                               placeholder="108.246"
+                              className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
                               value={field.value ?? ""}
                               onChange={(e) =>
                                 field.onChange(
@@ -385,9 +388,9 @@ export function CheckinPointFormDialog({
                   </div>
 
                   {currentPosition && (
-                    <p className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-                      <LocateFixed className="h-3.5 w-3.5" />
-                      Selected: {currentPosition.lat.toFixed(6)}, {currentPosition.lng.toFixed(6)}
+                    <p className="mt-3 flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                      <LocateFixed className="h-4 w-4 text-primary" />
+                      <span>Đã chọn: <strong className="font-mono">{currentPosition.lat.toFixed(6)}, {currentPosition.lng.toFixed(6)}</strong></span>
                     </p>
                   )}
                 </div>
@@ -397,7 +400,7 @@ export function CheckinPointFormDialog({
                   name="thumbnailUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Thumbnail</FormLabel>
+                      <FormLabel className="text-slate-900 dark:text-white">Ảnh thu nhỏ</FormLabel>
                       <FormControl>
                         <DragImageUploader
                           value={field.value}
@@ -416,17 +419,17 @@ export function CheckinPointFormDialog({
           </Form>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
-              Cancel
+            <Button variant="outline" className="border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm" onClick={() => onOpenChange(false)} disabled={loading}>
+              Hủy
             </Button>
-            <Button onClick={form.handleSubmit(handleFormSubmit)} disabled={loading}>
+            <Button className="bg-primary text-primary-foreground shadow hover:bg-primary/90 transition-colors" onClick={form.handleSubmit(handleFormSubmit)} disabled={loading}>
               {loading
                 ? mode === "create"
-                  ? "Creating..."
-                  : "Saving..."
+                  ? "Đang tạo..."
+                  : "Đang lưu..."
                 : mode === "create"
-                  ? "Create Checkin Point"
-                  : "Save Changes"}
+                  ? "Tạo điểm Check-in"
+                  : "Lưu thay đổi"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -439,7 +442,7 @@ export function CheckinPointFormDialog({
         parentPosition={parentPosition}
         options={{
           helperText:
-            "Click anywhere on the map to pick child checkin coordinates. Red marker is parent point, blue marker is selected child point.",
+            "Nhấn vào bản đồ để chọn tọa độ điểm check-in. Điểm đánh dấu màu đỏ là địa điểm chính, điểm màu xanh là vị trí bạn đang chọn.",
           showParentMarker: true,
           useBlueChildMarker: true,
           childMarkerVisibility: "after-select",

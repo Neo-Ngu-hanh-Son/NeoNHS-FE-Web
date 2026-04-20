@@ -6,12 +6,12 @@ import { Ref } from 'react';
 import { message, notification } from 'antd';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
-import { blogFormSchema } from '@/components/blog/type';
+import { BlogFormSchema } from '@/components/blog/type';
 
 interface BlogEditorSectionProps {
   editorRef: Ref<BlogEditorRef>;
   handleSave: (content: EditorSaveResult) => Promise<void>;
-  form: UseFormReturn<z.infer<typeof blogFormSchema>>;
+  form: UseFormReturn<z.infer<typeof BlogFormSchema>>;
   editorPrestateJSON?: string;
 }
 
@@ -23,12 +23,12 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
       const resultUrl = await uploadImageToCloudinary(file);
       console.log('Result url: ' + resultUrl);
       if (!resultUrl) {
-        messageApi.error('Error uploading image, please try again');
+        messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');
       }
       return resultUrl || '';
     } catch (error) {
       console.error('[BlogEditorSection] Error uploading image:', error);
-      messageApi.error('Error uploading image, please try again');
+      messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');
       return '';
     }
   };
@@ -37,7 +37,7 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
     <>
       <Card className="min-h-[500px] flex flex-col">
         <CardHeader>
-          <CardTitle>Content</CardTitle>
+          <CardTitle>Nội dung</CardTitle>
         </CardHeader>
         <CardContent className="flex-1">
           <BlogEditor
