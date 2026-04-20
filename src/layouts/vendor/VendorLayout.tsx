@@ -100,15 +100,61 @@ export function VendorLayout() {
       }
     }
 
-    // Workshop Sessions routes
-    if (path.startsWith('/vendor/workshop-sessions')) {
-      if (path === '/vendor/workshop-sessions') {
+    // Vouchers routes
+    if (path.startsWith('/vendor/vouchers')) {
+      if (path === '/vendor/vouchers') {
         return {
           items: [
             { label: 'Đối tác', path: '/vendor/dashboard' },
-            { label: 'Phiên Workshop', path: '/vendor/workshop-sessions' },
+            { label: 'Quản lý Voucher', path: '/vendor/vouchers' },
           ],
-          title: 'Phiên Workshop',
+          title: 'Quản lý Voucher',
+        };
+      }
+
+      if (path === '/vendor/vouchers/create') {
+        return {
+          items: [
+            { label: 'Đối tác', path: '/vendor/dashboard' },
+            { label: 'Quản lý Voucher', path: '/vendor/vouchers' },
+            { label: 'Tạo mới', path: '/vendor/vouchers/create' },
+          ],
+          title: 'Tạo Voucher mới',
+        };
+      }
+
+      if (path === '/vendor/vouchers/deleted') {
+        return {
+          items: [
+            { label: 'Đối tác', path: '/vendor/dashboard' },
+            { label: 'Quản lý Voucher', path: '/vendor/vouchers' },
+            { label: 'Thùng rác', path: '/vendor/vouchers/deleted' },
+          ],
+          title: 'Voucher đã xóa',
+        };
+      }
+
+      const voucherId = params.id;
+      if (voucherId) {
+        if (path.includes('/edit')) {
+          return {
+            items: [
+              { label: 'Đối tác', path: '/vendor/dashboard' },
+              { label: 'Quản lý Voucher', path: '/vendor/vouchers' },
+              { label: 'Chi tiết', path: `/vendor/vouchers/${voucherId}` },
+              { label: 'Chỉnh sửa', path: `/vendor/vouchers/${voucherId}/edit` },
+            ],
+            title: 'Chỉnh sửa Voucher',
+          };
+        }
+
+        return {
+          items: [
+            { label: 'Đối tác', path: '/vendor/dashboard' },
+            { label: 'Quản lý Voucher', path: '/vendor/vouchers' },
+            { label: 'Chi tiết', path: `/vendor/vouchers/${voucherId}` },
+          ],
+          title: 'Chi tiết Voucher',
         };
       }
     }

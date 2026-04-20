@@ -70,8 +70,8 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
             variant={isDeleted ? "secondary" : "default"}
             className={
               isDeleted
-                ? "bg-secondary text-muted-foreground hover:bg-secondary rounded-full"
-                : "bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full"
+                ? "bg-secondary text-muted-foreground hover:bg-secondary rounded-full whitespace-nowrap"
+                : "bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full whitespace-nowrap"
             }
           >
             {isDeleted ? "Đã xóa" : "Hoạt động"}

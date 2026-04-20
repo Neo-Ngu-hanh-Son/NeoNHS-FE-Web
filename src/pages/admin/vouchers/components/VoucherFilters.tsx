@@ -46,7 +46,7 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
             {/* Row 1: Search + main filters */}
             <div className="flex flex-wrap items-center gap-3">
                 <Input
-                    placeholder="Search by code..."
+                    placeholder="Tìm theo mã..."
                     value={filters.searchCode}
                     onChange={(e) => update({ searchCode: e.target.value })}
                     className="w-[200px]"
@@ -57,10 +57,10 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     onValueChange={(val) => update({ filterType: val === '_all' ? undefined : val as VoucherType })}
                 >
                     <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder="Voucher Type" />
+                        <SelectValue placeholder="Loại Voucher" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="_all">All Types</SelectItem>
+                        <SelectItem value="_all">Tất cả loại</SelectItem>
                         {VOUCHER_TYPE_OPTIONS.map(opt => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
@@ -72,10 +72,10 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     onValueChange={(val) => update({ filterStatus: val === '_all' ? undefined : val as VoucherStatus })}
                 >
                     <SelectTrigger className="w-[140px]">
-                        <SelectValue placeholder="Status" />
+                        <SelectValue placeholder="Trạng thái" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="_all">All Status</SelectItem>
+                        <SelectItem value="_all">Tất cả trạng thái</SelectItem>
                         {VOUCHER_STATUS_OPTIONS.map(opt => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
@@ -88,10 +88,10 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                         onValueChange={(val) => update({ filterScope: val === '_all' ? undefined : val as VoucherScope })}
                     >
                         <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Scope" />
+                            <SelectValue placeholder="Phạm vi" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="_all">All Scopes</SelectItem>
+                            <SelectItem value="_all">Tất cả phạm vi</SelectItem>
                             {VOUCHER_SCOPE_OPTIONS.map(opt => (
                                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                             ))}
@@ -104,10 +104,10 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     onValueChange={(val) => update({ filterProduct: val === '_all' ? undefined : val as ApplicableProduct })}
                 >
                     <SelectTrigger className="w-[160px]">
-                        <SelectValue placeholder="Product" />
+                        <SelectValue placeholder="Sản phẩm" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="_all">All Products</SelectItem>
+                        <SelectItem value="_all">Tất cả sản phẩm</SelectItem>
                         {APPLICABLE_PRODUCT_OPTIONS.map(opt => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
@@ -119,7 +119,7 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
             {/* Row 2: Date range + actions */}
             <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">From:</span>
+                    <span className="text-sm text-muted-foreground">Từ:</span>
                     <Input
                         type="date"
                         value={filters.startDate}
@@ -128,7 +128,7 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
                     />
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">To:</span>
+                    <span className="text-sm text-muted-foreground">Đến:</span>
                     <Input
                         type="date"
                         value={filters.endDate}
@@ -139,13 +139,13 @@ export function VoucherFilters({ filters, onFiltersChange, onSearch, onRefresh, 
 
                 <div className="ml-auto flex items-center gap-2">
                     <Button size="sm" onClick={onSearch} disabled={loading}>
-                        <Search className="mr-1 h-4 w-4" /> Search
+                        <Search className="mr-1 h-4 w-4" /> Tìm kiếm
                     </Button>
                     <Button variant="outline" size="sm" onClick={onClearFilters}>
-                        <X className="mr-1 h-4 w-4" /> Clear
+                        <X className="mr-1 h-4 w-4" /> Xóa bộ lọc
                     </Button>
                     <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
-                        <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+                        <RefreshCw className={`mr-1 h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Làm mới
                     </Button>
                 </div>
             </div>

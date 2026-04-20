@@ -8,11 +8,11 @@ import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { VoucherFilters, type VoucherFiltersState } from './components/VoucherFilters';
-import { VoucherTable } from './components/VoucherTable';
+import { VoucherFilters, type VoucherFiltersState } from '@/pages/admin/vouchers/components/VoucherFilters';
+import { VoucherTable } from '@/pages/admin/vouchers/components/VoucherTable';
 import { useVouchers } from '@/hooks/voucher';
 import type { AdminVoucherQueryParams } from '@/services/api/voucherService';
-import type { VoucherResponse, VoucherScope } from '@/types/voucher';
+import type { VoucherResponse } from '@/types/voucher';
 
 const initialFilters: VoucherFiltersState = {
     searchCode: '',
@@ -24,11 +24,7 @@ const initialFilters: VoucherFiltersState = {
     endDate: '',
 };
 
-interface AdminVouchersPageProps {
-    scope?: VoucherScope;
-}
-
-export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
+export default function VendorVouchersPage() {
     const navigate = useNavigate();
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -47,20 +43,16 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
         if (appliedFilters.searchCode.trim()) params.code = appliedFilters.searchCode.trim();
         if (appliedFilters.filterType) params.voucherType = appliedFilters.filterType;
         if (appliedFilters.filterStatus) params.status = appliedFilters.filterStatus;
-        
-        // Scope priority: Prop scope > Filter scope
-        const finalScope = scope || appliedFilters.filterScope;
-        if (finalScope) params.scope = finalScope;
-        
         if (appliedFilters.filterProduct) params.applicableProduct = appliedFilters.filterProduct;
         if (appliedFilters.startDate) params.startDate = appliedFilters.startDate;
         if (appliedFilters.endDate) params.endDate = appliedFilters.endDate;
         params.deleted = false;
 
         return params;
-    }, [currentPage, pageSize, sortBy, sortDir, appliedFilters, scope]);
+    }, [currentPage, pageSize, sortBy, sortDir, appliedFilters]);
 
-    const { vouchers, loading, totalElements, fetchVouchers, deleteVoucher } = useVouchers(queryParams);
+    // FETCH WITH VENDOR SCOPE
+    const { vouchers, loading, totalElements, fetchVouchers, deleteVoucher } = useVouchers(queryParams, 'VENDOR');
 
     const handleSort = (field: string) => {
         if (sortBy === field) {
@@ -89,61 +81,54 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
         setDeleteTarget(null);
     };
 
-    // Calculate quick stats (simplified)
     const stats = useMemo(() => {
         return {
             total: totalElements,
-            active: vouchers.filter(v => v.status === 'ACTIVE').length,
             used: vouchers.reduce((acc, v) => acc + (v.usageCount || 0), 0)
         };
     }, [vouchers, totalElements]);
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto space-y-6 p-6">
             {/* Quick Stats Header */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <StatsCard
-                    title="Tổng Voucher"
+                    title="Tổng Voucher của tôi"
                     value={stats.total}
                     icon={<Tag className="h-6 w-6 text-white" />}
                     iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
                 />
                 <StatsCard
-                    title="Lượt sử dụng"
+                    title="Tổng lượt sử dụng"
                     value={stats.used}
                     icon={<Clock className="h-6 w-6 text-white" />}
                     iconBg="bg-gradient-to-br from-emerald-500 to-green-600"
                 />
                 <StatsCard
-                    title="Tỷ lệ sử dụng"
-                    value={`${stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%`}
+                    title="Hiệu suất sử dụng"
+                    value={`${stats.total > 0 ? Math.round((stats.used / (vouchers.reduce((acc,v) => acc + (v.usageLimit || 1), 0))) * 100) : 0}%`}
                     icon={<BarChart2 className="h-6 w-6 text-white" />}
                     iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
                 />
             </div>
 
-            <Card className={`overflow-hidden border-t-4 ${scope === 'PLATFORM' ? 'border-t-accent-gold' : 'border-t-primary'}`}>
+            <Card className="overflow-hidden border-t-4 border-t-primary">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                     <div>
-                        <CardTitle className="text-xl">
-                            {scope === 'PLATFORM' ? 'Quản lý Voucher Hệ thống' : 
-                             scope === 'VENDOR' ? 'Quản lý Voucher Đối tác' : 
-                             'Quản lý Voucher'}
-                        </CardTitle>
+                        <p className="text-sm text-muted-foreground mb-1">Chương trình khuyến mãi</p>
+                        <CardTitle className="text-xl">Quản lý Voucher Đối tác</CardTitle>
                         <CardDescription>
-                            {scope === 'PLATFORM' ? 'Quản lý các mã giảm giá chính thức từ hệ thống Ngũ Hành Sơn' : 
-                             scope === 'VENDOR' ? 'Quản lý các mã giảm giá từ các đối tác' : 
-                             'Quản lý tất cả voucher trong hệ thống'}
+                            Tự thiết lập các mã giảm giá và quà tặng để thu hút khách hàng đến với dịch vụ của bạn
                         </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Button variant="outline" onClick={() => navigate('/admin/vouchers/deleted')}>
+                        <Button variant="outline" onClick={() => navigate('/vendor/vouchers/deleted')}>
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Voucher đã xóa
+                            Thùng rác
                         </Button>
-                        <Button onClick={() => navigate('/admin/vouchers/create')}>
+                        <Button onClick={() => navigate('/vendor/vouchers/create')}>
                             <Plus className="mr-2 h-4 w-4" />
-                            Tạo Voucher
+                            Tạo Voucher Mới
                         </Button>
                     </div>
                 </CardHeader>
@@ -155,7 +140,7 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
                         onRefresh={fetchVouchers}
                         onClearFilters={handleClearFilters}
                         loading={loading}
-                        hideScope={!!scope}
+                        hideScope={true} // Vendor only sees their own scope
                     />
 
                     <VoucherTable
@@ -168,7 +153,7 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
                         onPageChange={setCurrentPage}
                         onPageSizeChange={(size) => { setPageSize(size); setCurrentPage(1); }}
                         onDelete={(v) => setDeleteTarget(v)}
-                        scope={scope}
+                        scope="VENDOR"
                     />
                 </CardContent>
             </Card>
@@ -179,7 +164,8 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Xóa Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Bạn có chắc chắn muốn xóa voucher "{deleteTarget?.code}"? Hành động này có thể khôi phục sau.
+                            Bạn có chắc chắn muốn xóa voucher "{deleteTarget?.code}"? 
+                            Voucher sẽ được chuyển vào thùng rác và có thể khôi phục sau.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -190,7 +176,6 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
-
         </div>
     );
 }

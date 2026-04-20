@@ -100,12 +100,12 @@ export default function AdminEventsPage() {
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                     <div>
-                        <CardTitle className="text-xl">Event Management</CardTitle>
-                        <CardDescription>Manage all events in the system</CardDescription>
+                        <CardTitle className="text-xl">Quản lý sự kiện</CardTitle>
+                        <CardDescription>Quản lý tất cả sự kiện trong hệ thống</CardDescription>
                     </div>
                     <Button onClick={() => navigate('/admin/events/create')}>
                         <Plus className="mr-2 h-4 w-4" />
-                        Create Event
+                        Tạo sự kiện
                     </Button>
                 </CardHeader>
                 <CardContent>
@@ -145,15 +145,15 @@ export default function AdminEventsPage() {
             <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Hide Event</AlertDialogTitle>
+                        <AlertDialogTitle>Ẩn sự kiện</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to hide "{deleteTarget?.name}"? The event will be hidden and can be restored later.
+                            Bạn có chắc chắn muốn ẩn "{deleteTarget?.name}"? Sự kiện sẽ bị ẩn và có thể khôi phục sau.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Hide Event
+                            Ẩn sự kiện
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -163,14 +163,14 @@ export default function AdminEventsPage() {
             <AlertDialog open={!!restoreTarget} onOpenChange={(open) => !open && setRestoreTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Restore Event</AlertDialogTitle>
+                        <AlertDialogTitle>Khôi phục sự kiện</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to restore "{restoreTarget?.name}"? The event will become active again.
+                            Bạn có chắc chắn muốn khôi phục "{restoreTarget?.name}"? Sự kiện sẽ hoạt động trở lại.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleRestoreConfirm}>Restore</AlertDialogAction>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleRestoreConfirm}>Khôi phục</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
