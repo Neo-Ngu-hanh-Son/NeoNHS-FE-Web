@@ -4,31 +4,31 @@
  * Reuses the same form components as BlogCreationPage.
  */
 
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { message } from "antd";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { message } from 'antd';
+import { ArrowLeft, Save, Loader2 } from 'lucide-react';
+import { useRef } from 'react';
 
-import { BlogFormProvider, useBlogForm } from "@/contexts/Blog/BlogFormContext";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import BlogDetailsSection from "@/components/blog/creationForm/BlogDetailsSection";
-import BlogEditorSection from "@/components/blog/creationForm/BlogEditorSection";
-import BlogPublishingSection from "@/components/blog/creationForm/BlogPublishingSection";
-import BlogCategorySection from "@/components/blog/creationForm/BlogCategorySection";
-import BlogTagsSection from "@/components/blog/creationForm/BlogTagsSection";
-import BlogMediaSection from "@/components/blog/creationForm/BlogMediaSection";
+import { BlogFormProvider, useBlogForm } from '@/contexts/Blog/BlogFormContext';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import BlogDetailsSection from '@/components/blog/creationForm/BlogDetailsSection';
+import BlogEditorSection from '@/components/blog/creationForm/BlogEditorSection';
+import BlogPublishingSection from '@/components/blog/creationForm/BlogPublishingSection';
+import BlogCategorySection from '@/components/blog/creationForm/BlogCategorySection';
+import BlogTagsSection from '@/components/blog/creationForm/BlogTagsSection';
+import BlogMediaSection from '@/components/blog/creationForm/BlogMediaSection';
 
-import { blogService } from "@/services/api/blogService";
-import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
-import { BlogStatus } from "@/types/blog";
-import type { BlogResponse } from "@/types/blog";
-import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
-import { Spinner } from "@/components/ui/spinner";
+import { blogService } from '@/services/api/blogService';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { BlogStatus } from '@/types/blog';
+import type { BlogResponse } from '@/types/blog';
+import { BlogEditorRef, EditorSaveResult, BlogFormSchema } from '@/components/blog/type';
+import { Spinner } from '@/components/ui/spinner';
 
 function BlogEditPageInner() {
   const { id } = useParams<{ id: string }>();
@@ -39,20 +39,20 @@ function BlogEditPageInner() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof BlogFormSchema>>({
+    resolver: zodResolver(BlogFormSchema),
     defaultValues: {
-      title: "",
-      slug: "",
-      summary: "",
-      contentJSON: "",
-      contentHTML: "",
+      title: '',
+      slug: '',
+      summary: '',
+      contentJSON: '',
+      contentHTML: '',
       status: BlogStatus.DRAFT,
       isFeatured: false,
-      categoryId: "",
-      tags: "",
-      thumbnailUrl: "",
-      bannerUrl: "",
+      categoryId: '',
+      tags: '',
+      thumbnailUrl: '',
+      bannerUrl: '',
     },
   });
 
@@ -64,31 +64,31 @@ function BlogEditPageInner() {
       try {
         setLoading(true);
         const res = await blogService.getBlogById(id);
-        console.log("Fetched blog data: ", res);
+        console.log('Fetched blog data: ', res);
         if (res.data) {
           const b = res.data;
           setBlog(b);
           form.reset({
-            title: b.title ?? "",
-            slug: b.slug ?? "",
-            summary: b.summary ?? "",
-            contentJSON: b.contentJSON ?? "",
-            contentHTML: b.contentHTML ?? "",
+            title: b.title ?? '',
+            slug: b.slug ?? '',
+            summary: b.summary ?? '',
+            contentJSON: b.contentJSON ?? '',
+            contentHTML: b.contentHTML ?? '',
             status: b.status ?? BlogStatus.DRAFT,
             isFeatured: b.isFeatured ?? false,
-            categoryId: b.blogCategory?.id ?? "",
-            tags: b.tags ?? "",
-            thumbnailUrl: b.thumbnailUrl ?? "",
-            bannerUrl: b.bannerUrl ?? "",
+            categoryId: b.blogCategory?.id ?? '',
+            tags: b.tags ?? '',
+            thumbnailUrl: b.thumbnailUrl ?? '',
+            bannerUrl: b.bannerUrl ?? '',
           });
         } else {
-          message.error(res.message || "Blog not found, redirecting...", 5, () => {
-            navigate("/admin/blog");
+          message.error(res.message || 'Blog not found, redirecting...', 5, () => {
+            navigate('/admin/blog');
           });
         }
       } catch (err: unknown) {
-        message.error(getApiErrorMessage(err, "Failed to load blog, redirecting..."), 5, () => {
-          navigate("/admin/blog");
+        message.error(getApiErrorMessage(err, 'Failed to load blog, redirecting...'), 5, () => {
+          navigate('/admin/blog');
         });
       } finally {
         setLoading(false);
@@ -102,7 +102,7 @@ function BlogEditPageInner() {
     if (!id) return;
 
     if (content.charCount < 30) {
-      message.warning("Blog content must be at least 30 characters");
+      message.warning('Blog content must be at least 30 characters');
       return;
     }
 
@@ -119,34 +119,34 @@ function BlogEditPageInner() {
     try {
       const res = await blogService.updateBlog(id, payload);
       if (res.success || res.data) {
-        message.success("Blog updated successfully!");
-        navigate("/admin/blog");
+        message.success('Blog updated successfully!');
+        navigate('/admin/blog');
       } else {
-        message.error(res.message || "Failed to update blog");
+        message.error(res.message || 'Failed to update blog');
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, "An error occurred while updating the blog"));
+      message.error(getApiErrorMessage(err, 'An error occurred while updating the blog'));
     } finally {
       setSubmitting(false);
     }
   };
 
-  function submitHandler(_data: z.infer<typeof formSchema>) {
+  function submitHandler(_data: z.infer<typeof BlogFormSchema>) {
     if (editorRef.current) {
       editorRef.current.save();
     } else {
-      message.error("Editor not ready");
+      message.error('Editor not ready');
     }
   }
 
   const handlePublish = form.handleSubmit(
     (data) => submitHandler(data),
     (errors) => {
-      console.log("Blog form validation errors:", errors);
+      console.log('Blog form validation errors:', errors);
     },
   );
 
-  const isPublished = form.watch("status") === BlogStatus.PUBLISHED;
+  const isPublished = form.watch('status') === BlogStatus.PUBLISHED;
 
   if (loading) {
     return (
@@ -195,7 +195,7 @@ function BlogEditPageInner() {
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                {isPublished ? "Publish" : "Save Blog"}
+                {isPublished ? 'Publish' : 'Save Blog'}
               </>
             )}
           </Button>

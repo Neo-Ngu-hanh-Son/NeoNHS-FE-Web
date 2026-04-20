@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { message } from 'antd';
 import { checkinPointService } from '@/services/api/checkinPointService';
-import { pointService } from '@/services/api/pointService';
+import { adminPointService } from '@/services/api/pointService';
 import type { PointResponse } from '@/types/point';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import type {
@@ -75,7 +75,7 @@ export function useAdminCheckinPoints(
   const fetchParentPoints = useCallback(async () => {
     setParentPointsLoading(true);
     try {
-      const response = await pointService.getAllPointsWithPagination({
+      const response = await adminPointService.getAllPointsWithPaginationAdmin({
         page: 0,
         size: 1000,
         sortBy: 'name',

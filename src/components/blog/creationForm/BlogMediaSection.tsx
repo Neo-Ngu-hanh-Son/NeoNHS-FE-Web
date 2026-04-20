@@ -1,12 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { message } from "antd";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
-import { Label } from "@/components/ui/label";
-import DragImageUploader from "@/components/common/DragImageUploader";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { message } from 'antd';
+import { Controller, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { BlogFormSchema } from '@/components/blog/type';
+import { Label } from '@/components/ui/label';
+import DragImageUploader from '@/components/common/DragImageUploader';
 
-export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof BlogFormSchema>> }) {
   const [messageApi] = message.useMessage();
   return (
     <Card>

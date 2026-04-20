@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { message } from 'antd';
 import * as XLSX from 'xlsx';
 import { attractionService } from '@/services/api/attractionService';
-import { pointService } from '@/services/api/pointService';
+import { adminPointService } from '@/services/api/pointService';
 import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudinary';
 import { PointRequest } from '@/types/point';
 import { Destination, Point, MapPickerTarget } from '../types';
@@ -61,7 +61,7 @@ export function useAdminDestinations() {
         try {
             let response;
             if (destinationId && destinationId !== 'all') {
-                response = await pointService.getPointsWithPagination(destinationId, {
+                response = await adminPointService.getPointsWithPaginationAdmin(destinationId, {
                     page,
                     size,
                     search,
@@ -69,7 +69,7 @@ export function useAdminDestinations() {
                     sortDir: 'desc'
                 });
             } else {
-                response = await pointService.getAllPointsWithPagination({
+                response = await adminPointService.getAllPointsWithPaginationAdmin({
                     page,
                     size,
                     search,
@@ -151,10 +151,10 @@ export function useAdminDestinations() {
             let response;
             if (editingPoint && editingPoint.id) {
                 console.log('Action: Update - ID:', editingPoint.id);
-                response = await pointService.updatePoint(editingPoint.id, sanitizedValues);
+                response = await adminPointService.updatePoint(editingPoint.id, sanitizedValues);
             } else {
                 console.log('Action: Create');
-                response = await pointService.createPoint(sanitizedValues);
+                response = await adminPointService.createPoint(sanitizedValues);
             }
 
             console.log('Response Status:', response.success);
@@ -190,7 +190,7 @@ export function useAdminDestinations() {
 
     const handleDeletePoint = async (pointId: string) => {
         try {
-            const response = await pointService.deletePoint(pointId);
+            const response = await adminPointService.deletePoint(pointId);
             if (response.success) {
                 message.success('Point deleted successfully');
                 fetchPoints();
@@ -202,7 +202,7 @@ export function useAdminDestinations() {
 
     const handleRestorePoint = async (pointId: string) => {
         try {
-            const response = await pointService.restorePoint(pointId);
+            const response = await adminPointService.restorePoint(pointId);
             if (response.success) {
                 message.success('Point restored successfully');
                 fetchPoints();
@@ -249,7 +249,7 @@ export function useAdminDestinations() {
                             continue;
                         }
 
-                        const response = await pointService.createPoint(pointData);
+                        const response = await adminPointService.createPoint(pointData);
                         if (response.success) successCount++;
                         else failCount++;
                     } catch {

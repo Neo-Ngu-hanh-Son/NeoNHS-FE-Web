@@ -26,7 +26,7 @@ export type BlogEditorRef = {
   getJSON: () => string;
 };
 
-export const formSchema = z.object({
+export const BlogFormSchema = z.object({
   title: z.string().min(10, "Tiêu đề cần ít nhất 10 ký tự").max(100, "Tiêu đề không được vượt quá 100 ký tự"),
   slug: z.string().optional(),
   summary: z

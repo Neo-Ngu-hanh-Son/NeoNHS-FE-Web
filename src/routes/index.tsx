@@ -82,15 +82,7 @@ export const router = createBrowserRouter([
           { path: '/new-password', element: <NewPassword /> },
           { path: '/set-password', element: <SetPasswordPage /> },
           { path: '/places/:placeId/panorama', element: <PanoramaScreen /> },
-          {
-            path: '/places/:pointId/checkin-points/:checkinPointId/panorama',
-            element: <PanoramaScreen />,
-          },
           { path: '/places/panorama/mobile', element: <PanoramaScreenMobile /> },
-          {
-            path: '/places/checkin-points/panorama/mobile',
-            element: <PanoramaScreenMobile />,
-          },
         ],
       },
       {

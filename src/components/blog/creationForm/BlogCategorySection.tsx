@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBlogForm } from '@/contexts/Blog/BlogFormContext';
 import { Controller, UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
-import { formSchema } from '@/components/blog/type';
+import { BlogFormSchema } from '@/components/blog/type';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Button, Input } from '@/components/ui';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -26,7 +26,7 @@ import { message } from 'antd';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 import { useBlogCategories } from '@/hooks/blog/useBlogCategories';
 
-export default function BlogCategorySection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogCategorySection({ form }: { form: UseFormReturn<z.infer<typeof BlogFormSchema>> }) {
   const { categories, fetchAllCategories } = useBlogCategories();
   const [formValues, setFormValues] = useState<BlogCategoryRequest>({
     name: '',

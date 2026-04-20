@@ -1,24 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Viewer } from "@photo-sphere-viewer/core";
-import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
-import "@photo-sphere-viewer/core/index.css";
-import "@photo-sphere-viewer/markers-plugin/index.css";
-import "../styles/panorama.css";
-import { getNormalMarkerHTML } from "../helpers/panoramaHelpers";
-import InfoPanel, { type InfoPanelContent } from "../components/InfoPanel";
-import ViewTitle from "../components/ScreenComponents/ViewTitle";
-import { panoramaService } from "@/services/api/panoramaService";
-import type { PointPanoramaResponse, PanoramaHotSpotResponse } from "@/types";
-import PanoramaError from "../components/PanoramaError";
-import PanoramaLoading from "../components/PanoramaLoading";
-import PanoramaBackButton from "../components/ScreenComponents/PanoramaBackButton";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Viewer } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import '@photo-sphere-viewer/core/index.css';
+import '@photo-sphere-viewer/markers-plugin/index.css';
+import '../styles/panorama.css';
+import { getLinkMarkerHTML, getNormalMarkerHTML } from '../helpers/panoramaHelpers';
+import InfoPanel, { type InfoPanelContent } from '../components/InfoPanel';
+import ViewTitle from '../components/ScreenComponents/ViewTitle';
+import { panoramaService } from '@/services/api/panoramaService';
+import type { PointPanoramaResponse, PanoramaHotSpotResponse } from '@/types';
+import adminPointService from '@/services/api/pointService';
+import { PointResponse } from '@/types/point';
+import { PanoramaHelper } from '@/utils/PanoramaHelper';
+import ErrorModal from '../components/ErrorModal';
+import PanoramaLoading from '../components/PanoramaLoading';
+import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButton';
 
 export default function PanoramaScreen() {
-  const { placeId } = useParams<{ placeId: string }>();
+  const { placeId: urlPlaceId } = useParams<{ placeId: string }>();
 
-  // ─── Data fetching state ───
-  const [place, setPlace] = useState<PointPanoramaResponse | null>(null);
+  // ─── State ───
+  const [currentPano, setCurrentPano] = useState<PointPanoramaResponse | null>(null);
+  const [currentPlace, setCurrentPlace] = useState<PointResponse | null>(null);
+  const [activePanoramaId, setActivePanoramaId] = useState<string | null>(null);
+  const [placeId, setPlaceId] = useState<string | null>(urlPlaceId || null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,160 +32,191 @@ export default function PanoramaScreen() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelContent, setPanelContent] = useState<InfoPanelContent | undefined>(undefined);
 
-  // Stable ref so the PSV button callback always sees the latest toggle fn
+  const viewerRef = useRef<Viewer | null>(null);
+  const firstVisitRef = useRef(true);
+
+  // ─── Info Panel Toggle ───
   const togglePlacePanelRef = useRef<() => void>(() => {});
   togglePlacePanelRef.current = () => {
-    // When toggling via the ℹ button, show place-level info
     setPanelContent({
-      title: place?.name ?? "",
-      subtitle: place?.address ?? undefined,
-      description: place?.description ?? "",
+      title: currentPlace?.name ?? '',
+      description: currentPlace?.description ?? '',
     });
     setIsPanelOpen((prev) => !prev);
   };
 
   const handleClosePanel = useCallback(() => setIsPanelOpen(false), []);
 
-  // ─── Viewer refs ───
-  const containerRef = useRef<HTMLDivElement>(null);
-  const viewerRef = useRef<Viewer | null>(null);
-
-  const isMobile = navigator.userAgent.includes("NeoNHS-Mobile");
-
-  // ─── Fetch panorama data (With pre-data might be sent from the mobile) ───
+  // ─── 1. Place-level Effect (Metadata) ───
   useEffect(() => {
     if (!placeId) return;
+    if (currentPlace?.id === placeId) return;
 
-    // 1. Check if React Native already injected the data
-    const injectedData = (window as any).preLoadedPanoramaData;
-
-    if (injectedData) {
-      console.log("Using injected data from Native side ", injectedData);
-      setPlace(injectedData);
-      setIsLoading(false);
-
-      // Clean up the global variable so it doesn't persist weirdly
-      delete (window as any).preLoadedPanoramaData;
-      return;
-    }
-
-    // 2. Fallback to normal fetching if no injected data exists
     let cancelled = false;
-    (async () => {
+    const fetchPlace = async () => {
       try {
-        setIsLoading(true);
-        console.log("Fetching panorama data for placeId:", placeId);
-        const data = await panoramaService.getPointPanorama(placeId);
-        if (!cancelled) setPlace(data);
+        if (!firstVisitRef.current) setIsLoading(true);
+        const response = await adminPointService.getPointById(placeId);
+        if (cancelled) return;
+
+        setCurrentPlace(response.data);
+
+        // Reset to default if current pano doesn't belong to new place
+        const belongs = response.data.panoramas?.some((p) => p.id === activePanoramaId);
+        if (!belongs) {
+          const defaultPano = PanoramaHelper.getDefaultPanorama(response.data.panoramas ?? []);
+          setActivePanoramaId(defaultPano?.id || null);
+        }
       } catch (err: any) {
         if (!cancelled) setError(err.message);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        setIsLoading(false);
+        firstVisitRef.current = false;
       }
-    })();
+    };
 
+    fetchPlace();
     return () => {
       cancelled = true;
     };
   }, [placeId]);
 
-  // ─── Initialize viewer once place data is available ───
+  // ─── 2. Panorama-level Effect (Navigation) ───
   useEffect(() => {
-    if (!containerRef.current || !place) return;
+    if (!activePanoramaId) return;
 
-    let viewer: Viewer | null = null;
-    let frameId: number;
+    let cancelled = false;
+    const fetchPano = async () => {
+      try {
+        const activePanoData = await panoramaService.getPanoramaById(activePanoramaId);
+        if (cancelled) return;
 
-    frameId = requestAnimationFrame(() => {
-      if (!containerRef.current) return;
+        setCurrentPano(activePanoData);
+        if (activePanoData.placeId !== placeId) {
+          setPlaceId(activePanoData.placeId);
+        }
+      } catch (err: any) {
+        if (!cancelled) setError(err.message);
+      }
+    };
 
-      viewer = new Viewer({
-        container: containerRef.current,
-        panorama: place.panoramaImageUrl,
-        navbar: [
-          "zoom",
-          {
-            id: "custom-info",
-            title: "Location Info",
-            className: "psv-custom-info-button",
-            content:
-              '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.25v2.25a.75.75 0 001.5 0V10A.75.75 0 0010 9H9z" clip-rule="evenodd"/></svg>',
-            onClick: () => togglePlacePanelRef.current(),
-          },
-          "caption",
-        ],
-        plugins: [[MarkersPlugin, {}]],
-        minFov: 30,
-        maxFov: 120,
-        defaultZoomLvl: 50,
-        defaultYaw: place.defaultYaw ?? 0,
-        defaultPitch: place.defaultPitch ?? 0,
-        loadingTxt: "Loading panorama…",
-        moveSpeed: isMobile ? 1.5 : 1,
-        zoomSpeed: isMobile ? 1.2 : 1,
+    fetchPano();
+    return () => {
+      cancelled = true;
+    };
+  }, [activePanoramaId]);
+
+  // ─── 3. Initialize Viewer (Once) ───
+  useLayoutEffect(() => {
+    if (!containerRef.current || viewerRef.current) return;
+
+    const viewer = new Viewer({
+      container: containerRef.current,
+      navbar: [
+        'zoom',
+        {
+          id: 'custom-info',
+          title: 'Location Info',
+          content: '<svg ...></svg>', // Use your SVG here
+          onClick: () => togglePlacePanelRef.current(),
+        },
+        'caption',
+        'fullscreen',
+      ],
+      plugins: [[MarkersPlugin, {}]],
+      defaultZoomLvl: 50,
+    });
+
+    const markersPlugin = viewer.getPlugin(MarkersPlugin);
+
+    markersPlugin.addEventListener('select-marker', ({ marker }) => {
+      const data = marker.data as PanoramaHotSpotResponse | undefined;
+      if (!data) return;
+
+      if (data.type === 'INFO') {
+        marker.domElement.classList.add('scale-125');
+        setPanelContent({
+          title: data.title,
+          description: data.description,
+          imageUrl: data.imageUrl ?? undefined,
+        });
+        setIsPanelOpen(true);
+      } else if (data.type === 'LINK') {
+        setActivePanoramaId(data.targetPanoramaId);
+      }
+    });
+
+    markersPlugin.addEventListener('unselect-marker', ({ marker }) => {
+      marker.domElement.classList.remove('scale-125');
+    });
+
+    viewerRef.current = viewer;
+    return () => viewer.destroy();
+  }, []);
+
+  // ─── 4. Scene Update Effect ───
+  useEffect(() => {
+    if (!currentPlace || !currentPano || !viewerRef.current) return;
+
+    let cancelled = false;
+    const viewer = viewerRef.current;
+    const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
+
+    (async () => {
+      markersPlugin.clearMarkers();
+
+      await viewer.setPanorama(currentPano.panoramaImageUrl, {
+        transition: true,
+        showLoader: true,
       });
 
-      const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
+      if (cancelled) return;
 
-      // Add markers from backend data
-      place.hotSpots.forEach((m: PanoramaHotSpotResponse) => {
+      await viewer.animate({
+        yaw: currentPano.defaultYaw ?? 0,
+        pitch: currentPano.defaultPitch ?? 0,
+        speed: 1000,
+      });
+
+      currentPano.hotSpots.forEach((m) => {
         markersPlugin.addMarker({
           id: m.id,
           position: { yaw: m.yaw, pitch: m.pitch },
           tooltip: m.tooltip,
-          anchor: "bottom center",
-          size: { width: 24, height: 24 },
-          html: getNormalMarkerHTML(),
-          data: m, // stash the full marker data so we can read it on click
+          anchor: 'bottom center',
+          size: { width: 28, height: 28 }, // Slightly larger for desktop
+          html: m.type === 'INFO' ? getNormalMarkerHTML() : getLinkMarkerHTML(),
+          data: m,
         });
       });
-
-      markersPlugin.addEventListener("select-marker", ({ marker }) => {
-        const data = marker.data as PanoramaHotSpotResponse | undefined;
-        if (!data) return;
-        marker.domElement.classList.add("scale-125");
-        setPanelContent({
-          title: data.title,
-          subtitle: place.name ? `At ${place.name}` : undefined,
-          description: data.description,
-          imageUrl: data.imageUrl ? data.imageUrl : undefined,
-        });
-        setIsPanelOpen(true);
-      });
-
-      markersPlugin.addEventListener("unselect-marker", ({ marker }) => {
-        marker.domElement.classList.remove("scale-125");
-      });
-
-      viewerRef.current = viewer;
-    });
+    })();
 
     return () => {
-      cancelAnimationFrame(frameId);
-      viewer?.destroy();
-      viewerRef.current = null;
+      cancelled = true;
     };
-  }, [place]);
+  }, [currentPlace, currentPano]);
 
-  // ─── Loading state ───
-  if (isLoading) {
-    return <PanoramaLoading />;
-  }
+  const handleRetry = () => {
+    setError(null);
+    const id = activePanoramaId;
+    setActivePanoramaId(null);
+    setTimeout(() => setActivePanoramaId(id), 50);
+  };
 
-  // ─── Error state ───
-  if (error || !place) {
-    return <PanoramaError error={error || "Failed to load panorama"} />;
-  }
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  if (isLoading && firstVisitRef.current) return <PanoramaLoading />;
 
   return (
-    <div className="w-screen h-screen overflow-hidden relative">
+    <div className="w-screen h-screen overflow-hidden relative bg-[#0f1115]">
       <ViewTitle>
-        {!isMobile && <PanoramaBackButton />}
-        {place.name}
+        <PanoramaBackButton />
+        {currentPlace?.name || 'Loading...'}
       </ViewTitle>
+
       <div ref={containerRef} className="psv-container w-full h-full z-10" />
 
-      {/* Info panel — shows place info or marker detail depending on what was tapped */}
+      <ErrorModal error={error} onRetry={handleRetry} onClose={() => setError(null)} />
       <InfoPanel isOpen={isPanelOpen} onClose={handleClosePanel} content={panelContent} />
     </div>
   );
