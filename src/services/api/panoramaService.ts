@@ -19,27 +19,10 @@ export const panoramaService = {
     return res.data;
   },
 
-  /**
-   * @deprecated Prefer getPointPanoramas.
-   * Returns default panorama if present, otherwise first panorama.
-   */
-  getPointPanorama: async (pointId: string): Promise<PointPanoramaResponse> => {
-    const panoramas = await panoramaService.getPointPanoramas(pointId);
-    const selected = panoramas.find((item) => item.isDefault) ?? panoramas[0];
-
-    if (!selected) {
-      throw new Error("No panorama found for this point");
-    }
-
-    return selected;
-  },
-
-  /** Get panorama for a CheckinPoint */
-  getCheckinPointPanorama: async (
-    checkinPointId: string
-  ): Promise<PointPanoramaResponse> => {
+  /** Get panorama by ID */
+  getPanoramaById: async (panoramaId: string): Promise<PointPanoramaResponse> => {
     const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
-      `checkin-points/${checkinPointId}/panorama`
+      `/panoramas/${panoramaId}`
     );
     return res.data;
   },

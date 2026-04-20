@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Viewer } from "@photo-sphere-viewer/core";
-import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
-import "@photo-sphere-viewer/core/index.css";
-import "@photo-sphere-viewer/markers-plugin/index.css";
-import "../styles/panorama.css";
-import { getNormalMarkerHTML } from "../helpers/panoramaHelpers";
-import InfoPanel, { type InfoPanelContent } from "../components/InfoPanel";
-import ViewTitle from "../components/ScreenComponents/ViewTitle";
-import { panoramaService } from "@/services/api/panoramaService";
-import type { PointPanoramaResponse, PanoramaHotSpotResponse } from "@/types";
-import PanoramaError from "../components/PanoramaError";
-import PanoramaLoading from "../components/PanoramaLoading";
-import PanoramaBackButton from "../components/ScreenComponents/PanoramaBackButton";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Viewer } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import '@photo-sphere-viewer/core/index.css';
+import '@photo-sphere-viewer/markers-plugin/index.css';
+import '../styles/panorama.css';
+import { getNormalMarkerHTML } from '../helpers/panoramaHelpers';
+import InfoPanel, { type InfoPanelContent } from '../components/InfoPanel';
+import ViewTitle from '../components/ScreenComponents/ViewTitle';
+import { panoramaService } from '@/services/api/panoramaService';
+import type { PointPanoramaResponse, PanoramaHotSpotResponse } from '@/types';
+import PanoramaError from '../components/ErrorModal';
+import PanoramaLoading from '../components/PanoramaLoading';
+import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButton';
 
 export default function PanoramaScreen() {
   const { placeId } = useParams<{ placeId: string }>();
@@ -31,9 +31,9 @@ export default function PanoramaScreen() {
   togglePlacePanelRef.current = () => {
     // When toggling via the ℹ button, show place-level info
     setPanelContent({
-      title: place?.name ?? "",
+      title: place?.name ?? '',
       subtitle: place?.address ?? undefined,
-      description: place?.description ?? "",
+      description: place?.description ?? '',
     });
     setIsPanelOpen((prev) => !prev);
   };
@@ -44,7 +44,7 @@ export default function PanoramaScreen() {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
 
-  const isMobile = navigator.userAgent.includes("NeoNHS-Mobile");
+  const isMobile = navigator.userAgent.includes('NeoNHS-Mobile');
 
   // ─── Fetch panorama data (With pre-data might be sent from the mobile) ───
   useEffect(() => {
@@ -54,7 +54,7 @@ export default function PanoramaScreen() {
     const injectedData = (window as any).preLoadedPanoramaData;
 
     if (injectedData) {
-      console.log("Using injected data from Native side ", injectedData);
+      console.log('Using injected data from Native side ', injectedData);
       setPlace(injectedData);
       setIsLoading(false);
 
@@ -68,7 +68,7 @@ export default function PanoramaScreen() {
     (async () => {
       try {
         setIsLoading(true);
-        console.log("Fetching panorama data for placeId:", placeId);
+        console.log('Fetching panorama data for placeId:', placeId);
         const data = await panoramaService.getPointPanorama(placeId);
         if (!cancelled) setPlace(data);
       } catch (err: any) {
@@ -97,16 +97,16 @@ export default function PanoramaScreen() {
         container: containerRef.current,
         panorama: place.panoramaImageUrl,
         navbar: [
-          "zoom",
+          'zoom',
           {
-            id: "custom-info",
-            title: "Location Info",
-            className: "psv-custom-info-button",
+            id: 'custom-info',
+            title: 'Location Info',
+            className: 'psv-custom-info-button',
             content:
               '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.25v2.25a.75.75 0 001.5 0V10A.75.75 0 0010 9H9z" clip-rule="evenodd"/></svg>',
             onClick: () => togglePlacePanelRef.current(),
           },
-          "caption",
+          'caption',
         ],
         plugins: [[MarkersPlugin, {}]],
         minFov: 30,
@@ -114,7 +114,7 @@ export default function PanoramaScreen() {
         defaultZoomLvl: 50,
         defaultYaw: place.defaultYaw ?? 0,
         defaultPitch: place.defaultPitch ?? 0,
-        loadingTxt: "Loading panorama…",
+        loadingTxt: 'Loading panorama…',
         moveSpeed: isMobile ? 1.5 : 1,
         zoomSpeed: isMobile ? 1.2 : 1,
       });
@@ -127,17 +127,17 @@ export default function PanoramaScreen() {
           id: m.id,
           position: { yaw: m.yaw, pitch: m.pitch },
           tooltip: m.tooltip,
-          anchor: "bottom center",
+          anchor: 'bottom center',
           size: { width: 24, height: 24 },
           html: getNormalMarkerHTML(),
           data: m, // stash the full marker data so we can read it on click
         });
       });
 
-      markersPlugin.addEventListener("select-marker", ({ marker }) => {
+      markersPlugin.addEventListener('select-marker', ({ marker }) => {
         const data = marker.data as PanoramaHotSpotResponse | undefined;
         if (!data) return;
-        marker.domElement.classList.add("scale-125");
+        marker.domElement.classList.add('scale-125');
         setPanelContent({
           title: data.title,
           subtitle: place.name ? `At ${place.name}` : undefined,
@@ -147,8 +147,8 @@ export default function PanoramaScreen() {
         setIsPanelOpen(true);
       });
 
-      markersPlugin.addEventListener("unselect-marker", ({ marker }) => {
-        marker.domElement.classList.remove("scale-125");
+      markersPlugin.addEventListener('unselect-marker', ({ marker }) => {
+        marker.domElement.classList.remove('scale-125');
       });
 
       viewerRef.current = viewer;
@@ -168,7 +168,7 @@ export default function PanoramaScreen() {
 
   // ─── Error state ───
   if (error || !place) {
-    return <PanoramaError error={error || "Failed to load panorama"} />;
+    return <PanoramaError error={error || 'Failed to load panorama'} />;
   }
 
   return (

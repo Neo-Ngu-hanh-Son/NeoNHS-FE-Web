@@ -28,6 +28,7 @@ export interface PointPanoramaResponse {
   defaultYaw: number;
   defaultPitch: number;
   isDefault: boolean;
+  placeId: string;
   hotSpots: PanoramaHotSpotResponse[];
 }
 

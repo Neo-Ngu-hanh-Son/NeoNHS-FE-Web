@@ -3,11 +3,17 @@ import { PagedPointResponse, PointQueryParams, PointRequest, PointResponse } fro
 import { ApiResponse } from '../../types';
 
 export const pointService = {
-    getPointsByAttraction: async (attractionId: string): Promise<ApiResponse<PointResponse[]>> => {
+    getPointsById: async (id: string): Promise<ApiResponse<PointResponse>> => {
+        return apiClient.get<ApiResponse<PointResponse>>(`/points/${id}`);
+    }
+}
+
+export const adminPointService = {
+    getPointsByAttractionAdmin: async (attractionId: string): Promise<ApiResponse<PointResponse[]>> => {
         return apiClient.get<ApiResponse<PointResponse[]>>(`/admin/points/attraction/${attractionId}`);
     },
 
-    getPointsWithPagination: async (
+    getPointsWithPaginationAdmin: async (
         attractionId: string,
         params: PointQueryParams,
     ): Promise<ApiResponse<PagedPointResponse>> => {
@@ -23,7 +29,7 @@ export const pointService = {
         );
     },
 
-    getAllPointsWithPagination: async (
+    getAllPointsWithPaginationAdmin: async (
         params: PointQueryParams,
     ): Promise<ApiResponse<PagedPointResponse>> => {
         const query = new URLSearchParams();
@@ -57,4 +63,4 @@ export const pointService = {
     },
 };
 
-export default pointService;
+export default adminPointService;
