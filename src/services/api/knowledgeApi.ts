@@ -1,5 +1,7 @@
 import api from './apiClient';
 
+export type KnowledgeType = 'INFORMATION' | 'SYSTEM_PROMPT';
+
 export interface KnowledgeDocument {
     id: string;
     title: string;
@@ -7,6 +9,7 @@ export interface KnowledgeDocument {
     isActive: boolean;
     createdAt: string;
     updatedAt: string;
+    knowledgeType?: KnowledgeType;
 }
 
 export interface Page<T> {
@@ -17,20 +20,29 @@ export interface Page<T> {
     number: number;
 }
 
+export type KnowledgeDocumentPayload = {
+    title: string;
+    content: string;
+    knowledgeType?: KnowledgeType;
+    isActive?: boolean;
+};
+
 export const knowledgeApi = {
-    getDocuments: async (page = 0, size = 20) => {
-        return await api.get<Page<KnowledgeDocument> | KnowledgeDocument[]>(`/knowledge`, { params: { page, size } });
+    getDocuments: async (page = 0, size = 20, filters?: { knowledgeType?: KnowledgeType }) => {
+        return await api.get<Page<KnowledgeDocument> | KnowledgeDocument[]>(`/knowledge`, {
+            params: { page, size, ...filters },
+        });
     },
 
     getDocument: async (id: string) => {
         return await api.get<KnowledgeDocument>(`/knowledge/${id}`);
     },
 
-    createDocument: async (data: { title: string; content: string }) => {
+    createDocument: async (data: KnowledgeDocumentPayload) => {
         return await api.post<KnowledgeDocument>(`/knowledge`, data);
     },
 
-    updateDocument: async (id: string, data: { title: string; content: string }) => {
+    updateDocument: async (id: string, data: KnowledgeDocumentPayload) => {
         return await api.put<KnowledgeDocument>(`/knowledge/${id}`, data);
     },
 
@@ -38,6 +50,7 @@ export const knowledgeApi = {
         await api.delete(`/knowledge/${id}`);
     },
 
+    /** PATCH `/api/knowledge/{id}/visibility` — body: `{ "isActive": true | false }` */
     toggleVisibility: async (id: string, isActive: boolean) => {
         await api.patch(`/knowledge/${id}/visibility`, { isActive });
     },
