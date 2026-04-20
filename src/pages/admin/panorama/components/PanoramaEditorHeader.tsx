@@ -18,7 +18,6 @@ interface PanoramaEditorHeaderProps {
   variant?: 'page' | 'embedded';
   panorama: PointPanoramaResponse | null;
   targetId: string;
-  entityLabel: string;
   saving: boolean;
   hasImage: boolean;
   onSave: () => void;
@@ -32,7 +31,6 @@ export default function PanoramaEditorHeader({
   variant = 'page',
   panorama,
   targetId,
-  entityLabel,
   saving,
   hasImage,
   onSave,
@@ -40,33 +38,16 @@ export default function PanoramaEditorHeader({
   pointName,
   onBackToParent,
 }: PanoramaEditorHeaderProps) {
-  const navigate = useNavigate();
   const embedded = variant === 'embedded';
 
-  const handleBack = () => {
-    if (embedded && onBackToParent) {
-      onBackToParent();
-    } else {
-      navigate(-1);
-    }
-  };
-
-  const displayName = (pointName?.trim() || panorama?.name || '').trim();
-  const titleSuffix = displayName ? `: ${displayName}` : '';
+  const pointLabel = (pointName?.trim() || '').trim();
+  const panoramaLabel = (panorama?.title?.trim() || '').trim();
+  const titleSuffix = panoramaLabel ? `: ${panoramaLabel}` : pointLabel ? `: ${pointLabel}` : '';
+  const deleteTargetLabel = pointLabel || panoramaLabel || 'mục đã chọn';
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          size={embedded ? 'sm' : 'sm'}
-          className={embedded ? 'shrink-0 gap-2 px-2' : 'gap-1'}
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {embedded ? <span className="text-sm font-medium">Về thông tin điểm</span> : <span>Quay lại</span>}
-        </Button>
         <div className="min-w-0">
           <h1
             className={
@@ -75,9 +56,6 @@ export default function PanoramaEditorHeader({
           >
             {panorama ? 'Chỉnh sửa ảnh' : 'Tạo mới ảnh'} panorama{titleSuffix}
           </h1>
-          {/* <p className="text-sm text-muted-foreground">
-            {entityLabel} · {targetId}
-          </p> */}
         </div>
       </div>
 
@@ -106,7 +84,8 @@ export default function PanoramaEditorHeader({
               <AlertDialogHeader>
                 <AlertDialogTitle>Xóa panorama?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Thao tác này sẽ xóa vĩnh viễn ảnh panorama và mọi điểm nóng ({entityLabel}). Không thể hoàn tác.
+                  Thao tác này sẽ xóa vĩnh viễn ảnh panorama và mọi điểm nóng tại {deleteTargetLabel}. Không thể hoàn
+                  tác.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

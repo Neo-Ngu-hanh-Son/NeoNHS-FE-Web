@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, GripVertical } from "lucide-react";
-import type { HotSpotFormValues } from "../schema";
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Pencil, Trash2, GripVertical } from 'lucide-react';
+import type { HotSpotFormValues } from '../schema';
 
 interface HotSpotListProps {
   hotSpots: HotSpotFormValues[];
@@ -46,17 +46,21 @@ export default function HotSpotList({ hotSpots, onEdit, onDelete }: HotSpotListP
             <p className="text-xs text-muted-foreground truncate">
               {hs.tooltip} · yaw: {hs.yaw.toFixed(2)}, pitch: {hs.pitch.toFixed(2)}
             </p>
+            <div className="mt-1 flex items-center gap-2">
+              <Badge variant={hs.type === 'LINK' ? 'default' : 'secondary'} className="text-[10px]">
+                {hs.type}
+              </Badge>
+              {hs.type === 'LINK' && (
+                <span className="text-[10px] text-muted-foreground truncate">
+                  Panorama đang chọn: {hs.targetPanoramaId || 'Chưa chọn'}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-1 flex-shrink-0">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => onEdit(index)}
-              className="h-8 w-8 p-0"
-            >
+            <Button type="button" variant="ghost" size="sm" onClick={() => onEdit(index)} className="h-8 w-8 p-0">
               <Pencil className="h-3.5 w-3.5" />
             </Button>
             <Button

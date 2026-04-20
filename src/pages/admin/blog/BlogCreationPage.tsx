@@ -1,47 +1,49 @@
-import { BlogFormProvider, useBlogForm } from "@/contexts/Blog/BlogFormContext";
-import BlogFormHeaderSection from "@/components/blog/creationForm/BlogFormHeaderSection";
-import BlogDetailsSection from "@/components/blog/creationForm/BlogDetailsSection";
-import BlogEditorSection from "@/components/blog/creationForm/BlogEditorSection";
-import BlogPublishingSection from "@/components/blog/creationForm/BlogPublishingSection";
-import BlogCategorySection from "@/components/blog/creationForm/BlogCategorySection";
-import BlogTagsSection from "@/components/blog/creationForm/BlogTagsSection";
-import BlogMediaSection from "@/components/blog/creationForm/BlogMediaSection";
-import { useRef, useState } from "react";
-import { BlogEditorRef, EditorSaveResult, formSchema } from "@/components/blog/type";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { message } from "antd";
-import { BlogStatus } from "@/types/blog";
-import blogService from "@/services/api/blogService";
-import { useNavigate } from "react-router-dom";
+import { BlogFormProvider, useBlogForm } from '@/contexts/Blog/BlogFormContext';
+import BlogFormHeaderSection from '@/components/blog/creationForm/BlogFormHeaderSection';
+import BlogDetailsSection from '@/components/blog/creationForm/BlogDetailsSection';
+import BlogEditorSection from '@/components/blog/creationForm/BlogEditorSection';
+import BlogPublishingSection from '@/components/blog/creationForm/BlogPublishingSection';
+import BlogCategorySection from '@/components/blog/creationForm/BlogCategorySection';
+import BlogTagsSection from '@/components/blog/creationForm/BlogTagsSection';
+import BlogMediaSection from '@/components/blog/creationForm/BlogMediaSection';
+import { useRef, useState } from 'react';
+import { BlogEditorRef, EditorSaveResult, blogFormSchema } from '@/components/blog/type';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { message } from 'antd';
+import { BlogStatus } from '@/types/blog';
+import blogService from '@/services/api/blogService';
+import { useNavigate } from 'react-router-dom';
 
 function BlogCreationPageInner() {
   const [messageApi, contextHolder] = message.useMessage();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof blogFormSchema>>({
+    resolver: zodResolver(blogFormSchema),
     defaultValues: {
-      title: "",
-      slug: "",
-      summary: "",
-      contentJSON: "",
-      contentHTML: "",
+      title: '',
+      slug: '',
+      summary: '',
+      contentJSON: '',
+      contentHTML: '',
       status: BlogStatus.DRAFT,
       isFeatured: false,
-      categoryId: "",
-      tags: "",
-      thumbnailUrl: "",
-      bannerUrl: "",
+      categoryId: '',
+      tags: '',
+      thumbnailUrl: '',
+      bannerUrl: '',
     },
+    mode: 'onBlur',
   });
   const [loading, setLoading] = useState(false);
   const editorRef = useRef<BlogEditorRef>(null);
   const navigate = useNavigate();
+
   const handleSaveEditorState = async (content: EditorSaveResult) => {
-    console.log("Saving editor state: " + content);
+    console.log('Saving editor state: ' + content);
     if (content.charCount < 30) {
-      messageApi.warning("Blog content must be at least 30 characters");
+      messageApi.warning('Blog content must be at least 30 characters');
       return;
     }
     const formData = form.getValues();
@@ -56,10 +58,10 @@ function BlogCreationPageInner() {
       setLoading(true);
       const res = await blogService.createBlog(payload);
       if (res.success || res.data) {
-        messageApi.success("Blog created successfully!");
-        navigate("/admin/blog");
+        messageApi.success('Blog created successfully!');
+        navigate('/admin/blog');
       } else {
-        messageApi.error(res.message || "Failed to create blog");
+        messageApi.error(res.message || 'Failed to create blog');
       }
     } catch (error) {
       console.error(error);
@@ -69,12 +71,12 @@ function BlogCreationPageInner() {
     }
   };
 
-  function submitHandler(data: z.infer<typeof formSchema>) {
+  function submitHandler(data: z.infer<typeof blogFormSchema>) {
     if (editorRef.current) {
-      console.log("Saving form data: " + data);
+      console.log('Saving form data: ' + data);
       editorRef.current.save();
     } else {
-      console.error("Editor ref not found");
+      console.error('Editor ref not found');
     }
   }
 

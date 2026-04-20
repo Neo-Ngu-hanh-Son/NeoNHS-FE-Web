@@ -1,17 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BlogEditor from "@/components/blog/BlogEditor";
-import { uploadImageToCloudinary } from "@/utils/cloudinary";
-import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
-import { Ref } from "react";
-import { message, notification } from "antd";
-import { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import BlogEditor from '@/components/blog/BlogEditor';
+import { uploadImageToCloudinary } from '@/utils/cloudinary';
+import { BlogEditorRef, EditorSaveResult } from '@/components/blog/type';
+import { Ref } from 'react';
+import { message, notification } from 'antd';
+import { UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { blogFormSchema } from '@/components/blog/type';
 
 interface BlogEditorSectionProps {
   editorRef: Ref<BlogEditorRef>;
   handleSave: (content: EditorSaveResult) => Promise<void>;
-  form: UseFormReturn<z.infer<typeof formSchema>>;
+  form: UseFormReturn<z.infer<typeof blogFormSchema>>;
   editorPrestateJSON?: string;
 }
 
@@ -21,15 +21,15 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
       const resultUrl = await uploadImageToCloudinary(file);
-      console.log("Result url: " + resultUrl);
+      console.log('Result url: ' + resultUrl);
       if (!resultUrl) {
-        messageApi.error("Error uploading image, please try again");
+        messageApi.error('Error uploading image, please try again');
       }
-      return resultUrl || "";
+      return resultUrl || '';
     } catch (error) {
-      console.error("[BlogEditorSection] Error uploading image:", error);
-      messageApi.error("Error uploading image, please try again");
-      return "";
+      console.error('[BlogEditorSection] Error uploading image:', error);
+      messageApi.error('Error uploading image, please try again');
+      return '';
     }
   };
 

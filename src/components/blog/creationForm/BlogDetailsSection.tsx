@@ -1,16 +1,12 @@
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Controller, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { blogFormSchema } from '@/components/blog/type';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 
-export default function BlogDetailsSection({
-  form,
-}: {
-  form: UseFormReturn<z.infer<typeof formSchema>>;
-}) {
+export default function BlogDetailsSection({ form }: { form: UseFormReturn<z.infer<typeof blogFormSchema>> }) {
   return (
     <Card>
       <CardHeader>
@@ -19,7 +15,7 @@ export default function BlogDetailsSection({
       <CardContent className="space-y-4">
         <FieldGroup>
           <Controller
-            name={"title"}
+            name={'title'}
             control={form.control}
             render={({ field, fieldState }) => {
               return (
@@ -31,7 +27,7 @@ export default function BlogDetailsSection({
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter blog title"
                     autoComplete="off"
-                    className={`${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    className={`${fieldState.invalid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>
@@ -43,7 +39,7 @@ export default function BlogDetailsSection({
         {/* Summary */}
         <FieldGroup>
           <Controller
-            name={"summary"}
+            name={'summary'}
             control={form.control}
             render={({ field, fieldState }) => {
               return (
@@ -54,7 +50,7 @@ export default function BlogDetailsSection({
                     id="summary"
                     aria-invalid={fieldState.invalid}
                     placeholder="Enter a brief summary..."
-                    className={`min-h-[100px] ${fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    className={`min-h-[100px] ${fieldState.invalid ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
                   {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 </Field>

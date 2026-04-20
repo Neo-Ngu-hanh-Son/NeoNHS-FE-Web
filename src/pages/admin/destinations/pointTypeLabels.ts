@@ -5,7 +5,6 @@ export const POINT_TYPE_VI: Record<PointType, string> = {
     CAVE: 'Hang động',
     VIEWPOINT: 'Điểm ngắm cảnh',
     GENERAL: 'Chung',
-    CHECKIN: 'Check-in',
     STATUE: 'Tượng',
     GATE: 'Cổng',
     SHOP: 'Cửa hàng',

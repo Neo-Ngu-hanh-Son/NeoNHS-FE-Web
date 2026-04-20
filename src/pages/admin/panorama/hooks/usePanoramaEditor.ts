@@ -7,68 +7,75 @@ import { message } from "antd";
 /** Khi `embedPointId` có giá trị (nhúng trong modal POI), bỏ qua `pointId`/`checkinPointId` trên URL. */
 export interface UsePanoramaEditorOptions {
   embedPointId?: string;
+  panoramaId?: string;
 }
 
 export function usePanoramaEditor(options?: UsePanoramaEditorOptions) {
-  const params = useParams<{
-    pointId: string;
-    checkinPointId?: string;
-  }>();
+  const params = useParams<{ pointId: string }>();
+  const pointId = options?.embedPointId ?? params.pointId ?? "";
 
-  const pointId = options?.embedPointId ?? params.pointId;
-  const checkinPointId = options?.embedPointId ? undefined : params.checkinPointId;
-
-  const isCheckinPoint = Boolean(checkinPointId);
-  const targetId = isCheckinPoint ? checkinPointId! : pointId!;
-
-  const [panorama, setPanorama] = useState<PointPanoramaResponse | null>(null);
+  const [panoramas, setPanoramas] = useState<PointPanoramaResponse[]>([]);
+  const [selectedPanoramaId, setSelectedPanoramaId] = useState<string | null>(
+    options?.panoramaId ?? null
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPanorama = useCallback(async () => {
-    if (!targetId) {
-      setPanorama(null);
+  const selectedPanorama = panoramas.find((p) => p.id === selectedPanoramaId) ?? null;
+
+  const fetchPanoramas = useCallback(async () => {
+    if (!pointId) {
+      setPanoramas([]);
+      setSelectedPanoramaId(null);
       setLoading(false);
       return;
     }
+
     setLoading(true);
     try {
-      const data = isCheckinPoint
-        ? await adminPanoramaService.getCheckinPointPanorama(targetId)
-        : await adminPanoramaService.getPointPanorama(targetId);
-      setPanorama(data);
+      const data = await adminPanoramaService.getPointPanoramas(pointId);
+      setPanoramas(data);
+      if (!selectedPanoramaId || !data.some((p) => p.id === selectedPanoramaId)) {
+        const defaultId = data.find((p) => p.isDefault)?.id ?? data[0]?.id ?? null;
+        setSelectedPanoramaId(defaultId);
+      }
+      setError(null);
     } catch (error: Error | any) {
       if (error?.status === 400) {
-        setPanorama(null);
+        setPanoramas([]);
       } else {
         console.log("[usePanoramaEditor] Error fetching panorama: ", error);
         message.error("Tải panorama thất bại");
         setError("Đã xảy ra lỗi khi tải dữ liệu panorama. Vui lòng thử lại.");
       }
-      setPanorama(null);
+      setPanoramas([]);
     } finally {
       setLoading(false);
     }
-  }, [targetId, isCheckinPoint]);
+  }, [pointId, selectedPanoramaId]);
 
   useEffect(() => {
-    fetchPanorama();
-  }, [fetchPanorama]);
+    fetchPanoramas();
+  }, [fetchPanoramas]);
 
   const savePanorama = async (data: PanoramaRequest) => {
+    if (!pointId) {
+      message.error("Không xác định được điểm để lưu panorama");
+      return;
+    }
+
     setSaving(true);
     try {
-      const saved = isCheckinPoint
-        ? await adminPanoramaService.createOrUpdateCheckinPointPanorama(
-          targetId,
-          data
-        )
-        : await adminPanoramaService.createOrUpdatePointPanorama(
-          targetId,
-          data
-        );
-      setPanorama(saved);
+      const saved = selectedPanorama
+        ? await adminPanoramaService.updatePanorama(selectedPanorama.id, data)
+        : await adminPanoramaService.addPanoramaToPoint(pointId, data);
+
+      setPanoramas((prev) => {
+        const others = prev.filter((p) => p.id !== saved.id);
+        return [...others, saved];
+      });
+      setSelectedPanoramaId(saved.id);
       message.success("Đã lưu panorama");
     } catch (error) {
       message.error("Lưu panorama thất bại");
@@ -79,13 +86,16 @@ export function usePanoramaEditor(options?: UsePanoramaEditorOptions) {
   };
 
   const deletePanorama = async () => {
+    if (!selectedPanorama) {
+      message.warning("Chưa có panorama để xóa");
+      return;
+    }
+
     try {
-      if (isCheckinPoint) {
-        await adminPanoramaService.deleteCheckinPointPanorama(targetId);
-      } else {
-        await adminPanoramaService.deletePointPanorama(targetId);
-      }
-      setPanorama(null);
+      await adminPanoramaService.deletePanorama(selectedPanorama.id);
+      const remained = panoramas.filter((p) => p.id !== selectedPanorama.id);
+      setPanoramas(remained);
+      setSelectedPanoramaId(remained.find((p) => p.isDefault)?.id ?? remained[0]?.id ?? null);
       message.success("Đã xóa panorama");
     } catch {
       message.error("Xóa panorama thất bại");
@@ -93,14 +103,16 @@ export function usePanoramaEditor(options?: UsePanoramaEditorOptions) {
   };
 
   return {
-    panorama,
+    pointId,
+    panoramas,
+    selectedPanoramaId,
+    setSelectedPanoramaId,
     loading,
     saving,
-    isCheckinPoint,
-    targetId,
     savePanorama,
     deletePanorama,
-    refetch: fetchPanorama,
+    refetch: fetchPanoramas,
     error,
+    selectedPanorama,
   };
 }

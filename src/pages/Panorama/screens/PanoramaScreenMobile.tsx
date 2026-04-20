@@ -14,8 +14,7 @@ import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButto
 
 /**
  * This version differ from the other version is that it will only load once, then the mobile webview will just keep sending message to update the panorama data without unmounting this component. This is because:
- * 1. The webview component in React Native is expensive to mount/unmount, so we want to avoid that as much as possible.
- * 2. The webview need to download the entire front end bundle every time it mounts, which is also expensive and causes unnecessary data usage and load time for the user.
+ * 1. The webview need to download the entire front end bundle every time it mounts, which is also expensive and causes unnecessary data usage and load time for the user.
  */
 export default function PanoramaScreenMobile() {
   // ─── Data fetching state ───

@@ -26,7 +26,7 @@ export type BlogEditorRef = {
   getJSON: () => string;
 };
 
-export const formSchema = z.object({
+export const blogFormSchema = z.object({
   title: z.string().min(10, "Title need to be at least 10 characters").max(100, "Title must be at most 100 characters"),
   slug: z.string().optional(),
   summary: z
