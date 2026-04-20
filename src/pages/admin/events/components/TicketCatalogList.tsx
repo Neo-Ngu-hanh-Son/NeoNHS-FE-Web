@@ -30,19 +30,19 @@ import dayjs from 'dayjs';
 // ── Helpers ──────────────────────────────────────────
 
 const DAY_LABELS: Record<string, string> = {
-    MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu',
-    FRI: 'Fri', SAT: 'Sat', SUN: 'Sun',
+    MON: 'T2', TUE: 'T3', WED: 'T4', THU: 'T5',
+    FRI: 'T6', SAT: 'T7', SUN: 'CN',
 };
 
 function formatDays(applyOnDays: string | null | undefined): string {
-    if (!applyOnDays) return 'Every day';
+    if (!applyOnDays) return 'Mỗi ngày';
     const days = applyOnDays.split(',').map((d) => d.trim());
-    if (days.length === 7) return 'Every day';
+    if (days.length === 7) return 'Mỗi ngày';
     return days.map((d) => DAY_LABELS[d] || d).join(', ');
 }
 
 function formatPrice(price: number | null | undefined): string {
-    if (!price || price === 0) return 'Free';
+    if (!price || price === 0) return 'Miễn phí';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
 }
 
@@ -108,13 +108,13 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
         try {
             const res = await ticketCatalogService.permanentDelete(eventId, permanentDeleteTarget.id);
             if (res.success) {
-                message.success('Ticket type permanently deleted');
+                message.success('Đã xóa vĩnh viễn loại vé');
                 await fetchCatalogs();
             } else {
-                message.error(res.message || 'Failed to permanently delete');
+                message.error(res.message || 'Xóa vĩnh viễn thất bại');
             }
         } catch (err: unknown) {
-            message.error('Failed to permanently delete ticket type');
+            message.error('Xóa vĩnh viễn loại vé thất bại');
         }
         setPermanentDeleteTarget(null);
     };
@@ -133,32 +133,32 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
         <div>
             <div className="flex items-center justify-between mb-4">
                 <span className="text-sm text-muted-foreground">
-                    {catalogs.length} ticket type{catalogs.length !== 1 ? 's' : ''}
+                    {catalogs.length} loại vé
                 </span>
                 <Button size="sm" onClick={handleCreate}>
-                    <Plus className="h-4 w-4 mr-1" />Add Ticket Type
+                    <Plus className="h-4 w-4 mr-1" />Thêm loại vé
                 </Button>
             </div>
 
             {catalogs.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                     <TicketIcon className="h-10 w-10 mb-3 opacity-30" />
-                    <p className="text-sm font-medium">No ticket types yet</p>
-                    <p className="text-xs mt-1">Create one to get started</p>
+                    <p className="text-sm font-medium">Chưa có loại vé nào</p>
+                    <p className="text-xs mt-1">Tạo một loại vé để bắt đầu</p>
                 </div>
             ) : (
                 <div className="rounded-md border overflow-x-auto">
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="min-w-[160px]">Name</TableHead>
-                                <TableHead className="min-w-[90px]">Status</TableHead>
-                                <TableHead className="min-w-[100px]">Customer</TableHead>
-                                <TableHead className="min-w-[120px] text-right">Price</TableHead>
-                                <TableHead className="min-w-[100px]">Apply On</TableHead>
-                                <TableHead className="min-w-[170px]">Valid Period</TableHead>
-                                <TableHead className="min-w-[150px]">Quota</TableHead>
-                                <TableHead className="min-w-[100px]">Updated</TableHead>
+                                <TableHead className="min-w-[160px]">Tên</TableHead>
+                                <TableHead className="min-w-[90px]">Trạng thái</TableHead>
+                                <TableHead className="min-w-[100px]">Khách hàng</TableHead>
+                                <TableHead className="min-w-[120px] text-right">Giá</TableHead>
+                                <TableHead className="min-w-[100px]">Áp dụng vào</TableHead>
+                                <TableHead className="min-w-[170px]">Thời hạn hợp lệ</TableHead>
+                                <TableHead className="min-w-[150px]">Số lượng</TableHead>
+                                <TableHead className="min-w-[100px]">Cập nhật</TableHead>
                                 <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                         </TableHeader>
@@ -179,7 +179,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                                 <span className="font-medium text-sm">{catalog.name}</span>
                                                 {isHidden && (
                                                     <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-red-50 text-red-600 border-red-200">
-                                                        Hidden
+                                                        Đã ẩn
                                                     </Badge>
                                                 )}
                                             </div>
@@ -248,7 +248,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                                         </span>
                                                         {remaining !== null && (
                                                             <span className="text-muted-foreground font-medium">
-                                                                {remaining} left
+                                                                Còn {remaining}
                                                             </span>
                                                         )}
                                                     </div>
@@ -260,7 +260,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <span className="text-xs text-muted-foreground">Unlimited</span>
+                                                <span className="text-xs text-muted-foreground">Không giới hạn</span>
                                             )}
                                         </TableCell>
 
@@ -279,19 +279,19 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem onClick={() => handleEdit(catalog)}>
-                                                        <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                        <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     {isHidden ? (
                                                         <>
                                                             <DropdownMenuItem onClick={() => restoreCatalog(catalog.id)}>
-                                                                <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                                                                <RotateCcw className="mr-2 h-4 w-4" /> Khôi phục
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 className="text-destructive focus:text-destructive"
                                                                 onClick={() => setPermanentDeleteTarget(catalog)}
                                                             >
-                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete Forever
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Xóa vĩnh viễn
                                                             </DropdownMenuItem>
                                                         </>
                                                     ) : (
@@ -299,7 +299,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                                             className="text-orange-600 focus:text-orange-700"
                                                             onClick={() => setHideTarget(catalog)}
                                                         >
-                                                            <EyeOff className="mr-2 h-4 w-4" /> Hide
+                                                            <EyeOff className="mr-2 h-4 w-4" /> Ẩn
                                                         </DropdownMenuItem>
                                                     )}
                                                 </DropdownMenuContent>
@@ -325,15 +325,15 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
             <AlertDialog open={!!hideTarget} onOpenChange={(open) => !open && setHideTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Hide Ticket Type</AlertDialogTitle>
+                        <AlertDialogTitle>Ẩn loại vé</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to hide "{hideTarget?.name}"? It can be restored later.
+                            Bạn có chắc chắn muốn ẩn "{hideTarget?.name}" không? Bạn có thể khôi phục nó sau.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handleHideConfirm} className="bg-orange-600 text-white hover:bg-orange-700">
-                            <EyeOff className="mr-2 h-4 w-4" />Hide
+                            <EyeOff className="mr-2 h-4 w-4" />Ẩn
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -343,20 +343,20 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
             <AlertDialog open={!!permanentDeleteTarget} onOpenChange={(open) => !open && setPermanentDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Permanently Delete Ticket Type</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa vĩnh viễn loại vé</AlertDialogTitle>
                         <AlertDialogDescription className="space-y-2">
                             <span className="block">
-                                Are you sure you want to <strong>permanently delete</strong> "{permanentDeleteTarget?.name}"?
+                                Bạn có chắc chắn muốn <strong>xóa vĩnh viễn</strong> "{permanentDeleteTarget?.name}" không?
                             </span>
                             <span className="block text-destructive font-medium">
-                                ⚠️ This action cannot be undone.
+                                ⚠️ Hành động này không thể hoàn tác.
                             </span>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handlePermanentDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            <Trash2 className="mr-2 h-4 w-4" />Delete Forever
+                            <Trash2 className="mr-2 h-4 w-4" />Xóa vĩnh viễn
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -17,8 +17,8 @@ export default function VoucherCreatePage() {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">Create Voucher</h1>
-                <p className="text-muted-foreground text-sm mt-1">Create a new voucher by filling in the details below.</p>
+                <h1 className="text-2xl font-bold">Tạo Voucher</h1>
+                <p className="text-muted-foreground text-sm mt-1">Tạo mã giảm giá mới bằng cách điền thông tin bên dưới.</p>
             </div>
             <VoucherForm mode="create" onSubmit={handleSubmit as any} loading={loading} />
         </div>

@@ -64,7 +64,7 @@ export function TagTable({
               <TableHead className="font-semibold text-gray-600 w-[130px]">Màu</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[120px]">Biểu tượng</TableHead>
               {kind === "event" && (
-                <TableHead className="font-semibold text-gray-600 w-[90px]">Trạng thái</TableHead>
+                <TableHead className="font-semibold text-gray-600 w-[110px] whitespace-nowrap">Trạng thái</TableHead>
               )}
               <TableHead className="font-semibold text-gray-600 w-[140px] text-right">
                 Thao tác

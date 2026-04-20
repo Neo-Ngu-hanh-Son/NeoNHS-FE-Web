@@ -29,7 +29,7 @@ export default function VoucherEditPage() {
     if (!voucher) {
         return (
             <div className="max-w-4xl mx-auto text-center py-20">
-                <p className="text-muted-foreground">Voucher not found.</p>
+                <p className="text-muted-foreground">Không tìm thấy voucher.</p>
             </div>
         );
     }
@@ -37,9 +37,9 @@ export default function VoucherEditPage() {
     return (
         <div className="max-w-4xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">Edit Voucher</h1>
+                <h1 className="text-2xl font-bold">Chỉnh sửa Voucher</h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                    Update voucher <span className="font-mono font-semibold">{voucher.code}</span>
+                    Cập nhật voucher <span className="font-mono font-semibold">{voucher.code}</span>
                 </p>
             </div>
             <VoucherForm

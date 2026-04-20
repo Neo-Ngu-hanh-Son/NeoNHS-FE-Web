@@ -12,7 +12,7 @@ import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Eye, Pencil, Trash2, ArrowUpDown } from 'lucide-react';
-import type { VoucherResponse } from '@/types/voucher';
+import type { VoucherResponse, VoucherScope } from '@/types/voucher';
 import {
     voucherStatusBadgeStyles, voucherStatusLabels,
     voucherTypeBadgeStyles, voucherTypeLabels,
@@ -29,9 +29,10 @@ interface VoucherTableProps {
     onPageChange: (page: number) => void;
     onPageSizeChange: (size: number) => void;
     onDelete: (voucher: VoucherResponse) => void;
-    scope?: string;
+    scope?: VoucherScope;
 }
 
+// ... helper functions (formatDate, getDiscountDisplay, SortHeader remain the same)
 function formatDate(dateStr: string) {
     try {
         return new Date(dateStr).toLocaleDateString('vi-VN');
@@ -45,11 +46,7 @@ function getDiscountDisplay(v: VoucherResponse): string {
         if (v.discountType === 'PERCENT') return `${v.discountValue}%`;
         return `${v.discountValue.toLocaleString('vi-VN')}₫`;
     }
-    if (v.voucherType === 'BONUS_POINTS' && v.bonusPointsValue != null) {
-        return `${v.bonusPointsValue} pts`;
-    }
-    if (v.voucherType === 'GIFT_PRODUCT') return v.giftDescription || 'Gift';
-    if (v.voucherType === 'FREE_SERVICE') return v.freeTicketCatalogName || 'Free Service';
+    if (v.voucherType === 'GIFT_PRODUCT') return v.giftDescription || 'Quà tặng';
     return '—';
 }
 
@@ -70,10 +67,11 @@ function SortHeader({ field, label, sortBy, sortDir, onSort }: {
 
 export function VoucherTable({
     vouchers, loading, pagination, sortBy, sortDir,
-    onSort, onPageChange, onPageSizeChange, onDelete, scope,
+    onSort, onPageChange, onPageSizeChange, onDelete, scope = 'PLATFORM',
 }: VoucherTableProps) {
     const navigate = useNavigate();
     const totalPages = Math.ceil(pagination.total / pagination.pageSize) || 1;
+    const basePath = scope === 'PLATFORM' ? '/admin/vouchers' : '/vendor/vouchers';
 
     if (loading) {
         return (
@@ -86,8 +84,8 @@ export function VoucherTable({
     if (vouchers.length === 0) {
         return (
             <div className="text-center py-20 text-muted-foreground">
-                <p className="text-lg font-medium">No vouchers found</p>
-                <p className="text-sm mt-1">Try adjusting your filters or create a new voucher.</p>
+                <p className="text-lg font-medium">Không tìm thấy voucher</p>
+                <p className="text-sm mt-1">Hãy thử điều chỉnh bộ lọc hoặc tạo voucher mới.</p>
             </div>
         );
     }
@@ -98,19 +96,19 @@ export function VoucherTable({
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <SortHeader field="code" label="Code" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
-                            <TableHead>Type</TableHead>
-                            <TableHead>Value</TableHead>
-                            <TableHead>Usage</TableHead>
-                            <SortHeader field="startDate" label="Period" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
-                            <TableHead>Status</TableHead>
-                            {scope !== 'PLATFORM' && <TableHead>Vendor</TableHead>}
-                            <TableHead className="text-right">Actions</TableHead>
+                            <SortHeader field="code" label="Mã" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+                            <TableHead>Loại</TableHead>
+                            <TableHead>Giá trị</TableHead>
+                            <TableHead>Số lượng</TableHead>
+                            <SortHeader field="startDate" label="Thời gian" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
+                            <TableHead>Trạng thái</TableHead>
+                            {scope !== 'PLATFORM' && scope !== 'VENDOR' && <TableHead>Đối tác</TableHead>}
+                            <TableHead className="text-right">Thao tác</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {vouchers.map((v) => (
-                            <TableRow key={v.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`/admin/vouchers/${v.id}`)}>
+                            <TableRow key={v.id} className="cursor-pointer hover:bg-muted/50" onClick={() => navigate(`${basePath}/${v.id}`)}>
                                 <TableCell>
                                     <div className="font-mono font-semibold">{v.code}</div>
                                     <span className="text-xs text-muted-foreground">{voucherScopeLabels[v.scope]}</span>
@@ -139,17 +137,17 @@ export function VoucherTable({
                                         {voucherStatusLabels[v.status]}
                                     </Badge>
                                 </TableCell>
-                                    {scope !== 'PLATFORM' && (
+                                    {scope !== 'PLATFORM' && scope !== 'VENDOR' && (
                                         <TableCell className="font-medium text-primary">
                                             {v.vendorName || 'N/A'}
                                         </TableCell>
                                     )}
                                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                                     <div className="flex items-center justify-end gap-1">
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="View" onClick={() => navigate(`/admin/vouchers/${v.id}`)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="View" onClick={() => navigate(`${basePath}/${v.id}`)}>
                                             <Eye className="h-4 w-4" />
                                         </Button>
-                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => navigate(`/admin/vouchers/${v.id}/edit`)}>
+                                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Edit" onClick={() => navigate(`${basePath}/${v.id}/edit`)}>
                                             <Pencil className="h-4 w-4" />
                                         </Button>
                                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Delete" onClick={() => onDelete(v)}>
@@ -166,7 +164,7 @@ export function VoucherTable({
             {/* Pagination */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Show</span>
+                    <span>Hiển thị</span>
                     <Select value={String(pagination.pageSize)} onValueChange={(val) => onPageSizeChange(Number(val))}>
                         <SelectTrigger className="w-[70px] h-8">
                             <SelectValue />
@@ -177,7 +175,7 @@ export function VoucherTable({
                             ))}
                         </SelectContent>
                     </Select>
-                    <span>of {pagination.total} vouchers</span>
+                    <span>trên tổng {pagination.total} voucher</span>
                 </div>
 
                 <Pagination>
@@ -190,7 +188,7 @@ export function VoucherTable({
                         </PaginationItem>
                         <PaginationItem>
                             <span className="px-3 text-sm">
-                                Page {pagination.current} of {totalPages}
+                                Trang {pagination.current} / {totalPages}
                             </span>
                         </PaginationItem>
                         <PaginationItem>
