@@ -87,11 +87,6 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
               nếu muốn giữ tính năng chuyển sang nhân viên hỗ trợ.
             </li>
             <li>
-              Không đổi loại tài liệu (<code className="text-xs">knowledgeType</code>) của bản ghi này sau
-              khi đã tạo — backend chỉ đọc document có loại{' '}
-              <strong>SYSTEM_PROMPT</strong>.
-            </li>
-            <li>
               Thay đổi có hiệu lực cho các tin nhắn <strong>tiếp theo</strong>, không cần khởi động lại
               server.
             </li>
