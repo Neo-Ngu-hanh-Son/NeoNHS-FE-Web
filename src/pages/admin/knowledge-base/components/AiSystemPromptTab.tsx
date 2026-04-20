@@ -103,10 +103,8 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
         <Info className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
         <AlertTitle className="text-indigo-900 dark:text-indigo-100">System Prompt là gì?</AlertTitle>
         <AlertDescription className="text-indigo-800/95 dark:text-indigo-200/90">
-          Đây là bộ quy tắc và vai trò cố định gửi cho model AI trước mỗi cuộc hội thoại — khác với các bài
-          tri thức RAG ở tab &quot;Tri thức AI&quot;. Nội dung được lưu trong cùng collection{' '}
-          <code className="text-xs">knowledge_base</code> nhưng không xuất hiện trong tìm kiếm kiến thức
-          thông thường.
+          Đây là nơi cấu hình, đưa ra các quy tắc, hành vi để AI chatbot hoạt động. Sẽ định nghĩa được AI như thế nào khi trả lời các câu hỏi, các tác vụ.
+
         </AlertDescription>
       </Alert>
 
@@ -125,7 +123,7 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
             />
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-900/40">
+          {/* <div className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-900/40">
             <div>
               <p className="text-sm font-medium">Kích hoạt System Prompt</p>
               <p className="text-xs text-muted-foreground">
@@ -133,7 +131,7 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
               </p>
             </div>
             <Switch checked={isActive} onCheckedChange={setIsActive} />
-          </div>
+          </div> */}
 
           <div className="grid gap-2">
             <Label htmlFor="sys-prompt-content">Nội dung prompt</Label>
