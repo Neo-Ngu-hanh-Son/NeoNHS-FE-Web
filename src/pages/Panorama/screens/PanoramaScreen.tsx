@@ -20,7 +20,7 @@ import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButto
 export default function PanoramaScreen() {
   const { placeId: urlPlaceId } = useParams<{ placeId: string }>();
 
-  // ─── State ───
+  // ─── Data fetching state ───
   const [currentPano, setCurrentPano] = useState<PointPanoramaResponse | null>(null);
   const [currentPlace, setCurrentPlace] = useState<PointResponse | null>(null);
   const [activePanoramaId, setActivePanoramaId] = useState<string | null>(null);
@@ -32,14 +32,18 @@ export default function PanoramaScreen() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [panelContent, setPanelContent] = useState<InfoPanelContent | undefined>(undefined);
 
+  // ─── Viewer refs ───
+  const containerRef = useRef<HTMLDivElement>(null);
   const viewerRef = useRef<Viewer | null>(null);
-  const firstVisitRef = useRef(true);
+  const firstVisitRef = useRef(true); // To track if it's the first time loading data into the viewer
 
-  // ─── Info Panel Toggle ───
+  // Stable ref so the PSV button callback always sees the latest toggle fn
   const togglePlacePanelRef = useRef<() => void>(() => {});
   togglePlacePanelRef.current = () => {
+    // When toggling via the ℹ button, show place-level info
     setPanelContent({
       title: currentPlace?.name ?? '',
+      // subtitle: place?.address ? `At ${place.address}` : undefined, // We currently dont have any address
       description: currentPlace?.description ?? '',
     });
     setIsPanelOpen((prev) => !prev);
@@ -47,27 +51,39 @@ export default function PanoramaScreen() {
 
   const handleClosePanel = useCallback(() => setIsPanelOpen(false), []);
 
-  // ─── 1. Place-level Effect (Metadata) ───
+  // 1. Place-level Effect
   useEffect(() => {
     if (!placeId) return;
-    if (currentPlace?.id === placeId) return;
+    if (currentPlace?.id === placeId) {
+      setIsLoading(false); // Already have it, skip fetch
+      return;
+    }
 
     let cancelled = false;
+    setError(null);
     const fetchPlace = async () => {
       try {
-        if (!firstVisitRef.current) setIsLoading(true);
+        if (!firstVisitRef.current) {
+          setIsLoading(true);
+        }
         const response = await adminPointService.getPointById(placeId);
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
 
         setCurrentPlace(response.data);
 
-        // Reset to default if current pano doesn't belong to new place
-        const belongs = response.data.panoramas?.some((p) => p.id === activePanoramaId);
-        if (!belongs) {
+        // Only reset to default IF the currently active panorama
+        // doesn't belong to this new place.
+        const belongsToNewPlace = response.data.panoramas?.some((p) => p.id === activePanoramaId);
+
+        if (!belongsToNewPlace) {
           const defaultPano = PanoramaHelper.getDefaultPanorama(response.data.panoramas ?? []);
           setActivePanoramaId(defaultPano?.id || null);
         }
+        // Else just do nothing to keep the current panorama if it's still valid for the new place.
       } catch (err: any) {
+        console.error('Error fetching place data:', err);
         if (!cancelled) setError(err.message);
       } finally {
         setIsLoading(false);
@@ -79,23 +95,27 @@ export default function PanoramaScreen() {
     return () => {
       cancelled = true;
     };
-  }, [placeId]);
+  }, [placeId]); // Only runs when we jump to a different physical location
 
-  // ─── 2. Panorama-level Effect (Navigation) ───
+  // 2. Panorama-level Effect: Handles navigation between panos in one place
   useEffect(() => {
     if (!activePanoramaId) return;
 
     let cancelled = false;
+    setError(null);
     const fetchPano = async () => {
       try {
         const activePanoData = await panoramaService.getPanoramaById(activePanoramaId);
-        if (cancelled) return;
-
-        setCurrentPano(activePanoData);
-        if (activePanoData.placeId !== placeId) {
-          setPlaceId(activePanoData.placeId);
+        if (!cancelled) {
+          setCurrentPano(activePanoData);
+          const newPanoramaPlaceId = activePanoData.placeId;
+          // If the new panorama doesn't belong to the current place, we need to update place data as well
+          if (newPanoramaPlaceId !== placeId) {
+            setPlaceId(newPanoramaPlaceId);
+          }
         }
       } catch (err: any) {
+        console.error('Error fetching panorama data:', err);
         if (!cancelled) setError(err.message);
       }
     };
@@ -106,7 +126,7 @@ export default function PanoramaScreen() {
     };
   }, [activePanoramaId]);
 
-  // ─── 3. Initialize Viewer (Once) ───
+  // --- Init viewer with no data for later dynamic updates ---
   useLayoutEffect(() => {
     if (!containerRef.current || viewerRef.current) return;
 
@@ -117,52 +137,74 @@ export default function PanoramaScreen() {
         {
           id: 'custom-info',
           title: 'Location Info',
-          content: '<svg ...></svg>', // Use your SVG here
+          className: 'psv-custom-info-button',
+          content:
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="20" height="20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.25v2.25a.75.75 0 001.5 0V10A.75.75 0 0010 9H9z" clip-rule="evenodd"/></svg>',
           onClick: () => togglePlacePanelRef.current(),
         },
         'caption',
-        'fullscreen',
       ],
       plugins: [[MarkersPlugin, {}]],
+      minFov: 30,
+      maxFov: 120,
       defaultZoomLvl: 50,
+      loadingTxt: 'Loading panorama…',
+      moveSpeed: 1.5,
+      zoomSpeed: 1.2,
     });
 
     const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
-    markersPlugin.addEventListener('select-marker', ({ marker }) => {
+    const onSelect = ({ marker }: { marker: any }) => {
       const data = marker.data as PanoramaHotSpotResponse | undefined;
       if (!data) return;
 
-      if (data.type === 'INFO') {
-        marker.domElement.classList.add('scale-125');
-        setPanelContent({
-          title: data.title,
-          description: data.description,
-          imageUrl: data.imageUrl ?? undefined,
-        });
-        setIsPanelOpen(true);
-      } else if (data.type === 'LINK') {
-        setActivePanoramaId(data.targetPanoramaId);
+      switch (data.type) {
+        case 'INFO':
+          marker.domElement.classList.add('scale-125');
+          setPanelContent({
+            title: data.title,
+            description: data.description,
+            imageUrl: data.imageUrl ?? undefined,
+          });
+          setIsPanelOpen(true);
+          break;
+        case 'LINK':
+          setActivePanoramaId(data.targetPanoramaId);
+          break;
+        default:
+          console.warn('Unknown hotspot type:', data.type);
       }
-    });
+    };
 
-    markersPlugin.addEventListener('unselect-marker', ({ marker }) => {
+    const onUnselect = ({ marker }: { marker: any }) => {
       marker.domElement.classList.remove('scale-125');
-    });
+    };
+
+    markersPlugin.addEventListener('select-marker', onSelect);
+    markersPlugin.addEventListener('unselect-marker', onUnselect);
 
     viewerRef.current = viewer;
-    return () => viewer.destroy();
-  }, []);
 
-  // ─── 4. Scene Update Effect ───
+    return () => {
+      viewer.destroy();
+      viewerRef.current = null;
+      markersPlugin.removeEventListener('select-marker', onSelect);
+      markersPlugin.removeEventListener('unselect-marker', onUnselect);
+    };
+  }, [isLoading]);
+
+  /**
+   * Update scene when place/panorama changes.
+   */
   useEffect(() => {
     if (!currentPlace || !currentPano || !viewerRef.current) return;
 
     let cancelled = false;
     const viewer = viewerRef.current;
-    const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
 
     (async () => {
+      const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
       markersPlugin.clearMarkers();
 
       await viewer.setPanorama(currentPano.panoramaImageUrl, {
@@ -175,6 +217,7 @@ export default function PanoramaScreen() {
       await viewer.animate({
         yaw: currentPano.defaultYaw ?? 0,
         pitch: currentPano.defaultPitch ?? 0,
+        zoom: 50,
         speed: 1000,
       });
 
@@ -184,10 +227,20 @@ export default function PanoramaScreen() {
           position: { yaw: m.yaw, pitch: m.pitch },
           tooltip: m.tooltip,
           anchor: 'bottom center',
-          size: { width: 28, height: 28 }, // Slightly larger for desktop
+          size: { width: 24, height: 24 },
           html: m.type === 'INFO' ? getNormalMarkerHTML() : getLinkMarkerHTML(),
           data: m,
         });
+      });
+
+      // Update the place-level info panel if it's open to reflect the new place data
+      setPanelContent((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          title: currentPlace.name ?? '',
+          description: currentPlace.description ?? '',
+        };
       });
     })();
 
@@ -197,13 +250,24 @@ export default function PanoramaScreen() {
   }, [currentPlace, currentPano]);
 
   const handleRetry = () => {
+    const failedId = activePanoramaId;
     setError(null);
-    const id = activePanoramaId;
-    setActivePanoramaId(null);
-    setTimeout(() => setActivePanoramaId(id), 50);
-  };
+    setIsLoading(true);
 
-  const containerRef = useRef<HTMLDivElement>(null);
+    if (failedId) {
+      // We temporarily nullify the ID and reset it to force React
+      // to re-run the Panorama-level useEffect
+      setActivePanoramaId(null);
+      setTimeout(() => {
+        setActivePanoramaId(failedId);
+      }, 50);
+    } else if (placeId) {
+      // If we haven't even gotten a panorama yet, retry the place fetch
+      const currentPlaceId = placeId;
+      setPlaceId(null);
+      setTimeout(() => setPlaceId(currentPlaceId), 50);
+    }
+  };
 
   if (isLoading && firstVisitRef.current) return <PanoramaLoading />;
 

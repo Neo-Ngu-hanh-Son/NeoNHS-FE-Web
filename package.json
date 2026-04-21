@@ -1,5 +1,5 @@
 {
-  "name": "ccte-fe",
+  "name": "NeoNHS-fe",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -31,6 +31,7 @@
     "@base-ui/react": "^1.4.0",
     "@elevenlabs/elevenlabs-js": "^2.37.0",
     "@fontsource/roboto": "^5.2.9",
+    "@google/genai": "^1.50.1",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@hookform/resolvers": "^5.2.2",
     "@iconify/react": "^6.0.2",
@@ -73,6 +74,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "flag-icons": "^7.5.0",
     "framer-motion": "^12.38.0",
     "html2canvas": "^1.4.1",
     "input-otp": "^1.4.2",

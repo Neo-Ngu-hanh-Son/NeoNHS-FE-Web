@@ -1,6 +1,8 @@
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { usePanoramaForm } from '../hooks/usePanoramaForm';
 import PanoramaEditorHeader from './PanoramaEditorHeader';
 import PanoramaImageUpload from './PanoramaImageUpload';
@@ -89,6 +91,18 @@ export default function PanoramaEditorPanel({
                 value={form.panoramaTitle}
                 onChange={(event) => form.handleTitleChange(event.target.value)}
               />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <Label htmlFor="panorama-is-default" className="text-sm font-medium">
+                  Đặt làm panorama mặc định
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Khi bật, panorama này sẽ là điểm nhìn đầu tiên của địa điểm.
+                </p>
+              </div>
+              <Switch id="panorama-is-default" checked={form.isDefault} onCheckedChange={form.handleDefaultChange} />
             </div>
 
             <h2 className="text-base font-semibold">Ảnh panorama</h2>

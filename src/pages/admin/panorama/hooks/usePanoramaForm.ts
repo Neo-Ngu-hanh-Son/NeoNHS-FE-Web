@@ -23,6 +23,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
   // ─── Local form state ───
   const [panoramaTitle, setPanoramaTitle] = useState("");
   const [panoramaImageUrl, setPanoramaImageUrl] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
   const [defaultYaw, setDefaultYaw] = useState(0);
   const [defaultPitch, setDefaultPitch] = useState(0);
   const [hotSpots, setHotSpots] = useState<HotSpotFormValues[]>([]);
@@ -38,6 +39,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
   const resetLocalForm = useCallback(() => {
     setPanoramaTitle("");
     setPanoramaImageUrl("");
+    setIsDefault(false);
     setDefaultYaw(0);
     setDefaultPitch(0);
     setHotSpots([]);
@@ -95,6 +97,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
     if (selectedPanorama) {
       setPanoramaTitle(normalizeTitle(selectedPanorama.title));
       setPanoramaImageUrl(selectedPanorama.panoramaImageUrl);
+      setIsDefault(Boolean(selectedPanorama.isDefault));
       setDefaultYaw(selectedPanorama.defaultYaw);
       setDefaultPitch(selectedPanorama.defaultPitch);
       if (selectedPanorama.hotSpots && selectedPanorama.hotSpots.length > 0) {
@@ -133,6 +136,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
     setSelectedPanoramaId(null);
     resetLocalForm();
     setPanoramaTitle(`Panorama ${panoramas.length + 1}`);
+    setIsDefault(panoramas.length === 0);
   };
 
   // ─── Save ───
@@ -166,7 +170,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
       panoramaImageUrl,
       defaultYaw,
       defaultPitch,
-      isDefault: selectedPanorama?.isDefault ?? panoramas.length === 0,
+      isDefault,
       hotSpots: hotSpots.map((hs, i) => {
         const base = {
           yaw: hs.yaw,
@@ -247,6 +251,10 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
     setPanoramaTitle(normalizeTitle(title));
   };
 
+  const handleDefaultChange = (checked: boolean) => {
+    setIsDefault(checked);
+  };
+
   // ─── Default view ───
   const enterViewSelection = () => setViewSelectionMode(true);
   const cancelViewSelection = () => setViewSelectionMode(false);
@@ -309,6 +317,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
     targetPointId,
     panoramaTitle,
     panoramaImageUrl,
+    isDefault,
     defaultYaw,
     defaultPitch,
     hotSpots,
@@ -324,6 +333,7 @@ export function usePanoramaForm(editorOptions?: UsePanoramaEditorOptions) {
     handleSave: handleSavePanoramaAndHotSpots,
     handleDelete,
     handleTitleChange,
+    handleDefaultChange,
     handleImageChange,
     enterViewSelection,
     cancelViewSelection,
