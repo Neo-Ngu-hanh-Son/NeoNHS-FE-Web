@@ -67,6 +67,7 @@ function buildMockAlignedWords(text: string): ForcedAlignmentWord[] {
 export function useElevenLabsAudio({ apiKey, useMock }: UseElevenLabsAudioOptions) {
   const [modelId, setModelId] = useState<string>(ELEVEN_LABS_MODELS[0].id);
   const [voiceId, setVoiceId] = useState<string>(ELEVEN_LABS_VOICES[0].id);
+  const [languageCode, setLanguageCode] = useState<string>(ELEVEN_LABS_VOICES[0].language || 'en');
   const [generatingAudio, setGeneratingAudio] = useState(false);
   const [aligningWords, setAligningWords] = useState(false);
   const [generatedAudioUrl, setGeneratedAudioUrl] = useState('');
@@ -113,7 +114,7 @@ export function useElevenLabsAudio({ apiKey, useMock }: UseElevenLabsAudioOption
   }, [clearGeneratedAudio]);
 
   const handleGenerateAudio = useCallback(
-    async (text: string) => {
+    async (text: string, languageCode: string) => {
       if (!text.trim()) {
         message.warning('Vui lòng nhập nội dung trước');
         return false;
@@ -137,6 +138,7 @@ export function useElevenLabsAudio({ apiKey, useMock }: UseElevenLabsAudioOption
             text,
             modelId,
             outputFormat: 'mp3_44100_128',
+            languageCode: languageCode,
           });
 
           blob = await new Response(audio).blob();
@@ -218,11 +220,22 @@ export function useElevenLabsAudio({ apiKey, useMock }: UseElevenLabsAudioOption
     [apiKey, mockModeEnabled],
   );
 
+  const handleVoiceChange = useCallback((voiceId: string) => {
+    setVoiceId(voiceId);
+    // Search for language code based on voice selection
+    const voice = ELEVEN_LABS_VOICES.find((v) => v.id === voiceId);
+    if (voice) {
+      const languageCode = voice.language || 'en';
+      setLanguageCode(languageCode);
+    }
+  }, []);
+
   return {
     modelId,
     setModelId,
     voiceId,
     setVoiceId,
+    languageCode,
     generatingAudio,
     aligningWords,
     generatedAudioUrl,
@@ -234,5 +247,6 @@ export function useElevenLabsAudio({ apiKey, useMock }: UseElevenLabsAudioOption
     resetElevenLabsState,
     handleGenerateAudio,
     handleGenerateWordTiming,
+    handleVoiceChange,
   };
 }

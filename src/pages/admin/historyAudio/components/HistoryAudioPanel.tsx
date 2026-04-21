@@ -61,6 +61,7 @@ export default function HistoryAudioPanel({
     setModelId,
     voiceId,
     setVoiceId,
+    languageCode,
     generatingAudio,
     aligningWords,
     generatedAudioUrl,
@@ -72,7 +73,8 @@ export default function HistoryAudioPanel({
     resetElevenLabsState,
     handleGenerateAudio,
     handleGenerateWordTiming,
-  } = useElevenLabsAudio({ apiKey: elevenLabsKey });
+    handleVoiceChange,
+  } = useElevenLabsAudio({ apiKey: elevenLabsKey, useMock: false });
 
   const {
     uploadingCoverImage,
@@ -150,7 +152,7 @@ export default function HistoryAudioPanel({
   };
 
   const onGenerateAudio = async () => {
-    const generated = await handleGenerateAudio(text);
+    const generated = await handleGenerateAudio(text, languageCode);
     if (generated) {
       setMode('generate');
       resetTracking();
@@ -308,7 +310,7 @@ export default function HistoryAudioPanel({
             voiceId={voiceId}
             generatingAudio={generatingAudio}
             onModelChange={setModelId}
-            onVoiceChange={setVoiceId}
+            onVoiceChange={handleVoiceChange}
             onGenerateAudio={onGenerateAudio}
             onUploadAudio={onUploadAudio}
           />
@@ -338,7 +340,13 @@ export default function HistoryAudioPanel({
           </div>
         </>
       ) : (
-        <QuickCreateComponent />
+        <QuickCreateComponent
+          pointId={pointId}
+          onSubmittedAll={async () => {
+            await refetch();
+            setQuickCreateMode(false);
+          }}
+        />
       )}
 
       <HistoryAudioDeleteDialog

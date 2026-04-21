@@ -73,7 +73,6 @@ export default function HistoryAudiosTable({
                   <TableHead>Xem trước nội dung</TableHead>
                   <TableHead className="w-[100px]">Ngôn ngữ</TableHead>
                   <TableHead className="w-[90px]">Nguồn</TableHead>
-                  <TableHead className="w-[70px]">Âm thanh</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -119,17 +118,6 @@ export default function HistoryAudiosTable({
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {source === '-' ? '-' : formatAudioSource(source)}
-                      </TableCell>
-                      <TableCell>
-                        {hasEntryAudio ? (
-                          <Badge variant="default" className="text-xs">
-                            Có
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="text-xs">
-                            Không
-                          </Badge>
-                        )}
                       </TableCell>
                     </TableRow>
                   );

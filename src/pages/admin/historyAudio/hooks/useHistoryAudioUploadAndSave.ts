@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { message } from 'antd';
-import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudinary';
 import { ELEVEN_LABS_VOICES } from '@/pages/admin/historyAudio/constants';
 import type { ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
 import type { CreateHistoryAudioRequest, HistoryAudioResponse } from '@/types/historyAudio';
 import { clearEmtpyLines } from '../helpers';
+import { uploadImageToBackend, uploadVideoToBackend } from '@/utils/cloudinary';
 
 interface UseHistoryAudioUploadAndSaveOptions {
   createAudio: (payload: CreateHistoryAudioRequest) => Promise<HistoryAudioResponse>;
@@ -24,6 +24,7 @@ interface SaveHistoryAudioParams {
   mode: 'generate' | 'upload' | null;
   modelId: string;
   voiceId: string;
+  silent?: boolean;
 }
 
 interface SaveHistoryAudioResult {
@@ -31,10 +32,7 @@ interface SaveHistoryAudioResult {
   createdId?: string;
 }
 
-export function useHistoryAudioUploadAndSave({
-  createAudio,
-  updateAudio,
-}: UseHistoryAudioUploadAndSaveOptions) {
+export function useHistoryAudioUploadAndSave({ createAudio, updateAudio }: UseHistoryAudioUploadAndSaveOptions) {
   const [uploadingCoverImage, setUploadingCoverImage] = useState(false);
   const [uploadedAudioUrl, setUploadedAudioUrl] = useState('');
   const [uploadedAudioBlob, setUploadedAudioBlob] = useState<Blob | null>(null);
@@ -95,14 +93,14 @@ export function useHistoryAudioUploadAndSave({
 
     setUploadingCoverImage(true);
     try {
-      const uploadedUrl = await uploadImageToCloudinary(file);
+      const uploadedUrl = await uploadImageToBackend(file);
       if (!uploadedUrl) {
         message.error('Tải ảnh bìa lên thất bại');
         return null;
       }
 
       message.success('Đã tải ảnh bìa lên');
-      return uploadedUrl;
+      return uploadedUrl.mediaUrl;
     } catch (error) {
       console.error(error);
       message.error('Tải ảnh bìa lên thất bại');
@@ -126,9 +124,12 @@ export function useHistoryAudioUploadAndSave({
       mode,
       modelId,
       voiceId,
+      silent = false,
     }: SaveHistoryAudioParams): Promise<SaveHistoryAudioResult> => {
       if (!text.trim() && !hasAudio) {
-        message.warning('Vui lòng nhập nội dung lịch sử hoặc âm thanh trước khi lưu');
+        if (!silent) {
+          message.warning('Vui lòng nhập nội dung lịch sử hoặc âm thanh trước khi lưu');
+        }
         return { success: false };
       }
 
@@ -136,12 +137,14 @@ export function useHistoryAudioUploadAndSave({
         let audioUrl: string | null = selectedAudioUrl || null;
 
         if (selectedAudioBlob) {
-          const cloudinaryUrl = await uploadVideoToCloudinary(selectedAudioBlob);
-          if (!cloudinaryUrl) {
-            message.error('Tải âm thanh lên Cloudinary thất bại');
+          const backendUrl = await uploadVideoToBackend(selectedAudioBlob);
+          if (!backendUrl) {
+            if (!silent) {
+              message.error('Tải âm thanh lên backend thất bại');
+            }
             return { success: false };
           }
-          audioUrl = cloudinaryUrl;
+          audioUrl = backendUrl;
         }
 
         const normalizedTitle = title.trim() || null;
@@ -155,41 +158,49 @@ export function useHistoryAudioUploadAndSave({
           historyText: clearEmtpyLines(text),
           words: hasAudio
             ? alignedWords.map((word) => ({
-              text: word.text,
-              start: word.start,
-              end: word.end,
-            }))
+                text: word.text,
+                start: word.start,
+                end: word.end,
+              }))
             : [],
           metadata: shouldSendMetadata
             ? {
-              mode: hasAudio ? mode : null,
-              modelId: hasAudio && mode === 'generate' ? modelId : null,
-              voiceId: hasAudio && mode === 'generate' ? voiceId : null,
-              language:
-                hasAudio && mode === 'generate'
-                  ? ELEVEN_LABS_VOICES.find((v) => v.id === voiceId)?.language?.slice(0, 2).toLowerCase() || 'en'
-                  : hasAudio
-                    ? 'en'
-                    : null,
-              title: normalizedTitle,
-              artist: normalizedArtist,
-              coverImage: normalizedCoverImage,
-            }
+                mode: hasAudio ? mode : null,
+                modelId: hasAudio && mode === 'generate' ? modelId : null,
+                voiceId: hasAudio && mode === 'generate' ? voiceId : null,
+                language:
+                  hasAudio && mode === 'generate'
+                    ? ELEVEN_LABS_VOICES.find((v) => v.id === voiceId)
+                        ?.language?.slice(0, 2)
+                        .toLowerCase() || 'en'
+                    : hasAudio
+                      ? 'en'
+                      : null,
+                title: normalizedTitle,
+                artist: normalizedArtist,
+                coverImage: normalizedCoverImage,
+              }
             : null,
         };
 
         if (activeAudioId) {
           await updateAudio(activeAudioId, payload);
-          message.success('Cập nhật âm thanh lịch sử thành công');
+          if (!silent) {
+            message.success('Cập nhật âm thanh lịch sử thành công');
+          }
           return { success: true };
         }
 
         const created = await createAudio(payload);
-        message.success('Tạo âm thanh lịch sử thành công');
+        if (!silent) {
+          message.success('Tạo âm thanh lịch sử thành công');
+        }
         return { success: true, createdId: created.id };
       } catch (error) {
         console.error(error);
-        message.error('Lưu âm thanh lịch sử thất bại');
+        if (!silent) {
+          message.error('Lưu âm thanh lịch sử thất bại');
+        }
         return { success: false };
       }
     },

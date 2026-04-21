@@ -12,6 +12,7 @@ interface PlaybackAndTimingSectionProps {
   aligningWords: boolean;
   audioRef: React.RefObject<HTMLAudioElement | null>;
   onGenerateWordTiming: () => void;
+  showGenerateWordTimingButton?: boolean;
 }
 
 export default function PlaybackAndTimingSection({
@@ -22,6 +23,7 @@ export default function PlaybackAndTimingSection({
   aligningWords,
   audioRef,
   onGenerateWordTiming,
+  showGenerateWordTimingButton = true,
 }: PlaybackAndTimingSectionProps) {
   return (
     <div className="space-y-4">
@@ -32,10 +34,16 @@ export default function PlaybackAndTimingSection({
         {currentTime.toFixed(2)} giây
       </div>
 
-      <Button variant="outline" onClick={onGenerateWordTiming} disabled={aligningWords}>
-        {aligningWords ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <WandSparkles className="mr-2 h-4 w-4" />}
-        Tạo lời thoại
-      </Button>
+      {showGenerateWordTimingButton ? (
+        <Button variant="outline" onClick={onGenerateWordTiming} disabled={aligningWords}>
+          {aligningWords ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <WandSparkles className="mr-2 h-4 w-4" />
+          )}
+          Tạo lời thoại
+        </Button>
+      ) : null}
 
       {alignedWords.length > 0 && (
         <div className="max-h-[260px] overflow-y-auto rounded-lg border bg-muted/20 p-3">

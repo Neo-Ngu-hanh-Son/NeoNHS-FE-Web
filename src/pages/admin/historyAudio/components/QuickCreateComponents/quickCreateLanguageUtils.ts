@@ -7,20 +7,21 @@ export interface QuickCreateLanguageOption {
   countryCode: string;
 }
 
+// Have to map because Eleven Labs use different language ISO codes than the standard ones (e.g. zh for Chinese instead of zh-CN), and we want to display the correct country flags for each language.
 const LANGUAGE_TO_COUNTRY: Record<string, string> = {
   en: 'us', // English -> USA flag
-  vn: 'vn', // Vietnamese -> Vietnam flag
-  jp: 'jp', // Japanese -> Japan flag
-  kr: 'kr', // Korean -> South Korea flag
-  cn: 'cn', // Chinese -> China flag
+  vi: 'vn', // Vietnamese -> Vietnam flag
+  ja: 'jp', // Japanese -> Japan flag
+  ko: 'kr', // Korean -> South Korea flag
+  zh: 'cn', // Chinese -> China flag
 };
 
 const LANGUAGE_LABELS: Record<string, string> = {
   en: 'Tiếng Anh',
-  vn: 'Tiếng Việt',
-  jp: 'Tiếng Nhật',
-  kr: 'Tiếng Hàn',
-  cn: 'Tiếng Trung',
+  vi: 'Tiếng Việt',
+  ja: 'Tiếng Nhật',
+  ko: 'Tiếng Hàn',
+  zh: 'Tiếng Trung',
 };
 
 export function getQuickCreateLanguageOptions(): QuickCreateLanguageOption[] {

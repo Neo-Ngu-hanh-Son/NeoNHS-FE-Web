@@ -7,18 +7,20 @@ const ai = new GoogleGenAI({
   apiKey: API_KEY,
 });
 
-const TRANSLATION_PROMPT = `Act as a professional translator and JSON formatter. 
+const TRANSLATION_PROMPT = `Act as a professional cultural heritage translator and JSON formatter. 
 
-**Task:** 
-Translate the provided Vietnamese input into each language listed in the "requiredLanguage" array.
+**Context:** You are translating content for "NeoNHS", an ecosystem for experiencing the Marble Mountains (Ngũ Hành Sơn) in Da Nang, Vietnam. The content includes historical facts, legends, and descriptions of caves and pagodas.
+
+**Task:** Translate the provided Vietnamese input into each language listed in the "requiredLanguage" array.
 
 **Constraints:**
-1. Output MUST be a strictly valid JSON array of objects.
-2. Each object in the array must correspond to one language from the "requiredLanguage" list.
-3. Each object must contain the following keys: "title", "author", "script", and "language".
-4. The "language" key should contain the name of the language used for that specific translation.
-5. Maintain the original meaning and tone of the "script" and "title".
-6. Do not include any conversational text, explanations, or markdown code blocks (unless requested). Only the raw JSON.
+1. **Format:** Output MUST be a strictly valid JSON array of objects. No markdown blocks, no intro/outro.
+2. **Key Requirements:** Each object must have: "title", "author", "script", and "language" (the ISO 639-1 code).
+3. **Translation Quality:** - Maintain a professional, storytelling tone suitable for a tour guide.
+   - **Proper Nouns:** Keep Vietnamese names of caves/mountains/pagodas in their original Vietnamese form (with or without tone marks depending on the target language's custom) and optionally include the meaning in brackets for the first mention.
+   - **Cultural Sensitivity:** Use appropriate honorifics or formal terms when translating religious or historical content into Japanese (Keigo) or Korean.
+4. **Author field:** Keep the author name original unless it's a generic title like "Người kể chuyện" (Narrator).
+
 
 **Input Format:**
 {
@@ -52,6 +54,7 @@ Output: [
   {"title": "La Mer", "author": "An", "script": "Le bruit des vagues.", "language": "french"},
   {"title": "Das Meer", "author": "An", "script": "Das Rauschen der Wellen.", "language": "german"}
 ]
+
 `;
 
 function parseGeminiTranslationResponse(text: string): GeminiTranslationObject[] {
@@ -86,9 +89,9 @@ async function fakeTranslation({ title, author, script, requiredLanguages }: Gem
       title: 'Flavor of the Homeland',
       script: 'The fragrant aroma of new rice wafts through the afternoon breeze.',
     },
-    jp: { title: '故郷の香り', script: '午後の風に、炊きたてのご飯の香りが漂っています。' },
-    kr: { title: '고향의 향기', script: '오후의 바람에 갓 지은 밥의 향기가 풍깁니다.' },
-    vn: { title: 'Le Parfum du Pays', script: "L'arôme du riz nouveau embaume la brise de l'après-midi." },
+    ja: { title: '故郷の香り', script: '午後の風に、炊きたてのご飯の香りが漂っています。' },
+    ko: { title: '고향의 향기', script: '오후의 바람에 갓 지은 밥의 향기가 풍깁니다.' },
+    vi: { title: 'Le Parfum du Pays', script: "L'arôme du riz nouveau embaume la brise de l'après-midi." },
   };
 
   // Generate the response based on requiredLanguages
@@ -110,5 +113,4 @@ async function fakeTranslation({ title, author, script, requiredLanguages }: Gem
 
 export const GeminiAISerivce = {
   translate,
-  fakeTranslation,
 };

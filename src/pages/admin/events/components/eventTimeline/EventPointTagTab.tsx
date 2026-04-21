@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 
 import { useEventTimelines } from '@/hooks/event';
-import { uploadImageToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend } from '@/utils/cloudinary';
 import { EventPointTagResponse } from '@/types/eventTimeline';
 import { FormData } from '../../type';
 import EventPointTagPicker from './EventPointTagPicker';
@@ -199,7 +199,8 @@ const EventPointTagTab = forwardRef<EventPointTagTabHandle, Props>(function Even
 
     if (!blob) return null;
 
-    return uploadImageToCloudinary(blob);
+    const result = await uploadImageToBackend(blob);
+    return result?.mediaUrl ?? null;
   };
 
   const generateMarkerIcon = async (): Promise<string | null> => {

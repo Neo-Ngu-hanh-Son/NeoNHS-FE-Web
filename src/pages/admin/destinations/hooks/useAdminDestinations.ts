@@ -3,7 +3,7 @@ import { message } from 'antd';
 import * as XLSX from 'xlsx';
 import { attractionService } from '@/services/api/attractionService';
 import { adminPointService } from '@/services/api/pointService';
-import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend, uploadVideoToBackend } from '@/utils/cloudinary';
 import { PointRequest } from '@/types/point';
 import { Destination, Point, MapPickerTarget } from '../types';
 
@@ -123,10 +123,12 @@ export function useAdminDestinations() {
   ) => {
     setUploading((prev) => ({ ...prev, [field]: true }));
     try {
-      const url = type === 'image' ? await uploadImageToCloudinary(file) : await uploadVideoToCloudinary(file);
-
+      const url =
+        type === 'image'
+          ? await uploadImageToBackend(file)
+          : await uploadVideoToBackend(file).then((url) => ({ mediaUrl: url })); // Normalize video response to match image response structure
       if (url) {
-        setFieldValue(field, url);
+        setFieldValue(field, url.mediaUrl ?? '');
         message.success('File uploaded successfully!');
       } else {
         message.error('File upload failed.');

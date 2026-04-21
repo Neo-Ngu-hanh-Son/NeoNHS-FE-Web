@@ -6,14 +6,8 @@ import { MapPicker } from '@/components/common/MapPicker';
 import { ProfileAvatar } from './ProfileAvatar';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  Building2,
-  MapPin,
-  Landmark,
-  Lightbulb,
-  Save,
-  RotateCcw,
-} from 'lucide-react';
+import { Building2, MapPin, Landmark, Lightbulb, Save, RotateCcw } from 'lucide-react';
+import { validateImageFile, uploadImageToBackend } from '@/utils/cloudinary';
 
 const { TextArea } = Input;
 
@@ -29,7 +23,7 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
   const [location, setLocation] = useState<{ lat: number; lng: number } | undefined>(
     vendor.latitude && vendor.longitude
       ? { lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude) }
-      : undefined
+      : undefined,
   );
 
   useEffect(() => {
@@ -51,16 +45,15 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
   const handleAvatarUpload = async (file: File) => {
     setUploading(true);
     try {
-      const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
       const validationError = validateImageFile(file);
       if (validationError) throw new Error(validationError);
 
-      const avatarUrl = await uploadImageToCloudinary(file);
+      const avatarUrl = await uploadImageToBackend(file);
       if (!avatarUrl) throw new Error('Upload thất bại');
 
       const updated = await VendorService.updateVendorProfile({
         ...vendor,
-        avatarUrl,
+        avatarUrl: avatarUrl.mediaUrl,
       });
       message.success('Cập nhật ảnh đại diện thành công!');
       onSaved?.(updated);
@@ -114,7 +107,7 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
     setLocation(
       vendor.latitude && vendor.longitude
         ? { lat: parseFloat(vendor.latitude), lng: parseFloat(vendor.longitude) }
-        : undefined
+        : undefined,
     );
   };
 
@@ -155,7 +148,9 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Form.Item
-                  label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tên doanh nghiệp</span>}
+                  label={
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tên doanh nghiệp</span>
+                  }
                   name="businessName"
                   rules={[{ required: true, message: 'Vui lòng nhập tên doanh nghiệp' }]}
                 >
@@ -163,7 +158,9 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
                 </Form.Item>
 
                 <Form.Item
-                  label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Danh mục đăng ký</span>}
+                  label={
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Danh mục đăng ký</span>
+                  }
                 >
                   <Input
                     disabled
@@ -184,7 +181,9 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
               </Form.Item>
 
               <Form.Item
-                label={<span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Địa chỉ kinh doanh</span>}
+                label={
+                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Địa chỉ kinh doanh</span>
+                }
                 name="address"
               >
                 <Input
@@ -224,39 +223,51 @@ export function VendorEditForm({ vendor, onSaved }: VendorEditFormProps) {
           </CardHeader>
           <CardContent className="space-y-4">
             <Form.Item
-              label={<span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Mã số thuế</span>}
+              label={
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Mã số thuế
+                </span>
+              }
               name="taxCode"
             >
               <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 focus:ring-1 focus:ring-ring focus:border-primary outline-none transition-colors" />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tên ngân hàng</span>}
+              label={
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Tên ngân hàng
+                </span>
+              }
               name="bankName"
             >
               <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 focus:ring-1 focus:ring-ring focus:border-primary outline-none transition-colors" />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Số tài khoản</span>}
+              label={
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Số tài khoản
+                </span>
+              }
               name="bankAccountNumber"
             >
               <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 focus:ring-1 focus:ring-ring focus:border-primary outline-none transition-colors font-mono" />
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Tên chủ tài khoản</span>}
+              label={
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                  Tên chủ tài khoản
+                </span>
+              }
               name="bankAccountName"
             >
               <Input className="w-full px-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 focus:ring-1 focus:ring-ring focus:border-primary outline-none transition-colors uppercase" />
             </Form.Item>
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-3">
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full h-11"
-              >
+              <Button type="submit" disabled={loading} className="w-full h-11">
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />

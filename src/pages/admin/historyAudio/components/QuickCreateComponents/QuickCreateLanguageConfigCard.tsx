@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFieldArray, type UseFormReturn } from 'react-hook-form';
 import z from 'zod';
 import { quickCreateFormSchema } from './schemas/QuickCreateFormSchema';
-import { Languages, Plus, Wand2 } from 'lucide-react';
+import { Languages, Plus, Sparkles, Wand2 } from 'lucide-react';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ELEVEN_LABS_VOICES } from '@/pages/admin/historyAudio/constants';
 import {
@@ -20,8 +20,8 @@ type QuickCreateFormValues = z.infer<typeof quickCreateFormSchema>;
 
 interface QuickCreateLanguageConfigCardProps {
   form: UseFormReturn<QuickCreateFormValues>;
-  onConfirm: () => void | Promise<void>;
-  isConfirming?: boolean;
+  onConfirm: () => void;
+  isTranslating: boolean;
 }
 
 /**
@@ -30,7 +30,7 @@ interface QuickCreateLanguageConfigCardProps {
 export default function QuickCreateLanguageConfigCard({
   form,
   onConfirm,
-  isConfirming = false,
+  isTranslating,
 }: QuickCreateLanguageConfigCardProps) {
   const languageOptions = useMemo(() => getQuickCreateLanguageOptions(), []);
   const { fields, append, remove } = useFieldArray({
@@ -38,146 +38,67 @@ export default function QuickCreateLanguageConfigCard({
     name: 'languageSelections',
   });
 
-  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
-  const [previewingVoiceId, setPreviewingVoiceId] = useState<string | null>(null);
+  const selectedLanguageSelections = form.watch('languageSelections');
+  const selectedLanguageSet = new Set(selectedLanguageSelections.map((item) => item.language));
 
-  useEffect(() => {
-    return () => {
-      if (previewAudioRef.current) {
-        previewAudioRef.current.pause();
-        previewAudioRef.current.src = '';
-      }
-    };
-  }, []);
-
-  const stopVoicePreview = () => {
-    if (!previewAudioRef.current) {
-      return;
-    }
-
-    previewAudioRef.current.pause();
-    previewAudioRef.current.currentTime = 0;
-    setPreviewingVoiceId(null);
-  };
-
-  const handlePreviewVoice = async (voiceId: string) => {
-    const voice = ELEVEN_LABS_VOICES.find((item) => item.id === voiceId);
-    if (!voice?.sampleAudio) {
-      message.warning('Giọng đọc này chưa có bản nghe thử');
-      return;
-    }
-
-    if (previewingVoiceId === voiceId) {
-      stopVoicePreview();
-      return;
-    }
-
-    if (!previewAudioRef.current) {
-      previewAudioRef.current = new Audio();
-      previewAudioRef.current.onended = () => setPreviewingVoiceId(null);
-    }
-
-    try {
-      const audio = previewAudioRef.current;
-      audio.pause();
-      audio.src = voice.sampleAudio;
-      audio.currentTime = 0;
-      await audio.play();
-      setPreviewingVoiceId(voiceId);
-    } catch (error) {
-      console.error(error);
-      setPreviewingVoiceId(null);
-      message.error('Không thể phát bản nghe thử');
-    }
-  };
-
-  const handleSelectLanguage = (index: number, language: string) => {
-    form.setValue(`languageSelections.${index}.language`, language, {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-    form.setValue(`languageSelections.${index}.voiceId`, getDefaultVoiceIdForLanguage(language), {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-  };
-
-  const addLanguageItem = () => {
+  const handleToggleLanguage = (language: string) => {
     const current = form.getValues('languageSelections');
-    const unusedLanguage = languageOptions.find((option) => !current.some((item) => item.language === option.code));
-    const nextLanguage = unusedLanguage?.code ?? languageOptions[0]?.code ?? '';
-    const nextVoiceId = getDefaultVoiceIdForLanguage(nextLanguage);
-    append({ language: nextLanguage, voiceId: nextVoiceId });
-  };
+    const exists = current.some((item) => item.language === language);
 
-  const removeLanguageItem = (index: number) => {
-    const voiceId = form.getValues(`languageSelections.${index}.voiceId`);
-    if (previewingVoiceId === voiceId) {
-      stopVoicePreview();
-    }
-    remove(index);
+    const nextSelections = exists
+      ? current.filter((item) => item.language !== language)
+      : [...current, { language, voiceId: getDefaultVoiceIdForLanguage(language), model: '' }];
+
+    form.setValue('languageSelections', nextSelections, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   return (
-    <Card className="w-full">
+    <Card className="mt-6">
       <CardHeader>
-        <CardTitle>2. Cấu hình các ngôn ngữ</CardTitle>
-        <CardDescription>
-          Chọn các ngôn ngữ cần tạo và giọng đọc tương ứng. Bạn có thể thêm nhiều cấu hình và xóa từng cấu hình bất kỳ.
-        </CardDescription>
+        <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+          <Languages className="h-4 w-4" />
+          Chọn ngôn ngữ cần tạo
+        </CardTitle>
+        <CardDescription>Bật hoặc tắt ngôn ngữ bằng một lần nhấn, sau đó bắt đầu tạo bản dịch.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40px]">#</TableHead>
-              <TableHead>Ngôn ngữ</TableHead>
-              <TableHead>Giọng đọc</TableHead>
-              <TableHead className="w-[120px]">Hành động</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {fields.map((field, index) => {
-              const currentLanguage = form.watch(`languageSelections.${index}.language`);
-              const voiceOptions = getVoiceOptionsByLanguage(currentLanguage).map((voice) => ({
-                id: voice.id,
-                name: voice.name,
-              }));
+        <div className="flex flex-wrap gap-2">
+          {languageOptions.map((option) => {
+            const active = selectedLanguageSet.has(option.code);
+            return (
+              <Button
+                key={option.code}
+                type="button"
+                variant={active ? 'default' : 'outline'}
+                className={cn('h-10 gap-2 rounded-full px-4', active && 'ring-1 ring-primary/40')}
+                onClick={() => handleToggleLanguage(option.code)}
+              >
+                <span className={`fi fi-${option.countryCode} h-4 w-5 rounded-sm`} />
+                <span>{option.label}</span>
+              </Button>
+            );
+          })}
+        </div>
 
-              return (
-                <QuickCreateLanguageRow
-                  key={field.id}
-                  rowId={field.id}
-                  index={index}
-                  form={form}
-                  languageOptions={languageOptions}
-                  voiceOptions={voiceOptions}
-                  previewingVoiceId={previewingVoiceId}
-                  onSelectLanguage={handleSelectLanguage}
-                  onPreviewVoice={handlePreviewVoice}
-                  onRemove={removeLanguageItem}
-                  disableRemove={fields.length <= 1}
-                />
-              );
-            })}
-          </TableBody>
-        </Table>
+        <div className="flex flex-col gap-2 border-t pt-4 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm text-muted-foreground">
+            Đã chọn {selectedLanguageSelections.length} ngôn ngữ. Bản dịch sẽ được tạo tương ứng cho từng ngôn ngữ đã
+            bật.
+          </p>
+          <Button
+            type="button"
+            onClick={onConfirm}
+            disabled={isTranslating}
+            className={cn(isTranslating && 'btn-shimmer')}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            {isTranslating ? 'Đang tạo bản dịch...' : 'Bắt đầu tạo bản dịch'}
+          </Button>
+        </div>
       </CardContent>
-      <CardFooter className="justify-end">
-        <Button type="button" variant="outline" onClick={addLanguageItem} className="mr-2">
-          <Plus className="mr-2 h-4 w-4" />
-          Thêm ngôn ngữ
-        </Button>
-        <Button
-          type="button"
-          onClick={onConfirm}
-          disabled={isConfirming}
-          className={cn({ 'btn-shimmer': isConfirming })}
-        >
-          <Languages className="mr-2 h-4 w-4" />
-          {isConfirming ? 'Đang dịch...' : 'Dịch và khởi tạo'}
-        </Button>
-      </CardFooter>
     </Card>
   );
 }

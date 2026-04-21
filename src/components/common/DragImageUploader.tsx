@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback, type DragEvent, type ChangeEvent } from 'react';
-import { uploadImageToCloudinary, validateImageFile } from '@/utils/cloudinary';
+import { uploadImageToBackend, validateImageFile } from '@/utils/cloudinary';
 import { Upload, ImageIcon, RefreshCw, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Spinner } from '../ui/spinner';
@@ -55,9 +55,9 @@ export default function DragImageUploader({
       setFileName(file.name);
 
       try {
-        const url = await uploadImageToCloudinary(file);
+        const url = await uploadImageToBackend(file);
         if (!url) throw new Error('Upload failed — no URL returned');
-        onUpload(url);
+        onUpload(url.mediaUrl);
       } catch (err: any) {
         onError?.(err?.message || 'Failed to upload image. Please try again.');
       } finally {

@@ -13,6 +13,16 @@ const scriptSchema = z
 const quickCreateLanguageItemSchema = z.object({
   language: z.string().min(1, 'Vui lòng chọn ngôn ngữ'),
   voiceId: z.string().min(1, 'Vui lòng chọn giọng đọc'),
+  model: z.string().optional(),
+});
+
+const quickCreateAudioStatusSchema = z.enum(['idle', 'generating', 'uploading', 'uploaded', 'failed']);
+
+const forcedAlignmentWordSchema = z.object({
+  text: z.string().min(1, 'Thiếu từ căn chỉnh'),
+  start: z.number(),
+  end: z.number(),
+  loss: z.number().optional(),
 });
 
 export const quickCreateFormSchema = z.object({
@@ -28,11 +38,16 @@ const quickCreateTranslationEntrySchema = z.object({
     language: z.string().min(1, 'Thiếu thông tin ngôn ngữ'),
     voiceId: z.string().min(1, 'Thiếu thông tin giọng đọc'),
     voiceName: z.string().min(1, 'Thiếu thông tin tên giọng đọc'),
+    model: z.string().min(1, 'Thiếu thông tin model giọng đọc'),
+    audioStatus: quickCreateAudioStatusSchema,
+    audioUrl: z.string().optional(),
+    audioError: z.string().optional(),
   }),
   title: titleSchema,
   artist: artistSchema,
   coverImage: z.string().optional(),
   script: scriptSchema,
+  words: z.array(forcedAlignmentWordSchema).optional(),
 });
 
 export const multiQuickCreateSchema = z.object({
@@ -41,3 +56,4 @@ export const multiQuickCreateSchema = z.object({
 
 export type MultiQuickCreateValues = z.infer<typeof multiQuickCreateSchema>;
 export type QuickCreateTranslationEntry = z.infer<typeof quickCreateTranslationEntrySchema>;
+export type QuickCreateAudioStatus = z.infer<typeof quickCreateAudioStatusSchema>;

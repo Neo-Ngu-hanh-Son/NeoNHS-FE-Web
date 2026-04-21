@@ -5,6 +5,7 @@ import type { UploadProps } from 'antd';
 import { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload';
 import { userService } from '@/services/api/userService';
 import type { User } from '@/types';
+import { uploadImageToBackend, validateImageFile } from '@/utils/cloudinary';
 
 type Props = {
   initialUser?: User;
@@ -66,7 +67,6 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
 
     try {
       // Validate file first
-      const { validateImageFile, uploadImageToCloudinary } = await import('@/utils/cloudinary');
       const validationError = validateImageFile(fileObj);
       if (validationError) {
         message.error(validationError);
@@ -75,7 +75,7 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
 
       // Upload to Cloudinary immediately to get URL
       message.loading({ content: 'Uploading avatar...', key: 'avatar-upload' });
-      const uploadedUrl = await uploadImageToCloudinary(fileObj);
+      const uploadedUrl = await uploadImageToBackend(fileObj);
 
       if (!uploadedUrl) {
         message.error({ content: 'Failed to upload avatar', key: 'avatar-upload' });
@@ -83,10 +83,13 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
       }
 
       // Store the URL for later use when form is submitted
-      setPreviewUrl(uploadedUrl);
+      setPreviewUrl(uploadedUrl.mediaUrl);
       form.setFieldsValue({ avatar: uploadedUrl });
 
-      message.success({ content: 'Avatar uploaded! Click "Save changes" to update your profile.', key: 'avatar-upload' });
+      message.success({
+        content: 'Avatar uploaded! Click "Save changes" to update your profile.',
+        key: 'avatar-upload',
+      });
     } catch (err: any) {
       message.error({ content: err?.message ?? 'Failed to upload avatar', key: 'avatar-upload' });
     }
@@ -115,11 +118,7 @@ export const UserAccountForm = ({ initialUser, loading, onSaved }: Props) => {
     >
       <Card title="Avatar" style={{ marginBottom: 16 }}>
         <Space align="center" size="large">
-          <Avatar
-            size={64}
-            icon={<UserOutlined />}
-            src={previewUrl || initialUser?.avatarUrl}
-          />
+          <Avatar size={64} icon={<UserOutlined />} src={previewUrl || initialUser?.avatarUrl} />
           <Upload {...uploadProps}>
             <Button icon={<UploadOutlined />}>Upload new avatar</Button>
           </Upload>
