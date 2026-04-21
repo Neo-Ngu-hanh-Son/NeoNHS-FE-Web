@@ -1,15 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2, Volume2 } from "lucide-react";
-import { ELEVEN_LABS_MODELS, ELEVEN_LABS_VOICES } from "../constants";
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Volume2 } from 'lucide-react';
+import { ELEVEN_LABS_MODELS, ELEVEN_LABS_VOICES } from '../constants';
 
 interface GenerateAudioSectionProps {
   text: string;
@@ -76,12 +70,8 @@ export default function GenerateAudioSection({
           </div>
         </div>
 
-        <Button onClick={onGenerateAudio} disabled={generatingAudio}>
-          {generatingAudio ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Volume2 className="mr-2 h-4 w-4" />
-          )}
+        <Button onClick={onGenerateAudio} disabled={generatingAudio} size={'sm'}>
+          {generatingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Volume2 className="mr-2 h-4 w-4" />}
           Tạo âm thanh
         </Button>
       </CardContent>

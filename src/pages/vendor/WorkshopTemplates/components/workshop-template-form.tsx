@@ -1,25 +1,17 @@
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { workshopTemplateSchema, type WorkshopTemplateFormData, type WorkshopTemplateResponse } from "../types"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { WTagSelector } from "./wtag-selector"
-import { ImageUploader } from "./image-uploader"
-import { formatDuration } from "../utils/formatters"
-import { useEffect, useState } from "react"
-import { uploadImageToCloudinary } from "@/utils/cloudinary"
-import { message } from "antd"
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { workshopTemplateSchema, type WorkshopTemplateFormData, type WorkshopTemplateResponse } from '../types';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { WTagSelector } from './wtag-selector';
+import { ImageUploader } from './image-uploader';
+import { formatDuration } from '../utils/formatters';
+import { useEffect, useState } from 'react';
+import { uploadImageToBackend } from '@/utils/cloudinary';
+import { message } from 'antd';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -27,24 +19,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
-  FileText,
-  DollarSign,
-  Users,
-  Tags,
-  ImageIcon,
-  Clock,
-  UserMinus,
-  UserPlus,
-} from "lucide-react"
+} from '@/components/ui/alert-dialog';
+import { FileText, DollarSign, Users, Tags, ImageIcon, Clock, UserMinus, UserPlus } from 'lucide-react';
 
 interface WorkshopTemplateFormProps {
-  defaultValues?: WorkshopTemplateResponse
-  onSubmit: (data: WorkshopTemplateFormData) => Promise<void> | void
-  onCancel: () => void
-  isEditing?: boolean
-  submitting?: boolean
+  defaultValues?: WorkshopTemplateResponse;
+  onSubmit: (data: WorkshopTemplateFormData) => Promise<void> | void;
+  onCancel: () => void;
+  isEditing?: boolean;
+  submitting?: boolean;
 }
 
 export function WorkshopTemplateForm({
@@ -54,110 +37,107 @@ export function WorkshopTemplateForm({
   isEditing = false,
   submitting = false,
 }: WorkshopTemplateFormProps) {
-  const [durationDisplay, setDurationDisplay] = useState("")
-  const [isUploading, setIsUploading] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [pendingData, setPendingData] = useState<WorkshopTemplateFormData | null>(null)
+  const [durationDisplay, setDurationDisplay] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingData, setPendingData] = useState<WorkshopTemplateFormData | null>(null);
 
   // Initialize free mode based on default price
-  const [isFreeMode, setIsFreeMode] = useState(defaultValues ? defaultValues.defaultPrice === 0 : false)
+  const [isFreeMode, setIsFreeMode] = useState(defaultValues ? defaultValues.defaultPrice === 0 : false);
 
   const form = useForm<WorkshopTemplateFormData>({
     resolver: zodResolver(workshopTemplateSchema),
     defaultValues: defaultValues
       ? {
-        name: defaultValues.name,
-        shortDescription: defaultValues.shortDescription || "",
-        fullDescription: defaultValues.fullDescription || "",
-        estimatedDuration: defaultValues.estimatedDuration,
-        defaultPrice: defaultValues.defaultPrice,
-        minParticipants: defaultValues.minParticipants,
-        maxParticipants: defaultValues.maxParticipants,
-        imageUrls: defaultValues.images.map(img => img.imageUrl),
-        thumbnailIndex: defaultValues.images.findIndex(img => img.isThumbnail) || 0,
-        tagIds: defaultValues.tags.map(tag => tag.id),
-      }
+          name: defaultValues.name,
+          shortDescription: defaultValues.shortDescription || '',
+          fullDescription: defaultValues.fullDescription || '',
+          estimatedDuration: defaultValues.estimatedDuration,
+          defaultPrice: defaultValues.defaultPrice,
+          minParticipants: defaultValues.minParticipants,
+          maxParticipants: defaultValues.maxParticipants,
+          imageUrls: defaultValues.images.map((img) => img.imageUrl),
+          thumbnailIndex: defaultValues.images.findIndex((img) => img.isThumbnail) || 0,
+          tagIds: defaultValues.tags.map((tag) => tag.id),
+        }
       : {
-        name: "",
-        shortDescription: "",
-        fullDescription: "",
-        estimatedDuration: 60,
-        defaultPrice: 0,
-        minParticipants: 1,
-        maxParticipants: 10,
-        imageUrls: [],
-        thumbnailIndex: 0,
-        tagIds: [],
-      },
-  })
+          name: '',
+          shortDescription: '',
+          fullDescription: '',
+          estimatedDuration: 60,
+          defaultPrice: 0,
+          minParticipants: 1,
+          maxParticipants: 10,
+          imageUrls: [],
+          thumbnailIndex: 0,
+          tagIds: [],
+        },
+  });
 
-  const watchedDuration = form.watch("estimatedDuration")
+  const watchedDuration = form.watch('estimatedDuration');
   useEffect(() => {
     if (watchedDuration > 0) {
-      setDurationDisplay(formatDuration(watchedDuration))
+      setDurationDisplay(formatDuration(watchedDuration));
     } else {
-      setDurationDisplay("")
+      setDurationDisplay('');
     }
-  }, [watchedDuration])
+  }, [watchedDuration]);
 
   const handleFormSubmit = (data: WorkshopTemplateFormData) => {
-    setPendingData(data)
-    setShowConfirmModal(true)
-  }
+    setPendingData(data);
+    setShowConfirmModal(true);
+  };
 
   const handleConfirmUploadAndSubmit = async () => {
-    if (!pendingData) return
+    if (!pendingData) return;
 
-    const data = { ...pendingData }
-    const hasFiles = data.imageUrls.some(u => u instanceof File)
+    const data = { ...pendingData };
+    const hasFiles = data.imageUrls.some((u) => u instanceof File);
 
     if (hasFiles) {
-      setIsUploading(true)
-      const hideMsg = message.loading("Đang tải ảnh lên...", 0)
+      setIsUploading(true);
+      const hideMsg = message.loading('Đang tải ảnh lên...', 0);
       try {
-        const finalUrls: string[] = []
+        const finalUrls: string[] = [];
         for (let i = 0; i < data.imageUrls.length; i++) {
-          const item = data.imageUrls[i]
+          const item = data.imageUrls[i];
           if (item instanceof File) {
-            const url = await uploadImageToCloudinary(item)
-            if (url) finalUrls.push(url)
+            const url = await uploadImageToBackend(item);
+            if (url) finalUrls.push(url.mediaUrl);
           } else {
-            finalUrls.push(item as string)
+            finalUrls.push(item as string);
           }
         }
-        data.imageUrls = finalUrls
+        data.imageUrls = finalUrls;
       } catch (error: any) {
-        hideMsg()
-        message.error("Lỗi khi tải ảnh lên: " + error.message)
-        setIsUploading(false)
-        setShowConfirmModal(false)
-        return
+        hideMsg();
+        message.error('Lỗi khi tải ảnh lên: ' + error.message);
+        setIsUploading(false);
+        setShowConfirmModal(false);
+        return;
       }
-      hideMsg()
-      setIsUploading(false)
+      hideMsg();
+      setIsUploading(false);
     }
 
     try {
-      await onSubmit(data)
+      await onSubmit(data);
     } catch {
       // Parent handles error
     }
 
     if (!submitting) {
-      setShowConfirmModal(false)
+      setShowConfirmModal(false);
     }
-  }
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFormSubmit)}>
-
         {/* ═══ Two-column grid: left = text, right = media + settings ═══ */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-
           {/* ──────── LEFT COLUMN (7/12) ──────── */}
           <div className="lg:col-span-7 space-y-6">
-
             {/* Basic Information */}
             <Card className="rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
               <CardHeader className="pb-4">
@@ -178,13 +158,11 @@ export function WorkshopTemplateForm({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tên Workshop <span className="text-red-500">*</span></FormLabel>
+                      <FormLabel>
+                        Tên Workshop <span className="text-red-500">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="VD: Workshop Làm Gốm Truyền Thống"
-                          {...field}
-                          maxLength={255}
-                        />
+                        <Input placeholder="VD: Workshop Làm Gốm Truyền Thống" {...field} maxLength={255} />
                       </FormControl>
                       <div className="flex items-center justify-between">
                         <FormDescription>Một cái tên rõ ràng, mang tính mô tả</FormDescription>
@@ -262,16 +240,18 @@ export function WorkshopTemplateForm({
                 <div className="grid grid-cols-1 gap-6">
                   {/* Price Mode Selection */}
                   <div>
-                    <FormLabel className="mb-3 block">Loại Hình Workshop <span className="text-red-500">*</span></FormLabel>
+                    <FormLabel className="mb-3 block">
+                      Loại Hình Workshop <span className="text-red-500">*</span>
+                    </FormLabel>
                     <div className="flex gap-3">
                       <Button
                         type="button"
-                        variant={!isFreeMode ? "default" : "outline"}
-                        className={!isFreeMode ? "bg-primary text-white" : "text-muted-foreground"}
+                        variant={!isFreeMode ? 'default' : 'outline'}
+                        className={!isFreeMode ? 'bg-primary text-white' : 'text-muted-foreground'}
                         onClick={() => {
-                          setIsFreeMode(false)
-                          if (form.getValues("defaultPrice") === 0) {
-                            form.setValue("defaultPrice", 50000)
+                          setIsFreeMode(false);
+                          if (form.getValues('defaultPrice') === 0) {
+                            form.setValue('defaultPrice', 50000);
                           }
                         }}
                       >
@@ -279,11 +259,15 @@ export function WorkshopTemplateForm({
                       </Button>
                       <Button
                         type="button"
-                        variant={isFreeMode ? "default" : "outline"}
-                        className={isFreeMode ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "text-emerald-700 hover:text-emerald-800 border-emerald-200"}
+                        variant={isFreeMode ? 'default' : 'outline'}
+                        className={
+                          isFreeMode
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'text-emerald-700 hover:text-emerald-800 border-emerald-200'
+                        }
                         onClick={() => {
-                          setIsFreeMode(true)
-                          form.setValue("defaultPrice", 0, { shouldValidate: true })
+                          setIsFreeMode(true);
+                          form.setValue('defaultPrice', 0, { shouldValidate: true });
                         }}
                       >
                         Miễn Phí
@@ -299,7 +283,9 @@ export function WorkshopTemplateForm({
                         name="defaultPrice"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Giá Mặc Định <span className="text-red-500">*</span></FormLabel>
+                            <FormLabel>
+                              Giá Mặc Định <span className="text-red-500">*</span>
+                            </FormLabel>
                             <FormControl>
                               <div className="relative">
                                 <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -311,13 +297,13 @@ export function WorkshopTemplateForm({
                                   value={
                                     field.value || field.value === 0
                                       ? field.value === 0
-                                        ? ""
-                                        : new Intl.NumberFormat("en-US").format(field.value)
-                                      : ""
+                                        ? ''
+                                        : new Intl.NumberFormat('en-US').format(field.value)
+                                      : ''
                                   }
                                   onChange={(e) => {
-                                    const rawValue = e.target.value.replace(/\D/g, "")
-                                    field.onChange(rawValue ? parseInt(rawValue, 10) : 0)
+                                    const rawValue = e.target.value.replace(/\D/g, '');
+                                    field.onChange(rawValue ? parseInt(rawValue, 10) : 0);
                                   }}
                                 />
                                 <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">
@@ -338,7 +324,9 @@ export function WorkshopTemplateForm({
                       name="estimatedDuration"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Thời Lượng Dự Kiến <span className="text-red-500">*</span></FormLabel>
+                          <FormLabel>
+                            Thời Lượng Dự Kiến <span className="text-red-500">*</span>
+                          </FormLabel>
                           <FormControl>
                             <div className="relative">
                               <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -374,7 +362,6 @@ export function WorkshopTemplateForm({
 
           {/* ──────── RIGHT COLUMN (5/12) ──────── */}
           <div className="lg:col-span-5 space-y-6">
-
             {/* Images */}
             <Card className="rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
               <CardHeader className="pb-4">
@@ -384,7 +371,9 @@ export function WorkshopTemplateForm({
                   </div>
                   <div>
                     <CardTitle className="text-base font-semibold">Hình Ảnh</CardTitle>
-                    <CardDescription className="text-xs">Tải lên ít nhất một hình. Chọn một hình làm ảnh bìa.</CardDescription>
+                    <CardDescription className="text-xs">
+                      Tải lên ít nhất một hình. Chọn một hình làm ảnh bìa.
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -403,8 +392,8 @@ export function WorkshopTemplateForm({
                               imageUrls={imageField.value}
                               thumbnailIndex={thumbnailField.value}
                               onChange={(urls, thumbIdx) => {
-                                imageField.onChange(urls)
-                                thumbnailField.onChange(thumbIdx)
+                                imageField.onChange(urls);
+                                thumbnailField.onChange(thumbIdx);
                               }}
                               error={form.formState.errors.imageUrls?.message}
                             />
@@ -438,7 +427,9 @@ export function WorkshopTemplateForm({
                     name="minParticipants"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tối Thiểu <span className="text-red-500">*</span></FormLabel>
+                        <FormLabel>
+                          Tối Thiểu <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <UserMinus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -462,7 +453,9 @@ export function WorkshopTemplateForm({
                     name="maxParticipants"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tối Đa <span className="text-red-500">*</span></FormLabel>
+                        <FormLabel>
+                          Tối Đa <span className="text-red-500">*</span>
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -482,10 +475,8 @@ export function WorkshopTemplateForm({
                   />
                 </div>
 
-                {form.watch("maxParticipants") < form.watch("minParticipants") && (
-                  <p className="mt-3 text-sm text-red-500 font-medium">
-                    Tối đa phải lớn hơn hoặc bằng Tối thiểu
-                  </p>
+                {form.watch('maxParticipants') < form.watch('minParticipants') && (
+                  <p className="mt-3 text-sm text-red-500 font-medium">Tối đa phải lớn hơn hoặc bằng Tối thiểu</p>
                 )}
               </CardContent>
             </Card>
@@ -527,27 +518,19 @@ export function WorkshopTemplateForm({
 
         {/* ─── Actions ─── */}
         <div className="flex justify-end gap-3 pt-6 mt-6 border-t">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onCancel}
-            size="lg"
-            disabled={submitting}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} size="lg" disabled={submitting}>
             Cancel
           </Button>
-          <Button
-            type="submit"
-            size="lg"
-            disabled={submitting || isUploading}
-          >
-            {(submitting || isUploading) ? (
+          <Button type="submit" size="lg" disabled={submitting || isUploading}>
+            {submitting || isUploading ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                {isEditing ? "Đang lưu..." : "Đang tạo..."}
+                {isEditing ? 'Đang lưu...' : 'Đang tạo...'}
               </>
+            ) : isEditing ? (
+              'Lưu Thay Đổi'
             ) : (
-              isEditing ? "Lưu Thay Đổi" : "Tạo Mẫu"
+              'Tạo Mẫu'
             )}
           </Button>
         </div>
@@ -558,29 +541,27 @@ export function WorkshopTemplateForm({
         open={showConfirmModal}
         onOpenChange={(open) => {
           if (!isUploading && !submitting) {
-            setShowConfirmModal(open)
+            setShowConfirmModal(open);
           }
         }}
       >
         <AlertDialogContent
           onEscapeKeyDown={(e) => {
-            if (isUploading || submitting) e.preventDefault()
+            if (isUploading || submitting) e.preventDefault();
           }}
         >
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              {isEditing ? "Lưu Thay Đổi?" : "Tạo Mẫu Workshop?"}
-            </AlertDialogTitle>
+            <AlertDialogTitle>{isEditing ? 'Lưu Thay Đổi?' : 'Tạo Mẫu Workshop?'}</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <p>
                 {isEditing
-                  ? "Bạn có chắc chắn muốn lưu những thay đổi này vào mẫu không?"
-                  : "Bạn có chắc chắn muốn tạo mẫu workshop này không?"}
+                  ? 'Bạn có chắc chắn muốn lưu những thay đổi này vào mẫu không?'
+                  : 'Bạn có chắc chắn muốn tạo mẫu workshop này không?'}
               </p>
               {(isUploading || submitting) && (
                 <p className="font-medium text-blue-600 dark:text-blue-500 flex items-center gap-2">
                   <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 dark:border-blue-500" />
-                  Vui lòng không đóng cửa sổ này. {isUploading ? "Đang tải ảnh lên..." : "Đang lưu dữ liệu mẫu..."}
+                  Vui lòng không đóng cửa sổ này. {isUploading ? 'Đang tải ảnh lên...' : 'Đang lưu dữ liệu mẫu...'}
                 </p>
               )}
             </AlertDialogDescription>
@@ -600,18 +581,18 @@ export function WorkshopTemplateForm({
               disabled={isUploading || submitting}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {(isUploading || submitting) ? (
+              {isUploading || submitting ? (
                 <>
                   <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  {isUploading ? "Đang tải ảnh..." : "Đang lưu..."}
+                  {isUploading ? 'Đang tải ảnh...' : 'Đang lưu...'}
                 </>
               ) : (
-                "Xác nhận"
+                'Xác nhận'
               )}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </Form>
-  )
+  );
 }

@@ -13,7 +13,7 @@ export const hotSpotSchema = z.object({
     .string()
     .min(1, "Vui lòng nhập tiêu đề")
     .max(255, "Tối đa 255 ký tự"),
-  description: z.string().max(255, "Tối đa 255 ký tự").optional().or(z.literal("")),
+  description: z.string().max(1000, "Tối đa 1000 ký tự").optional().or(z.literal("")),
   imageUrl: z.string().url("Phải là URL hợp lệ").optional().or(z.literal("")),
   orderIndex: z.number().optional(),
   type: z.enum(["INFO", "LINK"]),

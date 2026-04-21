@@ -39,25 +39,25 @@ const Header: FunctionComponent = () => {
     // Nếu là ADMIN -> Hiện Admin Dashboard
     ...(user?.role === 'ADMIN'
       ? [
-        {
-          key: 'admin-dashboard',
-          label: 'Admin Dashboard',
-          icon: <LayoutDashboard className="w-4 h-4" />,
-          onClick: () => navigate('/admin/dashboard'), // Thêm dấu '/' phía trước để đảm bảo absolute routing
-        },
-      ]
+          {
+            key: 'admin-dashboard',
+            label: 'Admin Dashboard',
+            icon: <LayoutDashboard className="w-4 h-4" />,
+            onClick: () => navigate('/admin/dashboard'), // Thêm dấu '/' phía trước để đảm bảo absolute routing
+          },
+        ]
       : []),
 
     // Nếu là VENDOR -> Hiện Vendor Dashboard
     ...(user?.role === 'VENDOR'
       ? [
-        {
-          key: 'vendor-dashboard',
-          label: 'Vendor Dashboard',
-          icon: <LayoutDashboard className="w-4 h-4" />,
-          onClick: () => navigate('/vendor/dashboard'),
-        },
-      ]
+          {
+            key: 'vendor-dashboard',
+            label: 'Vendor Dashboard',
+            icon: <LayoutDashboard className="w-4 h-4" />,
+            onClick: () => navigate('/vendor/dashboard'),
+          },
+        ]
       : []),
 
     // Các menu chung cho tất cả mọi người (kể cả TOURIST)
@@ -90,18 +90,15 @@ const Header: FunctionComponent = () => {
 
   return (
     <header
-      className={`w-full font-[Inter] sticky top-0 z-50 transition-all duration-300 ${isScrolled
-        ? 'glass-nav shadow-sm'
-        : 'glass-nav-transparent bg-transparent'
-        }`}
+      className={`w-full font-[Inter] sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? 'glass-nav shadow-sm' : 'glass-nav-transparent bg-transparent'
+      }`}
     >
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16 lg:h-[72px]">
           {/* Logo Section - Left */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-emerald-200 transition-shadow duration-300">
-              <span className="text-white font-bold text-lg">N</span>
-            </div>
+            <img src="/src/assets/images/NeoNHSLogo_Optimized.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
             <span className="text-xl font-bold tracking-tight text-slate-900">NeoNHS</span>
           </Link>
 
@@ -113,10 +110,11 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`text-[15px] px-4 py-2 rounded-lg transition-all duration-300 ${isActiveLink(link.href)
-                      ? 'text-emerald-600 font-semibold bg-emerald-50'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                      }`}
+                    className={`text-[15px] px-4 py-2 rounded-lg transition-all duration-300 ${
+                      isActiveLink(link.href)
+                        ? 'text-emerald-600 font-semibold bg-emerald-50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
                   >
                     {link.label}
                   </Link>
@@ -175,10 +173,11 @@ const Header: FunctionComponent = () => {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className={`block text-base px-4 py-3 rounded-xl transition-all duration-300 ${isActiveLink(link.href)
-                      ? 'text-emerald-600 font-semibold bg-emerald-50'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                      }`}
+                    className={`block text-base px-4 py-3 rounded-xl transition-all duration-300 ${
+                      isActiveLink(link.href)
+                        ? 'text-emerald-600 font-semibold bg-emerald-50'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {link.label}

@@ -1,6 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ForcedAlignmentWord } from "@/pages/admin/historyAudio/types";
-import HistoryAudioPlayer from "./HistoryAudioPlayer";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import type { ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
+import HistoryAudioPlayer from './HistoryAudioPlayer';
 
 interface TimingSectionProps {
   hasAudio: boolean;
@@ -11,6 +11,8 @@ interface TimingSectionProps {
   aligningWords: boolean;
   audioRef: React.RefObject<HTMLAudioElement | null>;
   onGenerateWordTiming: () => void;
+  title?: string;
+  showGenerateWordTimingButton?: boolean;
 }
 
 export default function TimingSection({
@@ -22,12 +24,14 @@ export default function TimingSection({
   aligningWords,
   audioRef,
   onGenerateWordTiming,
+  title = '3. Thời điểm (timing)',
+  showGenerateWordTimingButton = true,
 }: TimingSectionProps) {
   if (!hasAudio) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">3. Thời điểm (timing)</CardTitle>
+          <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           Hãy thêm hoặc tạo file âm thanh trước nếu bạn muốn tạo thời điểm theo từng từ.
@@ -39,7 +43,7 @@ export default function TimingSection({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">3. Thời điểm (timing)</CardTitle>
+        <CardTitle className="text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <HistoryAudioPlayer
@@ -50,6 +54,7 @@ export default function TimingSection({
           aligningWords={aligningWords}
           audioRef={audioRef}
           onGenerateWordTiming={onGenerateWordTiming}
+          showGenerateWordTimingButton={showGenerateWordTimingButton}
         />
       </CardContent>
     </Card>
