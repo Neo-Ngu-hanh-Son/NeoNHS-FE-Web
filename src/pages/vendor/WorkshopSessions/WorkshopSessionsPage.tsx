@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays, RefreshCcw } from 'lucide-react'
+import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays, RefreshCcw, Loader2 } from 'lucide-react'
 import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
@@ -13,6 +13,11 @@ import { ViewSessionDialog } from './components/view-session-dialog'
 import { SessionCalendar } from './components/calendar'
 import { formatDate, parseSessionInstant } from './utils/formatters'
 import {
+  applySessionFilters,
+  distinctVietnamDateKeysNewestFirst,
+  sessionsVisibleForDaySlice,
+} from './utils/sessionListLazy'
+import {
   canCompleteWorkshopSession,
   canStartWorkshopSession,
   mapWorkshopSessionErrorToVi,
@@ -20,9 +25,16 @@ import {
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 import { WorkshopSessionService } from '@/services/api/workshopSessionService'
 
+const PAGE_SIZE = 100
+
 export default function WorkshopSessionsPage() {
   const [sessions, setSessions] = useState<WorkshopSessionResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [apiPage, setApiPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  /** Số ngày (có phiên) hiển thị: 7, 14, 21… — các ngày mới nhất trước */
+  const [visibleDayCount, setVisibleDayCount] = useState(7)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
@@ -44,19 +56,27 @@ export default function WorkshopSessionsPage() {
 
   // Fetch sessions on mount
   useEffect(() => {
-    fetchSessions()
+    void fetchSessions()
   }, [])
 
-  const fetchSessions = async () => {
+  /** Đổi bộ lọc → reset phần “lazy theo ngày” */
+  useEffect(() => {
+    setVisibleDayCount(7)
+  }, [searchQuery, statusFilter])
+
+  const fetchSessions = useCallback(async () => {
     try {
       setLoading(true)
       const response = await WorkshopSessionService.getMySessions({
         page: 0,
-        size: 100, // Get all for now
+        size: PAGE_SIZE,
         sortBy: 'startTime',
-        sortDirection: 'ASC',
+        sortDirection: 'DESC',
       })
       setSessions(response.content || [])
+      setApiPage(response.number ?? 0)
+      setTotalPages(response.totalPages ?? 1)
+      setVisibleDayCount(7)
     } catch (error: unknown) {
       console.error('Failed to fetch sessions:', error)
       notification.error({
@@ -66,40 +86,39 @@ export default function WorkshopSessionsPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  // Filter and sort sessions
-  const filteredSessions = useMemo(() => {
-    let filtered = sessions
+  /** Phiên sau khi lọc tìm kiếm + trạng thái (dùng cho lịch và thống kê) */
+  const baseFiltered = useMemo(
+    () => applySessionFilters(sessions, searchQuery, statusFilter),
+    [sessions, searchQuery, statusFilter],
+  )
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(s =>
-        s.workshopTemplate.name.toLowerCase().includes(query) ||
-        s.workshopTemplate.shortDescription.toLowerCase().includes(query)
-      )
-    }
+  /** Các ngày có phiên (mới nhất trước) */
+  const dateKeysNewestFirst = useMemo(
+    () => distinctVietnamDateKeysNewestFirst(baseFiltered),
+    [baseFiltered],
+  )
 
-    // Status filter
-    if (statusFilter && statusFilter !== 'all') {
-      filtered = filtered.filter(s => s.status === statusFilter)
-    }
+  /** Danh sách: chỉ các phiên thuộc N ngày đầu tiên trong dateKeysNewestFirst */
+  const sessionsForList = useMemo(
+    () => sessionsVisibleForDaySlice(baseFiltered, dateKeysNewestFirst, visibleDayCount),
+    [baseFiltered, dateKeysNewestFirst, visibleDayCount],
+  )
 
-    // Sort by start time (newest first)
-    filtered = [...filtered].sort(
-      (a, b) =>
-        parseSessionInstant(b.startTime).getTime() -
-        parseSessionInstant(a.startTime).getTime()
-    )
+  const sortedListSessions = useMemo(
+    () =>
+      [...sessionsForList].sort(
+        (a, b) =>
+          parseSessionInstant(b.startTime).getTime() - parseSessionInstant(a.startTime).getTime(),
+      ),
+    [sessionsForList],
+  )
 
-    return filtered
-  }, [sessions, searchQuery, statusFilter])
-
-  // Group sessions by date for list view
+  // Group sessions by date for list view (chỉ phần đang lazy-load)
   const groupedSessions = useMemo(() => {
     const groups: { [key: string]: WorkshopSessionResponse[] } = {}
-    filteredSessions.forEach(session => {
+    sortedListSessions.forEach((session) => {
       const dateKey = formatDate(session.startTime)
       if (!groups[dateKey]) {
         groups[dateKey] = []
@@ -107,7 +126,77 @@ export default function WorkshopSessionsPage() {
       groups[dateKey].push(session)
     })
     return groups
-  }, [filteredSessions])
+  }, [sortedListSessions])
+
+  /** Thứ tự nhóm ngày: mới nhất trước */
+  const orderedGroupEntries = useMemo(() => {
+    return Object.entries(groupedSessions).sort(([, sessionsA], [, sessionsB]) => {
+      const ta = parseSessionInstant(sessionsA[0].startTime).getTime()
+      const tb = parseSessionInstant(sessionsB[0].startTime).getTime()
+      return tb - ta
+    })
+  }, [groupedSessions])
+
+  const canLoadMoreDays =
+    visibleDayCount < dateKeysNewestFirst.length || apiPage < totalPages - 1
+
+  const handleLoadMoreDays = async () => {
+    const next = visibleDayCount + 7
+    if (next <= dateKeysNewestFirst.length) {
+      setVisibleDayCount(next)
+      return
+    }
+    /** Đã có thêm ngày trong bộ nhớ nhưng chưa “mở” hết (vd. xin 14 ngày mà chỉ có 10 ngày tổng) */
+    if (visibleDayCount < dateKeysNewestFirst.length) {
+      setVisibleDayCount(next)
+      return
+    }
+    if (apiPage >= totalPages - 1) {
+      notification.info({
+        message: 'Đã hiển thị đủ',
+        description: 'Không còn phiên hoặc ngày nào khác để tải thêm.',
+      })
+      return
+    }
+
+    setLoadingMore(true)
+    try {
+      let merged = [...sessions]
+      let p = apiPage
+      let tp = totalPages
+      let keys = distinctVietnamDateKeysNewestFirst(
+        applySessionFilters(merged, searchQuery, statusFilter),
+      )
+
+      while (keys.length < next && p < tp - 1) {
+        p += 1
+        const res = await WorkshopSessionService.getMySessions({
+          page: p,
+          size: PAGE_SIZE,
+          sortBy: 'startTime',
+          sortDirection: 'DESC',
+        })
+        merged = [...merged, ...(res.content || [])]
+        tp = res.totalPages ?? tp
+        keys = distinctVietnamDateKeysNewestFirst(
+          applySessionFilters(merged, searchQuery, statusFilter),
+        )
+      }
+      setSessions(merged)
+      setApiPage(p)
+      setTotalPages(tp)
+      setVisibleDayCount(next)
+    } catch (error: unknown) {
+      notification.error({
+        message: 'Tải thêm thất bại',
+        description: mapWorkshopSessionErrorToVi(
+          getApiErrorMessage(error, 'Không thể tải thêm dữ liệu. Vui lòng thử lại.'),
+        ),
+      })
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const handleView = (sessionId: string) => {
     const session = sessions.find(s => s.id === sessionId)
@@ -314,7 +403,15 @@ export default function WorkshopSessionsPage() {
 
       {/* Results count */}
       <div className="text-sm text-muted-foreground font-medium">
-        Hiển thị {filteredSessions.length} / {sessions.length} phiên
+        {view === 'list' ? (
+          <>
+             Hiển thị: {sessionsForList.length} phiên
+             </>
+        ) : (
+          <>
+            Lịch: {baseFiltered.length} phiên sau lọc · đã tải {sessions.length} phiên từ máy chủ
+          </>
+        )}
       </div>
 
       {/* Sessions Display */}
@@ -325,11 +422,11 @@ export default function WorkshopSessionsPage() {
             <p className="text-muted-foreground">Đang tải danh sách phiên...</p>
           </div>
         </div>
-      ) : filteredSessions.length > 0 ? (
+      ) : baseFiltered.length > 0 ? (
         view === 'list' ? (
           // List View - Grouped by Date
           <div className="space-y-6">
-            {Object.entries(groupedSessions).map(([date, dateSessions]) => (
+            {orderedGroupEntries.map(([date, dateSessions]) => (
               <div key={date} className="space-y-4">
                 <div className="flex items-center gap-3">
                   <CalendarIcon className="w-5 h-5 text-blue-500" />
@@ -368,11 +465,30 @@ export default function WorkshopSessionsPage() {
                 </div>
               </div>
             ))}
+            <div className="flex justify-center pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="rounded-xl gap-2 min-w-[220px]"
+                disabled={!canLoadMoreDays || loadingMore}
+                onClick={() => void handleLoadMoreDays()}
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Đang tải...
+                  </>
+                ) : (
+                  <>Tải thêm</>
+                )}
+              </Button>
+            </div>
           </div>
         ) : (
           // Calendar View
           <SessionCalendar
-            sessions={filteredSessions}
+            sessions={baseFiltered}
             onSessionClick={handleCalendarSessionView}
             onDateClick={handleCalendarDateClick}
             onSessionEdit={handleCalendarSessionEdit}
