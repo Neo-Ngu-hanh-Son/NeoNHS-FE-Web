@@ -4,10 +4,10 @@
 
 // --- Enums ---
 
-export type VoucherType = 'DISCOUNT' | 'GIFT_PRODUCT' | 'BONUS_POINTS' | 'FREE_SERVICE';
+export type VoucherType = 'DISCOUNT' | 'GIFT_PRODUCT';
 export type VoucherScope = 'PLATFORM' | 'VENDOR';
 export type VoucherStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
-export type DiscountType = 'PERCENT' | 'FIXED';
+export type DiscountType = 'PERCENT' | 'FIXED_AMOUNT';
 export type ApplicableProduct = 'ALL' | 'TICKET' | 'WORKSHOP' | 'EVENT_TICKET';
 
 // --- Response Types ---
@@ -30,19 +30,11 @@ export interface VoucherResponse {
     giftDescription: string | null;
     giftImageUrl: string | null;
 
-    // BONUS_POINTS fields
-    bonusPointsValue: number | null;
-
-    // FREE_SERVICE fields
-    freeTicketCatalogId: string | null;
-    freeTicketCatalogName: string | null;
-
     // Time & Usage
     startDate: string;
     endDate: string;
     usageLimit: number;
     usageCount: number;
-    maxUsagePerUser: number;
 
     // Status & Meta
     status: VoucherStatus;
@@ -72,7 +64,6 @@ export interface UserVoucherResponse {
     minOrderValue: number | null;
     giftDescription: string | null;
     giftImageUrl: string | null;
-    bonusPointsValue: number | null;
     startDate: string;
     endDate: string;
     status: VoucherStatus;
@@ -98,17 +89,10 @@ export interface CreateVoucherRequest {
     giftDescription?: string;
     giftImageUrl?: string;
 
-    // BONUS_POINTS
-    bonusPointsValue?: number;
-
-    // FREE_SERVICE
-    freeTicketCatalogId?: string;
-
     // Time & Usage
     startDate?: string;
     endDate?: string;
     usageLimit?: number;
-    maxUsagePerUser?: number;
 }
 
 export interface UpdateVoucherRequest {
@@ -120,12 +104,9 @@ export interface UpdateVoucherRequest {
     minOrderValue?: number;
     giftDescription?: string;
     giftImageUrl?: string;
-    bonusPointsValue?: number;
-    freeTicketCatalogId?: string;
     startDate?: string;
     endDate?: string;
     usageLimit?: number;
-    maxUsagePerUser?: number;
     status?: VoucherStatus;
 }
 

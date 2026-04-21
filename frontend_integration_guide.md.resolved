@@ -1,0 +1,46 @@
+# Frontend Integration Guide - Voucher Management Refinement
+
+This document outlines the changes in the Voucher System that require Frontend implementation or updates.
+
+## 1. Data Model Changes (DTOs)
+
+### Removed Fields
+The following fields have been removed from all Voucher-related requests/responses ([VoucherResponse](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/dto/response/voucher/VoucherResponse.java#14-92), [UserVoucherRespone](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/dto/response/voucher/UserVoucherRespone.java#14-92), [CreateVoucherRequest](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/dto/request/voucher/CreateVoucherRequest.java#13-64), [UpdateVoucherRequest](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/dto/request/voucher/UpdateVoucherRequest.java#13-55)):
+- `maxUsagePerUser` (Logic: Every user can only collect a voucher **once**).
+- `bonusPointsValue`
+- `freeTicketCatalogId` / `freeTicketCatalogName`
+
+### Removed Voucher Types
+The [VoucherType](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/service/impl/VoucherServiceImpl.java#365-386) enum no longer contains:
+- `BONUS_POINTS`
+- `FREE_SERVICE`
+- **Supported Types**: `DISCOUNT`, `GIFT_PRODUCT`.
+
+## 2. Business Logic Shifts
+
+### Collection & Usage
+- **Reservation at Collection**: The `usageCount` now increments as soon as a user clicks **"Collect"**. 
+    - *Frontend Impact*: If `usageCount >= usageLimit`, the UI should show the voucher as "Sold Out" or disable the collect button.
+- **Single Possession**: A user can only hold one instance of any specific voucher. The backend and UI should reflect this.
+
+### Gift Redemption Flow
+- **QR Code Workflow**: `GIFT_PRODUCT` vouchers are **NOT** applied during the checkout/payment process. 
+- **Staff Redemption**: They must be redeemed at the physical counter via a QR code.
+- **Redemption API**: `POST /api/staff/vouchers/redeem/{userVoucherId}`
+    - This API is for the **Staff/Admin App**.
+    - Marking a gift as redeemed converts `isUsed` to `true` and logs `usedDate`.
+
+## 3. API Updates
+
+### Staff Redemption (New)
+- **Endpoint**: `POST /api/staff/vouchers/redeem/{userVoucherId}`
+- **Security**: Requires `ADMIN` or `VENDOR` role.
+- **Response**: Returns the updated [UserVoucherRespone](file:///d:/ProjectCapstone/NeoNHS-BE/src/main/java/fpt/project/NeoNHS/dto/response/voucher/UserVoucherRespone.java#14-92).
+
+### Admin Creation
+- **Auto-default**: When an Admin creates a `GIFT_PRODUCT` voucher, the `applicableProduct` is forced to `ALL` by the backend. The Frontend can hide this selection or default it for the Admin UI.
+
+## 4. UI/UX Recommendations
+1.  **Voucher Wallet**: Group vouchers by `DISCOUNT` (usable in cart) and `GIFT` (show QR code for counter).
+2.  **QR Display**: For `GIFT_PRODUCT` type, provide a clear QR code containing the `userVoucherId` for staff to scan.
+3.  **Real-time Count**: Since `usageCount` increments at collection, ensure the "Available" count on the browse page reflects this immediate deduction.

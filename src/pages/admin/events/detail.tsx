@@ -85,13 +85,13 @@ export default function EventDetailPage() {
     try {
       const res = await eventService.deleteEvent(id!);
       if (res.success) {
-        message.success('Event hidden successfully');
+        message.success('Đã ẩn sự kiện thành công');
         await fetchEvent();
       } else {
-        message.error(res.message || 'Failed to hide event');
+        message.error(res.message || 'Lỗi khi ẩn sự kiện');
       }
     } catch (err: unknown) {
-      message.error('Failed to hide event');
+      message.error('Lỗi khi ẩn sự kiện');
     }
     setShowHide(false);
   };
@@ -100,13 +100,13 @@ export default function EventDetailPage() {
     try {
       const res = await eventService.permanentDeleteEvent(id!);
       if (res.success) {
-        message.success('Event permanently deleted');
+        message.success('Đã xóa vĩnh viễn sự kiện');
         navigate('/admin/events');
       } else {
-        message.error(res.message || 'Failed to permanently delete event');
+        message.error(res.message || 'Lỗi khi xóa vĩnh viễn sự kiện');
       }
     } catch (err: unknown) {
-      message.error('Failed to permanently delete event');
+      message.error('Lỗi khi xóa vĩnh viễn sự kiện');
     }
     setShowPermanentDelete(false);
   };
@@ -115,13 +115,13 @@ export default function EventDetailPage() {
     try {
       const res = await eventService.restoreEvent(id!);
       if (res.success) {
-        message.success('Event restored successfully');
+        message.success('Đã khôi phục sự kiện thành công');
         await fetchEvent();
       } else {
-        message.error(res.message || 'Failed to restore event');
+        message.error(res.message || 'Lỗi khi khôi phục sự kiện');
       }
     } catch (err: unknown) {
-      message.error('Failed to restore event');
+      message.error('Lỗi khi khôi phục sự kiện');
     }
   };
 
@@ -147,13 +147,13 @@ export default function EventDetailPage() {
       };
       const res = await eventService.updateEvent(event.id, data);
       if (res.success) {
-        message.success('Enabled ticket requirements successfully');
+        message.success('Bật yêu cầu vé thành công');
         await fetchEvent();
       } else {
-        message.error(res.message || 'Failed to update event');
+        message.error(res.message || 'Lỗi khi cập nhật sự kiện');
       }
     } catch (error) {
-      message.error('An error occurred while updating the event');
+      message.error('Đã xảy ra lỗi khi cập nhật sự kiện');
     } finally {
       setUpdatingTicketReq(false);
     }
@@ -181,13 +181,13 @@ export default function EventDetailPage() {
       };
       const res = await eventService.updateEvent(event.id, data);
       if (res.success) {
-        message.success('Location updated successfully');
+        message.success('Cập nhật địa điểm thành công');
         await fetchEvent();
       } else {
-        message.error(res.message || 'Failed to update location');
+        message.error(res.message || 'Lỗi khi cập nhật địa điểm');
       }
     } catch (error) {
-      message.error('An error occurred while updating the location');
+      message.error('Đã xảy ra lỗi khi cập nhật địa điểm');
     } finally {
       setUpdatingLocation(false);
     }
@@ -215,10 +215,10 @@ export default function EventDetailPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
-          <p className="text-lg font-medium">Event not found</p>
+          <p className="text-lg font-medium">Không tìm thấy sự kiện</p>
           <Button variant="outline" className="mt-4" onClick={() => navigate('/admin/events')}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Events
+            Trở lại danh sách
           </Button>
         </div>
       </div>
@@ -241,22 +241,22 @@ export default function EventDetailPage() {
               </Badge>
               {isDeleted && (
                 <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
-                  Hidden
+                  Đã ẩn
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground mt-0.5">Events &gt; {event.name}</p>
+            <p className="text-sm text-muted-foreground mt-0.5">Sự kiện &gt; {event.name}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" onClick={() => navigate(`/admin/events/${id}/edit`)}>
             <Pencil className="mr-2 h-4 w-4" />
-            Edit
+            Chỉnh sửa
           </Button>
           {isDeleted ? (
             <Button variant="default" onClick={handleRestore}>
               <RotateCcw className="mr-2 h-4 w-4" />
-              Restore
+              Khôi phục
             </Button>
           ) : (
             <Button
@@ -265,12 +265,12 @@ export default function EventDetailPage() {
               onClick={() => setShowHide(true)}
             >
               <EyeOff className="mr-2 h-4 w-4" />
-              Hide
+              Ẩn
             </Button>
           )}
           <Button variant="destructive" onClick={() => setShowPermanentDelete(true)}>
             <Trash2 className="mr-2 h-4 w-4" />
-            Permanently Delete
+            Xóa vĩnh viễn
           </Button>
         </div>
       </div>
@@ -280,11 +280,11 @@ export default function EventDetailPage() {
         <TabsList>
           <TabsTrigger value="overview" className="gap-1.5">
             <Info className="h-4 w-4" />
-            Overview
+            Tổng quan
           </TabsTrigger>
           <TabsTrigger value="gallery" className="gap-1.5">
             <ImageIcon className="h-4 w-4" />
-            Gallery
+            Thư viện
             {event.images && event.images.length > 0 && (
               <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1.5 text-[10px]">
                 {event.images.length}
@@ -293,19 +293,19 @@ export default function EventDetailPage() {
           </TabsTrigger>
           <TabsTrigger value="timeline" className="gap-1.5">
             <CalendarDays className="h-4 w-4" />
-            Timeline
+            Lịch trình
           </TabsTrigger>
           <TabsTrigger value="points" className="gap-1.5">
             <MapPin className="h-4 w-4" />
-            Points
+            Địa điểm
           </TabsTrigger>
           <TabsTrigger value="point-tags" className="gap-1.5">
             <Tags className="h-4 w-4" />
-            Point Tags
+            Thẻ địa điểm
           </TabsTrigger>
           <TabsTrigger value="tickets" className="gap-1.5">
             <Ticket className="h-4 w-4" />
-            Tickets
+            Vé
           </TabsTrigger>
         </TabsList>
 
@@ -317,39 +317,34 @@ export default function EventDetailPage() {
               {/* Event Info Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Event Information</CardTitle>
+                  <CardTitle>Thông tin sự kiện</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <InfoItem
                       icon={<Calendar className="h-4 w-4" />}
-                      label="Start Time"
+                      label="Thời gian bắt đầu"
                       value={formatEventDate(event.startTime)}
                     />
                     <InfoItem
                       icon={<Calendar className="h-4 w-4" />}
-                      label="End Time"
+                      label="Thời gian kết thúc"
                       value={formatEventDate(event.endTime)}
                     />
                     <InfoItem
                       icon={<MapPin className="h-4 w-4" />}
-                      label="Location"
+                      label="Địa điểm chính"
                       value={event.locationName || '—'}
                     />
                     <InfoItem
-                      icon={<DollarSign className="h-4 w-4" />}
-                      label="Price"
-                      value={formatEventPrice(event.price)}
-                    />
-                    <InfoItem
                       icon={<Users className="h-4 w-4" />}
-                      label="Enrolled"
+                      label="Số người tham gia"
                       value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants}` : ''}`}
                     />
                     <InfoItem
                       icon={<Ticket className="h-4 w-4" />}
-                      label="Ticket Required"
-                      value={event.isTicketRequired ? 'Yes' : 'No'}
+                      label="Yêu cầu vé"
+                      value={event.isTicketRequired ? 'Có' : 'Không'}
                     />
                   </div>
 
@@ -378,7 +373,7 @@ export default function EventDetailPage() {
               {/* Description Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Description</CardTitle>
+                  <CardTitle>Mô tả sự kiện</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {event.shortDescription && (
@@ -390,7 +385,7 @@ export default function EventDetailPage() {
                       dangerouslySetInnerHTML={{ __html: event.fullDescription }}
                     />
                   ) : (
-                    <p className="text-muted-foreground text-sm italic">No description provided</p>
+                    <p className="text-muted-foreground text-sm italic">Không có mô tả chi tiết</p>
                   )}
                 </CardContent>
               </Card>
@@ -401,7 +396,7 @@ export default function EventDetailPage() {
               {event.thumbnailUrl && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Thumbnail</CardTitle>
+                    <CardTitle>Ảnh đại diện</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="aspect-video rounded-lg overflow-hidden">
@@ -414,7 +409,7 @@ export default function EventDetailPage() {
               {/* Map Card */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Location Map</CardTitle>
+                  <CardTitle>Bản đồ khu vực tổ chức sự kiện</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div 
@@ -446,8 +441,8 @@ export default function EventDetailPage() {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground p-6 text-center">
                         <MapPin className="h-10 w-10 mb-3 opacity-20" />
-                        <p className="font-medium text-sm">No Location Map</p>
-                        <p className="text-xs mt-1">Click to assign a location on the map</p>
+                        <p className="font-medium text-sm">Chưa có bản đồ</p>
+                        <p className="text-xs mt-1">Nhấp để gắn tọa độ cho địa điểm tổ chức trên bản đồ</p>
                       </div>
                     )}
                   </div>
@@ -461,7 +456,7 @@ export default function EventDetailPage() {
         <TabsContent value="gallery">
           <Card>
             <CardHeader>
-              <CardTitle>Image Gallery</CardTitle>
+              <CardTitle>Thư viện ảnh</CardTitle>
             </CardHeader>
             <CardContent>
               <ImageGallery eventId={id!} images={event.images || []} onImagesChange={fetchEvent} />
@@ -473,7 +468,7 @@ export default function EventDetailPage() {
         <TabsContent value="timeline">
           <Card>
             <CardHeader>
-              <CardTitle>Event Timeline</CardTitle>
+              <CardTitle>Lịch trình sự kiện</CardTitle>
             </CardHeader>
             <CardContent>
               <EventTimelineList eventId={id!} eventStartDate={event.startTime} eventEndDate={event.endTime} />
@@ -485,7 +480,7 @@ export default function EventDetailPage() {
         <TabsContent value="points">
           <Card>
             <CardHeader>
-              <CardTitle>Event Points</CardTitle>
+              <CardTitle>Các điểm sự kiện</CardTitle>
             </CardHeader>
             <CardContent>
               <EventPointList />
@@ -497,7 +492,7 @@ export default function EventDetailPage() {
         <TabsContent value="point-tags">
           <Card>
             <CardHeader>
-              <CardTitle>Event Point Tags</CardTitle>
+              <CardTitle>Thẻ đánh dấu hiển thị trên bản đồ điểm sư kiện</CardTitle>
             </CardHeader>
             <CardContent>
               <EventPointTagList />
@@ -510,7 +505,7 @@ export default function EventDetailPage() {
           {event.isTicketRequired ? (
             <Card>
               <CardHeader>
-                <CardTitle>Ticket Types</CardTitle>
+                <CardTitle>Loại vé</CardTitle>
               </CardHeader>
               <CardContent>
                 <TicketCatalogList eventId={id!} />
@@ -520,9 +515,9 @@ export default function EventDetailPage() {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-16 text-center text-muted-foreground pt-10">
                 <Ticket className="h-12 w-12 mb-4 text-muted-foreground/30" />
-                <h3 className="text-lg font-semibold text-foreground">No Tickets Required</h3>
+                <h3 className="text-lg font-semibold text-foreground">Không yêu cầu vé</h3>
                 <p className="mt-2 text-sm max-w-sm mb-6">
-                  This event was configured to not require tickets. You can quickly enable tickets here to start adding ticket varieties.
+                  Sự kiện này được cấu hình không yêu cầu vé. Bạn có thể bật tính năng vé tại đây để bắt đầu thêm các loại vé.
                 </p>
                 <Button 
                   onClick={handleEnableTickets} 
@@ -530,7 +525,7 @@ export default function EventDetailPage() {
                   className="gap-2"
                 >
                   {updatingTicketReq ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
-                  Enable Ticket Requirements
+                  Bật yêu cầu vé
                 </Button>
               </CardContent>
             </Card>
@@ -542,17 +537,16 @@ export default function EventDetailPage() {
       <AlertDialog open={showHide} onOpenChange={setShowHide}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Hide Event</AlertDialogTitle>
+            <AlertDialogTitle>Ẩn sự kiện</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to hide "{event.name}"? The event will be hidden from public view but can be
-              restored later.
+              Bạn có chắc chắn muốn ẩn "{event.name}"? Sự kiện sẽ không hiển thị trên trang chủ nhưng có thể khôi phục sau.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction onClick={handleHide} className="bg-orange-600 text-white hover:bg-orange-700">
               <EyeOff className="mr-2 h-4 w-4" />
-              Hide Event
+              Ẩn sự kiện
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -562,24 +556,24 @@ export default function EventDetailPage() {
       <AlertDialog open={showPermanentDelete} onOpenChange={setShowPermanentDelete}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Permanently Delete Event</AlertDialogTitle>
+            <AlertDialogTitle>Xóa vĩnh viễn sự kiện</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">
-                Are you sure you want to <strong>permanently delete</strong> "{event.name}"?
+                Bạn có chắc chắn muốn <strong>xóa vĩnh viễn</strong> "{event.name}"?
               </span>
               <span className="block text-destructive font-medium">
-                ⚠️ This action cannot be undone. The event and all associated data will be permanently removed.
+                ⚠️ Hành động này không thể hoàn tác. Sự kiện và tất cả dữ liệu liên quan sẽ bị xóa vĩnh viễn.
               </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handlePermanentDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Permanently Delete
+              Xóa vĩnh viễn
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

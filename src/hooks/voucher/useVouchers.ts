@@ -5,8 +5,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { message } from 'antd';
-import { adminVoucherService, AdminVoucherQueryParams } from '@/services/api/voucherService';
-import type { VoucherResponse } from '@/types/voucher';
+import { adminVoucherService, vendorVoucherService, AdminVoucherQueryParams } from '@/services/api/voucherService';
+import type { VoucherResponse, VoucherScope } from '@/types/voucher';
 
 interface UseVouchersReturn {
     vouchers: VoucherResponse[];
@@ -17,19 +17,21 @@ interface UseVouchersReturn {
     deleteVoucher: (id: string) => Promise<boolean>;
 }
 
-export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn {
+export function useVouchers(params: AdminVoucherQueryParams, scope: VoucherScope = 'PLATFORM'): UseVouchersReturn {
     const [vouchers, setVouchers] = useState<VoucherResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const paramsRef = useRef<string>('');
-    const paramsKey = JSON.stringify(params);
+    const paramsKey = JSON.stringify({ ...params, scope });
+
+    const service = scope === 'PLATFORM' ? adminVoucherService : vendorVoucherService;
 
     const fetchVouchers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await adminVoucherService.getAll(params);
+            const response = await service.getAll(params);
             if (response.success) {
                 setVouchers(response.data.content);
                 setTotalElements(response.data.totalElements);
@@ -43,8 +45,7 @@ export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn 
         } finally {
             setLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paramsKey]);
+    }, [paramsKey, service, params]);
 
     useEffect(() => {
         if (paramsRef.current !== paramsKey) {
@@ -55,7 +56,7 @@ export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn 
 
     const deleteVoucher = useCallback(async (id: string): Promise<boolean> => {
         try {
-            const response = await adminVoucherService.delete(id);
+            const response = await service.delete(id);
             if (response.success) {
                 message.success('Voucher deleted successfully');
                 await fetchVouchers();
@@ -69,7 +70,7 @@ export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn 
             message.error('Failed to delete voucher: ' + (err.message || 'Unknown error'));
             return false;
         }
-    }, [fetchVouchers]);
+    }, [fetchVouchers, service]);
 
     return { vouchers, loading, totalElements, totalPages, fetchVouchers, deleteVoucher };
 }

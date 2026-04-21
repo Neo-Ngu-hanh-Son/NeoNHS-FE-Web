@@ -38,8 +38,8 @@ export default function EventEditPage() {
     return (
         <div className="max-w-6xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">Edit Event</h1>
-                <p className="text-muted-foreground text-sm mt-1">Update the event details below.</p>
+                <h1 className="text-2xl font-bold">Chỉnh sửa sự kiện</h1>
+                <p className="text-muted-foreground text-sm mt-1">Cập nhật thông tin sự kiện dưới đây.</p>
             </div>
             <EventForm mode="edit" initialData={event} onSubmit={handleSubmit as any} loading={submitLoading} />
         </div>

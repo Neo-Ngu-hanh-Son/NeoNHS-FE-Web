@@ -59,10 +59,10 @@ export function EventCardGrid({
 
     // Derive current sort label
     const sortOptions = [
-        { value: 'name', label: 'Name' },
-        { value: 'startTime', label: 'Start Time' },
-        { value: 'price', label: 'Price' },
-        { value: 'createdAt', label: 'Created' },
+        { value: 'name', label: 'Tên' },
+        { value: 'startTime', label: 'Thời gian bắt đầu' },
+        { value: 'price', label: 'Giá' },
+        { value: 'createdAt', label: 'Ngày tạo' },
     ];
     const currentSortValue = sortBy ? `${sortBy}_${sortDir || 'asc'}` : 'createdAt_desc';
 
@@ -91,15 +91,15 @@ export function EventCardGrid({
                 <div className="rounded-full bg-muted p-4 mb-4">
                     <ImageIcon className="h-8 w-8 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold mb-1">No events found</h3>
+                <h3 className="text-lg font-semibold mb-1">Không tìm thấy sự kiện nào</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                     {hasActiveFilters
-                        ? 'Try adjusting your filters to find what you\'re looking for.'
-                        : 'Get started by creating your first event.'}
+                        ? 'Thử điều chỉnh bộ lọc của bạn để tìm thấy những gì bạn đang tìm kiếm.'
+                        : 'Bắt đầu bằng cách tạo sự kiện đầu tiên của bạn.'}
                 </p>
                 {hasActiveFilters && (
                     <Button variant="outline" size="sm" onClick={onClearFilters}>
-                        Clear Filters
+                        Xóa bộ lọc
                     </Button>
                 )}
             </div>
@@ -112,11 +112,11 @@ export function EventCardGrid({
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-muted-foreground">
-                        {pagination.total} event{pagination.total !== 1 ? 's' : ''}
+                        {pagination.total} sự kiện
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Sort by:</span>
+                    <span className="text-xs text-muted-foreground">Sắp xếp theo:</span>
                     <Select value={currentSortValue} onValueChange={handleSortChange}>
                         <SelectTrigger className="w-[140px] h-8 text-xs">
                             <SelectValue />
@@ -181,7 +181,7 @@ export function EventCardGrid({
                                     {isDeleted && (
                                         <Badge variant="destructive" className="text-[10px] px-2 py-0.5 shadow-sm">
                                             <EyeOff className="h-3 w-3 mr-0.5" />
-                                            Hidden
+                                            Đã ẩn
                                         </Badge>
                                     )}
                                 </div>
@@ -196,22 +196,22 @@ export function EventCardGrid({
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                                             <DropdownMenuItem onClick={() => navigate(`/admin/events/${event.id}`)}>
-                                                <Eye className="mr-2 h-4 w-4" /> View Details
+                                                <Eye className="mr-2 h-4 w-4" /> Xem chi tiết
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => navigate(`/admin/events/${event.id}/edit`)}>
-                                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                                <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
                                             </DropdownMenuItem>
                                             <DropdownMenuSeparator />
                                             {isDeleted ? (
                                                 <DropdownMenuItem onClick={() => onRestore(event)}>
-                                                    <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                                                    <RotateCcw className="mr-2 h-4 w-4" /> Khôi phục
                                                 </DropdownMenuItem>
                                             ) : (
                                                 <DropdownMenuItem
                                                     onClick={() => onDelete(event)}
                                                     className="text-destructive focus:text-destructive"
                                                 >
-                                                    <EyeOff className="mr-2 h-4 w-4" /> Hide
+                                                    <EyeOff className="mr-2 h-4 w-4" /> Ẩn
                                                 </DropdownMenuItem>
                                             )}
                                         </DropdownMenuContent>
@@ -252,7 +252,7 @@ export function EventCardGrid({
 
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm font-semibold text-primary">
-                                        {formatEventPrice(event.price)}
+                                        {event.isTicketRequired ? 'Yêu cầu vé' : 'Miễn phí'}
                                     </span>
                                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                         <Users className="h-3 w-3" />
@@ -294,7 +294,7 @@ export function EventCardGrid({
             {pagination.total > 0 && (
                 <div className="flex items-center justify-between mt-6 pt-4 border-t">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">Rows per page:</span>
+                        <span className="text-xs text-muted-foreground">Số dòng mỗi trang:</span>
                         <Select
                             value={pagination.pageSize.toString()}
                             onValueChange={(v) => onPageSizeChange(Number(v))}
@@ -309,12 +309,12 @@ export function EventCardGrid({
                             </SelectContent>
                         </Select>
                         <span className="text-xs text-muted-foreground ml-2">
-                            {pagination.total} total
+                            Tổng số {pagination.total}
                         </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <span className="text-xs text-muted-foreground mr-2">
-                            Page {pagination.current} of {totalPages || 1}
+                            Trang {pagination.current} / {totalPages || 1}
                         </span>
                         <Button
                             variant="outline" size="icon" className="h-7 w-7"

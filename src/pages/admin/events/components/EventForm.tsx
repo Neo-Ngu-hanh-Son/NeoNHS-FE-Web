@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
+import dayjs from 'dayjs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +13,7 @@ import { Loader2, MapPin, Upload, X } from 'lucide-react';
 import { TagCombobox } from './TagCombobox';
 import { GoogleMapPickerModal } from '@/pages/admin/destinations/components/GoogleMapPickerModal';
 import { EVENT_STATUS_OPTIONS } from '../constants';
-import { uploadImageToBackend, validateImageFile } from '@/utils/cloudinary';
+import { validateImageFile } from '@/utils/cloudinary';
 import type { EventResponse, CreateEventRequest, UpdateEventRequest } from '@/types/event';
 import BlogEditor from '@/components/blog/BlogEditor';
 import { BlogEditorRef, EditorSaveResult } from '@/components/blog/type';
@@ -162,33 +163,33 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     const now = new Date();
 
     if (form.name.trim()) {
-      if (form.name.length > 255) e.name = 'Max 255 characters';
+      if (form.name.length > 255) e.name = 'Tối đa 255 ký tự';
     } else {
-      e.name = 'Event name is required';
+      e.name = 'Tên sự kiện là bắt buộc';
     }
 
-    if (form.shortDescription.length > 255) e.shortDescription = 'Max 255 characters';
-    if (form.locationName.length > 255) e.locationName = 'Max 255 characters';
+    if (form.shortDescription.length > 255) e.shortDescription = 'Tối đa 255 ký tự';
+    if (form.locationName.length > 255) e.locationName = 'Tối đa 255 ký tự';
 
-    if (!form.startTime) e.startTime = 'Start time is required';
-    else if (mode === 'create' && new Date(form.startTime) < now) e.startTime = 'Must be present or future';
+    if (!form.startTime) e.startTime = 'Thời gian bắt đầu là bắt buộc';
+    else if (mode === 'create' && new Date(form.startTime) < now) e.startTime = 'Phải là hiện tại hoặc tương lai';
 
-    if (!form.endTime) e.endTime = 'End time is required';
-    else if (mode === 'create' && new Date(form.endTime) <= now) e.endTime = 'Must be in the future';
+    if (!form.endTime) e.endTime = 'Thời gian kết thúc là bắt buộc';
+    else if (mode === 'create' && new Date(form.endTime) <= now) e.endTime = 'Phải ở trong tương lai';
 
     if (form.startTime && form.endTime && new Date(form.endTime) <= new Date(form.startTime)) {
-      e.endTime = 'End time must be after start time';
+      e.endTime = 'Thời gian kết thúc phải sau thời gian bắt đầu';
     }
 
     if (!thumbnailFile && !form.thumbnailUrl.trim()) {
-      e.thumbnailUrl = 'Thumbnail is required';
+      e.thumbnailUrl = 'Ảnh đại diện là bắt buộc';
     }
-    if (form.thumbnailUrl && form.thumbnailUrl.length > 255) e.thumbnailUrl = 'Max 255 characters';
+    if (form.thumbnailUrl && form.thumbnailUrl.length > 255) e.thumbnailUrl = 'Tối đa 255 ký tự';
 
-    if (form.price && Number(form.price) < 0) e.price = 'Must be ≥ 0';
+    // Price validation removed as base price is no longer used
     if (form.maxParticipants) {
       const mp = Number(form.maxParticipants);
-      if (mp <= 0 || !Number.isInteger(mp)) e.maxParticipants = 'Must be a positive integer';
+      if (mp <= 0 || !Number.isInteger(mp)) e.maxParticipants = 'Phải là số nguyên dương';
     }
 
     setErrors(e);
@@ -204,10 +205,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     });
 
     if (result.charCount > 1000) {
-      setErrors((prev) => ({
-        ...prev,
-        fullDescription: `Description is too long (${result.charCount}/1000 characters)`,
-      }));
+      setErrors((prev) => ({ ...prev, fullDescription: `Mô tả quá dài (${result.charCount}/1000 ký tự)` }));
       return;
     }
 
@@ -215,13 +213,13 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
       name: form.name.trim(),
       shortDescription: form.shortDescription.trim() || undefined,
       fullDescription: result.html.trim() || undefined,
-      startTime: new Date(form.startTime).toISOString(),
-      endTime: new Date(form.endTime).toISOString(),
+      startTime: dayjs(form.startTime).format('YYYY-MM-DDTHH:mm:ss'),
+      endTime: dayjs(form.endTime).format('YYYY-MM-DDTHH:mm:ss'),
       locationName: form.locationName.trim() || undefined,
       latitude: form.latitude.trim() || undefined,
       longitude: form.longitude.trim() || undefined,
       isTicketRequired: form.isTicketRequired,
-      price: form.price ? Number(form.price) : undefined,
+      price: 0, // No longer using base price, prices are in ticket catalog
       maxParticipants: form.maxParticipants ? Number(form.maxParticipants) : undefined,
       thumbnailUrl: thumbnailFile ? 'placeholder_for_validation' : undefined,
       tagIds: form.tagIds.length > 0 ? form.tagIds : undefined,
@@ -242,13 +240,13 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         name: form.name.trim(),
         shortDescription: form.shortDescription.trim() || undefined,
         fullDescription: form.fullDescription.trim() || undefined,
-        startTime: new Date(form.startTime).toISOString(),
-        endTime: new Date(form.endTime).toISOString(),
+        startTime: dayjs(form.startTime).format('YYYY-MM-DDTHH:mm:ss'),
+        endTime: dayjs(form.endTime).format('YYYY-MM-DDTHH:mm:ss'),
         locationName: form.locationName.trim() || undefined,
         latitude: form.latitude.trim() || undefined,
         longitude: form.longitude.trim() || undefined,
         isTicketRequired: form.isTicketRequired,
-        price: form.price ? Number(form.price) : undefined,
+        price: 0,
         maxParticipants: form.maxParticipants ? Number(form.maxParticipants) : undefined,
         thumbnailUrl: thumbnailFile ? 'placeholder_for_validation' : undefined,
         tagIds: form.tagIds.length > 0 ? form.tagIds : undefined,
@@ -272,42 +270,42 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {/* Basic Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
+            <CardTitle>Thông tin cơ bản</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="name">Event Name *</Label>
+              <Label htmlFor="name">Tên sự kiện *</Label>
               <Input
                 id="name"
                 value={form.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                placeholder="Enter event name"
+                placeholder="Nhập tên sự kiện"
                 maxLength={255}
               />
               {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
             </div>
             <div>
               <Label htmlFor="shortDescription">
-                Short Description{' '}
+                Mô tả ngắn{' '}
                 <span className="text-muted-foreground font-normal">({form.shortDescription.length}/255)</span>
               </Label>
               <Input
                 id="shortDescription"
                 value={form.shortDescription}
                 onChange={(e) => handleChange('shortDescription', e.target.value)}
-                placeholder="Brief description for card display"
+                placeholder="Mô tả ngắn hiển thị trên thẻ"
                 maxLength={255}
               />
               {errors.shortDescription && <p className="text-xs text-destructive mt-1">{errors.shortDescription}</p>}
             </div>
             <div>
-              <Label className="mb-2 block">Full Description</Label>
+              <Label className="mb-2 block">Mô tả chi tiết</Label>
               <div className="border rounded-md overflow-hidden bg-white">
                 <BlogEditor
                   ref={editorRef}
                   onSave={handleEditorSave}
                   initialHtml={form.fullDescription}
-                  placeholder="Enter detailed event description..."
+                  placeholder="Nhập mô tả chi tiết sự kiện..."
                 />
               </div>
               {errors.fullDescription && <p className="text-xs text-destructive mt-1">{errors.fullDescription}</p>}
@@ -318,12 +316,12 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {/* Time & Location */}
         <Card>
           <CardHeader>
-            <CardTitle>Time & Location</CardTitle>
+            <CardTitle>Thời gian & Địa điểm</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="startTime">Start Time *</Label>
+                <Label htmlFor="startTime">Thời gian bắt đầu *</Label>
                 <Input
                   id="startTime"
                   type="datetime-local"
@@ -333,7 +331,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                 {errors.startTime && <p className="text-xs text-destructive mt-1">{errors.startTime}</p>}
               </div>
               <div>
-                <Label htmlFor="endTime">End Time *</Label>
+                <Label htmlFor="endTime">Thời gian kết thúc *</Label>
                 <Input
                   id="endTime"
                   type="datetime-local"
@@ -346,12 +344,12 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
 
             {/* Location */}
             <div>
-              <Label htmlFor="locationName">Location Name</Label>
+              <Label htmlFor="locationName">Tên địa điểm</Label>
               <Input
                 id="locationName"
                 value={form.locationName}
                 onChange={(e) => handleChange('locationName', e.target.value)}
-                placeholder="e.g. Ngu Hanh Son District"
+                placeholder="VD: Quận Ngũ Hành Sơn"
                 maxLength={255}
               />
               {errors.locationName && <p className="text-xs text-destructive mt-1">{errors.locationName}</p>}
@@ -359,11 +357,11 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
 
             {/* Map Picker */}
             <div>
-              <Label>Coordinates</Label>
+              <Label>Tọa độ</Label>
               <div className="flex items-center gap-2 mt-1">
                 <Button type="button" variant="outline" size="sm" onClick={() => setMapPickerOpen(true)}>
                   <MapPin className="h-4 w-4 mr-1" />
-                  Pick on Map
+                  Chọn trên bản đồ
                 </Button>
                 {form.latitude && form.longitude && (
                   <div className="flex items-center gap-1">
@@ -387,7 +385,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
                   <Label htmlFor="latitude" className="text-xs text-muted-foreground">
-                    Latitude
+                    Vĩ độ
                   </Label>
                   <Input
                     id="latitude"
@@ -401,7 +399,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                 </div>
                 <div>
                   <Label htmlFor="longitude" className="text-xs text-muted-foreground">
-                    Longitude
+                    Kinh độ
                   </Label>
                   <Input
                     id="longitude"
@@ -421,7 +419,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {/* Tickets & Pricing */}
         <Card>
           <CardHeader>
-            <CardTitle>Tickets & Pricing</CardTitle>
+            <CardTitle>Vé & Giá</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
@@ -430,50 +428,20 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                 checked={form.isTicketRequired}
                 onCheckedChange={(v) => handleChange('isTicketRequired', v)}
               />
-              <Label htmlFor="isTicketRequired">Ticket Required</Label>
+              <Label htmlFor="isTicketRequired">Yêu cầu vé</Label>
             </div>
-            {form.isTicketRequired && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">Price (VND)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min={0}
-                    value={form.price}
-                    onChange={(e) => handleChange('price', e.target.value)}
-                    placeholder="50000"
-                  />
-                  {errors.price && <p className="text-xs text-destructive mt-1">{errors.price}</p>}
-                </div>
-                <div>
-                  <Label htmlFor="maxParticipants">Max Participants</Label>
-                  <Input
-                    id="maxParticipants"
-                    type="number"
-                    min={1}
-                    value={form.maxParticipants}
-                    onChange={(e) => handleChange('maxParticipants', e.target.value)}
-                    placeholder="100"
-                  />
-                  {errors.maxParticipants && <p className="text-xs text-destructive mt-1">{errors.maxParticipants}</p>}
-                </div>
-              </div>
-            )}
-            {!form.isTicketRequired && (
-              <div>
-                <Label htmlFor="maxParticipants">Max Participants</Label>
-                <Input
-                  id="maxParticipants"
-                  type="number"
-                  min={1}
-                  value={form.maxParticipants}
-                  onChange={(e) => handleChange('maxParticipants', e.target.value)}
-                  placeholder="100"
-                />
-                {errors.maxParticipants && <p className="text-xs text-destructive mt-1">{errors.maxParticipants}</p>}
-              </div>
-            )}
+            <div>
+              <Label htmlFor="maxParticipants">Giới hạn người tham gia</Label>
+              <Input
+                id="maxParticipants"
+                type="number"
+                min={1}
+                value={form.maxParticipants}
+                onChange={(e) => handleChange('maxParticipants', e.target.value)}
+                placeholder="100"
+              />
+              {errors.maxParticipants && <p className="text-xs text-destructive mt-1">{errors.maxParticipants}</p>}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -484,7 +452,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {mode === 'edit' && (
           <Card>
             <CardHeader>
-              <CardTitle>Status</CardTitle>
+              <CardTitle>Trạng thái</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={form.status} onValueChange={(v) => handleChange('status', v)}>
@@ -506,7 +474,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {/* Thumbnail */}
         <Card>
           <CardHeader>
-            <CardTitle>Thumbnail {mode === 'create' && '*'}</CardTitle>
+            <CardTitle>Ảnh đại diện {mode === 'create' && '*'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {thumbnailPreview || form.thumbnailUrl ? (
@@ -520,7 +488,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">Click to change image</span>
+                  <span className="text-white text-sm font-medium">Nhấp để thay đổi ảnh</span>
                 </div>
                 <button
                   type="button"
@@ -531,7 +499,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                     handleChange('thumbnailUrl', '');
                   }}
                   className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
-                  title="Remove image"
+                  title="Xóa ảnh"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -547,13 +515,15 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                   {uploading ? (
                     <>
                       <Loader2 className="h-8 w-8 mb-1 animate-spin" />
-                      <span className="text-xs">Uploading...</span>
+                      <span className="text-xs">Đang tải lên...</span>
                     </>
                   ) : (
                     <>
                       <Upload className="h-8 w-8 mb-1" />
-                      <span className="text-xs">Click or drag to upload</span>
-                      <span className="text-[10px] text-muted-foreground/60 mt-0.5">JPG, PNG, GIF, WebP (max 5MB)</span>
+                      <span className="text-xs">Nhấp hoặc kéo thả để tải ảnh lên</span>
+                      <span className="text-[10px] text-muted-foreground/60 mt-0.5">
+                        JPG, PNG, GIF, WebP (tối đa 5MB)
+                      </span>
                     </>
                   )}
                 </div>
@@ -580,7 +550,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         {/* Tags */}
         <Card>
           <CardHeader>
-            <CardTitle>Tags</CardTitle>
+            <CardTitle>Thẻ</CardTitle>
           </CardHeader>
           <CardContent>
             <TagCombobox selectedTagIds={form.tagIds} onChange={(ids) => handleChange('tagIds', ids)} />
@@ -591,11 +561,11 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
       {/* Footer */}
       <div className="lg:col-span-3 flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={() => navigate(-1)}>
-          Cancel
+          Hủy
         </Button>
         <Button onClick={handleSubmit} disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === 'create' ? 'Create Event' : 'Update Event'}
+          {mode === 'create' ? 'Tạo sự kiện' : 'Cập nhật sự kiện'}
         </Button>
       </div>
 
