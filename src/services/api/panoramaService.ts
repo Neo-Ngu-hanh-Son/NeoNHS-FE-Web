@@ -5,25 +5,24 @@ import type {
   PanoramaRequest,
   PanoramaHotSpotRequest,
   PanoramaHotSpotResponse,
+  LinkingPanoramaResponse,
 } from "@/types";
 
 // ─── Public endpoints (no auth) ───
 
 export const panoramaService = {
-  /** Get panorama for a Point */
-  getPointPanorama: async (pointId: string): Promise<PointPanoramaResponse> => {
-    const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
-      `points/${pointId}/panorama`
+  /** Get all panoramas for a Point */
+  getPointPanoramas: async (pointId: string): Promise<PointPanoramaResponse[]> => {
+    const res = await apiClient.get<ApiResponse<PointPanoramaResponse[]>>(
+      `/points/${pointId}/panorama`
     );
     return res.data;
   },
 
-  /** Get panorama for a CheckinPoint */
-  getCheckinPointPanorama: async (
-    checkinPointId: string
-  ): Promise<PointPanoramaResponse> => {
+  /** Get panorama by ID */
+  getPanoramaById: async (panoramaId: string): Promise<PointPanoramaResponse> => {
     const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
-      `checkin-points/${checkinPointId}/panorama`
+      `/panoramas/${panoramaId}`
     );
     return res.data;
   },
@@ -33,99 +32,78 @@ export const panoramaService = {
 
 export const adminPanoramaService = {
   // --- Point panorama ---
-
-  createOrUpdatePointPanorama: async (
+  addPanoramaToPoint: async (
     pointId: string,
     data: PanoramaRequest
   ): Promise<PointPanoramaResponse> => {
-    const res = await apiClient.put<ApiResponse<PointPanoramaResponse>>(
-      `/admin/panorama/points/${pointId}`,
+    const res = await apiClient.post<ApiResponse<PointPanoramaResponse>>(
+      `/admin/points/${pointId}/panoramas`,
       data
     );
     return res.data;
   },
 
-  getPointPanorama: async (
-    pointId: string
-  ): Promise<PointPanoramaResponse> => {
-    const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
-      `/admin/panorama/points/${pointId}`
-    );
-    return res.data;
-  },
-
-  deletePointPanorama: async (pointId: string): Promise<void> => {
-    await apiClient.delete(`/admin/panorama/points/${pointId}`);
-  },
-
-  // --- CheckinPoint panorama ---
-
-  createOrUpdateCheckinPointPanorama: async (
-    checkinPointId: string,
+  updatePanorama: async (
+    panoramaId: string,
     data: PanoramaRequest
   ): Promise<PointPanoramaResponse> => {
     const res = await apiClient.put<ApiResponse<PointPanoramaResponse>>(
-      `/admin/panorama/checkin-points/${checkinPointId}`,
+      `/admin/panoramas/${panoramaId}`,
       data
     );
     return res.data;
   },
 
-  getCheckinPointPanorama: async (
-    checkinPointId: string
-  ): Promise<PointPanoramaResponse> => {
-    const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
-      `/admin/panorama/checkin-points/${checkinPointId}`
+  getPointPanoramas: async (
+    pointId: string
+  ): Promise<PointPanoramaResponse[]> => {
+    const res = await apiClient.get<ApiResponse<PointPanoramaResponse[]>>(
+      `/admin/points/${pointId}/panoramas`
     );
     return res.data;
   },
 
-  deleteCheckinPointPanorama: async (
-    checkinPointId: string
-  ): Promise<void> => {
-    await apiClient.delete(
-      `/admin/panorama/checkin-points/${checkinPointId}`
+  getPanoramaById: async (panoramaId: string): Promise<PointPanoramaResponse> => {
+    const res = await apiClient.get<ApiResponse<PointPanoramaResponse>>(
+      `/admin/panoramas/${panoramaId}`
     );
+    return res.data;
+  },
+
+  getLinkingPanoramas: async (panoramaId: string): Promise<LinkingPanoramaResponse[]> => {
+    const res = await apiClient.get<
+      ApiResponse<LinkingPanoramaResponse | LinkingPanoramaResponse[]>
+    >(`/admin/panoramas/linking?currentPanoramaId=${panoramaId}`);
+
+    if (Array.isArray(res.data)) {
+      return res.data;
+    }
+
+    return res.data ? [res.data] : [];
+  },
+
+  deletePanorama: async (panoramaId: string): Promise<void> => {
+    await apiClient.delete(`/admin/panoramas/${panoramaId}`);
   },
 
   // --- Individual hot spot CRUD ---
 
-  addHotSpotToPoint: async (
-    pointId: string,
+  addHotSpotToPanorama: async (
+    panoramaId: string,
     data: PanoramaHotSpotRequest
   ): Promise<PanoramaHotSpotResponse> => {
     const res = await apiClient.post<ApiResponse<PanoramaHotSpotResponse>>(
-      `/admin/panorama/points/${pointId}/hotspots`,
+      `/admin/panoramas/${panoramaId}/hotspots`,
       data
     );
     return res.data;
   },
 
-  addHotSpotToCheckinPoint: async (
-    checkinPointId: string,
-    data: PanoramaHotSpotRequest
-  ): Promise<PanoramaHotSpotResponse> => {
-    const res = await apiClient.post<ApiResponse<PanoramaHotSpotResponse>>(
-      `/admin/panorama/checkin-points/${checkinPointId}/hotspots`,
-      data
-    );
-    return res.data;
-  },
-
-  getHotSpotsByPoint: async (
-    pointId: string
+  getHotSpotsByPanorama: async (
+    panoramaId: string
   ): Promise<PanoramaHotSpotResponse[]> => {
     const res = await apiClient.get<ApiResponse<PanoramaHotSpotResponse[]>>(
-      `/admin/panorama/points/${pointId}/hotspots`
-    );
-    return res.data;
-  },
-
-  getHotSpotsByCheckinPoint: async (
-    checkinPointId: string
-  ): Promise<PanoramaHotSpotResponse[]> => {
-    const res = await apiClient.get<ApiResponse<PanoramaHotSpotResponse[]>>(
-      `/admin/panorama/checkin-points/${checkinPointId}/hotspots`
+      `/admin/panoramas/${panoramaId}/hotspots`
     );
     return res.data;
   },
@@ -135,14 +113,14 @@ export const adminPanoramaService = {
     data: PanoramaHotSpotRequest
   ): Promise<PanoramaHotSpotResponse> => {
     const res = await apiClient.put<ApiResponse<PanoramaHotSpotResponse>>(
-      `/admin/panorama/hotspots/${hotSpotId}`,
+      `/admin/hotspots/${hotSpotId}`,
       data
     );
     return res.data;
   },
 
   deleteHotSpot: async (hotSpotId: string): Promise<void> => {
-    await apiClient.delete(`/admin/panorama/hotspots/${hotSpotId}`);
+    await apiClient.delete(`/admin/hotspots/${hotSpotId}`);
   },
 };
 

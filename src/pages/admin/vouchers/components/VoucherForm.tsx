@@ -52,17 +52,10 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
     const [giftDescription, setGiftDescription] = useState('');
     const [giftImageUrl, setGiftImageUrl] = useState('');
 
-    // BONUS_POINTS fields
-    const [bonusPointsValue, setBonusPointsValue] = useState<string>('');
-
-    // FREE_SERVICE fields
-    const [freeTicketCatalogId, setFreeTicketCatalogId] = useState('');
-
     // Time & Usage
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [usageLimit, setUsageLimit] = useState<string>('');
-    const [maxUsagePerUser, setMaxUsagePerUser] = useState<string>('');
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -70,44 +63,35 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
         const e: Record<string, string> = {};
 
         if (!isEdit) {
-            if (!code.trim()) e.code = 'Voucher code is required';
-            else if (code.length > 50) e.code = 'Max 50 characters';
-            else if (!VOUCHER_CODE_REGEX.test(code)) e.code = 'Only letters, numbers, _ and - allowed';
+            if (!code.trim()) e.code = 'Vui lòng nhập mã voucher';
+            else if (code.length > 50) e.code = 'Tối đa 50 ký tự';
+            else if (!VOUCHER_CODE_REGEX.test(code)) e.code = 'Chỉ cho phép chữ cái, số, _ và -';
         }
 
-        if (description.length > 1000) e.description = 'Max 1000 characters';
+        if (description.length > 1000) e.description = 'Tối đa 1000 ký tự';
 
         if (voucherType === 'DISCOUNT') {
-            if (!discountValue || Number(discountValue) <= 0) e.discountValue = 'Must be greater than 0';
-            else if (discountType === 'PERCENT' && Number(discountValue) > 100) e.discountValue = 'Percentage must be ≤ 100';
-            if (maxDiscountValue && Number(maxDiscountValue) <= 0) e.maxDiscountValue = 'Must be greater than 0';
-            if (minOrderValue && Number(minOrderValue) < 0) e.minOrderValue = 'Must be ≥ 0';
+            if (!discountValue || Number(discountValue) <= 0) e.discountValue = 'Giá trị phải lớn hơn 0';
+            else if (discountType === 'PERCENT' && Number(discountValue) > 100) e.discountValue = 'Phần trăm phải ≤ 100';
+            if (maxDiscountValue && Number(maxDiscountValue) <= 0) e.maxDiscountValue = 'Giá trị phải lớn hơn 0';
+            if (minOrderValue && Number(minOrderValue) < 0) e.minOrderValue = 'Giá trị phải ≥ 0';
         } else if (voucherType === 'GIFT_PRODUCT') {
-            if (!isEdit && !giftDescription.trim()) e.giftDescription = 'Gift description is required';
-            if (giftDescription.length > 255) e.giftDescription = 'Max 255 characters';
-        } else if (voucherType === 'BONUS_POINTS') {
-            if (!bonusPointsValue || Number(bonusPointsValue) <= 0) e.bonusPointsValue = 'Must be a positive integer';
-            else if (!Number.isInteger(Number(bonusPointsValue))) e.bonusPointsValue = 'Must be an integer';
-        } else if (voucherType === 'FREE_SERVICE') {
-            if (!freeTicketCatalogId.trim()) e.freeTicketCatalogId = 'Ticket catalog ID is required';
-            else if (!UUID_REGEX.test(freeTicketCatalogId.trim())) e.freeTicketCatalogId = 'Must be a valid UUID';
+            if (!isEdit && !giftDescription.trim()) e.giftDescription = 'Vui lòng nhập mô tả quà tặng';
+            if (giftDescription.length > 255) e.giftDescription = 'Tối đa 255 ký tự';
         }
 
         if (!isEdit) {
-            if (!startDate) e.startDate = 'Start date is required';
-            else if (new Date(startDate) < new Date()) e.startDate = 'Must be present or future';
-            if (!endDate) e.endDate = 'End date is required';
-            else if (new Date(endDate) <= new Date()) e.endDate = 'Must be in the future';
+            if (!startDate) e.startDate = 'Vui lòng chọn ngày bắt đầu';
+            else if (new Date(startDate) < new Date()) e.startDate = 'Phải ở hiện tại hoặc tương lai';
+            if (!endDate) e.endDate = 'Vui lòng chọn ngày kết thúc';
+            else if (new Date(endDate) <= new Date()) e.endDate = 'Phải ở trong tương lai';
         }
         if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
-            e.endDate = 'End date must be after start date';
+            e.endDate = 'Ngày kết thúc phải sau ngày bắt đầu';
         }
 
         if (usageLimit && (Number(usageLimit) <= 0 || !Number.isInteger(Number(usageLimit)))) {
-            e.usageLimit = 'Must be a positive integer';
-        }
-        if (maxUsagePerUser && (Number(maxUsagePerUser) <= 0 || !Number.isInteger(Number(maxUsagePerUser)))) {
-            e.maxUsagePerUser = 'Must be a positive integer';
+            e.usageLimit = 'Phải là số nguyên dương';
         }
 
         setErrors(e);
@@ -130,13 +114,9 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             setGiftDescription(initialData.giftDescription || '');
             setGiftImageUrl(initialData.giftImageUrl || '');
 
-            if (initialData.bonusPointsValue != null) setBonusPointsValue(String(initialData.bonusPointsValue));
-            setFreeTicketCatalogId(initialData.freeTicketCatalogId || '');
-
             if (initialData.startDate) setStartDate(initialData.startDate.slice(0, 16));
             if (initialData.endDate) setEndDate(initialData.endDate.slice(0, 16));
             if (initialData.usageLimit != null) setUsageLimit(String(initialData.usageLimit));
-            if (initialData.maxUsagePerUser != null) setMaxUsagePerUser(String(initialData.maxUsagePerUser));
         }
     }, [initialData]);
 
@@ -151,7 +131,6 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                 startDate: startDate || undefined,
                 endDate: endDate || undefined,
                 usageLimit: usageLimit ? Number(usageLimit) : undefined,
-                maxUsagePerUser: maxUsagePerUser ? Number(maxUsagePerUser) : undefined,
             };
             // Add type-specific fields
             if (voucherType === 'DISCOUNT') {
@@ -162,10 +141,6 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             } else if (voucherType === 'GIFT_PRODUCT') {
                 data.giftDescription = giftDescription || undefined;
                 data.giftImageUrl = giftImageUrl || undefined;
-            } else if (voucherType === 'BONUS_POINTS') {
-                data.bonusPointsValue = bonusPointsValue ? Number(bonusPointsValue) : undefined;
-            } else if (voucherType === 'FREE_SERVICE') {
-                data.freeTicketCatalogId = freeTicketCatalogId || undefined;
             }
             await onSubmit(data);
         } else {
@@ -177,7 +152,6 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                 startDate: startDate || undefined,
                 endDate: endDate || undefined,
                 usageLimit: usageLimit ? Number(usageLimit) : undefined,
-                maxUsagePerUser: maxUsagePerUser ? Number(maxUsagePerUser) : undefined,
             };
             if (voucherType === 'DISCOUNT') {
                 data.discountType = discountType;
@@ -187,10 +161,6 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             } else if (voucherType === 'GIFT_PRODUCT') {
                 data.giftDescription = giftDescription || undefined;
                 data.giftImageUrl = giftImageUrl || undefined;
-            } else if (voucherType === 'BONUS_POINTS') {
-                data.bonusPointsValue = bonusPointsValue ? Number(bonusPointsValue) : undefined;
-            } else if (voucherType === 'FREE_SERVICE') {
-                data.freeTicketCatalogId = freeTicketCatalogId || undefined;
             }
             await onSubmit(data);
         }
@@ -201,28 +171,34 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             {/* Basic Info */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-lg">Basic Information</CardTitle>
+                    <CardTitle className="text-lg">Thông tin cơ bản</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="code">Voucher Code *</Label>
+                        <Label htmlFor="code">Mã Voucher *</Label>
                         <Input
                             id="code"
                             value={code}
                             onChange={(e) => { setCode(e.target.value.toUpperCase()); if (errors.code) setErrors(prev => ({ ...prev, code: '' })); }}
-                            placeholder="e.g. SUMMER2026"
+                            placeholder="VÍ DỤ: KM-SUMMER2026"
                             maxLength={50}
                             disabled={isEdit}
                         />
                         {errors.code && <p className="text-xs text-destructive mt-1">{errors.code}</p>}
-                        {isEdit && <p className="text-xs text-muted-foreground">Code cannot be changed after creation</p>}
+                        {isEdit && <p className="text-xs text-muted-foreground">Không thể thay đổi mã voucher sau khi đã tạo</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="voucherType">Voucher Type *</Label>
+                        <Label htmlFor="voucherType">Loại Voucher *</Label>
                         <Select
                             value={voucherType}
-                            onValueChange={(val) => setVoucherType(val as VoucherType)}
+                            onValueChange={(val) => {
+                                const type = val as VoucherType;
+                                setVoucherType(type);
+                                if (type === 'GIFT_PRODUCT') {
+                                    setApplicableProduct('ALL');
+                                }
+                            }}
                             disabled={isEdit}
                         >
                             <SelectTrigger id="voucherType">
@@ -234,12 +210,16 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                                 ))}
                             </SelectContent>
                         </Select>
-                        {isEdit && <p className="text-xs text-muted-foreground">Type cannot be changed after creation</p>}
+                        {isEdit && <p className="text-xs text-muted-foreground">Không thể thay đổi loại voucher sau khi đã tạo</p>}
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="applicableProduct">Applicable Product *</Label>
-                        <Select value={applicableProduct} onValueChange={(val) => setApplicableProduct(val as ApplicableProduct)}>
+                        <Label htmlFor="applicableProduct">Sản phẩm áp dụng *</Label>
+                        <Select 
+                            value={applicableProduct} 
+                            onValueChange={(val) => setApplicableProduct(val as ApplicableProduct)}
+                            disabled={voucherType === 'GIFT_PRODUCT'}
+                        >
                             <SelectTrigger id="applicableProduct">
                                 <SelectValue />
                             </SelectTrigger>
@@ -249,15 +229,18 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                                 ))}
                             </SelectContent>
                         </Select>
+                        {voucherType === 'GIFT_PRODUCT' && (
+                            <p className="text-[10px] text-amber-600 font-medium italic">Voucher quà tặng mặc định áp dụng cho tất cả dịch vụ</p>
+                        )}
                     </div>
 
                     <div className="space-y-2 md:col-span-2">
-                        <Label htmlFor="description">Description <span className="text-muted-foreground font-normal">({description.length}/1000)</span></Label>
+                        <Label htmlFor="description">Mô tả <span className="text-muted-foreground font-normal">({description.length}/1000)</span></Label>
                         <Textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder="Describe this voucher..."
+                            placeholder="Mô tả về voucher này..."
                             rows={3}
                             maxLength={1000}
                         />
@@ -270,11 +253,11 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             {voucherType === 'DISCOUNT' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Discount Details</CardTitle>
+                        <CardTitle className="text-lg">Chi tiết chiết khấu</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="discountType">Discount Type</Label>
+                            <Label htmlFor="discountType">Loại chiết khấu</Label>
                             <Select value={discountType} onValueChange={(val) => setDiscountType(val as DiscountType)}>
                                 <SelectTrigger id="discountType">
                                     <SelectValue />
@@ -287,37 +270,37 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="discountValue">Discount Value *</Label>
+                            <Label htmlFor="discountValue">Giá trị chiết khấu *</Label>
                             <Input
                                 id="discountValue"
                                 type="number"
                                 value={discountValue}
                                 onChange={(e) => { setDiscountValue(e.target.value); if (errors.discountValue) setErrors(prev => ({ ...prev, discountValue: '' })); }}
-                                placeholder={discountType === 'PERCENT' ? '1-100' : 'Amount in ₫'}
+                                placeholder={discountType === 'PERCENT' ? 'Từ 1-100%' : 'Số tiền (₫)'}
                                 min={0}
                             />
                             {errors.discountValue && <p className="text-xs text-destructive mt-1">{errors.discountValue}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="maxDiscountValue">Max Discount Value</Label>
+                            <Label htmlFor="maxDiscountValue">Giá trị chiết khấu tối đa</Label>
                             <Input
                                 id="maxDiscountValue"
                                 type="number"
                                 value={maxDiscountValue}
                                 onChange={(e) => setMaxDiscountValue(e.target.value)}
-                                placeholder="Maximum discount amount"
+                                placeholder="Mức giảm tối đa (₫)"
                                 min={0}
                             />
                             {errors.maxDiscountValue && <p className="text-xs text-destructive mt-1">{errors.maxDiscountValue}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="minOrderValue">Min Order Value</Label>
+                            <Label htmlFor="minOrderValue">Giá trị đơn hàng tối thiểu</Label>
                             <Input
                                 id="minOrderValue"
                                 type="number"
                                 value={minOrderValue}
                                 onChange={(e) => setMinOrderValue(e.target.value)}
-                                placeholder="Minimum order value required"
+                                placeholder="Yêu cầu đơn hàng từ (₫)"
                                 min={0}
                             />
                             {errors.minOrderValue && <p className="text-xs text-destructive mt-1">{errors.minOrderValue}</p>}
@@ -329,71 +312,29 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             {voucherType === 'GIFT_PRODUCT' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Gift Product Details</CardTitle>
+                        <CardTitle className="text-lg">Chi tiết quà tặng</CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-1 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="giftDescription">Gift Description {!isEdit && '*'} <span className="text-muted-foreground font-normal">({giftDescription.length}/255)</span></Label>
+                            <Label htmlFor="giftDescription">Mô tả quà tặng {!isEdit && '*'} <span className="text-muted-foreground font-normal">({giftDescription.length}/255)</span></Label>
                             <Textarea
                                 id="giftDescription"
                                 value={giftDescription}
                                 onChange={(e) => { setGiftDescription(e.target.value); if (errors.giftDescription) setErrors(prev => ({ ...prev, giftDescription: '' })); }}
-                                placeholder="Describe the gift product..."
+                                placeholder="Mô tả về sản phẩm quà tặng..."
                                 rows={3}
                                 maxLength={255}
                             />
                             {errors.giftDescription && <p className="text-xs text-destructive mt-1">{errors.giftDescription}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label>Gift Image</Label>
+                            <Label>Hình ảnh quà tặng</Label>
                             <DragImageUploader
                                 value={giftImageUrl}
                                 onUpload={(url) => setGiftImageUrl(url)}
-                                placeholder="Drag & drop gift image here, or click to browse"
+                                placeholder="Kéo thả hình ảnh vào đây, hoặc click để chọn"
                                 minHeight={150}
                             />
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {voucherType === 'BONUS_POINTS' && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Bonus Points Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2 max-w-sm">
-                            <Label htmlFor="bonusPointsValue">Bonus Points *</Label>
-                            <Input
-                                id="bonusPointsValue"
-                                type="number"
-                                value={bonusPointsValue}
-                                onChange={(e) => { setBonusPointsValue(e.target.value); if (errors.bonusPointsValue) setErrors(prev => ({ ...prev, bonusPointsValue: '' })); }}
-                                placeholder="Number of points"
-                                min={1}
-                            />
-                            {errors.bonusPointsValue && <p className="text-xs text-destructive mt-1">{errors.bonusPointsValue}</p>}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {voucherType === 'FREE_SERVICE' && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Free Service Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-2 max-w-sm">
-                            <Label htmlFor="freeTicketCatalogId">Ticket Catalog ID *</Label>
-                            <Input
-                                id="freeTicketCatalogId"
-                                value={freeTicketCatalogId}
-                                onChange={(e) => { setFreeTicketCatalogId(e.target.value); if (errors.freeTicketCatalogId) setErrors(prev => ({ ...prev, freeTicketCatalogId: '' })); }}
-                                placeholder="UUID of the ticket catalog"
-                            />
-                            {errors.freeTicketCatalogId && <p className="text-xs text-destructive mt-1">{errors.freeTicketCatalogId}</p>}
                         </div>
                     </CardContent>
                 </Card>
@@ -402,11 +343,11 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             {/* Time & Usage */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-lg">Time & Usage Limits</CardTitle>
+                    <CardTitle className="text-lg">Thời gian & Giới hạn sử dụng</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                        <Label htmlFor="startDate">Start Date {!isEdit && '*'}</Label>
+                        <Label htmlFor="startDate">Ngày bắt đầu {!isEdit && '*'}</Label>
                         <Input
                             id="startDate"
                             type="datetime-local"
@@ -416,7 +357,7 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                         {errors.startDate && <p className="text-xs text-destructive mt-1">{errors.startDate}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="endDate">End Date {!isEdit && '*'}</Label>
+                        <Label htmlFor="endDate">Ngày kết thúc {!isEdit && '*'}</Label>
                         <Input
                             id="endDate"
                             type="datetime-local"
@@ -426,28 +367,16 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                         {errors.endDate && <p className="text-xs text-destructive mt-1">{errors.endDate}</p>}
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="usageLimit">Usage Limit</Label>
+                        <Label htmlFor="usageLimit">Giới hạn sử dụng</Label>
                         <Input
                             id="usageLimit"
                             type="number"
                             value={usageLimit}
                             onChange={(e) => setUsageLimit(e.target.value)}
-                            placeholder="Total usage limit"
+                            placeholder="Tổng số lượt sử dụng tối đa"
                             min={1}
                         />
                         {errors.usageLimit && <p className="text-xs text-destructive mt-1">{errors.usageLimit}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="maxUsagePerUser">Max Usage Per User</Label>
-                        <Input
-                            id="maxUsagePerUser"
-                            type="number"
-                            value={maxUsagePerUser}
-                            onChange={(e) => setMaxUsagePerUser(e.target.value)}
-                            placeholder="Per user limit"
-                            min={1}
-                        />
-                        {errors.maxUsagePerUser && <p className="text-xs text-destructive mt-1">{errors.maxUsagePerUser}</p>}
                     </div>
                 </CardContent>
             </Card>
@@ -455,11 +384,11 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             {/* Submit */}
             <div className="flex items-center gap-3 justify-end">
                 <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                    Cancel
+                    Hủy
                 </Button>
                 <Button type="submit" disabled={loading}>
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {isEdit ? 'Update Voucher' : 'Create Voucher'}
+                    {isEdit ? 'Cập nhật Voucher' : 'Tạo Voucher'}
                 </Button>
             </div>
         </form>

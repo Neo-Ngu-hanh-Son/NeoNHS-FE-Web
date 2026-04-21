@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Sparkles } from 'lucide-react';
 import { GoogleMapPicker } from './GoogleMapPicker';
 import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
-import { uploadImageToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend, uploadImageUrlToBackend } from '@/utils/cloudinary';
 import { message } from 'antd';
 import * as turf from '@turf/turf';
 
@@ -283,10 +283,10 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
       setProcessingImage(true);
       console.log('Shortening URL via Cloudinary:', selectedPoint.photoUrl);
       try {
-        const cloudinaryUrl = await uploadImageToCloudinary(selectedPoint.photoUrl);
+        const cloudinaryUrl = await uploadImageUrlToBackend(selectedPoint.photoUrl);
         if (cloudinaryUrl) {
-          finalPhotoUrl = cloudinaryUrl;
-          console.log('Shortened URL:', cloudinaryUrl);
+          finalPhotoUrl = cloudinaryUrl.mediaUrl;
+          console.log('Shortened URL:', cloudinaryUrl.mediaUrl);
         } else {
           message.warning('Không thể tối ưu hóa ảnh qua Cloudinary. URL của Google có thể quá dài để lưu.');
         }

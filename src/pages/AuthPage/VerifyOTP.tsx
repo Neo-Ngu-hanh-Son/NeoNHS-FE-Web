@@ -1,10 +1,10 @@
-import { CheckOTPForm } from "./components/check-otp-form";
-import { AppstoreOutlined } from "@ant-design/icons";
-import loginImage from "@/assets/images/login-img.jpg";
+import { CheckOTPForm } from './components/check-otp-form';
+import { AppstoreOutlined } from '@ant-design/icons';
+import loginImage from '@/assets/images/login-img.jpg';
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 export default function VerifyOTP() {
   const { isAuthenticated } = useAuth();
@@ -12,7 +12,7 @@ export default function VerifyOTP() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
   return (
@@ -23,7 +23,7 @@ export default function VerifyOTP() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <AppstoreOutlined className="text-sm" />
             </div>
-            CCTE
+            NeoNHS
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">

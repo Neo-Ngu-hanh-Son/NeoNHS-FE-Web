@@ -1,8 +1,8 @@
-import { useRef, useState, useCallback, type DragEvent, type ChangeEvent } from "react";
-import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
-import { Upload, ImageIcon, RefreshCw, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Spinner } from "../ui/spinner";
+import { useRef, useState, useCallback, type DragEvent, type ChangeEvent } from 'react';
+import { uploadImageToBackend, validateImageFile } from '@/utils/cloudinary';
+import { Upload, ImageIcon, RefreshCw, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Spinner } from '../ui/spinner';
 
 interface DragImageUploaderProps {
   /** Current uploaded image URL (controlled) */
@@ -30,7 +30,7 @@ export default function DragImageUploader({
   onUpload,
   onError,
   maxSizeMB = 5,
-  placeholder = "Drag & drop an image here, or click to browse",
+  placeholder = 'Drag & drop an image here, or click to browse',
   className,
   disabled = false,
   minHeight = 200,
@@ -38,7 +38,7 @@ export default function DragImageUploader({
 }: DragImageUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState('');
   const [dragOver, setDragOver] = useState(false);
 
   const processFile = useCallback(
@@ -55,11 +55,11 @@ export default function DragImageUploader({
       setFileName(file.name);
 
       try {
-        const url = await uploadImageToCloudinary(file);
-        if (!url) throw new Error("Upload failed — no URL returned");
-        onUpload(url);
+        const url = await uploadImageToBackend(file);
+        if (!url) throw new Error('Upload failed — no URL returned');
+        onUpload(url.mediaUrl);
       } catch (err: any) {
-        onError?.(err?.message || "Failed to upload image. Please try again.");
+        onError?.(err?.message || 'Failed to upload image. Please try again.');
       } finally {
         setUploading(false);
       }
@@ -94,7 +94,7 @@ export default function DragImageUploader({
     const file = e.target.files?.[0];
     if (file) processFile(file);
     // Reset so the same file can be re-selected
-    e.target.value = "";
+    e.target.value = '';
   };
 
   // ─── Hidden file input ───
@@ -112,16 +112,14 @@ export default function DragImageUploader({
   // ─── State: uploading ───
   if (uploading) {
     return (
-      <div className={cn("space-y-1", className)}>
+      <div className={cn('space-y-1', className)}>
         <div
           className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-primary bg-primary/10"
           style={{ minHeight }}
         >
           <Spinner className="h-8 w-8 animate-spin text-primary" />
           <p className="text-sm text-primary font-medium">Uploading…</p>
-          <p className="text-xs text-muted-foreground max-w-[80%] truncate text-center">
-            {fileName}
-          </p>
+          <p className="text-xs text-muted-foreground max-w-[80%] truncate text-center">{fileName}</p>
         </div>
         {fileInput}
       </div>
@@ -131,21 +129,17 @@ export default function DragImageUploader({
   // ─── State: image uploaded ───
   if (value) {
     return (
-      <div className={cn("space-y-2", className)}>
+      <div className={cn('space-y-2', className)}>
         <div
           className="group relative rounded-lg border border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center"
           style={{ minHeight }}
         >
-          <img
-            src={value}
-            alt="Uploaded"
-            className={cn("max-h-[400px] w-full object-contain", imageClassName)}
-          />
+          <img src={value} alt="Uploaded" className={cn('max-h-[400px] w-full object-cover', imageClassName)} />
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              onUpload("");
+              onUpload('');
             }}
             disabled={disabled}
             className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/80 disabled:cursor-not-allowed"
@@ -170,7 +164,7 @@ export default function DragImageUploader({
 
   // ─── State: empty (no image) ───
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={cn('space-y-1', className)}>
       <div
         role="button"
         tabIndex={0}
@@ -179,25 +173,19 @@ export default function DragImageUploader({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             handleClick();
           }
         }}
         className={cn(
-          "flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed transition-colors cursor-pointer",
-          dragOver
-            ? "border-primary bg-primary/50"
-            : "border-gray-300 hover:border-gray-400 bg-gray-50/30",
-          disabled && "opacity-50 cursor-not-allowed",
+          'flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed transition-colors cursor-pointer',
+          dragOver ? 'border-primary bg-primary/50' : 'border-gray-300 hover:border-gray-400 bg-gray-50/30',
+          disabled && 'opacity-50 cursor-not-allowed',
         )}
         style={{ minHeight }}
       >
-        {dragOver ? (
-          <ImageIcon className="h-10 w-10 text-primary" />
-        ) : (
-          <Upload className="h-10 w-10 text-gray-400" />
-        )}
+        {dragOver ? <ImageIcon className="h-10 w-10 text-primary" /> : <Upload className="h-10 w-10 text-gray-400" />}
         <p className="text-sm text-muted-foreground text-center px-4">{placeholder}</p>
         <p className="text-xs text-muted-foreground">JPG, PNG, GIF or WebP · max {maxSizeMB}MB</p>
       </div>

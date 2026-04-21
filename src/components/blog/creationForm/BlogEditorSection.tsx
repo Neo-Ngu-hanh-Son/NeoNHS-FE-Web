@@ -1,17 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import BlogEditor from "@/components/blog/BlogEditor";
-import { uploadImageToCloudinary } from "@/utils/cloudinary";
-import { BlogEditorRef, EditorSaveResult } from "@/components/blog/type";
-import { Ref } from "react";
-import { message, notification } from "antd";
-import { UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import BlogEditor from '@/components/blog/BlogEditor';
+import { uploadImageToBackend } from '@/utils/cloudinary';
+import { BlogEditorRef, EditorSaveResult } from '@/components/blog/type';
+import { Ref } from 'react';
+import { message, notification } from 'antd';
+import { UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { BlogFormSchema } from '@/components/blog/type';
 
 interface BlogEditorSectionProps {
   editorRef: Ref<BlogEditorRef>;
   handleSave: (content: EditorSaveResult) => Promise<void>;
-  form: UseFormReturn<z.infer<typeof formSchema>>;
+  form: UseFormReturn<z.infer<typeof BlogFormSchema>>;
   editorPrestateJSON?: string;
 }
 
@@ -20,16 +20,16 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
-      const resultUrl = await uploadImageToCloudinary(file);
-      console.log("Result url: " + resultUrl);
+      const resultUrl = await uploadImageToBackend(file);
+      console.log('Result url: ' + resultUrl);
       if (!resultUrl) {
-        messageApi.error("Tải ảnh lên thất bại, vui lòng thử lại");
+        messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');
       }
-      return resultUrl || "";
+      return resultUrl?.mediaUrl || '';
     } catch (error) {
-      console.error("[BlogEditorSection] Error uploading image:", error);
-      messageApi.error("Tải ảnh lên thất bại, vui lòng thử lại");
-      return "";
+      console.error('[BlogEditorSection] Error uploading image:', error);
+      messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');
+      return '';
     }
   };
 

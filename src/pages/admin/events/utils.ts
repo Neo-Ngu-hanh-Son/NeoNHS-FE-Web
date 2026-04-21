@@ -9,7 +9,7 @@ export function formatEventDate(dateString: string): string {
 }
 
 export function formatEventPrice(price: number | null | undefined): string {
-    if (!price || price === 0) return 'Free';
+    if (!price || price === 0) return 'Miễn phí';
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
         currency: 'VND',

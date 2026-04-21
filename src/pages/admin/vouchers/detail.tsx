@@ -6,7 +6,7 @@ import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ArrowLeft, Pencil, Trash2, Loader2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Loader2, RotateCcw, Tag, Clock, BarChart2 } from 'lucide-react';
 import { useState } from 'react';
 import { useVoucher } from '@/hooks/voucher';
 import { adminVoucherService } from '@/services/api/voucherService';
@@ -16,6 +16,7 @@ import {
     voucherTypeBadgeStyles, voucherTypeLabels,
     voucherScopeLabels, applicableProductLabels, discountTypeLabels,
 } from './constants';
+import { StatsCard } from '@/components/dashboard/StatsCard';
 
 function formatDateTime(dateStr: string | null | undefined) {
     if (!dateStr) return '—';
@@ -49,13 +50,13 @@ export default function VoucherDetailPage() {
         try {
             const response = await adminVoucherService.delete(id);
             if (response.success) {
-                message.success('Voucher deleted successfully');
+                message.success('Đã xóa voucher thành công');
                 navigate('/admin/vouchers');
             } else {
-                message.error(response.message || 'Failed to delete voucher');
+                message.error(response.message || 'Xóa voucher thất bại');
             }
         } catch (error: unknown) {
-            message.error('Failed to delete voucher');
+            message.error('Xóa voucher thất bại');
         } finally {
             setDeleting(false);
             setShowDelete(false);
@@ -68,14 +69,14 @@ export default function VoucherDetailPage() {
         try {
             const response = await adminVoucherService.permanentDelete(id);
             if (response.success) {
-                message.success('Voucher permanently deleted');
+                message.success('Đã xóa vĩnh viễn voucher');
                 navigate('/admin/vouchers');
             } else {
-                message.error(response.message || 'Failed to permanently delete voucher');
+                message.error(response.message || 'Xóa vĩnh viễn voucher thất bại');
             }
         } catch (error: unknown) {
             const err = error as any;
-            message.error(err?.response?.data?.message || 'Failed to permanently delete voucher');
+            message.error(err?.response?.data?.message || 'Xóa vĩnh viễn voucher thất bại');
         } finally {
             setDeleting(false);
             setShowPermanentDelete(false);
@@ -88,13 +89,13 @@ export default function VoucherDetailPage() {
         try {
             const response = await adminVoucherService.restore(id);
             if (response.success) {
-                message.success('Voucher restored successfully');
+                message.success('Khôi phục voucher thành công');
                 refetch();
             } else {
-                message.error(response.message || 'Failed to restore voucher');
+                message.error(response.message || 'Khôi phục voucher thất bại');
             }
         } catch (error: any) {
-            message.error(error?.response?.data?.message || 'Failed to restore voucher');
+            message.error(error?.response?.data?.message || 'Khôi phục voucher thất bại');
         } finally {
             setRestoring(false);
             setShowRestore(false);
@@ -112,9 +113,9 @@ export default function VoucherDetailPage() {
     if (!voucher) {
         return (
             <div className="max-w-4xl mx-auto text-center py-20">
-                <p className="text-muted-foreground">Voucher not found.</p>
+                <p className="text-muted-foreground">Không tìm thấy voucher.</p>
                 <Button variant="outline" className="mt-4" onClick={() => navigate('/admin/vouchers')}>
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to list
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Quay lại danh sách
                 </Button>
             </div>
         );
@@ -137,22 +138,22 @@ export default function VoucherDetailPage() {
                     {isDeleted ? (
                         <>
                             <Button variant="outline" onClick={() => setShowRestore(true)}>
-                                <RotateCcw className="mr-2 h-4 w-4" /> Restore
+                                <RotateCcw className="mr-2 h-4 w-4" /> Khôi phục
                             </Button>
                             <Button variant="destructive" onClick={() => setShowPermanentDelete(true)}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Permanent Delete
+                                <Trash2 className="mr-2 h-4 w-4" /> Xóa vĩnh viễn
                             </Button>
                         </>
                     ) : (
                         <>
                             <Button variant="outline" onClick={() => navigate(`/admin/vouchers/${id}/edit`)}>
-                                <Pencil className="mr-2 h-4 w-4" /> Edit
+                                <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
                             </Button>
                             <Button variant="destructive" onClick={() => setShowDelete(true)}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                <Trash2 className="mr-2 h-4 w-4" /> Xóa
                             </Button>
                             <Button variant="destructive" onClick={() => setShowPermanentDelete(true)}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Permanent Delete
+                                <Trash2 className="mr-2 h-4 w-4" /> Xóa vĩnh viễn
                             </Button>
                         </>
                     )}
@@ -162,31 +163,53 @@ export default function VoucherDetailPage() {
             {isDeleted && (
                 <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive flex items-center gap-2">
                     <Trash2 className="h-4 w-4 shrink-0" />
-                    This voucher has been soft-deleted on {formatDateTime(voucher.deletedAt)}. You can restore it or permanently delete it.
+                    Voucher này đã bị tạm xóa vào lúc {formatDateTime(voucher.deletedAt)}. Bạn có thể khôi phục hoặc xóa vĩnh viễn.
                 </div>
             )}
+
+            {/* Quick Stats Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatsCard
+                    title="Tổng số lượt"
+                    value={voucher.usageLimit || '—'}
+                    icon={<Tag className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
+                />
+                <StatsCard
+                    title="Đã sử dụng"
+                    value={voucher.usageCount || 0}
+                    icon={<Clock className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-emerald-500 to-green-600"
+                />
+                <StatsCard
+                    title="Còn lại"
+                    value={voucher.usageLimit ? (voucher.usageLimit - (voucher.usageCount || 0)) : '—'}
+                    icon={<BarChart2 className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
+                />
+            </div>
 
             {/* Basic Info */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-lg">Basic Information</CardTitle>
+                    <CardTitle className="text-lg">Thông tin cơ bản</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-6">
-                        <InfoItem label="Status">
+                        <InfoItem label="Trạng thái">
                             <Badge variant="outline" className={voucherStatusBadgeStyles[voucher.status]}>
                                 {voucherStatusLabels[voucher.status]}
                             </Badge>
                         </InfoItem>
-                        <InfoItem label="Type">
+                        <InfoItem label="Loại Voucher">
                             <Badge variant="outline" className={voucherTypeBadgeStyles[voucher.voucherType]}>
                                 {voucherTypeLabels[voucher.voucherType]}
                             </Badge>
                         </InfoItem>
-                        <InfoItem label="Scope">{voucherScopeLabels[voucher.scope]}</InfoItem>
-                        <InfoItem label="Applicable Product">{applicableProductLabels[voucher.applicableProduct]}</InfoItem>
-                        <InfoItem label="Created By">{voucher.createdByUserName}</InfoItem>
-                        {voucher.vendorName && <InfoItem label="Vendor">{voucher.vendorName}</InfoItem>}
+                        <InfoItem label="Phạm vi">{voucherScopeLabels[voucher.scope]}</InfoItem>
+                        <InfoItem label="Sản phẩm áp dụng">{applicableProductLabels[voucher.applicableProduct]}</InfoItem>
+                        <InfoItem label="Người tạo">{voucher.createdByUserName}</InfoItem>
+                        {voucher.vendorName && <InfoItem label="Đối tác">{voucher.vendorName}</InfoItem>}
                     </div>
                 </CardContent>
             </Card>
@@ -195,16 +218,16 @@ export default function VoucherDetailPage() {
             {voucher.voucherType === 'DISCOUNT' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Discount Details</CardTitle>
+                        <CardTitle className="text-lg">Chi tiết chiết khấu</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
-                            <InfoItem label="Discount Type">{voucher.discountType ? discountTypeLabels[voucher.discountType] : '—'}</InfoItem>
-                            <InfoItem label="Discount Value">
+                            <InfoItem label="Loại chiết khấu">{voucher.discountType ? discountTypeLabels[voucher.discountType] : '—'}</InfoItem>
+                            <InfoItem label="Giá trị chiết khấu">
                                 {voucher.discountType === 'PERCENT' ? `${voucher.discountValue}%` : formatCurrency(voucher.discountValue)}
                             </InfoItem>
-                            <InfoItem label="Max Discount">{formatCurrency(voucher.maxDiscountValue)}</InfoItem>
-                            <InfoItem label="Min Order">{formatCurrency(voucher.minOrderValue)}</InfoItem>
+                            <InfoItem label="Giảm tối đa">{formatCurrency(voucher.maxDiscountValue)}</InfoItem>
+                            <InfoItem label="Đơn hàng tối thiểu">{formatCurrency(voucher.minOrderValue)}</InfoItem>
                         </div>
                     </CardContent>
                 </Card>
@@ -213,16 +236,16 @@ export default function VoucherDetailPage() {
             {voucher.voucherType === 'GIFT_PRODUCT' && (
                 <Card>
                     <CardHeader>
-                        <CardTitle className="text-lg">Gift Product Details</CardTitle>
+                        <CardTitle className="text-lg">Chi tiết quà tặng</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         <div>
-                            <span className="text-sm text-muted-foreground">Gift Description</span>
+                            <span className="text-sm text-muted-foreground">Mô tả quà tặng</span>
                             <p className="mt-0.5 font-medium whitespace-pre-wrap break-words">{voucher.giftDescription || '—'}</p>
                         </div>
                         {voucher.giftImageUrl && (
                             <div>
-                                <span className="text-sm text-muted-foreground">Gift Image</span>
+                                <span className="text-sm text-muted-foreground">Hình ảnh quà tặng</span>
                                 <img src={voucher.giftImageUrl} alt="Gift" className="mt-1 max-w-xs rounded-lg border" />
                             </div>
                         )}
@@ -230,44 +253,19 @@ export default function VoucherDetailPage() {
                 </Card>
             )}
 
-            {voucher.voucherType === 'BONUS_POINTS' && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Bonus Points Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <InfoItem label="Points">{voucher.bonusPointsValue ?? '—'}</InfoItem>
-                    </CardContent>
-                </Card>
-            )}
-
-            {voucher.voucherType === 'FREE_SERVICE' && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-lg">Free Service Details</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-2 gap-4">
-                            <InfoItem label="Ticket Catalog">{voucher.freeTicketCatalogName || '—'}</InfoItem>
-                            <InfoItem label="Ticket Catalog ID">{voucher.freeTicketCatalogId || '—'}</InfoItem>
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
 
             {/* Time & Usage */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="text-lg">Time & Usage</CardTitle>
+                    <CardTitle className="text-lg">Thời gian & Giới hạn sử dụng</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-y-4 gap-x-6">
-                        <InfoItem label="Start Date">{formatDateTime(voucher.startDate)}</InfoItem>
-                        <InfoItem label="End Date">{formatDateTime(voucher.endDate)}</InfoItem>
-                        <InfoItem label="Usage">{voucher.usageCount} / {voucher.usageLimit}</InfoItem>
-                        <InfoItem label="Max Per User">{voucher.maxUsagePerUser}</InfoItem>
-                        <InfoItem label="Created At">{formatDateTime(voucher.createdAt)}</InfoItem>
-                        <InfoItem label="Updated At">{formatDateTime(voucher.updatedAt)}</InfoItem>
+                        <InfoItem label="Ngày bắt đầu">{formatDateTime(voucher.startDate)}</InfoItem>
+                        <InfoItem label="Ngày kết thúc">{formatDateTime(voucher.endDate)}</InfoItem>
+                        <InfoItem label="Sử dụng">{voucher.usageCount} / {voucher.usageLimit}</InfoItem>
+                        <InfoItem label="Ngày tạo">{formatDateTime(voucher.createdAt)}</InfoItem>
+                        <InfoItem label="Ngày cập nhật">{formatDateTime(voucher.updatedAt)}</InfoItem>
                     </div>
                 </CardContent>
             </Card>
@@ -276,20 +274,20 @@ export default function VoucherDetailPage() {
             <AlertDialog open={showDelete} onOpenChange={setShowDelete}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete voucher "{voucher.code}"? This action can be undone later.
+                            Bạn có chắc chắn muốn xóa voucher "{voucher.code}"? Hành động này có thể khôi phục sau.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleDelete}
                             disabled={deleting}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Delete
+                            Xóa
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -299,20 +297,20 @@ export default function VoucherDetailPage() {
             <AlertDialog open={showPermanentDelete} onOpenChange={setShowPermanentDelete}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Permanently Delete Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa vĩnh viễn Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will <strong>permanently</strong> delete voucher "<strong className="font-mono">{voucher.code}</strong>". This action <strong>cannot be undone</strong>.
+                            Hành động này sẽ xóa <strong>vĩnh viễn</strong> voucher "<strong className="font-mono">{voucher.code}</strong>". Không thể khôi phục thao tác này.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handlePermanentDelete}
                             disabled={deleting}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {deleting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Permanently Delete
+                            Xóa vĩnh viễn
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -322,16 +320,16 @@ export default function VoucherDetailPage() {
             <AlertDialog open={showRestore} onOpenChange={setShowRestore}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Restore Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Khôi phục Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to restore voucher "<strong className="font-mono">{voucher.code}</strong>"? It will be set back to ACTIVE status.
+                            Bạn có chắc chắn muốn khôi phục voucher "<strong className="font-mono">{voucher.code}</strong>"? Nó sẽ quay lại trạng thái ĐANG HOẠT ĐỘNG.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handleRestore} disabled={restoring}>
                             {restoring ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
-                            Restore
+                            Khôi phục
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

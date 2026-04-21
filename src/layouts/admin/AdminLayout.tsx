@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import NavlinkWithChildren from '../../components/adminLayout/NavlinkWithChildren.tsx';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import {
   BarChart3,
   Bell,
@@ -105,23 +113,7 @@ export function AdminLayout() {
       ],
     },
     { label: 'Vé', path: '/admin/tickets', icon: <Ticket className="w-5 h-5" /> },
-    {
-      label: 'Voucher',
-      path: 'vouchers-composite',
-      icon: <BadgePercent className="w-5 h-5" />,
-      children: [
-        {
-          label: 'Voucher nền tảng',
-          path: '/admin/vouchers/platform',
-          icon: <BadgePercent className="w-5 h-5" />,
-        },
-        {
-          label: 'Voucher đối tác',
-          path: '/admin/vouchers/vendor',
-          icon: <BadgePercent className="w-5 h-5" />,
-        },
-      ],
-    },
+    { label: 'Voucher nền tảng', path: '/admin/vouchers/platform', icon: <BadgePercent className="w-5 h-5" /> },
     { label: 'Báo cáo', path: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
     {
       label: 'Sự kiện',
@@ -149,23 +141,54 @@ export function AdminLayout() {
   // Helper to get breadcrumb from path
   const getPageHierarchy = () => {
     const path = window.location.pathname;
-    const findInItems = (items: Array<AdminNavItem | AdminNavChild>): string[] | null => {
+    const findInItems = (items: Array<AdminNavItem | AdminNavChild>): { label: string; path: string }[] | null => {
       for (const item of items) {
-        if (item.path === path) return [item.label];
+        if (item.path === path) return [{ label: item.label, path: item.path }];
         if ('children' in item && item.children) {
           const childPath = findInItems(item.children);
-          if (childPath) return [item.label, ...childPath];
+          if (childPath) {
+            const parentPath = item.path.startsWith('/') ? item.path : item.children[0].path;
+            return [{ label: item.label, path: parentPath }, ...childPath];
+          }
         }
       }
       return null;
     };
 
     const hierarchy = findInItems(navItems);
-    return hierarchy || ['Hệ thống'];
+    if (hierarchy) return hierarchy;
+
+    // Dynamic event routes
+    if (path.startsWith('/admin/events/')) {
+        const parts = path.split('/');
+        if (parts.length === 4 && parts[3] === 'create') {
+            return [
+                { label: 'Sự kiện', path: '/admin/events' }, 
+                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
+                { label: 'Tạo mới', path: path }
+            ];
+        }
+        if (parts.length === 5 && parts[4] === 'edit') {
+            return [
+                { label: 'Sự kiện', path: '/admin/events' }, 
+                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
+                { label: 'Chỉnh sửa', path: path }
+            ];
+        }
+        if (parts.length === 4) { // /admin/events/:id
+            return [
+                { label: 'Sự kiện', path: '/admin/events' }, 
+                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
+                { label: 'Chi tiết', path: path }
+            ];
+        }
+    }
+
+    return [{ label: 'Hệ thống', path: '/admin' }];
   };
 
   const hierarchy = getPageHierarchy();
-  const pageTitle = hierarchy[hierarchy.length - 1];
+  const pageTitle = hierarchy[hierarchy.length - 1]?.label || 'Hệ thống';
 
   return (
     <div className="flex h-screen overflow-hidden font-sans">
@@ -249,17 +272,43 @@ export function AdminLayout() {
               {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
             </button>
             <div className="flex flex-col">
-              <div className="flex items-center gap-1.5 text-sm text-slate-400 dark:text-slate-500">
-                <span>Hệ thống</span>
-                {hierarchy.map((label, index) => (
-                  <React.Fragment key={index}>
-                    <span>/</span>
-                    <span className={index === hierarchy.length - 1 ? 'text-emerald-600 dark:text-emerald-400 font-medium' : ''}>
-                      {label}
-                    </span>
-                  </React.Fragment>
-                ))}
-              </div>
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <div className="flex items-center gap-2">
+                    <BreadcrumbItem>
+                      <BreadcrumbLink asChild>
+                        <Link
+                          to="/admin"
+                          className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        >
+                          Hệ thống
+                        </Link>
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                  </div>
+                  {hierarchy.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <BreadcrumbSeparator />
+                      <BreadcrumbItem>
+                        {index === hierarchy.length - 1 ? (
+                          <BreadcrumbPage className="text-emerald-600 dark:text-emerald-400 font-medium">
+                            {item.label}
+                          </BreadcrumbPage>
+                        ) : (
+                          <BreadcrumbLink asChild>
+                            <Link
+                              to={item.path}
+                              className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                            >
+                              {item.label}
+                            </Link>
+                          </BreadcrumbLink>
+                        )}
+                      </BreadcrumbItem>
+                    </div>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
               <h2 className="text-xl font-bold mt-0.5 text-slate-900 dark:text-white">{pageTitle}</h2>
             </div>
           </div>

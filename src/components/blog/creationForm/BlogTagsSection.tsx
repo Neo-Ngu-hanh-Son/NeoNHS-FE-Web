@@ -1,11 +1,11 @@
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Controller, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { BlogFormSchema } from '@/components/blog/type';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 
-export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<typeof BlogFormSchema>> }) {
   return (
     <Card>
       <CardHeader>
@@ -24,7 +24,7 @@ export default function BlogTagsSection({ form }: { form: UseFormReturn<z.infer<
                   id="tags"
                   placeholder="Du lịch, Hướng dẫn, Mẹo hay"
                   aria-invalid={fieldState.invalid}
-                  className={fieldState.invalid ? "border-destructive focus-visible:ring-destructive" : ""}
+                  className={fieldState.invalid ? 'border-destructive focus-visible:ring-destructive' : ''}
                 />
                 <p className="text-xs text-muted-foreground mt-2">Các thẻ cách nhau bằng dấu phẩy.</p>
                 {fieldState.invalid && <FieldError errors={[fieldState.error]} />}

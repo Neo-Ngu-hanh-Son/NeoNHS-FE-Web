@@ -29,7 +29,7 @@ export function useVendorVouchers(params: VendorVoucherQueryParams): UseVendorVo
     const fetchVouchers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await vendorVoucherService.getMyVouchers(params);
+            const response = await vendorVoucherService.getAll(params);
             if (response.success) {
                 setVouchers(response.data.content);
                 setTotalElements(response.data.totalElements);

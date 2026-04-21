@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,15 +10,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ArrowLeft, Save, Trash2, Eye } from "lucide-react";
-import type { PointPanoramaResponse } from "@/types";
+} from '@/components/ui/alert-dialog';
+import { ArrowLeft, Save, Trash2, Eye } from 'lucide-react';
+import type { PointPanoramaResponse } from '@/types';
 
 interface PanoramaEditorHeaderProps {
-  variant?: "page" | "embedded";
+  variant?: 'page' | 'embedded';
   panorama: PointPanoramaResponse | null;
-  targetId: string;
-  entityLabel: string;
+  targetPointId: string;
   saving: boolean;
   hasImage: boolean;
   onSave: () => void;
@@ -29,10 +28,9 @@ interface PanoramaEditorHeaderProps {
 }
 
 export default function PanoramaEditorHeader({
-  variant = "page",
+  variant = 'page',
   panorama,
-  targetId,
-  entityLabel,
+  targetPointId,
   saving,
   hasImage,
   onSave,
@@ -40,46 +38,24 @@ export default function PanoramaEditorHeader({
   pointName,
   onBackToParent,
 }: PanoramaEditorHeaderProps) {
-  const navigate = useNavigate();
-  const embedded = variant === "embedded";
+  const embedded = variant === 'embedded';
 
-  const handleBack = () => {
-    if (embedded && onBackToParent) {
-      onBackToParent();
-    } else {
-      navigate(-1);
-    }
-  };
-
-  const displayName = (pointName?.trim() || panorama?.name || "").trim();
-  const titleSuffix = displayName ? `: ${displayName}` : "";
+  const pointLabel = (pointName?.trim() || '').trim();
+  const panoramaLabel = (panorama?.title?.trim() || '').trim();
+  const titleSuffix = panoramaLabel ? `: ${panoramaLabel}` : pointLabel ? `: ${pointLabel}` : '';
+  const deleteTargetLabel = pointLabel || panoramaLabel || 'mục đã chọn';
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-        <Button
-          type="button"
-          variant="ghost"
-          size={embedded ? "sm" : "sm"}
-          className={embedded ? "shrink-0 gap-2 px-2" : "gap-1"}
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {embedded ? <span className="text-sm font-medium">Về thông tin điểm</span> : <span>Quay lại</span>}
-        </Button>
         <div className="min-w-0">
           <h1
             className={
-              embedded
-                ? "text-lg font-semibold tracking-tight text-slate-900 dark:text-white"
-                : "text-xl font-bold"
+              embedded ? 'text-lg font-semibold tracking-tight text-slate-900 dark:text-white' : 'text-xl font-bold'
             }
           >
-            {panorama ? "Chỉnh sửa ảnh" : "Tạo mới ảnh"} panorama{titleSuffix}
+            {panorama ? 'Chỉnh sửa ảnh' : 'Tạo mới ảnh'} panorama{titleSuffix}
           </h1>
-          {/* <p className="text-sm text-muted-foreground">
-            {entityLabel} · {targetId}
-          </p> */}
         </div>
       </div>
 
@@ -88,7 +64,7 @@ export default function PanoramaEditorHeader({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/panorama/${targetId}`, "_blank")}
+            onClick={() => window.open(`/places/${targetPointId}/panorama`, '_blank')}
             className="gap-1"
           >
             <Eye className="h-4 w-4" />
@@ -108,7 +84,8 @@ export default function PanoramaEditorHeader({
               <AlertDialogHeader>
                 <AlertDialogTitle>Xóa panorama?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Thao tác này sẽ xóa vĩnh viễn ảnh panorama và mọi điểm nóng ({entityLabel}). Không thể hoàn tác.
+                  Thao tác này sẽ xóa vĩnh viễn ảnh panorama và mọi điểm nóng tại {deleteTargetLabel}. Không thể hoàn
+                  tác.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -121,7 +98,7 @@ export default function PanoramaEditorHeader({
 
         <Button onClick={onSave} disabled={saving} size="sm" className="gap-1">
           <Save className="h-4 w-4" />
-          {saving ? "Đang lưu…" : "Lưu panorama"}
+          {saving ? 'Đang lưu…' : 'Lưu panorama'}
         </Button>
       </div>
     </div>

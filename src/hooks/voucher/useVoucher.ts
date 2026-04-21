@@ -5,8 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { message } from 'antd';
-import { adminVoucherService } from '@/services/api/voucherService';
-import type { VoucherResponse } from '@/types/voucher';
+import { adminVoucherService, vendorVoucherService } from '@/services/api/voucherService';
+import type { VoucherResponse, VoucherScope } from '@/types/voucher';
 
 interface UseVoucherReturn {
     voucher: VoucherResponse | null;
@@ -14,15 +14,16 @@ interface UseVoucherReturn {
     refetch: () => Promise<void>;
 }
 
-export function useVoucher(id: string | undefined): UseVoucherReturn {
+export function useVoucher(id: string | undefined, scope: VoucherScope = 'PLATFORM'): UseVoucherReturn {
     const [voucher, setVoucher] = useState<VoucherResponse | null>(null);
     const [loading, setLoading] = useState(false);
+    const service = scope === 'PLATFORM' ? adminVoucherService : vendorVoucherService;
 
     const fetchVoucher = useCallback(async () => {
         if (!id) return;
         setLoading(true);
         try {
-            const response = await adminVoucherService.getById(id);
+            const response = await service.getById(id);
             if (response.success) {
                 setVoucher(response.data);
             } else {
@@ -34,7 +35,7 @@ export function useVoucher(id: string | undefined): UseVoucherReturn {
         } finally {
             setLoading(false);
         }
-    }, [id]);
+    }, [id, service]);
 
     useEffect(() => {
         fetchVoucher();

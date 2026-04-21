@@ -1,9 +1,10 @@
+import type { PointPanoramaResponse } from './panorama';
+
 export const PointType = {
     PAGODA: 'PAGODA',
     CAVE: 'CAVE',
     VIEWPOINT: 'VIEWPOINT',
     GENERAL: 'GENERAL',
-    CHECKIN: 'CHECKIN',
     STATUE: 'STATUE',
     GATE: 'GATE',
     SHOP: 'SHOP',
@@ -45,6 +46,7 @@ export interface PointResponse {
     defaultYaw?: number | null;
     defaultPitch?: number | null;
     checkinPoints?: unknown[] | null;
+    panoramas?: PointPanoramaResponse[] | null;
     historyAudioCount: number;
     deletedAt?: string | null;
 }

@@ -1,11 +1,11 @@
-import { AppstoreOutlined } from "@ant-design/icons";
+import { AppstoreOutlined } from '@ant-design/icons';
 
-import { RegisterForm } from "./components/register-form";
-import loginImage from "@/assets/images/login-img.jpg";
+import { RegisterForm } from './components/register-form';
+import loginImage from '@/assets/images/login-img.jpg';
 
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/auth/useAuth';
 
 export default function SignupPage() {
   const { isAuthenticated } = useAuth();
@@ -13,7 +13,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
   return (
@@ -24,7 +24,7 @@ export default function SignupPage() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <AppstoreOutlined className="text-sm" />
             </div>
-            CCTE
+            NeoNHS
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">

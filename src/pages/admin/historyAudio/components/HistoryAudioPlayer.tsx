@@ -1,5 +1,5 @@
-import type { ForcedAlignmentWord } from "@/pages/admin/historyAudio/types";
-import PlaybackAndTimingSection from "@/pages/admin/historyAudio/components/PlaybackAndTimingSection";
+import type { ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
+import PlaybackAndTimingSection from '@/pages/admin/historyAudio/components/PlaybackAndTimingSection';
 
 interface HistoryAudioPlayerProps {
   audioUrl: string;
@@ -9,6 +9,7 @@ interface HistoryAudioPlayerProps {
   aligningWords: boolean;
   audioRef: React.RefObject<HTMLAudioElement | null>;
   onGenerateWordTiming: () => void;
+  showGenerateWordTimingButton?: boolean;
 }
 
 export default function HistoryAudioPlayer(props: HistoryAudioPlayerProps) {

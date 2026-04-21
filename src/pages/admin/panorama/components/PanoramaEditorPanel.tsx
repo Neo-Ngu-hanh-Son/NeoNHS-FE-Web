@@ -1,16 +1,23 @@
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { usePanoramaForm } from "../hooks/usePanoramaForm";
-import PanoramaEditorHeader from "./PanoramaEditorHeader";
-import PanoramaImageUpload from "./PanoramaImageUpload";
-import CameraDefaultsForm from "./CameraDefaultsForm";
-import HotSpotManager from "./HotSpotManager";
-import PanoramaPreview from "./PanoramaPreview";
-import { Spinner } from "@/components/ui/spinner";
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { usePanoramaForm } from '../hooks/usePanoramaForm';
+import PanoramaEditorHeader from './PanoramaEditorHeader';
+import PanoramaImageUpload from './PanoramaImageUpload';
+import CameraDefaultsForm from './CameraDefaultsForm';
+import HotSpotManager from './HotSpotManager';
+import PanoramaPreview from './PanoramaPreview';
+import { Spinner } from '@/components/ui/spinner';
+import PanoramaList from './PanoramaList';
+import { Button } from '@/components/ui';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export interface PanoramaEditorPanelProps {
   /** `embedded`: trong modal POI — nút quay lại gọi `onBackToParent` thay vì `navigate(-1)` */
-  variant?: "page" | "embedded";
+  variant?: 'page' | 'embedded';
   /** Bắt buộc khi `variant="embedded"` — id điểm POI */
   embedPointId?: string;
   pointName?: string;
@@ -18,19 +25,18 @@ export interface PanoramaEditorPanelProps {
 }
 
 export default function PanoramaEditorPanel({
-  variant = "page",
+  variant = 'page',
   embedPointId,
   pointName,
   onBackToParent,
 }: PanoramaEditorPanelProps) {
-  const embedded = variant === "embedded";
-  const form = usePanoramaForm(embedded && embedPointId ? { embedPointId } : undefined);
+  const navigate = useNavigate();
+  const embedded = variant === 'embedded';
+  const form = usePanoramaForm({ embedPointId });
 
-  const entityLabel = form.isCheckinPoint ? "Điểm check-in" : "Điểm POI";
-
-  if (form.loading) {
+  if (form.isLoading) {
     return (
-      <div className={embedded ? "py-12" : "mx-auto max-w-[1200px] p-6"}>
+      <div className={embedded ? 'py-12' : 'mx-auto max-w-[1200px] p-6'}>
         <div className="flex h-64 items-center justify-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner className="h-8 w-8 text-primary" />
@@ -41,26 +47,64 @@ export default function PanoramaEditorPanel({
     );
   }
 
+  const handleBack = () => {
+    if (embedded && onBackToParent) {
+      onBackToParent();
+    } else {
+      navigate(-1);
+    }
+  };
+
   return (
-    <div className={embedded ? "space-y-4" : "mx-auto max-w-[1200px] space-y-6 p-6"}>
+    <div className={embedded ? 'space-y-4' : 'mx-auto max-w-[1200px] space-y-6 p-6'}>
+      <Button type="button" variant="ghost" size={'sm'} className={'shrink-0 gap-2 px-2'} onClick={handleBack}>
+        <ArrowLeft className="h-4 w-4" />
+        {embedded ? <span className="text-sm font-medium">Về thông tin điểm</span> : <span>Quay lại</span>}
+      </Button>
+      <PanoramaList
+        panoramas={form.panoramas}
+        selectedPanoramaId={form.selectedPanoramaId}
+        onSelectPanorama={form.changeEditingPanorama}
+        onCreatePanorama={form.startCreatePanorama}
+        disabled={form.isSaving}
+      />
+      <Separator />
+
       <PanoramaEditorHeader
         variant={variant}
-        panorama={form.panorama}
-        targetId={form.targetId}
-        entityLabel={entityLabel}
-        saving={form.saving}
+        panorama={form.selectedPanorama}
+        targetPointId={form.targetPointId}
+        saving={form.isSaving}
         hasImage={!!form.panoramaImageUrl}
         onSave={form.handleSave}
         onDelete={form.handleDelete}
         pointName={pointName}
         onBackToParent={onBackToParent}
       />
-
-      <Separator />
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="space-y-6">
           <Card className="space-y-5 p-5">
+            <div className="space-y-2">
+              <h2 className="text-base font-semibold">Tiêu đề panorama</h2>
+              <Input
+                placeholder="Ví dụ: Sảnh chính, Hang phía Đông..."
+                value={form.panoramaTitle}
+                onChange={(event) => form.handleTitleChange(event.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <Label htmlFor="panorama-is-default" className="text-sm font-medium">
+                  Đặt làm panorama mặc định
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Khi bật, panorama này sẽ là điểm nhìn đầu tiên của địa điểm.
+                </p>
+              </div>
+              <Switch id="panorama-is-default" checked={form.isDefault} onCheckedChange={form.handleDefaultChange} />
+            </div>
+
             <h2 className="text-base font-semibold">Ảnh panorama</h2>
             <PanoramaImageUpload
               value={form.panoramaImageUrl}
@@ -86,6 +130,7 @@ export default function PanoramaEditorPanel({
             onDelete={form.deleteHotSpot}
             onReorder={form.reorderHotSpots}
             onClearClickedPosition={form.clearClickedPosition}
+            currentPanoramaId={form.selectedPanoramaId}
           />
         </div>
 

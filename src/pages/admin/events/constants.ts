@@ -13,17 +13,17 @@ export const statusBadgeStyles: Record<EventStatus, string> = {
 };
 
 export const statusLabels: Record<EventStatus, string> = {
-    UPCOMING: 'Upcoming',
-    ONGOING: 'Ongoing',
-    COMPLETED: 'Completed',
-    CANCELLED: 'Cancelled',
+    UPCOMING: 'Sắp diễn ra',
+    ONGOING: 'Đang diễn ra',
+    COMPLETED: 'Đã hoàn thành',
+    CANCELLED: 'Đã hủy',
 };
 
 export const EVENT_STATUS_OPTIONS: { value: EventStatus; label: string }[] = [
-    { value: 'UPCOMING', label: 'Upcoming' },
-    { value: 'ONGOING', label: 'Ongoing' },
-    { value: 'COMPLETED', label: 'Completed' },
-    { value: 'CANCELLED', label: 'Cancelled' },
+    { value: 'UPCOMING', label: 'Sắp diễn ra' },
+    { value: 'ONGOING', label: 'Đang diễn ra' },
+    { value: 'COMPLETED', label: 'Đã hoàn thành' },
+    { value: 'CANCELLED', label: 'Đã hủy' },
 ];
 
 export const ticketStatusBadgeStyles: Record<TicketCatalogStatus, string> = {
@@ -33,17 +33,17 @@ export const ticketStatusBadgeStyles: Record<TicketCatalogStatus, string> = {
 };
 
 export const TICKET_STATUS_OPTIONS: { value: TicketCatalogStatus; label: string }[] = [
-    { value: 'ACTIVE', label: 'Active' },
-    { value: 'INACTIVE', label: 'Inactive' },
-    { value: 'SOLD_OUT', label: 'Sold Out' },
+    { value: 'ACTIVE', label: 'Hoạt động' },
+    { value: 'INACTIVE', label: 'Không hoạt động' },
+    { value: 'SOLD_OUT', label: 'Đã bán hết' },
 ];
 
 export const WEEKDAY_OPTIONS = [
-    { value: 'MON', label: 'Mon' },
-    { value: 'TUE', label: 'Tue' },
-    { value: 'WED', label: 'Wed' },
-    { value: 'THU', label: 'Thu' },
-    { value: 'FRI', label: 'Fri' },
-    { value: 'SAT', label: 'Sat' },
-    { value: 'SUN', label: 'Sun' },
+    { value: 'MON', label: 'T2' },
+    { value: 'TUE', label: 'T3' },
+    { value: 'WED', label: 'T4' },
+    { value: 'THU', label: 'T5' },
+    { value: 'FRI', label: 'T6' },
+    { value: 'SAT', label: 'T7' },
+    { value: 'SUN', label: 'CN' },
 ];

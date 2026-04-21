@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RootLayout } from '@/layouts/RootLayout';
 import { AppLayout } from '@/layouts/AppLayout';
 import { BlankLayout } from '@/layouts/BlankLayout';
@@ -26,7 +26,6 @@ import AdminVendorTemplatesPage from '@/pages/admin/vendorTemplate/AdminVendorTe
 import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage';
 import AdminVouchersPage from '@/pages/admin/vouchers';
 import PlatformVouchersPage from '@/pages/admin/vouchers/PlatformVouchers';
-import VendorVouchersPage from '@/pages/admin/vouchers/VendorVouchers';
 import VoucherCreatePage from '@/pages/admin/vouchers/create';
 import VoucherDetailPage from '@/pages/admin/vouchers/detail';
 import VoucherEditPage from '@/pages/admin/vouchers/edit';
@@ -47,8 +46,11 @@ import WorkshopTemplateEditPage from '@/pages/vendor/WorkshopTemplates/WorkshopT
 import WorkshopSessionsPage from '@/pages/vendor/WorkshopSessions/WorkshopSessionsPage';
 import WorkshopCalendarPage from '@/pages/vendor/WorkshopCalendar/CalendarPage.tsx';
 import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPage';
-import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage';
-import VendorDeletedVouchersPage from '@/pages/vendor/Vouchers/DeletedVouchersPage';
+import VendorVouchersPage from '@/pages/vendor/vouchers/index';
+import VendorVoucherCreatePage from '@/pages/vendor/vouchers/create';
+import VendorVoucherEditPage from '@/pages/vendor/vouchers/edit';
+import VendorVoucherDetailPage from '@/pages/vendor/vouchers/detail';
+import VendorDeletedVouchersPage from '@/pages/vendor/vouchers/DeletedVouchersPage';
 import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage';
 import ManageBlogPage from '@/pages/admin/blog/ManageBlogPage';
 import BlogCreationPage from '@/pages/admin/blog/BlogCreationPage';
@@ -83,15 +85,7 @@ export const router = createBrowserRouter([
           { path: '/new-password', element: <NewPassword /> },
           { path: '/set-password', element: <SetPasswordPage /> },
           { path: '/places/:placeId/panorama', element: <PanoramaScreen /> },
-          {
-            path: '/places/:pointId/checkin-points/:checkinPointId/panorama',
-            element: <PanoramaScreen />,
-          },
           { path: '/places/panorama/mobile', element: <PanoramaScreenMobile /> },
-          {
-            path: '/places/checkin-points/panorama/mobile',
-            element: <PanoramaScreenMobile />,
-          },
         ],
       },
       {
@@ -116,6 +110,7 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
         children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
           { path: 'dashboard', element: <VendorDashboardPage /> },
           { path: 'profile', element: <VendorProfilePage /> },
           { path: 'workshop-templates', element: <WorkshopTemplatesPage /> },
@@ -126,8 +121,11 @@ export const router = createBrowserRouter([
           { path: 'workshop-calendar', element: <WorkshopCalendarPage /> },
           { path: 'messages', element: <ChatPage /> },
           { path: 'ticket-verification', element: <TicketVerificationPage /> },
-          { path: 'vouchers', element: <VouchersPage /> },
+          { path: 'vouchers', element: <VendorVouchersPage /> },
+          { path: 'vouchers/create', element: <VendorVoucherCreatePage /> },
           { path: 'vouchers/deleted', element: <VendorDeletedVouchersPage /> },
+          { path: 'vouchers/:id', element: <VendorVoucherDetailPage /> },
+          { path: 'vouchers/:id/edit', element: <VendorVoucherEditPage /> },
         ],
       },
       {
@@ -138,6 +136,7 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
         children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
           { path: 'dashboard', element: <AdminDashboardPage /> },
           { path: 'destinations', element: <AdminDestinationsPage /> },
           { path: 'checkin-points', element: <AdminCheckinPointsPage /> },
@@ -146,9 +145,8 @@ export const router = createBrowserRouter([
           { path: 'vendors', element: <AdminVendorsPage /> },
           { path: 'vendors/templates', element: <AdminVendorTemplatesPage /> },
           { path: 'tickets', element: <AdminTicketsPage /> },
-          { path: 'vouchers', element: <AdminVouchersPage /> },
+          { path: 'vouchers', element: <Navigate to="platform" replace /> },
           { path: 'vouchers/platform', element: <PlatformVouchersPage /> },
-          { path: 'vouchers/vendor', element: <VendorVouchersPage /> },
           { path: 'vouchers/create', element: <VoucherCreatePage /> },
           { path: 'vouchers/deleted', element: <AdminDeletedVouchersPage /> },
           { path: 'vouchers/:id', element: <VoucherDetailPage /> },
