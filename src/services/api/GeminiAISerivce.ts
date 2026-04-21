@@ -1,11 +1,11 @@
 import { GeminiTranslationObject, GeminiTranslationRequest } from '@/pages/admin/historyAudio/types';
 import { GoogleGenAI } from '@google/genai';
 
-const API_KEY = import.meta.env.VITE_GEMINI_TRANSLATOR_API_KEY;
+// const API_KEY = import.meta.env.VITE_GEMINI_TRANSLATOR_API_KEY;
 
-const ai = new GoogleGenAI({
-  apiKey: API_KEY,
-});
+  const ai = new GoogleGenAI({
+    apiKey: "ABCD",
+  });
 
 const TRANSLATION_PROMPT = `Act as a professional cultural heritage translator and JSON formatter. 
 

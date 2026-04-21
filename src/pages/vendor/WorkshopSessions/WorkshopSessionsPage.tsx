@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays } from 'lucide-react'
+import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays, RefreshCcw } from 'lucide-react'
 import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
@@ -12,6 +12,12 @@ import { EditSessionDialog } from './components/edit-session-dialog'
 import { ViewSessionDialog } from './components/view-session-dialog'
 import { SessionCalendar } from './components/calendar'
 import { formatDate, parseSessionInstant } from './utils/formatters'
+import {
+  canCompleteWorkshopSession,
+  canStartWorkshopSession,
+  mapWorkshopSessionErrorToVi,
+} from './utils/workshopSessionRules'
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 import { WorkshopSessionService } from '@/services/api/workshopSessionService'
 
 export default function WorkshopSessionsPage() {
@@ -51,11 +57,11 @@ export default function WorkshopSessionsPage() {
         sortDirection: 'ASC',
       })
       setSessions(response.content || [])
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Failed to fetch sessions:', error)
       notification.error({
-        message: 'Tải Dữ Liệu Thất Bại',
-        description: error.message || 'Không thể tải danh sách phiên. Vui lòng thử lại.',
+        message: 'Tải dữ liệu thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể tải danh sách phiên. Vui lòng thử lại.')),
       })
     } finally {
       setLoading(false)
@@ -153,37 +159,51 @@ export default function WorkshopSessionsPage() {
   }
 
   const handleStartSession = async (session: WorkshopSessionResponse) => {
+    if (!canStartWorkshopSession(session)) {
+      notification.warning({
+        message: 'Chưa thể bắt đầu phiên',
+        description: 'Vui lòng đảm bảo đã có khách đăng ký và chỉ thao tác trong khoảng ±30 phút quanh giờ bắt đầu.',
+      })
+      return
+    }
     try {
       await WorkshopSessionService.updateSessionStatus(session.id, 'ONGOING')
       setSessions(prev => prev.map(s =>
         s.id === session.id ? { ...s, status: SessionStatus.ONGOING } : s
       ))
       notification.success({
-        message: 'Bắt Đầu Phiên',
+        message: 'Đã bắt đầu phiên',
         description: `"${session.workshopTemplate.name}" hiện đang diễn ra.`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       notification.error({
-        message: 'Bắt Đầu Thất Bại',
-        description: error.message || 'Vui lòng thử lại.',
+        message: 'Bắt đầu thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể cập nhật trạng thái. Vui lòng thử lại.')),
       })
     }
   }
 
   const handleCompleteSession = async (session: WorkshopSessionResponse) => {
+    if (!canCompleteWorkshopSession(session)) {
+      notification.warning({
+        message: 'Chưa thể hoàn thành phiên',
+        description: 'Chỉ được hoàn thành khi phiên đang diễn ra và trong khoảng ±30 phút quanh giờ kết thúc.',
+      })
+      return
+    }
     try {
       await WorkshopSessionService.updateSessionStatus(session.id, 'COMPLETED')
       setSessions(prev => prev.map(s =>
         s.id === session.id ? { ...s, status: SessionStatus.COMPLETED } : s
       ))
       notification.success({
-        message: 'Hoàn Thành Phiên',
+        message: 'Đã hoàn thành phiên',
         description: `"${session.workshopTemplate.name}" đã được đánh dấu hoàn thành.`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       notification.error({
-        message: 'Hoàn Thành Thất Bại',
-        description: error.message || 'Vui lòng thử lại.',
+        message: 'Hoàn thành thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể cập nhật trạng thái. Vui lòng thử lại.')),
       })
     }
   }
@@ -277,6 +297,17 @@ export default function WorkshopSessionsPage() {
           >
             <CalendarDays className="w-4 h-4" />
             Lịch
+          </Button>
+        </div>
+        <div className="flex gap-2 dark:bg-slate-800 rounded-lg p-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={fetchSessions}
+            className="gap-1 rounded-md w-full"
+          >
+            <RefreshCcw className="w-4 h-4" />
+            Làm mới
           </Button>
         </div>
       </div>

@@ -135,6 +135,7 @@ export function AdminLayout() {
       ],
     },
     { label: 'Tin nhắn', path: '/admin/messages', icon: <MessageSquare className="w-5 h-5" /> },
+    { label: 'Kiến thức', path: '/admin/knowledge-base', icon: <BookOpen className="w-6 h-6" /> },
   ];
 
   // Helper to get breadcrumb from path
@@ -221,9 +222,8 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ''}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-colors cursor-pointer ${
-                      isCollapsed ? 'justify-center' : ''
-                    } ${isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white'}`
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                    } ${isActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
                   }
                 >
                   <span className="shrink-0">{item.icon}</span>
@@ -241,9 +241,8 @@ export function AdminLayout() {
         >
           <div
             onClick={() => navigate('/')}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-white/60 hover:bg-white/5 hover:text-white cursor-pointer transition-colors ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-white/60 hover:bg-white/5 hover:text-white cursor-pointer transition-colors ${isCollapsed ? 'justify-center' : ''
+              }`}
             title={isCollapsed ? 'Trang chủ' : ''}
           >
             <Home className="w-5 h-5 shrink-0" />
@@ -251,9 +250,8 @@ export function AdminLayout() {
           </div>
           <div
             onClick={handleLogout}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors ${isCollapsed ? 'justify-center' : ''
+              }`}
             title={isCollapsed ? 'Đăng xuất' : ''}
           >
             <LogOut className="w-5 h-5 shrink-0" />

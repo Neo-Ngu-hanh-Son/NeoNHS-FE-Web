@@ -65,6 +65,7 @@ import PanoramaScreenMobile from '@/pages/Panorama/screens/PanoramaScreenMobile'
 import ManageHistoryAudioPage from '@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx';
 import AdminCheckinPointsPage from '@/pages/admin/checkin-points/AdminCheckinPointsPage';
 import ChatPage from '@/pages/Chat/ChatPage';
+import KnowledgeBasePage from '@/pages/admin/knowledge-base/KnowledgeBasePage';
 import { RequireRole } from '@/routes/RequireRole';
 import { UserRole } from '@/types';
 import EventTimelineCreatePage from '@/pages/admin/events/timeline/EventTimelineCreatePage';
@@ -172,6 +173,7 @@ export const router = createBrowserRouter([
             element: <AdminPanoramaEditorPage />,
           },
           { path: 'messages', element: <ChatPage /> },
+          { path: 'knowledge-base', element: <KnowledgeBasePage /> },
         ],
       },
     ],

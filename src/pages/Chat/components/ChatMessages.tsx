@@ -1,6 +1,8 @@
 import { RefObject } from 'react';
 import { Image as AntImage } from 'antd';
 import { ChatMessage } from '@/services/api/chatService';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface ChatMessagesProps {
   messages: ChatMessage[];
@@ -68,6 +70,11 @@ export default function ChatMessages({
           const isNewBlock = !prevMsg || prevMsg.senderId !== msg.senderId || showTimestampHeader;
           const marginTopClass = index === 0 ? '' : isNewBlock ? 'mt-6' : 'mt-1';
 
+          // Filter out empty messages (Issue 3)
+          if (!msg.content?.trim() && !msg.mediaUrl && !msg.metadata && msg.messageType !== 'IMAGE') {
+            return null;
+          }
+
           return (
             <div key={msg.id} className={`flex flex-col ${marginTopClass}`}>
               {/* Central Timestamp Header */}
@@ -86,7 +93,13 @@ export default function ChatMessages({
                 {!isSender && (
                   <div className="w-8 shrink-0 mr-2 flex flex-col justify-end">
                     {showAvatar ? (
-                      <img src={partnerAvatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      msg.senderId === 'AI_ASSISTANT' ? (
+                        <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm">
+                          ✨
+                        </div>
+                      ) : (
+                        <img src={partnerAvatar} alt="" className="w-8 h-8 rounded-full object-cover" />
+                      )
                     ) : (
                       <div className="w-8 h-8" /> // Empty placeholder to align text
                     )}
@@ -96,12 +109,12 @@ export default function ChatMessages({
                 <div className={`flex flex-col max-w-[70%] ${isSender ? 'items-end' : 'items-start'}`}>
                   <div
                     className={`${msg.messageType === 'IMAGE' ? 'p-1 bg-transparent border-0 shadow-none' : 'px-4 py-2.5'} rounded-2xl shadow-sm break-words text-[15px] leading-relaxed w-full ${isSender
-                      ? `${msg.messageType === 'IMAGE' ? '' : 'bg-primary text-primary-foreground'} ${showAvatar ? 'rounded-br-sm' : ''}`
+                      ? `${msg.messageType === 'IMAGE' ? '' : 'bg-[#0084ff] text-white'} ${showAvatar ? 'rounded-br-sm' : ''}`
                       : `${msg.messageType === 'IMAGE' ? '' : 'bg-[#f0f2f5] dark:bg-[#2a2d31] text-[#1c1e21] dark:text-white border border-black/5 dark:border-white/5'} ${showAvatar ? 'rounded-bl-sm' : ''}`
                       }`}
                   >
                     {msg.messageType === 'IMAGE' && (msg as any)._isUploading ? (
-                      <div className="rounded-xl overflow-hidden shadow-sm relative">
+                      <div className="rounded-xl overflow-hidden shadow-sm relative" key="uploading">
                         <img
                           src={(msg as any)._localPreview}
                           alt="Đang tải lên..."
@@ -116,7 +129,7 @@ export default function ChatMessages({
                       </div>
                     ) : msg.messageType === 'IMAGE' && msg.mediaUrl ? (
                       <AntImage.PreviewGroup items={[msg.mediaUrl]}>
-                        <div className="rounded-xl overflow-hidden shadow-sm flex">
+                        <div className="rounded-xl overflow-hidden shadow-sm flex" key={`image-${msg.id}`}>
                           <AntImage
                             src={msg.mediaUrl}
                             alt="Ảnh đã gửi"
@@ -126,8 +139,8 @@ export default function ChatMessages({
                         </div>
                       </AntImage.PreviewGroup>
                     ) : msg.messageType === 'PRODUCT_SNIPPET' && msg.metadata ? (
-                      <div className="flex flex-col gap-2">
-                        <span>{msg.content}</span>
+                      <div className="flex flex-col gap-2" key={`product-${msg.id}`}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                         <div
                           className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition ${isSender ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 shadow-sm border border-border'}`}
                           onClick={() => window.open(`/vendor/workshop-templates/${msg.metadata?.workshopId}`, '_blank')}
@@ -142,7 +155,9 @@ export default function ChatMessages({
                         </div>
                       </div>
                     ) : (
-                      msg.content
+                      <div className={`prose prose-sm dark:prose-invert max-w-none ${isSender ? 'prose-p:m-0' : 'prose-p:m-0'}`} key={`text-${msg.id}`}>
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                      </div>
                     )}
                   </div>
                 </div>
