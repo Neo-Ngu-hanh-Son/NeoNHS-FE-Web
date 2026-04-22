@@ -6,43 +6,50 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { knowledgeApi, type KnowledgeDocument } from '@/services/api/knowledgeApi';
 import {
-  extractDocuments,
-  isInformationKnowledge,
-  isSystemPromptKnowledge,
+  extractDocuments
 } from './knowledge-helpers';
 import { KnowledgeBasePageHeader } from './components/KnowledgeBasePageHeader';
 import { AiSystemPromptTab } from './components/AiSystemPromptTab';
 import { KnowledgeArticlesTab } from './components/KnowledgeArticlesTab';
 
 export default function KnowledgeBasePage() {
-  const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
+  const [articles, setArticles] = useState<KnowledgeDocument[]>([]);
+  const [systemPromptDoc, setSystemPromptDoc] = useState<KnowledgeDocument | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [pageSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
 
-  const fetchAll = useCallback(async () => {
+  const fetchArticles = useCallback(async (p: number) => {
     setLoading(true);
     try {
-      const res = await knowledgeApi.getDocuments(0, 100);
-      setDocuments(extractDocuments(res));
+      const res = await knowledgeApi.getDocuments(p, pageSize, { knowledgeType: 'INFORMATION' });
+      const docs = extractDocuments(res);
+      setArticles(docs);
+      setTotalElements((res as any).totalElements || 0);
+      setPage(p);
     } catch {
       message.error('Không thể tải cơ sở dữ liệu tri thức');
     } finally {
       setLoading(false);
     }
+  }, [pageSize]);
+
+  const fetchSystemPrompt = useCallback(async () => {
+    try {
+      const res = await knowledgeApi.getDocuments(0, 10, { knowledgeType: 'SYSTEM_PROMPT' });
+      const docs = extractDocuments(res);
+      setSystemPromptDoc(docs[0] || null);
+    } catch {
+      // Quietly fail or handle
+    }
   }, []);
 
   useEffect(() => {
-    void fetchAll();
-  }, [fetchAll]);
+    void fetchArticles(0);
+    void fetchSystemPrompt();
+  }, [fetchArticles, fetchSystemPrompt]);
 
-  const informationDocs = useMemo(
-    () => documents.filter(isInformationKnowledge),
-    [documents],
-  );
-
-  const systemPromptDoc = useMemo(
-    () => documents.find(isSystemPromptKnowledge) ?? null,
-    [documents],
-  );
 
   return (
     <div className="min-h-screen bg-slate-50/50 p-4 md:p-8">
@@ -64,11 +71,19 @@ export default function KnowledgeBasePage() {
           </TabsList>
 
           <TabsContent value="prompt" className="mt-6 focus-visible:outline-none">
-            <AiSystemPromptTab systemPromptDoc={systemPromptDoc} onRefresh={fetchAll} />
+            <AiSystemPromptTab systemPromptDoc={systemPromptDoc} onRefresh={fetchSystemPrompt} />
           </TabsContent>
 
           <TabsContent value="articles" className="mt-6 focus-visible:outline-none">
-            <KnowledgeArticlesTab articles={informationDocs} loading={loading} onRefresh={fetchAll} />
+            <KnowledgeArticlesTab
+              articles={articles}
+              loading={loading}
+              page={page}
+              totalElements={totalElements}
+              pageSize={pageSize}
+              onPageChange={fetchArticles}
+              onRefresh={() => fetchArticles(page)}
+            />
           </TabsContent>
         </Tabs>
       </motion.div>
