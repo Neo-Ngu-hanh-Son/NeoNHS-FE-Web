@@ -62,3 +62,13 @@ export {
   TableCaption,
 } from './table'
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip'
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from './pagination'
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'

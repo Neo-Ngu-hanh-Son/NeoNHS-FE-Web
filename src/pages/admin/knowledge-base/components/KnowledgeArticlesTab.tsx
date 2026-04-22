@@ -9,6 +9,8 @@ import {
   Search,
   Loader2,
   Info,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -42,6 +44,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
 } from '@/components/ui';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -52,10 +61,22 @@ import { KnowledgeDocumentDialog } from './KnowledgeDocumentDialog';
 type KnowledgeArticlesTabProps = {
   articles: KnowledgeDocument[];
   loading: boolean;
+  page: number;
+  totalElements: number;
+  pageSize: number;
+  onPageChange: (newPage: number) => void;
   onRefresh: () => Promise<void>;
 };
 
-export function KnowledgeArticlesTab({ articles, loading, onRefresh }: KnowledgeArticlesTabProps) {
+export function KnowledgeArticlesTab({
+  articles,
+  loading,
+  page,
+  totalElements,
+  pageSize,
+  onPageChange,
+  onRefresh,
+}: KnowledgeArticlesTabProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingDoc, setEditingDoc] = useState<KnowledgeDocument | null>(null);
   const [syncingDocs, setSyncingDocs] = useState<Record<string, boolean>>({});
@@ -183,7 +204,7 @@ export function KnowledgeArticlesTab({ articles, loading, onRefresh }: Knowledge
                   variant="secondary"
                   className="border-none bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
                 >
-                  {articles.length}
+                  {totalElements}
                 </Badge>
                 Tổng số tài liệu
               </div>
@@ -315,6 +336,81 @@ export function KnowledgeArticlesTab({ articles, loading, onRefresh }: Knowledge
               </AnimatePresence>
             </TableBody>
           </Table>
+
+          {/* Pagination Controls */}
+          {totalElements > pageSize && (
+            <div className="border-t border-slate-100 bg-slate-50/30 px-6 py-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (page > 0) onPageChange(page - 1);
+                      }}
+                      className={cn(page === 0 && 'pointer-events-none opacity-50')}
+                      text="Trước"
+                    />
+                  </PaginationItem>
+
+                  {Array.from({ length: Math.ceil(totalElements / pageSize) }).map((_, i) => {
+                    // Show current page, first, last, and neighbors
+                    const totalPages = Math.ceil(totalElements / pageSize);
+                    if (
+                      i === 0 ||
+                      i === totalPages - 1 ||
+                      (i >= page - 1 && i <= page + 1)
+                    ) {
+                      return (
+                        <PaginationItem key={i}>
+                          <PaginationLink
+                            href="#"
+                            isActive={page === i}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              onPageChange(i);
+                            }}
+                          >
+                            {i + 1}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    }
+                    if (i === page - 2 || i === page + 2) {
+                      return (
+                        <PaginationItem key={i}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (page < Math.ceil(totalElements / pageSize) - 1)
+                          onPageChange(page + 1);
+                      }}
+                      className={cn(
+                        page >= Math.ceil(totalElements / pageSize) - 1 &&
+                        'pointer-events-none opacity-50',
+                      )}
+                      text="Sau"
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+              <div className="mt-2 text-center text-xs text-slate-400">
+                Hiển thị {page * pageSize + 1} -{' '}
+                {Math.min((page + 1) * pageSize, totalElements)} trong tổng số{' '}
+                {totalElements} tài liệu
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
