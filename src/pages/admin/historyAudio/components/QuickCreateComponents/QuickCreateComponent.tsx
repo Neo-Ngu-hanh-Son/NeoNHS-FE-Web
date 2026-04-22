@@ -6,9 +6,9 @@ import { message } from 'antd';
 import QuickCreateIntro from './QuickCreateIntro';
 import QuickCreateBasicInfoCard from './QuickCreateBasicInfoCard';
 import { getDefaultLanguageSelection, getQuickCreateLanguageOptions } from './quickCreateLanguageUtils';
-import { GeminiTranslationRequest } from '../../types';
+import { HistoryAudioTranslationRequest } from '../../types';
 import ManageQuickCreateHistoryAudiosCard from './PreviewLanguageTranslationCard';
-import { GeminiAISerivce } from '@/services/api/GeminiAISerivce';
+import { AITranslationService } from '@/services/api/aiTranslationService';
 import { ELEVEN_LABS_VOICES } from '../../constants';
 import { useCallback, useMemo, useState } from 'react';
 import { useHistoryAudioMutations } from '@/hooks/historyAudio/useHistoryAudioMutations';
@@ -80,11 +80,11 @@ export default function QuickCreateComponent({ pointId, onSubmittedAll }: Props)
       author: formData.artist,
       requiredLanguages: formData.languageSelections.map((selection) => selection.language),
       script: formData.script,
-    } as GeminiTranslationRequest;
+    } as HistoryAudioTranslationRequest;
 
     setIsTranslating(true);
     try {
-      const translations = await GeminiAISerivce.translate(requestData);
+      const translations = await AITranslationService.translate(requestData);
       const entries = formData.languageSelections.map((selection, index) => {
         const translated = translations[index] ?? translations.find((item) => item.language === selection.language);
         const voice = ELEVEN_LABS_VOICES.find((item) => item.id === selection.voiceId);

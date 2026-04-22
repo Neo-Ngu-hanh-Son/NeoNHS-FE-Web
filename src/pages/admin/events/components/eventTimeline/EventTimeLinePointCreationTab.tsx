@@ -206,7 +206,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
 
   const handleLocationSelection = (lat: number, lng: number, placeId?: string) => {
     if (!isPointInBoundary(lat, lng)) {
-      setError('This location is outside the boundary of Ngũ Hành Sơn.');
+      setError('Địa điểm này nằm ngoài Ngũ Hành Sơn');
       return;
     }
 

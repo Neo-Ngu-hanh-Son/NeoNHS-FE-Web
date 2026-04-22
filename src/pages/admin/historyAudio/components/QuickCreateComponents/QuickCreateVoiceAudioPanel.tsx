@@ -2,7 +2,7 @@ import { Button, Input } from '@/components';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, Loader2, Pause, Play, Settings2, Sparkles, Wand2 } from 'lucide-react';
+import { CheckCircle2, Loader2, Pause, Play, Settings2, Sparkles, Upload, Wand2 } from 'lucide-react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { ELEVEN_LABS_VOICES } from '../../constants';
 import type { MultiQuickCreateValues, QuickCreateTranslationEntry } from './schemas/QuickCreateFormSchema';
@@ -21,7 +21,7 @@ interface QuickCreateVoiceAudioPanelProps {
 function getAudioStatusLabel(status?: string) {
   switch (status) {
     case 'generating':
-      return 'Đang tạo audio và timing từ ElevenLabs...';
+      return 'Đang tạo audio và timing...';
     case 'uploading':
       return 'Đang tải audio lên hệ thống...';
     case 'uploaded':
@@ -46,6 +46,7 @@ export default function QuickCreateVoiceAudioPanel({
   const status = entry.metadata.audioStatus;
   const isUploaded = status === 'uploaded' && Boolean(entry.metadata.audioUrl);
   const isFailed = status === 'failed';
+  const isUploading = status === 'uploading';
 
   return (
     <div className="space-y-6">
@@ -112,13 +113,17 @@ export default function QuickCreateVoiceAudioPanel({
                   ? 'border-emerald-200 bg-emerald-50 text-emerald-600'
                   : isFailed
                     ? 'border-destructive/20 bg-destructive/10 text-destructive'
-                    : 'bg-muted text-muted-foreground',
+                    : isUploading
+                      ? 'border-blue-200 bg-blue-50 text-blue-600'
+                      : 'bg-muted text-muted-foreground',
               )}
             >
               {status === 'generating' ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : isUploaded ? (
                 <CheckCircle2 className="h-5 w-5" />
+              ) : isUploading ? (
+                <Upload className="h-5 w-5 animate-spin" />
               ) : (
                 <Sparkles className="h-5 w-5" />
               )}
@@ -144,7 +149,7 @@ export default function QuickCreateVoiceAudioPanel({
             variant={isUploaded ? 'outline' : 'default'}
             className={cn('shadow-sm', !isUploaded && 'btn-glow-pulse')}
           >
-            {isGeneratingAudio ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
+            {isGeneratingAudio ? null : <Wand2 className="mr-2 h-4 w-4" />}
             {isUploaded ? 'Tạo lại Audio' : 'Khởi tạo Audio AI'}
           </Button>
         </div>

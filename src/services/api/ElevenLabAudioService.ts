@@ -1,6 +1,7 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import { useCallback } from 'react';
 import { ElevenLabsAudioGenerationResponse, ForcedAlignmentResponse } from '../../pages/admin/historyAudio/types';
+import adminHistoryAudioService from './adminHistoryAudioService';
 
 const API_KEY = process.env.REACT_APP_ELEVENLABS_API_KEY || '';
 
@@ -8,10 +9,12 @@ const handleGenerateAudio = async ({
   text,
   voiceId,
   modelId,
+  languageCode,
 }: {
   text: string;
   voiceId: string;
   modelId: string;
+  languageCode: string;
 }): Promise<ElevenLabsAudioGenerationResponse> => {
   if (!text.trim()) {
     throw new Error('Vui lòng nhập nội dung trước');
@@ -21,11 +24,18 @@ const handleGenerateAudio = async ({
   }
 
   try {
-    const elevenlabs = new ElevenLabsClient({ apiKey: API_KEY });
-    const audio = await elevenlabs.textToSpeech.convert(voiceId, {
+    // const elevenlabs = new ElevenLabsClient({ apiKey: API_KEY });
+    // const audio = await elevenlabs.textToSpeech.convert(voiceId, {
+    //   text,
+    //   modelId,
+    //   outputFormat: 'mp3_44100_128',
+    // });
+    const audio = await adminHistoryAudioService.textToSpeech({
+      voiceId,
       text,
       modelId,
       outputFormat: 'mp3_44100_128',
+      languageCode: languageCode,
     });
 
     const blob = await new Response(audio).blob();
@@ -51,15 +61,20 @@ const handleGenerateWordTiming = useCallback(
     }
 
     try {
-      const elevenlabs = new ElevenLabsClient({ apiKey: API_KEY });
-      const response = (await elevenlabs.forcedAlignment.create({
+      // const elevenlabs = new ElevenLabsClient({ apiKey: API_KEY });
+      // const response = (await elevenlabs.forcedAlignment.create({
+      //   file: audioBlob,
+      //   text,
+      // })) as ForcedAlignmentResponse;
+
+      const response = await adminHistoryAudioService.forcedAlignment({
         file: audioBlob,
         text,
-      })) as ForcedAlignmentResponse;
+      });
 
       const words = response.words ?? [];
       if (!words.length) {
-        throw new Error('Không nhận được dữ liệu căn chỉnh từ');
+        throw new Error('Không nhận được dữ liệu căn chỉnh từ ElevenLabs');
       }
 
       return true;

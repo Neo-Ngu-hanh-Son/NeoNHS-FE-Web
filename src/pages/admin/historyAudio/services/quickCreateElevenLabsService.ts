@@ -1,5 +1,6 @@
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 import type { ForcedAlignmentResponse, ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
+import { adminHistoryAudioService } from '@/services/api/adminHistoryAudioService';
 
 interface GenerateQuickCreateAudioAndTimingOptions {
   text: string;
@@ -101,28 +102,38 @@ export async function generateQuickCreateAudioAndTiming({
     };
   }
 
-  const elevenlabs = new ElevenLabsClient({ apiKey });
-  const audio = await elevenlabs.textToSpeech.convert(voiceId, {
-    text: normalizedText,
-    modelId: modelId || 'eleven_multilingual_v2',
-    outputFormat: 'mp3_44100_128',
-    languageCode: languageCode,
-  });
+  try {
+    const audio = await adminHistoryAudioService.textToSpeech({
+      voiceId,
+      text: normalizedText,
+      modelId: modelId || 'eleven_multilingual_v2',
+      outputFormat: 'mp3_44100_128',
+      languageCode,
+    });
 
-  const audioBlob = await new Response(audio).blob();
+    const audioBlob = await new Response(audio).blob();
 
-  const response = (await elevenlabs.forcedAlignment.create({
-    file: audioBlob,
-    text: normalizedText,
-  })) as ForcedAlignmentResponse;
+    // const response = (await elevenlabs.forcedAlignment.create({
+    //   file: audioBlob,
+    //   text: normalizedText,
+    // })) as ForcedAlignmentResponse;
 
-  const words = response.words ?? [];
-  if (!words.length) {
-    throw new Error('Không nhận được dữ liệu căn chỉnh từ ElevenLabs');
+    const response = await adminHistoryAudioService.forcedAlignment({
+      file: audioBlob,
+      text: normalizedText,
+    });
+
+    const words = response.words ?? [];
+    if (!words.length) {
+      throw new Error('Không nhận được dữ liệu căn chỉnh từ ElevenLabs');
+    }
+
+    return {
+      audioBlob,
+      words,
+    };
+  } catch (error) {
+    console.error('Lỗi khi tạo audio hoặc căn chỉnh:', error);
+    throw new Error('Tạo audio hoặc căn chỉnh thất bại');
   }
-
-  return {
-    audioBlob,
-    words,
-  };
 }

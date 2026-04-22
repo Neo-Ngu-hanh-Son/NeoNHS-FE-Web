@@ -17,7 +17,7 @@ import HistoryAudiosTable from './HistoryAudiosTable.tsx';
 import HistoryTextSection from './HistoryTextSection.tsx';
 import TimingSection from './TimingSection.tsx';
 import HistoryAudioActions from './HistoryAudioActions.tsx';
-import { GeminiAISerivce } from '@/services/api/GeminiAISerivce.ts';
+import { AITranslationService } from '@/services/api/aiTranslationService.ts';
 import QuickCreateComponent from './QuickCreateComponents/QuickCreateComponent.tsx';
 
 interface HistoryAudioPanelProps {
@@ -343,7 +343,7 @@ export default function HistoryAudioPanel({
         <QuickCreateComponent
           pointId={pointId}
           onSubmittedAll={async () => {
-            await refetch();
+            refetch();
             setQuickCreateMode(false);
           }}
         />

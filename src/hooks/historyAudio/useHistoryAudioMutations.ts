@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import historyAudioService from '@/services/api/historyAudioService';
+import adminHistoryAudioService from '@/services/api/adminHistoryAudioService';
 import type { CreateHistoryAudioRequest, HistoryAudioResponse } from '@/types/historyAudio';
 import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
 
@@ -33,7 +33,7 @@ export function useHistoryAudioMutations(pointId: string, options?: UseHistoryAu
       setError(null);
       setIsSaving(true);
       try {
-        const res = await historyAudioService.create(pointId, payload);
+        const res = await adminHistoryAudioService.create(pointId, payload);
         await runAfterMutation();
         return res.data;
       } catch (err) {
@@ -56,7 +56,7 @@ export function useHistoryAudioMutations(pointId: string, options?: UseHistoryAu
       setError(null);
       setIsSaving(true);
       try {
-        const res = await historyAudioService.update(pointId, audioId, payload);
+        const res = await adminHistoryAudioService.update(pointId, audioId, payload);
         await runAfterMutation();
         return res.data;
       } catch (err) {
@@ -79,7 +79,7 @@ export function useHistoryAudioMutations(pointId: string, options?: UseHistoryAu
       setError(null);
       setIsDeleting(true);
       try {
-        await historyAudioService.delete(pointId, audioId);
+        await adminHistoryAudioService.delete(pointId, audioId);
         await runAfterMutation();
       } catch (err) {
         const errorMessage = getApiErrorMessage(err, 'Delete history audio failed');
@@ -106,7 +106,7 @@ export function useHistoryAudioMutations(pointId: string, options?: UseHistoryAu
       setIsBulkCreating(true);
       try {
         const settled = await Promise.allSettled(
-          payloads.map((payload) => historyAudioService.create(pointId, payload)),
+          payloads.map((payload) => adminHistoryAudioService.create(pointId, payload)),
         );
 
         const created: HistoryAudioResponse[] = [];
@@ -140,10 +140,7 @@ export function useHistoryAudioMutations(pointId: string, options?: UseHistoryAu
     [pointId, runAfterMutation],
   );
 
-  const isMutating = useMemo(
-    () => isSaving || isDeleting || isBulkCreating,
-    [isBulkCreating, isDeleting, isSaving],
-  );
+  const isMutating = useMemo(() => isSaving || isDeleting || isBulkCreating, [isBulkCreating, isDeleting, isSaving]);
 
   return {
     createAudio,
