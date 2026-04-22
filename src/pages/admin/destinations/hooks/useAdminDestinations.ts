@@ -1,9 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import * as XLSX from 'xlsx';
 import { attractionService } from '@/services/api/attractionService';
 import { adminPointService } from '@/services/api/pointService';
-import { uploadImageToCloudinary, uploadVideoToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend, uploadVideoToBackend } from '@/utils/cloudinary';
 import { PointRequest } from '@/types/point';
 import { Destination, Point, MapPickerTarget } from '../types';
 
@@ -12,6 +11,7 @@ export function useAdminDestinations() {
     const [points, setPoints] = useState<Point[]>([]);
     const [pointsLoading, setPointsLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
 
     // Pagination State
     const [currentPage, setCurrentPage] = useState(0);
@@ -56,47 +56,50 @@ export function useAdminDestinations() {
         }
     }, []);
 
-    const fetchPoints = useCallback(async (page = currentPage, size = pageSize, search = searchText, destinationId = currentPointDestination?.id) => {
-        setPointsLoading(true);
-        try {
-            let response;
-            if (destinationId && destinationId !== 'all') {
-                response = await adminPointService.getPointsWithPaginationAdmin(destinationId, {
-                    page,
-                    size,
-                    search,
-                    sortBy: 'createdAt',
-                    sortDir: 'desc'
-                });
-            } else {
-                response = await adminPointService.getAllPointsWithPaginationAdmin({
-                    page,
-                    size,
-                    search,
-                    sortBy: 'createdAt',
-                    sortDir: 'desc'
-                });
-            }
+    const fetchPoints = useCallback(
+        async (page = currentPage, size = pageSize, search = searchText, destinationId = currentPointDestination?.id) => {
+            setPointsLoading(true);
+            try {
+                let response;
+                if (destinationId && destinationId !== 'all') {
+                    response = await adminPointService.getPointsWithPaginationAdmin(destinationId, {
+                        page,
+                        size,
+                        search,
+                        sortBy: 'createdAt',
+                        sortDir: 'desc',
+                    });
+                } else {
+                    response = await adminPointService.getAllPointsWithPaginationAdmin({
+                        page,
+                        size,
+                        search,
+                        sortBy: 'createdAt',
+                        sortDir: 'desc',
+                    });
+                }
 
-            if (response.success) {
-                const content = response.data.content || [];
-                // Map destination names from our destinations list
-                const enrichedPoints = content.map((p: any) => {
-                    const dest = destinations.find(d => d.id === (p.attractionId || p.attraction?.id));
-                    return {
-                        ...p,
-                        destinationName: dest ? dest.name : (p.attraction?.name || 'Unassigned')
-                    };
-                });
-                setPoints(enrichedPoints);
-                setTotalPoints(response.data.totalElements || 0);
+                if (response.success) {
+                    const content = response.data.content || [];
+                    // Map destination names from our destinations list
+                    const enrichedPoints = content.map((p: any) => {
+                        const dest = destinations.find((d) => d.id === (p.attractionId || p.attraction?.id));
+                        return {
+                            ...p,
+                            destinationName: dest ? dest.name : p.attraction?.name || 'Unassigned',
+                        };
+                    });
+                    setPoints(enrichedPoints);
+                    setTotalPoints(response.data.totalElements || 0);
+                }
+            } catch (error: any) {
+                message.error('Failed to fetch points: ' + error.message);
+            } finally {
+                setPointsLoading(false);
             }
-        } catch (error: any) {
-            message.error('Failed to fetch points: ' + error.message);
-        } finally {
-            setPointsLoading(false);
-        }
-    }, [currentPage, pageSize, searchText, currentPointDestination, destinations]);
+        },
+        [currentPage, pageSize, searchText, currentPointDestination, destinations],
+    );
 
     useEffect(() => {
         fetchAttractions();
@@ -111,15 +114,20 @@ export function useAdminDestinations() {
         setCurrentPage(0);
     }, [searchText, currentPointDestination]);
 
-    const handleFileUpload = async (file: File, field: string, type: 'image' | 'video', setFieldValue: (field: string, value: string) => void) => {
-        setUploading(prev => ({ ...prev, [field]: true }));
+    const handleFileUpload = async (
+        file: File,
+        field: string,
+        type: 'image' | 'video',
+        setFieldValue: (field: string, value: string) => void,
+    ) => {
+        setUploading((prev) => ({ ...prev, [field]: true }));
         try {
-            const url = type === 'image'
-                ? await uploadImageToCloudinary(file)
-                : await uploadVideoToCloudinary(file);
-
+            const url =
+                type === 'image'
+                    ? await uploadImageToBackend(file)
+                    : await uploadVideoToBackend(file).then((url) => ({ mediaUrl: url })); // Normalize video response to match image response structure
             if (url) {
-                setFieldValue(field, url);
+                setFieldValue(field, url.mediaUrl ?? '');
                 message.success('File uploaded successfully!');
             } else {
                 message.error('File upload failed.');
@@ -127,7 +135,7 @@ export function useAdminDestinations() {
         } catch (error) {
             message.error('File upload error.');
         } finally {
-            setUploading(prev => ({ ...prev, [field]: false }));
+            setUploading((prev) => ({ ...prev, [field]: false }));
         }
     };
 
@@ -137,10 +145,7 @@ export function useAdminDestinations() {
     };
 
     const handleSavePoint = async (values: PointRequest) => {
-        setPointsLoading(true);
-        console.log('--- ATTEMPTING TO SAVE POINT ---');
-        console.log('Payload:', values);
-
+        setIsSaving(true);
         try {
             const sanitizedValues = {
                 ...values,
@@ -150,15 +155,10 @@ export function useAdminDestinations() {
 
             let response;
             if (editingPoint && editingPoint.id) {
-                console.log('Action: Update - ID:', editingPoint.id);
                 response = await adminPointService.updatePoint(editingPoint.id, sanitizedValues);
             } else {
-                console.log('Action: Create');
                 response = await adminPointService.createPoint(sanitizedValues);
             }
-
-            console.log('Response Status:', response.success);
-            console.log('Full Response Data:', response);
 
             if (response.success) {
                 message.success(editingPoint ? 'Point updated successfully' : 'Point added successfully');
@@ -166,7 +166,6 @@ export function useAdminDestinations() {
                 setIsPointModalVisible(false);
                 setPreviewPos(null);
             } else {
-                // This shouldn't normally happen if errors are caught, but just in case
                 message.error('Save failed: ' + (response.message || 'Unknown server error'));
             }
         } catch (error: any) {
@@ -183,8 +182,8 @@ export function useAdminDestinations() {
                 message.error('Failed to save point: ' + errorMsg);
             }
         } finally {
-            console.log('--- SAVE OPERATION COMPLETE ---');
             setPointsLoading(false);
+            setIsSaving(false);
         }
     };
 
@@ -212,67 +211,29 @@ export function useAdminDestinations() {
         }
     };
 
-    const handleImportPoints = async (file: File) => {
-        if (!currentPointDestination) {
-            message.warning("Please select a destination to import points into.");
-            return;
-        }
-        setPointsLoading(true);
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            try {
-                const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-                let successCount = 0;
-                let failCount = 0;
-
-                for (const row of jsonData as any[]) {
-                    try {
-                        const pointData: PointRequest = {
-                            name: row.name || row.Name,
-                            description: row.description || row.Description,
-                            // history: row.history || row.History || '',
-                            latitude: Number(Number(row.latitude || row.Latitude).toFixed(6)),
-                            longitude: Number(Number(row.longitude || row.Longitude).toFixed(6)),
-                            orderIndex: Number(row.orderIndex || row.OrderIndex || row.order || 1),
-                            estTimeSpent: Number(row.estTimeSpent || row.EstTimeSpent || 30),
-                            type: (row.type || row.Type || 'GENERAL'),
-                            attractionId: currentPointDestination.id
-                        };
-
-                        if (!pointData.name || isNaN(pointData.latitude) || isNaN(pointData.longitude)) {
-                            failCount++;
-                            continue;
-                        }
-
-                        const response = await adminPointService.createPoint(pointData);
-                        if (response.success) successCount++;
-                        else failCount++;
-                    } catch {
-                        failCount++;
-                    }
-                }
-
-                message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+    const handleHardDeletePoint = async (pointId: string) => {
+        try {
+            const response = await adminPointService.hardDeletePoint(pointId);
+            if (response.success) {
+                message.success('Point permanently deleted');
                 fetchPoints();
-            } catch (error) {
-                message.error('Failed to parse Excel file.');
-            } finally {
-                setPointsLoading(false);
             }
-        };
-        reader.readAsArrayBuffer(file);
+        } catch (error: any) {
+            message.error('Failed to permanently delete point: ' + error.message);
+        }
     };
 
-    const filteredDestinations = useMemo(() => destinations.filter(d =>
-        d.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        (d.description && d.description.toLowerCase().includes(searchText.toLowerCase())) ||
-        (d.address && d.address.toLowerCase().includes(searchText.toLowerCase()))
-    ), [destinations, searchText]);
+
+    const filteredDestinations = useMemo(
+        () =>
+            destinations.filter(
+                (d) =>
+                    d.name.toLowerCase().includes(searchText.toLowerCase()) ||
+                    (d.description && d.description.toLowerCase().includes(searchText.toLowerCase())) ||
+                    (d.address && d.address.toLowerCase().includes(searchText.toLowerCase())),
+            ),
+        [destinations, searchText],
+    );
 
     const handleSelectDiscovery = (place: any) => {
         const lat = Number(place.latitude.toFixed(6));
@@ -285,7 +246,7 @@ export function useAdminDestinations() {
             longitude: lng,
             googlePlaceId: place.googlePlaceId,
             thumbnailUrl: place.photoUrl || '',
-            attractionId: currentPointDestination?.id || ''
+            attractionId: currentPointDestination?.id || '',
         } as Point);
 
         setPreviewPos([lat, lng]);
@@ -334,6 +295,7 @@ export function useAdminDestinations() {
         setPickerCoord,
         previewPos,
         setPreviewPos,
+        isSaving,
 
         // Actions
         fetchAttractions,
@@ -343,7 +305,7 @@ export function useAdminDestinations() {
         handleSavePoint,
         handleDeletePoint,
         handleRestorePoint,
-        handleImportPoints,
+        handleHardDeletePoint,
         handleSelectDiscovery,
     };
 }

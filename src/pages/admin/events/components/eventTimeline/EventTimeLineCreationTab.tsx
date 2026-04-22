@@ -30,21 +30,21 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
   return (
     <div className="space-y-4 py-2">
       <div className="border-b pb-2">
-        <h3 className="text-sm font-semibold">Event Timeline Details</h3>
+        <h3 className="text-sm font-semibold">Chi tiết timeline sự kiện</h3>
       </div>
       <div>
-        <Label htmlFor="tl-name">Name *</Label>
+        <Label htmlFor="tl-name">Tên *</Label>
         <Input
           id="tl-name"
           value={form.name}
           onChange={(e) => handleChange('name', e.target.value)}
-          placeholder="e.g. Opening Ceremony"
+          placeholder="VD: Lễ khai mạc"
         />
         {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
       </div>
 
       <div>
-        <Label htmlFor="tl-date">Date *</Label>
+        <Label htmlFor="tl-date">Ngày *</Label>
         <Input
           id="tl-date"
           type="date"
@@ -58,7 +58,7 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="tl-startTime">Start Time *</Label>
+          <Label htmlFor="tl-startTime">Giờ bắt đầu *</Label>
           <Input
             id="tl-startTime"
             type="time"
@@ -68,7 +68,7 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
           {errors.startTime && <p className="text-xs text-destructive mt-1">{errors.startTime}</p>}
         </div>
         <div>
-          <Label htmlFor="tl-endTime">End Time *</Label>
+          <Label htmlFor="tl-endTime">Giờ kết thúc *</Label>
           <Input
             id="tl-endTime"
             type="time"
@@ -80,7 +80,7 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
       </div>
 
       <div>
-        <Label htmlFor="tl-organizer">Organizer</Label>
+        <Label htmlFor="tl-organizer">Đơn vị tổ chức</Label>
         <Input
           id="tl-organizer"
           value={form.organizer}
@@ -91,23 +91,23 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
       </div>
 
       <div>
-        <Label htmlFor="tl-co-organizer">Co-organizer</Label>
+        <Label htmlFor="tl-co-organizer">Đơn vị đồng tổ chức</Label>
         <Input
           id="tl-co-organizer"
           value={form.coOrganizer}
           onChange={(e) => handleChange('coOrganizer', e.target.value)}
-          placeholder="e.g. NeoNHS Youth Union"
+          placeholder="VD: Đoàn thanh niên NeoNHS"
         />
         {errors.coOrganizer && <p className="text-xs text-destructive mt-1">{errors.coOrganizer}</p>}
       </div>
 
       <div>
-        <Label htmlFor="tl-desc">Description</Label>
+        <Label htmlFor="tl-desc">Mô tả</Label>
         <Textarea
           id="tl-desc"
           value={form.description}
           onChange={(e) => handleChange('description', e.target.value)}
-          placeholder="Brief description of this activity..."
+          placeholder="Mô tả ngắn gọn về hoạt động này..."
           rows={3}
         />
       </div>

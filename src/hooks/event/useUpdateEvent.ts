@@ -25,15 +25,15 @@ export function useUpdateEvent(): UseUpdateEventReturn {
         try {
             const response = await eventService.updateEvent(id, data, file);
             if (response.success) {
-                message.success('Event updated successfully');
+                message.success('Cập nhật sự kiện thành công');
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to update event');
+                message.error(response.message || 'Cập nhật sự kiện thất bại');
                 return null;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to update event: ' + (err.message || 'Unknown error'));
+            message.error('Cập nhật sự kiện thất bại: ' + (err.message || 'Lỗi không xác định'));
             return null;
         } finally {
             setLoading(false);

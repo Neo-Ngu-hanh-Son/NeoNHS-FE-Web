@@ -39,22 +39,22 @@ function handleTimelineApiError(error: unknown, fallback: string): void {
 
     if (status === 401) {
         localStorage.removeItem('token');
-        message.error('Session expired. Please sign in again.');
+        message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
         window.location.href = '/login';
         return;
     }
 
     if (status === 403) {
-        message.error('Access denied. ADMIN role is required to manage event timelines.');
+        message.error('Từ chối truy cập. Cần có quyền ADMIN để quản lý dòng thời gian sự kiện.');
         return;
     }
 
     if (status === 404) {
-        message.error('The event or timeline entry no longer exists.');
+        message.error('Sự kiện hoặc dòng thời gian không còn tồn tại.');
         return;
     }
 
-    message.error(`${fallback}: ${err?.message || 'Unknown error'}`);
+    message.error(`${fallback}: ${err?.message || 'Lỗi không xác định'}`);
 }
 
 export function useEventTimelines(eventId: string, autoFetch: boolean = true): UseEventTimelinesReturn {
@@ -106,7 +106,7 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
         try {
             const response = await eventTimelineService.create(eventId, data);
             if (response.success) {
-                message.success('Timeline entry created successfully');
+                message.success('Tạo dòng thời gian thành công');
                 await fetchTimelines();
                 return true;
             } else {
@@ -123,7 +123,7 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
         try {
             const response = await eventTimelineService.update(eventId, id, data);
             if (response.success) {
-                message.success('Timeline entry updated successfully');
+                message.success('Cập nhật dòng thời gian thành công');
                 await fetchTimelines();
                 return true;
             } else {
@@ -140,7 +140,7 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
         try {
             const response = await eventTimelineService.delete(eventId, id);
             if (response.success) {
-                message.success('Timeline entry deleted successfully');
+                message.success('Xóa dòng thời gian thành công');
                 await fetchTimelines();
                 return true;
             } else {
@@ -159,11 +159,11 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
             if (response.success) {
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to fetch event points');
+                message.error(response.message || 'Lấy sự kiện thất bại points');
                 return [];
             }
         } catch (error: unknown) {
-            handleTimelineApiError(error, 'Failed to fetch event points');
+            handleTimelineApiError(error, 'Lấy sự kiện thất bại points');
             return [];
         }
     }, [eventId]);
@@ -174,11 +174,11 @@ export function useEventTimelines(eventId: string, autoFetch: boolean = true): U
             if (response.success) {
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to fetch event point tags');
+                message.error(response.message || 'Lấy sự kiện thất bại point tags');
                 return [];
             }
         } catch (error: unknown) {
-            handleTimelineApiError(error, 'Failed to fetch event point tags');
+            handleTimelineApiError(error, 'Lấy sự kiện thất bại point tags');
             return [];
         }
     }, [eventId]);

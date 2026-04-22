@@ -1,9 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Upload } from 'lucide-react';
 
 interface HistoryTextSectionProps {
   title: string;
@@ -35,7 +35,7 @@ export default function HistoryTextSection({
     if (file) {
       onUploadCoverImage(file);
     }
-    event.target.value = "";
+    event.target.value = '';
   };
 
   return (
@@ -74,20 +74,16 @@ export default function HistoryTextSection({
                   onChange={handleCoverFileChange}
                   disabled={uploadingCoverImage}
                 />
-                <Button type="button" variant="outline" asChild>
+                <Button type="button" variant="outline" asChild size={'sm'}>
                   <span>
                     <Upload className="mr-2 h-4 w-4" />
-                    {uploadingCoverImage ? "Đang tải lên…" : "Tải ảnh bìa"}
+                    {uploadingCoverImage ? 'Đang tải lên…' : 'Tải ảnh bìa'}
                   </span>
                 </Button>
               </label>
 
               {coverImage ? (
-                <img
-                  src={coverImage}
-                  alt="Xem trước ảnh bìa"
-                  className="h-32 w-32 rounded border object-cover"
-                />
+                <img src={coverImage} alt="Xem trước ảnh bìa" className="h-32 w-32 rounded border object-cover" />
               ) : (
                 <p className="text-xs text-muted-foreground">
                   Nếu để trống, hệ thống sẽ dùng ảnh đại diện của điểm làm mặc định.

@@ -43,17 +43,17 @@ export function TagCombobox({ selectedTagIds, onChange, className }: TagCombobox
                     >
                         <span className="truncate text-muted-foreground">
                             {selectedTagIds.length > 0
-                                ? `${selectedTagIds.length} tag${selectedTagIds.length > 1 ? 's' : ''} selected`
-                                : 'Select tags...'}
+                                ? `Đã chọn ${selectedTagIds.length} thẻ`
+                                : 'Chọn thẻ...'}
                         </span>
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[280px] p-0" align="start">
                     <Command>
-                        <CommandInput placeholder="Search tags..." />
+                        <CommandInput placeholder="Tìm kiếm thẻ..." />
                         <CommandList>
-                            <CommandEmpty>{loading ? 'Loading...' : 'No tags found.'}</CommandEmpty>
+                            <CommandEmpty>{loading ? 'Đang tải...' : 'Không tìm thấy thẻ.'}</CommandEmpty>
                             <CommandGroup>
                                 {tags.map((tag) => (
                                     <CommandItem

@@ -22,15 +22,15 @@ export function useCreateVoucher(scope: VoucherScope = 'PLATFORM'): UseCreateVou
         try {
             const response = await service.create(data);
             if (response.success) {
-                message.success('Voucher created successfully');
+                message.success('Tạo voucher thành công');
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to create voucher');
+                message.error(response.message || 'Tạo voucher thất bại');
                 return null;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to create voucher: ' + (err.message || 'Unknown error'));
+            message.error('Tạo voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
             return null;
         } finally {
             setLoading(false);

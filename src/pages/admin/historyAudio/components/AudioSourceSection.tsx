@@ -1,20 +1,14 @@
-import { useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Upload, WandSparkles } from "lucide-react";
-import { ELEVEN_LABS_MODELS, ELEVEN_LABS_VOICES } from "@/pages/admin/historyAudio/constants";
+import { useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Upload, WandSparkles } from 'lucide-react';
+import { ELEVEN_LABS_MODELS, ELEVEN_LABS_VOICES } from '@/pages/admin/historyAudio/constants';
 
 interface AudioSourceSectionProps {
   text: string;
-  mode: "generate" | "upload" | null;
+  mode: 'generate' | 'upload' | null;
   hasAudio: boolean;
   modelId: string;
   voiceId: string;
@@ -44,14 +38,10 @@ export default function AudioSourceSection({
     if (file) {
       onUploadAudio(file);
     }
-    event.target.value = "";
+    event.target.value = '';
   };
 
-  const sourceLabel = hasAudio
-    ? mode === "generate"
-      ? "Đã tạo từ văn bản"
-      : "Đã tải lên"
-    : "Chưa có";
+  const sourceLabel = hasAudio ? (mode === 'generate' ? 'Đã tạo từ văn bản' : 'Đã tải lên') : 'Chưa có';
 
   return (
     <Card>
@@ -63,7 +53,7 @@ export default function AudioSourceSection({
           <div className="space-y-3 rounded-lg border p-4">
             <div className="flex items-center gap-2 text-sm font-medium">
               <WandSparkles className="h-4 w-4 text-primary" />
-              Tạo từ văn bản
+              Tạo âm thanh bằng AI
             </div>
 
             <div className="space-y-2">
@@ -100,7 +90,7 @@ export default function AudioSourceSection({
 
             <Button onClick={onGenerateAudio} disabled={generatingAudio || !text.trim()}>
               <WandSparkles className="mr-2 h-4 w-4" />
-              {generatingAudio ? "Đang tạo…" : "Tạo âm thanh"}
+              {generatingAudio ? 'Đang tạo…' : 'Tạo âm thanh'}
             </Button>
           </div>
 
@@ -109,9 +99,7 @@ export default function AudioSourceSection({
               <Upload className="h-4 w-4 text-primary" />
               Tải lên âm thanh
             </div>
-            <p className="text-xs text-muted-foreground">
-              Tải lên file thuyết minh của bạn cho nội dung lịch sử này.
-            </p>
+            <p className="text-xs text-muted-foreground">Tải lên file thuyết minh của bạn cho nội dung lịch sử này.</p>
 
             <input
               ref={uploadInputRef}
@@ -120,7 +108,7 @@ export default function AudioSourceSection({
               className="hidden"
               onChange={handleUploadInputChange}
             />
-            <Button variant="outline" onClick={() => uploadInputRef.current?.click()}>
+            <Button variant="outline" onClick={() => uploadInputRef.current?.click()} size={'sm'}>
               <Upload className="mr-2 h-4 w-4" />
               Chọn file âm thanh
             </Button>

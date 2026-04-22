@@ -5,7 +5,7 @@ import { message } from 'antd';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import DragImageUploader from '@/components/common/DragImageUploader';
-import { uploadImageToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend, uploadImageUrlToBackend } from '@/utils/cloudinary';
 import { NGU_HANH_SON_BOUNDARY, MAP_CENTER, NGU_HANH_SON_GEOJSON_POLYGON } from '@/pages/admin/destinations/constants';
 import type { DiscoveryResult } from '@/pages/admin/destinations/components/GoogleMapPickerModal';
 import GoogleMapPickerCompact from '@/pages/admin/destinations/components/GoogleMapPickerCompact';
@@ -206,7 +206,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
 
   const handleLocationSelection = (lat: number, lng: number, placeId?: string) => {
     if (!isPointInBoundary(lat, lng)) {
-      setError('This location is outside the boundary of Ngũ Hành Sơn.');
+      setError('Địa điểm này nằm ngoài Ngũ Hành Sơn');
       return;
     }
 
@@ -264,9 +264,9 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
     if (selectedPoint.photoUrl && !selectedPoint.photoUrl.includes('cloudinary.com')) {
       setProcessingImage(true);
       try {
-        const cloudinaryUrl = await uploadImageToCloudinary(selectedPoint.photoUrl);
-        if (cloudinaryUrl) {
-          finalPhotoUrl = cloudinaryUrl;
+        const backendUrl = await uploadImageUrlToBackend(selectedPoint.photoUrl);
+        if (backendUrl) {
+          finalPhotoUrl = backendUrl.mediaUrl;
         }
       } catch {
         message.warning('Could not optimize selected Google image URL.');

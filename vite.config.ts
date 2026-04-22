@@ -1,6 +1,6 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-import path from 'node:path'
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import path from 'node:path';
 
 export default defineConfig({
   plugins: [react()],
@@ -11,7 +11,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
-    dedupe: ["three"],
+    dedupe: ['three'],
   },
   //Just for development, will be removed in production
   server: {
@@ -24,6 +24,4 @@ export default defineConfig({
     },
     allowedHosts: ['.ngrok-free.app', '.ngrok-free.dev', '.devtunnels.ms'],
   },
-})
-
-
+});

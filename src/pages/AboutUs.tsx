@@ -32,8 +32,7 @@ const values = [
   {
     icon: <Heart className="w-8 h-8" />,
     title: 'Đam mê',
-    description:
-      'Đội ngũ được thúc đẩy bởi tình yêu sâu sắc với di sản và mong muốn chia sẻ vẻ đẹp với thế giới.',
+    description: 'Đội ngũ được thúc đẩy bởi tình yêu sâu sắc với di sản và mong muốn chia sẻ vẻ đẹp với thế giới.',
     color: 'bg-rose-50 text-rose-600',
   },
   {
@@ -53,15 +52,39 @@ const values = [
 ];
 
 const teamMembers = [
-  { name: 'Châu Thành Đạt', role: 'Trưởng nhóm', image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80' },
-  { name: 'Phạm Minh Kiệt', role: 'Thành viên', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80' },
-  { name: 'Nguyễn Quang Huy', role: 'Thành viên', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80' },
-  { name: 'Đoàn Trần Quang Huy', role: 'Thành viên', image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80' },
-  { name: 'Lê Nhật Trường', role: 'Thành viên', image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80' },
+  {
+    name: 'Châu Thành Đạt',
+    role: 'Trưởng nhóm',
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+  },
+  {
+    name: 'Phạm Minh Kiệt',
+    role: 'Thành viên',
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',
+  },
+  {
+    name: 'Nguyễn Quang Huy',
+    role: 'Thành viên',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',
+  },
+  {
+    name: 'Đoàn Trần Quang Huy',
+    role: 'Thành viên',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+  },
+  {
+    name: 'Lê Nhật Trường',
+    role: 'Thành viên',
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+  },
 ];
 
 const contactInfo = [
-  { icon: <MapPin className="w-6 h-6" />, label: 'Vị trí', value: '81 Huyền Trân Công Chúa, Hoà Hải, Ngũ Hành Sơn, Đà Nẵng' },
+  {
+    icon: <MapPin className="w-6 h-6" />,
+    label: 'Vị trí',
+    value: '81 Huyền Trân Công Chúa, Hoà Hải, Ngũ Hành Sơn, Đà Nẵng',
+  },
   { icon: <Phone className="w-6 h-6" />, label: 'Điện thoại', value: '+84 236 3961 114' },
   { icon: <Mail className="w-6 h-6" />, label: 'Email', value: 'contact@neonhs.vn' },
   { icon: <Clock className="w-6 h-6" />, label: 'Thời gian', value: 'Thứ 2 - CN: 07:00 - 17:00' },
@@ -108,7 +131,6 @@ function AnimatedSection({ children, className = '' }: { children: React.ReactNo
 export function AboutUs() {
   return (
     <div className="min-h-screen bg-page-gradient overflow-x-hidden">
-
       {/* ========================================
           HERO SECTION
           ======================================== */}
@@ -122,18 +144,13 @@ export function AboutUs() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         <div className="relative z-10 text-center text-white px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold bg-white/10 border border-white/15 text-white/90 mb-6 backdrop-blur-sm">
               <Sparkles className="w-4 h-4" />
               Về chúng tôi
             </div>
             <h1 className="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">
-              Kết nối di sản với{' '}
-              <span className="gradient-text">thế giới</span>
+              Kết nối di sản với <span className="gradient-text">thế giới</span>
             </h1>
             <p className="text-lg md:text-xl max-w-2xl mx-auto text-white/80 leading-relaxed">
               Cầu nối giữa quá khứ và hiện tại, đưa bạn đến trái tim của Ngũ Hành Sơn.
@@ -153,17 +170,15 @@ export function AboutUs() {
                 <Globe className="w-4 h-4" />
                 Sứ mệnh
               </div>
-              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">
-                Sứ mệnh của chúng tôi
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">Sứ mệnh của chúng tôi</h2>
               <p className="text-slate-500 text-lg mb-6 leading-relaxed">
-                Tại NeoNHS, sứ mệnh của chúng tôi là bảo tồn và quảng bá di sản văn hoá phong phú của
-                Ngũ Hành Sơn, đồng thời thúc đẩy du lịch bền vững. Chúng tôi tin rằng du lịch không chỉ
-                là tham quan — mà là đắm chìm trong linh hồn của một vùng đất.
+                Tại NeoNHS, sứ mệnh của chúng tôi là bảo tồn và quảng bá di sản văn hoá phong phú của Ngũ Hành Sơn, đồng
+                thời thúc đẩy du lịch bền vững. Chúng tôi tin rằng du lịch không chỉ là tham quan — mà là đắm chìm trong
+                linh hồn của một vùng đất.
               </p>
               <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-                Bằng cách kết nối du khách với nghệ nhân địa phương và cung cấp lộ trình thông minh,
-                chúng tôi tạo nên những trải nghiệm ý nghĩa để lại dấu ấn lâu dài.
+                Bằng cách kết nối du khách với nghệ nhân địa phương và cung cấp lộ trình thông minh, chúng tôi tạo nên
+                những trải nghiệm ý nghĩa để lại dấu ấn lâu dài.
               </p>
               <div className="flex gap-8">
                 <div className="text-center">
@@ -204,9 +219,7 @@ export function AboutUs() {
               <Heart className="w-4 h-4" />
               Giá trị cốt lõi
             </div>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-              Kim chỉ nam hành động
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">Kim chỉ nam hành động</h2>
             <p className="text-slate-500 text-lg max-w-2xl mx-auto">
               Những nguyên tắc dẫn dắt mọi cuộc hành trình và sự kết nối chúng tôi tạo ra.
             </p>
@@ -218,7 +231,9 @@ export function AboutUs() {
                 className="border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-300 rounded-[2rem] bg-white group"
               >
                 <CardContent className="p-8 text-center flex flex-col items-center h-full">
-                  <div className={`mb-6 p-4 rounded-2xl ${value.color} transition-transform group-hover:scale-110 duration-300`}>
+                  <div
+                    className={`mb-6 p-4 rounded-2xl ${value.color} transition-transform group-hover:scale-110 duration-300`}
+                  >
                     {value.icon}
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-slate-900">{value.title}</h3>
@@ -243,9 +258,7 @@ export function AboutUs() {
             <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
               Gặp gỡ đội ngũ <span className="gradient-text">NeoNHS</span>
             </h2>
-            <p className="text-slate-500 text-lg">
-              Những con người đam mê đứng sau NeoNHS
-            </p>
+            <p className="text-slate-500 text-lg">Những con người đam mê đứng sau NeoNHS</p>
           </motion.div>
           <motion.div variants={fadeUp} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {teamMembers.map((member, index) => (

@@ -77,7 +77,7 @@ export function MapPickerModal({
   onConfirm,
 }: MapPickerModalProps) {
   const {
-    helperText = "Click anywhere on the map to pick coordinates for the event location.",
+    helperText = "Nhấp vào bất kỳ đâu trên bản đồ để chọn tọa độ cho địa điểm tổ chức sự kiện.",
     showParentMarker = false,
     showChildMarker = true,
     useBlueChildMarker = false,
@@ -127,7 +127,7 @@ export function MapPickerModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            Select Location on Map
+            Chọn vị trí trên bản đồ
           </DialogTitle>
         </DialogHeader>
 
@@ -191,11 +191,11 @@ export function MapPickerModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Hủy
           </Button>
           <Button onClick={handleConfirm}>
             <MapPin className="h-4 w-4 mr-1" />
-            Confirm Location
+            Xác nhận vị trí
           </Button>
         </DialogFooter>
       </DialogContent>

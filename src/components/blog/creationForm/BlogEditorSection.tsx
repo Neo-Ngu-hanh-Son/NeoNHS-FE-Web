@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import BlogEditor from '@/components/blog/BlogEditor';
-import { uploadImageToCloudinary } from '@/utils/cloudinary';
+import { uploadImageToBackend } from '@/utils/cloudinary';
 import { BlogEditorRef, EditorSaveResult } from '@/components/blog/type';
 import { Ref } from 'react';
 import { message, notification } from 'antd';
@@ -20,12 +20,12 @@ export default function BlogEditorSection({ editorRef, handleSave, editorPrestat
 
   const handleEditorImageUpload = async (file: File): Promise<string> => {
     try {
-      const resultUrl = await uploadImageToCloudinary(file);
+      const resultUrl = await uploadImageToBackend(file);
       console.log('Result url: ' + resultUrl);
       if (!resultUrl) {
         messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');
       }
-      return resultUrl || '';
+      return resultUrl?.mediaUrl || '';
     } catch (error) {
       console.error('[BlogEditorSection] Error uploading image:', error);
       messageApi.error('Tải ảnh lên thất bại, vui lòng thử lại');

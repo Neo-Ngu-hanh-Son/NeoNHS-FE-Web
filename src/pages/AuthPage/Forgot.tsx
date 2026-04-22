@@ -1,10 +1,10 @@
-import { AppstoreOutlined } from "@ant-design/icons";
-import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/auth/useAuth";
+import { AppstoreOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/auth/useAuth';
 
-import { ForgotForm } from "./components/forgot-form";
-import loginImage from "@/assets/images/login-img.jpg";
+import { ForgotForm } from './components/forgot-form';
+import loginImage from '@/assets/images/login-img.jpg';
 
 export default function ForgotPage() {
   const { isAuthenticated } = useAuth();
@@ -12,7 +12,7 @@ export default function ForgotPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
   return (
@@ -23,7 +23,7 @@ export default function ForgotPage() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <AppstoreOutlined className="text-sm" />
             </div>
-            CCTE
+            NeoNHS
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">

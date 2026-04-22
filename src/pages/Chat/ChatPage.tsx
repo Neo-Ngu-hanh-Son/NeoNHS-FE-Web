@@ -44,6 +44,17 @@ const enrichRoomWithUserData = async (
   };
 };
 
+// Helper for robust date parsing
+const getTimestamp = (dateStr: string | null | undefined): number => {
+  if (!dateStr) return 0;
+  // Handle space instead of T in some ISO strings
+  const isoStr = typeof dateStr === 'string' && dateStr.includes(' ') && !dateStr.includes('T')
+    ? dateStr.replace(' ', 'T')
+    : dateStr;
+  const date = new Date(isoStr);
+  return isNaN(date.getTime()) ? 0 : date.getTime();
+};
+
 export default function ChatPage() {
   const { user } = useAuth();
 
@@ -60,6 +71,8 @@ export default function ChatPage() {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isPartnerTyping, setIsPartnerTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const activeRoomIdRef = useRef<string | null>(null);
@@ -82,7 +95,15 @@ export default function ChatPage() {
         const enrichedRooms = await Promise.all(
           serverRooms.map((room) => enrichRoomWithUserData(room, currentUserId, userCacheRef.current))
         );
-        setRooms(enrichedRooms);
+
+        // Sort rooms: newest lastMessageAt or newest createdAt first
+        const sortedRooms = enrichedRooms.sort((a, b) => {
+          const timeA = Math.max(getTimestamp(a.lastMessageAt), getTimestamp(a.createdAt));
+          const timeB = Math.max(getTimestamp(b.lastMessageAt), getTimestamp(b.createdAt));
+          return timeB - timeA;
+        });
+
+        setRooms(sortedRooms);
 
         if (enrichedRooms.length > 0) {
           setActiveRoomId(enrichedRooms[0].id);
@@ -116,11 +137,33 @@ export default function ChatPage() {
           return room;
         });
 
-        return updatedRooms.sort((a, b) => {
-          const timeA = new Date(a.lastMessageAt || 0).getTime();
-          const timeB = new Date(b.lastMessageAt || 0).getTime();
+        return [...updatedRooms].sort((a, b) => {
+          const timeA = Math.max(getTimestamp(a.lastMessageAt), getTimestamp(a.createdAt));
+          const timeB = Math.max(getTimestamp(b.lastMessageAt), getTimestamp(b.createdAt));
           return timeB - timeA;
         });
+      });
+
+      // If room not in list, reload rooms to catch the new one
+      setRooms(prev => {
+        const roomExists = prev.some(r => r.id === message.chatRoomId);
+        if (!roomExists) {
+          // Trigger a reload outside of this state update
+          setTimeout(() => {
+            ChatRestService.getMyRooms().then(async serverRooms => {
+              const refreshedRooms = await Promise.all(
+                serverRooms.map((room) => enrichRoomWithUserData(room, currentUserId, userCacheRef.current))
+              );
+              refreshedRooms.sort((a, b) => {
+                const timeA = Math.max(getTimestamp(a.lastMessageAt), getTimestamp(a.createdAt));
+                const timeB = Math.max(getTimestamp(b.lastMessageAt), getTimestamp(b.createdAt));
+                return timeB - timeA;
+              });
+              setRooms(refreshedRooms);
+            });
+          }, 0);
+        }
+        return prev;
       });
 
       setActiveRoomId(currentActiveId => {
@@ -165,20 +208,53 @@ export default function ChatPage() {
     };
 
     loadMessageHistory();
+
+    // Subscribe to typing indicators
+    if (wsServiceRef.current && wsServiceRef.current.isConnected) {
+      const unsub = wsServiceRef.current.subscribeToRoomTyping(activeRoomId, (data) => {
+        if (data.senderId !== currentUserId) {
+          setIsPartnerTyping(data.isTyping);
+        }
+      });
+      return () => unsub();
+    }
   }, [activeRoomId]);
 
   useEffect(() => {
+    // Also send read receipt when messages updates if the latest message isn't ours
+    if (messages.length > 0 && activeRoomId && wsServiceRef.current?.isConnected) {
+      const latestMsg = messages[messages.length - 1]; // End of chronological list
+      if (latestMsg.senderId !== currentUserId) {
+        wsServiceRef.current.sendReadReceipt(activeRoomId, latestMsg.id);
+      }
+    }
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, activeRoomId, currentUserId]);
 
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || !activeRoomId || !wsServiceRef.current) return;
 
+    wsServiceRef.current.sendTypingStop(activeRoomId);
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
     const content = newMessage.trim();
     wsServiceRef.current.sendMessage(activeRoomId, content);
 
     setNewMessage('');
+  };
+
+  const handleTextChange = (value: string) => {
+    setNewMessage(value);
+
+    if (activeRoomId && wsServiceRef.current?.isConnected) {
+      wsServiceRef.current.sendTypingStart(activeRoomId);
+
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = setTimeout(() => {
+        wsServiceRef.current?.sendTypingStop(activeRoomId);
+      }, 2500);
+    }
   };
 
   const handleImageSelect = async (file: File) => {
@@ -248,6 +324,8 @@ export default function ChatPage() {
             <ChatWindowHeader
               partnerAvatar={partnerAvatar}
               partnerName={activeRoom.otherUser?.fullname}
+              isTyping={isPartnerTyping}
+              roomType={(activeRoom as any).roomType}
             />
 
             <ChatMessages
@@ -263,7 +341,7 @@ export default function ChatPage() {
 
             <ChatComposer
               newMessage={newMessage}
-              onChange={setNewMessage}
+              onChange={handleTextChange}
               onSend={handleSendMessage}
               onImageSelect={handleImageSelect}
               isConnected={isConnected}

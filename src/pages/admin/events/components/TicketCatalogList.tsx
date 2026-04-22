@@ -60,6 +60,15 @@ function statusStyle(status: string) {
     }
 }
 
+function getStatusLabel(status: string) {
+    switch (status) {
+        case 'ACTIVE': return 'Hoạt động';
+        case 'INACTIVE': return 'Không hoạt động';
+        case 'SOLD_OUT': return 'Đã bán hết';
+        default: return status;
+    }
+}
+
 function quotaBar(sold: number, total: number) {
     const pct = total > 0 ? Math.min((sold / total) * 100, 100) : 0;
     const color = pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-yellow-500' : 'bg-green-500';
@@ -202,7 +211,7 @@ export function TicketCatalogList({ eventId }: TicketCatalogListProps) {
                                         {/* Status */}
                                         <TableCell>
                                             <Badge variant="outline" className={`text-[11px] ${statusStyle(catalog.status)}`}>
-                                                {catalog.status}
+                                                {getStatusLabel(catalog.status)}
                                             </Badge>
                                         </TableCell>
 
