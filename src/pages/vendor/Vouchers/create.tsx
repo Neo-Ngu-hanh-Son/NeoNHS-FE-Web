@@ -4,14 +4,6 @@ import { ArrowLeft } from 'lucide-react';
 import { VoucherForm } from '@/pages/admin/vouchers/components/VoucherForm';
 import { useCreateVoucher } from '@/hooks/voucher';
 import type { CreateVoucherRequest } from '@/types/voucher';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 export default function VendorCreateVoucherPage() {
     const navigate = useNavigate();
@@ -27,25 +19,6 @@ export default function VendorCreateVoucherPage() {
     return (
         <div className="max-w-4xl mx-auto space-y-6 p-6">
             <div className="flex flex-col gap-4">
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink onClick={() => navigate('/vendor/dashboard')} className="cursor-pointer">
-                                Dashboard
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbLink onClick={() => navigate('/vendor/vouchers')} className="cursor-pointer">
-                                Quản lý Voucher
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>Tạo Voucher mới</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
 
                 <div className="flex items-center gap-3">
                     <Button variant="ghost" size="icon" onClick={() => navigate('/vendor/vouchers')}>

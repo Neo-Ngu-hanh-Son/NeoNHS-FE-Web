@@ -23,14 +23,6 @@ import {
     voucherStatusBadgeStyles, voucherStatusLabels,
     voucherTypeBadgeStyles, voucherTypeLabels,
 } from '@/pages/admin/vouchers/constants';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 function formatDate(dateStr: string) {
     try {

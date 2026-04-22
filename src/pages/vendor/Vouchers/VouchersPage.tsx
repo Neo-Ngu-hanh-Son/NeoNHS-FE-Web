@@ -25,15 +25,11 @@ const VOUCHER_CODE_REGEX = /^[A-Za-z0-9_-]+$/;
 const voucherTypeColors: Record<VoucherType, string> = {
     DISCOUNT: 'blue',
     GIFT_PRODUCT: 'purple',
-    BONUS_POINTS: 'gold',
-    FREE_SERVICE: 'cyan',
 };
 
 const voucherTypeLabels: Record<VoucherType, string> = {
     DISCOUNT: 'Discount',
     GIFT_PRODUCT: 'Gift Product',
-    BONUS_POINTS: 'Bonus Points',
-    FREE_SERVICE: 'Free Service',
 };
 
 const statusColors: Record<VoucherStatus, string> = {
@@ -155,7 +151,7 @@ export default function VouchersPage() {
                 startDate: values.startDate?.toISOString(),
                 endDate: values.endDate?.toISOString(),
                 usageLimit: values.usageLimit,
-                maxUsagePerUser: values.maxUsagePerUser,
+                pointCost: values.pointCost || 0,
             };
             if (values.voucherType === 'DISCOUNT') {
                 data.discountType = values.discountType;
@@ -198,8 +194,8 @@ export default function VouchersPage() {
             startDate: voucher.startDate ? dayjs(voucher.startDate) : null,
             endDate: voucher.endDate ? dayjs(voucher.endDate) : null,
             usageLimit: voucher.usageLimit,
-            maxUsagePerUser: voucher.maxUsagePerUser,
             status: voucher.status,
+            pointCost: voucher.pointCost || 0,
         });
         setEditOpen(true);
     };
@@ -214,8 +210,8 @@ export default function VouchersPage() {
                 startDate: values.startDate?.toISOString(),
                 endDate: values.endDate?.toISOString(),
                 usageLimit: values.usageLimit,
-                maxUsagePerUser: values.maxUsagePerUser,
                 status: values.status,
+                pointCost: values.pointCost || 0,
             };
             if (editVoucherType === 'DISCOUNT') {
                 data.discountType = values.discountType;
@@ -288,6 +284,14 @@ export default function VouchersPage() {
             dataIndex: 'applicableProduct',
             key: 'applicableProduct',
             render: (product: ApplicableProduct) => applicableProductLabels[product],
+        },
+        {
+            title: 'Point Cost',
+            dataIndex: 'pointCost',
+            key: 'pointCost',
+            render: (cost: number) => (
+                <span className="font-bold text-amber-600">{cost?.toLocaleString() || 0}</span>
+            ),
         },
         {
             title: 'Usage',
@@ -546,8 +550,8 @@ export default function VouchersPage() {
                         <Form.Item name="usageLimit" label="Usage Limit" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
                             <InputNumber min={1} className="w-full" placeholder="Total limit" />
                         </Form.Item>
-                        <Form.Item name="maxUsagePerUser" label="Max Per User" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
-                            <InputNumber min={1} className="w-full" placeholder="Per user limit" />
+                        <Form.Item name="pointCost" label="Point Cost" rules={[{ type: 'number', min: 0, message: 'Must be ≥ 0' }]}>
+                            <InputNumber min={0} className="w-full" placeholder="Points needed" />
                         </Form.Item>
                     </div>
 
@@ -689,8 +693,8 @@ export default function VouchersPage() {
                         <Form.Item name="usageLimit" label="Usage Limit" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
                             <InputNumber min={1} className="w-full" />
                         </Form.Item>
-                        <Form.Item name="maxUsagePerUser" label="Max Per User" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
-                            <InputNumber min={1} className="w-full" />
+                        <Form.Item name="pointCost" label="Point Cost" rules={[{ type: 'number', min: 0, message: 'Must be ≥ 0' }]}>
+                            <InputNumber min={0} className="w-full" />
                         </Form.Item>
                     </div>
                     <Form.Item name="status" label="Status">
