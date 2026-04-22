@@ -94,7 +94,6 @@ export const validateImageFile = (file: File, maxSizeMB: number = 5): string | n
 // Shorten image url
 export const uploadImageUrlToBackend = async (url: string): Promise<ImageUploadResponse | null> => {
   try {
-    // We send a JSON body with the URL instead of FormData
     const response = await axios.post(`${UPLOAD_API}/image-url`, { url });
     return response.data.data;
   } catch (error) {

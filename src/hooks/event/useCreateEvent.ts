@@ -21,15 +21,15 @@ export function useCreateEvent(): UseCreateEventReturn {
         try {
             const response = await eventService.createEvent(data, file);
             if (response.success) {
-                message.success('Event created successfully');
+                message.success('Tạo sự kiện thành công');
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to create event');
+                message.error(response.message || 'Tạo sự kiện thất bại');
                 return null;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to create event: ' + (err.message || 'Unknown error'));
+            message.error('Tạo sự kiện thất bại: ' + (err.message || 'Lỗi không xác định'));
             return null;
         } finally {
             setLoading(false);

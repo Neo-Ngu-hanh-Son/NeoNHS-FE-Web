@@ -25,11 +25,11 @@ export function useTags(): UseTagsReturn {
             if (response.success) {
                 setTags(response.data);
             } else {
-                message.error(response.message || 'Failed to fetch tags');
+                message.error(response.message || 'Lấy thẻ thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch tags: ' + (err.message || 'Unknown error'));
+            message.error('Lấy thẻ thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }

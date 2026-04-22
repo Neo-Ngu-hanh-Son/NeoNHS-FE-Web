@@ -36,11 +36,11 @@ export function useEvents(params: EventQueryParams): UseEventsReturn {
                 setTotalElements(response.data.totalElements);
                 setTotalPages(response.data.totalPages);
             } else {
-                message.error(response.message || 'Failed to fetch events');
+                message.error(response.message || 'Lấy sự kiện thất bạis');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch events: ' + (err.message || 'Unknown error'));
+            message.error('Lấy sự kiện thất bạis: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }
@@ -58,16 +58,16 @@ export function useEvents(params: EventQueryParams): UseEventsReturn {
         try {
             const response = await eventService.deleteEvent(id);
             if (response.success) {
-                message.success('Event deleted successfully');
+                message.success('Xóa sự kiện thành công');
                 await fetchEvents();
                 return true;
             } else {
-                message.error(response.message || 'Failed to delete event');
+                message.error(response.message || 'Xóa sự kiện thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to delete event: ' + (err.message || 'Unknown error'));
+            message.error('Xóa sự kiện thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [fetchEvents]);
@@ -76,16 +76,16 @@ export function useEvents(params: EventQueryParams): UseEventsReturn {
         try {
             const response = await eventService.restoreEvent(id);
             if (response.success) {
-                message.success('Event restored successfully');
+                message.success('Khôi phục sự kiện thành công');
                 await fetchEvents();
                 return true;
             } else {
-                message.error(response.message || 'Failed to restore event');
+                message.error(response.message || 'Khôi phục sự kiện thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to restore event: ' + (err.message || 'Unknown error'));
+            message.error('Khôi phục sự kiện thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [fetchEvents]);

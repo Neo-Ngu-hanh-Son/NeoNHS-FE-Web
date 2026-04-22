@@ -2,7 +2,12 @@ import { WorkshopSessionResponse, SessionStatus } from "../../types"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { SessionStatusBadge } from "../session-status-badge"
+import {
+  canEditWorkshopSession,
+  getEditWorkshopSessionBlockReason,
+} from "../../utils/workshopSessionRules"
 import { Eye, Edit, XCircle, Clock, Users, DollarSign } from "lucide-react"
 import {
   formatTimeRange,
@@ -89,8 +94,10 @@ export function DayView({
                     {hourSessions.map(session => {
                       const thumbnail = session.workshopTemplate?.images?.find(img => img.isThumbnail)?.imageUrl 
                         || session.workshopTemplate?.images?.[0]?.imageUrl
-                      const canEdit = session.status === SessionStatus.SCHEDULED
-                      const canCancel = session.status === SessionStatus.SCHEDULED && session.currentEnrollments > 0
+                      const canCancel =
+                        session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING
+                      const showEditSlot = session.status === SessionStatus.SCHEDULED
+                      const editBlockedReason = showEditSlot ? getEditWorkshopSessionBlockReason(session) : null
 
                       return (
                         <Card
@@ -172,44 +179,61 @@ export function DayView({
                               </div>
 
                               {/* Actions */}
-                              <div className="flex flex-col gap-2 shrink-0">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    onSessionClick(session)
-                                  }}
-                                >
-                                  <Eye className="w-3.5 h-3.5 mr-1" />
-                                  View
-                                </Button>
-                                {canEdit && (
+                              <TooltipProvider delayDuration={200}>
+                                <div className="flex shrink-0 flex-col gap-2">
                                   <Button
                                     size="sm"
                                     variant="outline"
                                     onClick={(e) => {
                                       e.stopPropagation()
-                                      onSessionEdit(session)
+                                      onSessionClick(session)
                                     }}
                                   >
-                                    <Edit className="w-3.5 h-3.5 mr-1" />
-                                    Edit
+                                    <Eye className="mr-1 h-3.5 w-3.5" />
+                                    Xem
                                   </Button>
-                                )}
-                                {canCancel && (
-                                  <Button
-                                    size="sm"
-                                    variant="destructive"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      onSessionCancel(session)
-                                    }}
-                                  >
-                                    <XCircle className="w-3.5 h-3.5" />
-                                  </Button>
-                                )}
-                              </div>
+                                  {showEditSlot &&
+                                    (canEditWorkshopSession(session) ? (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          onSessionEdit(session)
+                                        }}
+                                      >
+                                        <Edit className="mr-1 h-3.5 w-3.5" />
+                                        Sửa
+                                      </Button>
+                                    ) : (
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span>
+                                            <Button size="sm" variant="outline" disabled>
+                                              <Edit className="mr-1 h-3.5 w-3.5" />
+                                              Sửa
+                                            </Button>
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent side="left" className="max-w-xs text-left">
+                                          <p>{editBlockedReason}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    ))}
+                                  {canCancel && (
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        onSessionCancel(session)
+                                      }}
+                                    >
+                                      <XCircle className="h-3.5 w-3.5" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </TooltipProvider>
                             </div>
                           </CardContent>
                         </Card>

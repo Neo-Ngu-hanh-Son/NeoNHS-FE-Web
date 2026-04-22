@@ -22,15 +22,15 @@ export function useUpdateVoucher(scope: VoucherScope = 'PLATFORM'): UseUpdateVou
         try {
             const response = await service.update(id, data);
             if (response.success) {
-                message.success('Voucher updated successfully');
+                message.success('Cập nhật voucher thành công');
                 return response.data;
             } else {
-                message.error(response.message || 'Failed to update voucher');
+                message.error(response.message || 'Cập nhật voucher thất bại');
                 return null;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to update voucher: ' + (err.message || 'Unknown error'));
+            message.error('Cập nhật voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
             return null;
         } finally {
             setLoading(false);

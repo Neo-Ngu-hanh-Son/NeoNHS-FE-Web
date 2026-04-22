@@ -21,6 +21,15 @@ import {
   formatDuration,
   calculateDuration
 } from "../utils/formatters"
+import {
+  canCompleteWorkshopSession,
+  canStartWorkshopSession,
+  getCompleteWorkshopSessionBlockReason,
+  getStartWorkshopSessionBlockReason,
+} from "../utils/workshopSessionRules"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 
 interface ViewSessionDialogProps {
   open: boolean
@@ -244,40 +253,81 @@ export function ViewSessionDialog({
             </>
           ) : null}
 
-          {/* Status Action Buttons */}
+          {/* Status Action Buttons — khớp quy tắc backend (đăng ký, cửa sổ ±30 phút) */}
           {(session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING) && (
             <>
               <Separator />
-              <div className="flex gap-3 justify-end items-center bg-slate-50 dark:bg-slate-800/50 -mx-6 -mb-6 p-4 rounded-b-2xl border-t border-slate-100 dark:border-slate-800">
-                {session.status === SessionStatus.SCHEDULED && onStart && (
-                  <Button
-                    onClick={() => { onStart(session); onOpenChange(false) }}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Bắt Đầu Phiên Này
-                  </Button>
-                )}
-                {session.status === SessionStatus.ONGOING && onComplete && (
-                  <Button
-                    onClick={() => { onComplete(session); onOpenChange(false) }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Hoàn Thành Phiên
-                  </Button>
-                )}
-                {onCancel && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => { onCancel(session); onOpenChange(false) }}
-                    className="shadow-sm"
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Hủy Phiên Này
-                  </Button>
-                )}
-              </div>
+              <Alert className="border-amber-200 bg-amber-50/90 dark:border-amber-900 dark:bg-amber-950/30">
+                <Info className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                <AlertTitle className="text-amber-900 dark:text-amber-100">Lưu ý thao tác trạng thái</AlertTitle>
+                <AlertDescription className="text-sm text-amber-900/90 dark:text-amber-200/90">
+                  <strong>Bắt đầu:</strong> cần có ít nhất một khách đăng ký và chỉ được bấm trong khoảng ±30 phút quanh giờ bắt đầu.
+                  <br />
+                  <strong>Hoàn thành:</strong> chỉ khi phiên đang diễn ra và trong khoảng ±30 phút quanh giờ kết thúc.
+                </AlertDescription>
+              </Alert>
+              <TooltipProvider delayDuration={200}>
+                <div className="-mx-6 -mb-6 flex flex-wrap items-center justify-end gap-3 rounded-b-2xl border-t border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  {session.status === SessionStatus.SCHEDULED && onStart &&
+                    (canStartWorkshopSession(session) ? (
+                      <Button
+                        onClick={() => { onStart(session); onOpenChange(false) }}
+                        className="bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        Bắt đầu phiên này
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button disabled className="bg-emerald-600/70 text-white">
+                              <Play className="mr-2 h-4 w-4" />
+                              Bắt đầu phiên này
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-left">
+                          <p>{getStartWorkshopSessionBlockReason(session)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  {session.status === SessionStatus.ONGOING && onComplete &&
+                    (canCompleteWorkshopSession(session) ? (
+                      <Button
+                        onClick={() => { onComplete(session); onOpenChange(false) }}
+                        className="bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Hoàn thành phiên
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button disabled className="bg-blue-600/70 text-white">
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Hoàn thành phiên
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-left">
+                          <p>{getCompleteWorkshopSessionBlockReason(session)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  {onCancel && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => { onCancel(session); onOpenChange(false) }}
+                      className="shadow-sm"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Hủy phiên này
+                    </Button>
+                  )}
+                </div>
+              </TooltipProvider>
             </>
           )}
         </div>

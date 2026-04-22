@@ -4,9 +4,18 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { SessionStatusBadge } from "./session-status-badge"
 import { Calendar, Users, Eye, Edit, XCircle, Play, CheckCircle } from "lucide-react"
 import { formatDate, formatTimeRange, formatPrice, getEnrollmentPercentage } from "../utils/formatters"
+import {
+  canCompleteWorkshopSession,
+  canEditWorkshopSession,
+  canStartWorkshopSession,
+  getCompleteWorkshopSessionBlockReason,
+  getEditWorkshopSessionBlockReason,
+  getStartWorkshopSessionBlockReason,
+} from "../utils/workshopSessionRules"
 
 interface SessionCardProps {
   session: WorkshopSessionResponse
@@ -28,10 +37,19 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
     setImageFailed(false)
   }, [session.id, thumbnail])
 
-  const canEdit = session.status === SessionStatus.SCHEDULED
+  const editBlockedReason =
+    session.status === SessionStatus.SCHEDULED ? getEditWorkshopSessionBlockReason(session) : null
+  const canEditAction = session.status === SessionStatus.SCHEDULED && onEdit
+
+  const startBlockedReason =
+    session.status === SessionStatus.SCHEDULED ? getStartWorkshopSessionBlockReason(session) : null
+  const canStartAction = session.status === SessionStatus.SCHEDULED && onStart
+
+  const completeBlockedReason =
+    session.status === SessionStatus.ONGOING ? getCompleteWorkshopSessionBlockReason(session) : null
+  const canCompleteAction = session.status === SessionStatus.ONGOING && onComplete
+
   const canCancel = session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING
-  const canStart = session.status === SessionStatus.SCHEDULED
-  const canComplete = session.status === SessionStatus.ONGOING
   const enrollmentPercentage = getEnrollmentPercentage(session.currentEnrollments, session.maxParticipants)
   const isFull = session.availableSlots === 0 && session.status === SessionStatus.SCHEDULED
 
@@ -98,49 +116,123 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
 
           <Progress value={enrollmentPercentage} className="h-1.5 bg-slate-100 dark:bg-slate-700" />
 
-          {/* Actions — Đã bỏ hidden sm:inline và thêm flex-wrap để tự rớt dòng */}
-          <div className="mt-1 flex flex-wrap w-full gap-2 border-t border-slate-100 pt-3 dark:border-slate-700">
-            {onView && (
-              <Button type="button" size="sm" variant="outline" onClick={onView} className="flex-1 min-w-[100px] h-8 gap-1.5 text-xs">
-                <Eye className="h-3.5 w-3.5" />
-                <span>Chi tiết</span>
-              </Button>
-            )}
+          {/* Actions — tooltip khi nút bị khóa theo quy tắc backend */}
+          <TooltipProvider delayDuration={200}>
+            <div className="mt-1 flex w-full flex-wrap gap-2 border-t border-slate-100 pt-3 dark:border-slate-700">
+              {onView && (
+                <Button type="button" size="sm" variant="outline" onClick={onView} className="h-8 min-w-[100px] flex-1 gap-1.5 text-xs">
+                  <Eye className="h-3.5 w-3.5" />
+                  <span>Chi tiết</span>
+                </Button>
+              )}
 
-            {canEdit && onEdit && (
-              <Button type="button" size="sm" variant="outline" onClick={onEdit} className="flex-1 min-w-[100px] h-8 gap-1.5 text-xs">
-                <Edit className="h-3.5 w-3.5" />
-                <span>Sửa lịch</span>
-              </Button>
-            )}
+              {canEditAction &&
+                (canEditWorkshopSession(session) ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={onEdit}
+                    className="h-8 min-w-[100px] flex-1 gap-1.5 text-xs"
+                  >
+                    <Edit className="h-3.5 w-3.5" />
+                    <span>Sửa lịch</span>
+                  </Button>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex min-w-[100px] flex-1">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          disabled
+                          className="h-8 w-full gap-1.5 text-xs"
+                        >
+                          <Edit className="h-3.5 w-3.5" />
+                          <span>Sửa lịch</span>
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-left">
+                      <p>{editBlockedReason}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
 
-            {canStart && onStart && (
-              <Button type="button" size="sm" onClick={onStart} className="flex-1 min-w-[100px] h-8 gap-1.5 bg-primary text-xs text-primary-foreground hover:bg-primary/90">
-                <Play className="h-3.5 w-3.5" />
-                <span>Bắt đầu</span>
-              </Button>
-            )}
+              {canStartAction &&
+                (canStartWorkshopSession(session) ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={onStart}
+                    className="h-8 min-w-[100px] flex-1 gap-1.5 bg-primary text-xs text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Play className="h-3.5 w-3.5" />
+                    <span>Bắt đầu</span>
+                  </Button>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex min-w-[100px] flex-1">
+                        <Button
+                          type="button"
+                          size="sm"
+                          disabled
+                          className="h-8 w-full gap-1.5 bg-primary/80 text-xs text-primary-foreground"
+                        >
+                          <Play className="h-3.5 w-3.5" />
+                          <span>Bắt đầu</span>
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-left">
+                      <p>{startBlockedReason}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
 
-            {canComplete && onComplete && (
-              <Button type="button" size="sm" onClick={onComplete} className="flex-1 min-w-[100px] h-8 gap-1.5 bg-blue-600 text-xs text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700">
-                <CheckCircle className="h-3.5 w-3.5" />
-                <span>Hoàn tất</span>
-              </Button>
-            )}
+              {canCompleteAction &&
+                (canCompleteWorkshopSession(session) ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={onComplete}
+                    className="h-8 min-w-[100px] flex-1 gap-1.5 bg-blue-600 text-xs text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                  >
+                    <CheckCircle className="h-3.5 w-3.5" />
+                    <span>Hoàn tất</span>
+                  </Button>
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex min-w-[100px] flex-1">
+                        <Button type="button" size="sm" disabled className="h-8 w-full gap-1.5 bg-blue-600/80 text-xs text-white">
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          <span>Hoàn tất</span>
+                        </Button>
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs text-left">
+                      <p>{completeBlockedReason}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
 
-            {canCancel && onCancel && (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="flex-1 min-w-[100px] h-8 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
-                onClick={onCancel}
-              >
-                <XCircle className="h-3.5 w-3.5" />
-                <span>Hủy phiên</span>
-              </Button>
-            )}
-          </div>
+              {canCancel && onCancel && (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 min-w-[100px] flex-1 gap-1.5 text-xs text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={onCancel}
+                >
+                  <XCircle className="h-3.5 w-3.5" />
+                  <span>Hủy phiên</span>
+                </Button>
+              )}
+            </div>
+          </TooltipProvider>
         </div>
       </div>
     </Card>

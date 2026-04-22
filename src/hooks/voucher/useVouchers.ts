@@ -37,11 +37,11 @@ export function useVouchers(params: AdminVoucherQueryParams, scope: VoucherScope
                 setTotalElements(response.data.totalElements);
                 setTotalPages(response.data.totalPages);
             } else {
-                message.error(response.message || 'Failed to fetch vouchers');
+                message.error(response.message || 'Lấy danh sách voucher thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch vouchers: ' + (err.message || 'Unknown error'));
+            message.error('Lấy danh sách voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }
@@ -58,16 +58,16 @@ export function useVouchers(params: AdminVoucherQueryParams, scope: VoucherScope
         try {
             const response = await service.delete(id);
             if (response.success) {
-                message.success('Voucher deleted successfully');
+                message.success('Xóa voucher thành công');
                 await fetchVouchers();
                 return true;
             } else {
-                message.error(response.message || 'Failed to delete voucher');
+                message.error(response.message || 'Xóa voucher thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to delete voucher: ' + (err.message || 'Unknown error'));
+            message.error('Xóa voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [fetchVouchers, service]);

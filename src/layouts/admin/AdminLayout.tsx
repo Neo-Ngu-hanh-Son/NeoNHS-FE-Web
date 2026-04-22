@@ -33,6 +33,7 @@ import {
   Ticket,
   Users,
   BadgePercent,
+  Wand2,
 } from 'lucide-react';
 
 type AdminNavChild = {
@@ -135,6 +136,7 @@ export function AdminLayout() {
       ],
     },
     { label: 'Tin nhắn', path: '/admin/messages', icon: <MessageSquare className="w-5 h-5" /> },
+    { label: 'Kiến thức AI', path: '/admin/knowledge-base', icon: <Wand2 className="w-5 h-5" /> },
   ];
 
   // Helper to get breadcrumb from path
@@ -159,28 +161,29 @@ export function AdminLayout() {
 
     // Dynamic event routes
     if (path.startsWith('/admin/events/')) {
-        const parts = path.split('/');
-        if (parts.length === 4 && parts[3] === 'create') {
-            return [
-                { label: 'Sự kiện', path: '/admin/events' }, 
-                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
-                { label: 'Tạo mới', path: path }
-            ];
-        }
-        if (parts.length === 5 && parts[4] === 'edit') {
-            return [
-                { label: 'Sự kiện', path: '/admin/events' }, 
-                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
-                { label: 'Chỉnh sửa', path: path }
-            ];
-        }
-        if (parts.length === 4) { // /admin/events/:id
-            return [
-                { label: 'Sự kiện', path: '/admin/events' }, 
-                { label: 'Quản lý sự kiện', path: '/admin/events' }, 
-                { label: 'Chi tiết', path: path }
-            ];
-        }
+      const parts = path.split('/');
+      if (parts.length === 4 && parts[3] === 'create') {
+        return [
+          { label: 'Sự kiện', path: '/admin/events' },
+          { label: 'Quản lý sự kiện', path: '/admin/events' },
+          { label: 'Tạo mới', path: path },
+        ];
+      }
+      if (parts.length === 5 && parts[4] === 'edit') {
+        return [
+          { label: 'Sự kiện', path: '/admin/events' },
+          { label: 'Quản lý sự kiện', path: '/admin/events' },
+          { label: 'Chỉnh sửa', path: path },
+        ];
+      }
+      if (parts.length === 4) {
+        // /admin/events/:id
+        return [
+          { label: 'Sự kiện', path: '/admin/events' },
+          { label: 'Quản lý sự kiện', path: '/admin/events' },
+          { label: 'Chi tiết', path: path },
+        ];
+      }
     }
 
     return [{ label: 'Hệ thống', path: '/admin' }];
@@ -221,9 +224,9 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ''}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-colors cursor-pointer ${
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${
                       isCollapsed ? 'justify-center' : ''
-                    } ${isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:bg-white/5 hover:text-white'}`
+                    } ${isActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
                   }
                 >
                   <span className="shrink-0">{item.icon}</span>
