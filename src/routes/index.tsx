@@ -9,6 +9,7 @@ import Register from '@/pages/AuthPage/Register';
 import VerifyOTP from '@/pages/AuthPage/VerifyOTP';
 import NewPassword from '@/pages/AuthPage/NewPassword';
 import SetPasswordPage from '@/pages/AuthPage/SetPasswordPage';
+import { AuthRoutesLayout } from '@/pages/AuthPage/AuthRoutesLayout';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import UserProfilePage from '@/pages/ProfilePage/UserProfilePage';
@@ -78,12 +79,17 @@ export const router = createBrowserRouter([
       {
         element: <BlankLayout />,
         children: [
-          { path: '/login', element: <Login /> },
-          { path: '/forgot-password', element: <Forgot /> },
-          { path: '/register', element: <Register /> },
-          { path: '/verify-otp', element: <VerifyOTP /> },
-          { path: '/new-password', element: <NewPassword /> },
-          { path: '/set-password', element: <SetPasswordPage /> },
+          {
+            element: <AuthRoutesLayout />,
+            children: [
+              { path: '/login', element: <Login /> },
+              { path: '/forgot-password', element: <Forgot /> },
+              { path: '/register', element: <Register /> },
+              { path: '/verify-otp', element: <VerifyOTP /> },
+              { path: '/new-password', element: <NewPassword /> },
+              { path: '/set-password', element: <SetPasswordPage /> },
+            ],
+          },
           { path: '/places/:placeId/panorama', element: <PanoramaScreen /> },
           { path: '/places/panorama/mobile', element: <PanoramaScreenMobile /> },
         ],

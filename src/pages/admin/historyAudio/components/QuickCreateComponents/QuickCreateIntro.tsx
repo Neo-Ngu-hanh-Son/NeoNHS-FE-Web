@@ -34,7 +34,7 @@ export default function QuickCreateIntro() {
           Tạo nhanh âm thanh lịch sử với AI
         </ItemTitle>
         <ItemDescription className="max-w-[700px] leading-relaxed">
-          Nhập các thông tin cơ bản và để <span className="font-semibold text-primary">Gemini AI</span> lo phần còn lại.
+          Nhập các thông tin cơ bản và để <span className="font-semibold text-primary"> AI</span> lo phần còn lại.
           Hệ thống sẽ tự động dịch thuật và cấu hình giọng đọc đa ngôn ngữ cho bạn chỉ trong tích tắc.
         </ItemDescription>
       </ItemContent>

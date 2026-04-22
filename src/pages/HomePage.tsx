@@ -566,7 +566,7 @@ export function HomePage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-4 mb-6">
                       <motion.span
-                        className="text-5xl font-black text-slate-200 dark:text-slate-700"
+                        className="text-5xl font-black text-slate-400 dark:text-slate-700"
                         whileInView={{ opacity: [0, 1], scale: [0.5, 1] }}
                         transition={{ duration: 0.5 }}
                         viewport={{ once: true }}

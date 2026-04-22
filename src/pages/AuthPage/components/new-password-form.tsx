@@ -11,6 +11,7 @@ import {
     CloseCircleFilled
 } from "@ant-design/icons"
 import { notification } from "antd"
+import { useAuthLocale } from "../i18n/AuthLocaleContext"
 
 
 interface NewPasswordFormProps {
@@ -21,6 +22,7 @@ interface NewPasswordFormProps {
 }
 
 export function NewPasswordForm({ className, onSubmit, loading, error: parentError }: NewPasswordFormProps) {
+    const { t } = useAuthLocale()
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
     const [showPassword, setShowPassword] = useState(false)
@@ -42,8 +44,8 @@ export function NewPasswordForm({ className, onSubmit, loading, error: parentErr
         e.preventDefault()
         if (!allChecksPassed) {
             api.error({
-                title: 'Invalid Password',
-                description: "Password does not meet requirements.",
+                title: t('newPwd.invalidTitle'),
+                description: t('newPwd.invalidDesc'),
                 icon: <CloseCircleFilled style={{ color: '#ef4444' }} />,
                 placement: 'topRight',
                 duration: 3,
@@ -52,8 +54,8 @@ export function NewPasswordForm({ className, onSubmit, loading, error: parentErr
         }
         if (password !== confirmPassword) {
             api.error({
-                title: 'Password Mismatch',
-                description: "Passwords do not match.",
+                title: t('newPwd.mismatchTitle'),
+                description: t('newPwd.mismatchDesc'),
                 icon: <CloseCircleFilled style={{ color: '#ef4444' }} />,
                 placement: 'topRight',
                 duration: 3,
@@ -74,18 +76,18 @@ export function NewPasswordForm({ className, onSubmit, loading, error: parentErr
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
                                 <LockOutlined className="text-2xl text-white" />
                             </div>
-                            <h1 className="text-2xl font-bold">Set New Password</h1>
+                            <h1 className="text-2xl font-bold">{t('newPwd.title')}</h1>
                             <p className="text-muted-foreground text-sm text-balance">
-                                Enter your new password below.
+                                {t('newPwd.subtitle')}
                             </p>
                         </div>
                         <Field>
-                            <FieldLabel htmlFor="password">New Password</FieldLabel>
+                            <FieldLabel htmlFor="password">{t('newPwd.fieldNew')}</FieldLabel>
                             <div className="relative">
                                 <Input
                                     id="password"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Enter new password"
+                                    placeholder={t('newPwd.fieldNewPh')}
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
@@ -102,19 +104,19 @@ export function NewPasswordForm({ className, onSubmit, loading, error: parentErr
                             {/* Password Requirements */}
                             {password.length > 0 && (
                                 <div className="mt-2 p-3 rounded-lg bg-gray-50 space-y-1.5">
-                                    <PasswordCheck passed={passwordChecks.length} text="At least 8 characters" />
-                                    <PasswordCheck passed={passwordChecks.hasLetter} text="Contains a letter" />
-                                    <PasswordCheck passed={passwordChecks.hasNumber} text="Contains a number" />
+                                    <PasswordCheck passed={passwordChecks.length} text={t('register.ruleLength')} />
+                                    <PasswordCheck passed={passwordChecks.hasLetter} text={t('register.ruleLetter')} />
+                                    <PasswordCheck passed={passwordChecks.hasNumber} text={t('register.ruleNumber')} />
                                 </div>
                             )}
                         </Field>
                         <Field>
-                            <FieldLabel htmlFor="confirmPassword">Confirm New Password</FieldLabel>
+                            <FieldLabel htmlFor="confirmPassword">{t('newPwd.fieldConfirm')}</FieldLabel>
                             <div className="relative">
                                 <Input
                                     id="confirmPassword"
                                     type={showConfirmPassword ? "text" : "password"}
-                                    placeholder="Confirm new password"
+                                    placeholder={t('newPwd.fieldConfirmPh')}
                                     required
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -134,20 +136,20 @@ export function NewPasswordForm({ className, onSubmit, loading, error: parentErr
                             {confirmPassword.length > 0 && !passwordsMatch && (
                                 <p className="text-sm text-red-500 flex items-center gap-1.5 mt-1">
                                     <CloseCircleFilled className="text-xs" />
-                                    Passwords do not match
+                                    {t('newPwd.mismatch')}
                                 </p>
                             )}
                             {passwordsMatch && (
                                 <p className="text-sm text-emerald-600 flex items-center gap-1.5 mt-1">
                                     <CheckCircleFilled className="text-xs" />
-                                    Passwords match
+                                    {t('newPwd.match')}
                                 </p>
                             )}
                         </Field>
                         {(error || parentError) && <FieldDescription className="text-red-500 text-center">{error || parentError}</FieldDescription>}
                         <Button type="submit" className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
                             disabled={loading}>
-                            {loading ? "Setting..." : "Set Password"}
+                            {loading ? t('newPwd.setting') : t('newPwd.submit')}
                         </Button>
                     </FieldGroup>
                 </form>
