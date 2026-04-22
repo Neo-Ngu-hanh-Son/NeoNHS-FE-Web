@@ -50,6 +50,7 @@ export default function AdminDestinationsPage() {
     handleFocus,
     handleSavePoint,
     handleDeletePoint,
+    handleHardDeletePoint,
     handleRestorePoint,
     handleImportPoints,
     handleSelectDiscovery,
@@ -65,7 +66,7 @@ export default function AdminDestinationsPage() {
     }
   };
 
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'point' } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; type: 'point'; isSoftDeleted?: boolean } | null>(null);
 
   const onConfirmCoord = (geocodedData?: {
     name?: string;
@@ -101,7 +102,11 @@ export default function AdminDestinationsPage() {
 
   const confirmDelete = () => {
     if (!deleteTarget) return;
-    handleDeletePoint(deleteTarget.id);
+    if (deleteTarget.isSoftDeleted) {
+      handleHardDeletePoint(deleteTarget.id);
+    } else {
+      handleDeletePoint(deleteTarget.id);
+    }
     setDeleteTarget(null);
   };
 
@@ -177,7 +182,8 @@ export default function AdminDestinationsPage() {
                 setPreviewPos(null);
                 setIsPointModalVisible(true);
               }}
-              onDeletePoint={(id) => setDeleteTarget({ id, type: 'point' })}
+              onDeletePoint={(id, isSoftDeleted) => setDeleteTarget({ id, type: 'point', isSoftDeleted })}
+              onRestorePoint={handleRestorePoint}
               onFocus={handleFocusWithScroll}
               onImportPoints={handleImportPoints}
               pagination={{
@@ -245,11 +251,17 @@ export default function AdminDestinationsPage() {
         <AlertDialogContent className="rounded-2xl border border-slate-200 bg-card shadow-sm dark:border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-lg font-semibold text-slate-900 dark:text-white">
-              Xác nhận xóa điểm
+              {deleteTarget?.isSoftDeleted ? 'Xác nhận xóa vĩnh viễn' : 'Xác nhận xóa điểm'}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm text-muted-foreground">
-              Thao tác này sẽ <span className="font-semibold text-destructive">xóa vĩnh viễn</span> điểm khỏi cơ sở dữ
-              liệu. Không thể hoàn tác.
+              {deleteTarget?.isSoftDeleted ? (
+                <>
+                  Thao tác này sẽ <span className="font-semibold text-destructive">xóa vĩnh viễn</span> điểm khỏi cơ sở dữ liệu.
+                  <span className="block mt-1 font-medium text-amber-600 dark:text-amber-400">Không thể hoàn tác hành động này!</span>
+                </>
+              ) : (
+                'Thao tác này sẽ chuyển điểm vào trạng thái xóa mềm. Bạn có thể khôi phục lại sau này.'
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2 sm:gap-0">
@@ -258,7 +270,7 @@ export default function AdminDestinationsPage() {
               onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Xóa
+              {deleteTarget?.isSoftDeleted ? 'Xóa vĩnh viễn' : 'Xóa'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
