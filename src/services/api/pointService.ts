@@ -15,7 +15,7 @@ export const adminPointService = {
 
     getPointsWithPaginationAdmin: async (
         attractionId: string,
-        params: PointQueryParams,
+        params: PointQueryParams & { includeDeleted?: boolean },
     ): Promise<ApiResponse<PagedPointResponse>> => {
         const query = new URLSearchParams();
         if (params.page !== undefined) query.append('page', params.page.toString());
@@ -23,6 +23,7 @@ export const adminPointService = {
         if (params.sortBy) query.append('sortBy', params.sortBy);
         if (params.sortDir) query.append('sortDir', params.sortDir);
         if (params.search) query.append('search', params.search);
+        query.append('includeDeleted', (params.includeDeleted ?? true).toString());
 
         return apiClient.get<ApiResponse<PagedPointResponse>>(
             `/admin/points/attraction/${attractionId}?${query.toString()}`,
@@ -30,7 +31,7 @@ export const adminPointService = {
     },
 
     getAllPointsWithPaginationAdmin: async (
-        params: PointQueryParams,
+        params: PointQueryParams & { includeDeleted?: boolean },
     ): Promise<ApiResponse<PagedPointResponse>> => {
         const query = new URLSearchParams();
         if (params.page !== undefined) query.append('page', params.page.toString());
@@ -38,6 +39,7 @@ export const adminPointService = {
         if (params.sortBy) query.append('sortBy', params.sortBy);
         if (params.sortDir) query.append('sortDir', params.sortDir);
         if (params.search) query.append('search', params.search);
+        query.append('includeDeleted', (params.includeDeleted ?? true).toString());
 
         return apiClient.get<ApiResponse<PagedPointResponse>>(`/admin/points/all?${query.toString()}`);
     },
@@ -60,6 +62,10 @@ export const adminPointService = {
 
     restorePoint: async (id: string): Promise<ApiResponse<void>> => {
         return apiClient.put<ApiResponse<void>>(`/admin/points/${id}/restore`, {});
+    },
+
+    hardDeletePoint: async (id: string): Promise<ApiResponse<void>> => {
+        return apiClient.delete<ApiResponse<void>>(`/admin/points/${id}/hard`);
     },
 };
 

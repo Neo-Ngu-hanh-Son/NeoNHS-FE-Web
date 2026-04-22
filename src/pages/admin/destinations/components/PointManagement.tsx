@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pin, Upload, MapPin, Edit, Trash2, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { Plus, Pin, Upload, MapPin, Edit, Trash2, ChevronLeft, ChevronRight, Search, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,7 +15,8 @@ interface PointManagementProps {
   loading: boolean;
   onAddPoint: () => void;
   onEditPoint: (point: Point) => void;
-  onDeletePoint: (id: string) => void;
+  onDeletePoint: (id: string, isSoftDeleted?: boolean) => void;
+  onRestorePoint: (id: string) => void;
   onFocus: (lat: number, lng: number) => void;
   onImportPoints: (file: File) => void;
   pagination: {
@@ -38,6 +39,7 @@ export function PointManagement({
   onAddPoint,
   onEditPoint,
   onDeletePoint,
+  onRestorePoint,
   onFocus,
   onImportPoints,
   pagination,
@@ -188,8 +190,10 @@ export function PointManagement({
                     allPoints.map((p, idx) => (
                       <TableRow
                         key={p.id}
-                        className="cursor-pointer border-border transition-colors hover:bg-muted/50"
+                        className={`cursor-pointer border-border transition-colors hover:bg-muted/50 ${p.deletedAt ? 'bg-slate-50/50 opacity-60 grayscale-[0.5] blur-[0.2px]' : ''
+                          }`}
                         onClick={() => {
+                          if (p.deletedAt) return;
                           onFocus(p.latitude, p.longitude);
                           onEditPoint(p);
                         }}
@@ -208,13 +212,19 @@ export function PointManagement({
                                 </div>
                               )}
                             </div>
-                            {/* Xóa class truncate, thêm break-words và line-clamp-2 để xuống dòng */}
-                            <span
-                              className="line-clamp-2 break-words font-medium text-slate-900 dark:text-slate-100"
-                              title={p.name}
-                            >
-                              {p.name}
-                            </span>
+                            <div className="flex flex-col">
+                              <span
+                                className="line-clamp-2 break-words font-medium text-slate-900 dark:text-slate-100"
+                                title={p.name}
+                              >
+                                {p.name}
+                              </span>
+                              {p.deletedAt && (
+                                <span className="text-[10px] font-semibold text-destructive uppercase tracking-wider">
+                                  Đã xóa tạm thời
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
@@ -227,67 +237,100 @@ export function PointManagement({
                             {pointTypeLabel(p.type)}
                           </span>
                         </TableCell>
-                        {/* <TableCell className="text-center">
-                                                    <span className="font-mono text-xs text-muted-foreground">
-                                                        {p.estTimeSpent != null ? `${p.estTimeSpent} phút` : '—'}
-                                                    </span>
-                                                </TableCell> */}
                         <TableCell className="pr-2 text-right">
                           <div className="flex items-center justify-end gap-0.5">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onFocus(p.latitude, p.longitude);
-                                  }}
-                                  aria-label="Định vị trên bản đồ"
-                                >
-                                  <MapPin className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Định vị</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/30 dark:hover:text-amber-400"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onEditPoint(p);
-                                  }}
-                                  aria-label="Sửa điểm"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Sửa</TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  type="button"
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDeletePoint(p.id);
-                                  }}
-                                  aria-label="Xóa điểm"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>Xóa</TooltipContent>
-                            </Tooltip>
+                            {!p.deletedAt ? (
+                              <>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-emerald-50 hover:text-emerald-600 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onFocus(p.latitude, p.longitude);
+                                      }}
+                                    >
+                                      <MapPin className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Định vị</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-amber-50 hover:text-amber-700 dark:hover:bg-amber-950/30 dark:hover:text-amber-400"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onEditPoint(p);
+                                      }}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Sửa</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-full text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeletePoint(p.id, false);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Xóa</TooltipContent>
+                                </Tooltip>
+                              </>
+                            ) : (
+                              <>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-full text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onRestorePoint(p.id);
+                                      }}
+                                    >
+                                      <RefreshCcw className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Khôi phục</TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-9 w-9 rounded-full text-destructive transition-colors hover:bg-destructive/10"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onDeletePoint(p.id, true);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>Xóa vĩnh viễn</TooltipContent>
+                                </Tooltip>
+                              </>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
