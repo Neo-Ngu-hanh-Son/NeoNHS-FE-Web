@@ -99,6 +99,7 @@ export function VoucherTable({
                             <SortHeader field="code" label="Mã" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                             <TableHead>Loại</TableHead>
                             <TableHead>Giá trị</TableHead>
+                            <TableHead>Điểm</TableHead>
                             <TableHead>Số lượng</TableHead>
                             <SortHeader field="startDate" label="Thời gian" sortBy={sortBy} sortDir={sortDir} onSort={onSort} />
                             <TableHead>Trạng thái</TableHead>
@@ -123,6 +124,9 @@ export function VoucherTable({
                                     {v.voucherType === 'DISCOUNT' && v.discountType && (
                                         <span className="text-muted-foreground text-xs">{discountTypeLabels[v.discountType]}</span>
                                     )}
+                                </TableCell>
+                                <TableCell className="text-sm font-semibold">
+                                    {v.pointCost || 0}
                                 </TableCell>
                                 <TableCell className="text-sm">
                                     <span>{v.usageCount}</span>

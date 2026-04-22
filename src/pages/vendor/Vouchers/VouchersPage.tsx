@@ -45,17 +45,13 @@ const { Option } = Select;
 const VOUCHER_CODE_REGEX = /^[A-Za-z0-9_-]+$/;
 
 const voucherTypeColors: Record<VoucherType, string> = {
-  DISCOUNT: 'blue',
-  GIFT_PRODUCT: 'purple',
-  BONUS_POINTS: 'gold',
-  FREE_SERVICE: 'cyan',
+    DISCOUNT: 'blue',
+    GIFT_PRODUCT: 'purple',
 };
 
 const voucherTypeLabels: Record<VoucherType, string> = {
-  DISCOUNT: 'Discount',
-  GIFT_PRODUCT: 'Gift Product',
-  BONUS_POINTS: 'Bonus Points',
-  FREE_SERVICE: 'Free Service',
+    DISCOUNT: 'Discount',
+    GIFT_PRODUCT: 'Gift Product',
 };
 
 const statusColors: Record<VoucherStatus, string> = {
@@ -165,105 +161,105 @@ export default function VouchersPage() {
   const createVoucherType = Form.useWatch('voucherType', createForm);
   const editVoucherType = editingVoucher?.voucherType;
 
-  // Create
-  const handleCreate = async (values: any) => {
-    setSubmitting(true);
-    try {
-      const data: CreateVoucherRequest = {
-        code: values.code,
-        description: values.description,
-        voucherType: values.voucherType,
-        applicableProduct: values.applicableProduct,
-        startDate: values.startDate?.toISOString(),
-        endDate: values.endDate?.toISOString(),
-        usageLimit: values.usageLimit,
-        maxUsagePerUser: values.maxUsagePerUser,
-      };
-      if (values.voucherType === 'DISCOUNT') {
-        data.discountType = values.discountType;
-        data.discountValue = values.discountValue;
-        data.maxDiscountValue = values.maxDiscountValue;
-        data.minOrderValue = values.minOrderValue;
-      } else if (values.voucherType === 'GIFT_PRODUCT') {
-        data.giftDescription = values.giftDescription;
-        data.giftImageUrl = createGiftImageUrl || undefined;
-      }
-      const response = await vendorVoucherService.create(data);
-      if (response.success) {
-        message.success('Voucher created successfully');
-        setCreateOpen(false);
-        createForm.resetFields();
-        setCreateGiftImageUrl('');
-        fetchVouchers();
-      } else {
-        message.error(response.message || 'Failed to create voucher');
-      }
-    } catch (error: any) {
-      message.error(error.message || 'Failed to create voucher');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    // Create
+    const handleCreate = async (values: any) => {
+        setSubmitting(true);
+        try {
+            const data: CreateVoucherRequest = {
+                code: values.code,
+                description: values.description,
+                voucherType: values.voucherType,
+                applicableProduct: values.applicableProduct,
+                startDate: values.startDate?.toISOString(),
+                endDate: values.endDate?.toISOString(),
+                usageLimit: values.usageLimit,
+                pointCost: values.pointCost || 0,
+            };
+            if (values.voucherType === 'DISCOUNT') {
+                data.discountType = values.discountType;
+                data.discountValue = values.discountValue;
+                data.maxDiscountValue = values.maxDiscountValue;
+                data.minOrderValue = values.minOrderValue;
+            } else if (values.voucherType === 'GIFT_PRODUCT') {
+                data.giftDescription = values.giftDescription;
+                data.giftImageUrl = createGiftImageUrl || undefined;
+            }
+            const response = await vendorVoucherService.create(data);
+            if (response.success) {
+                message.success('Voucher created successfully');
+                setCreateOpen(false);
+                createForm.resetFields();
+                setCreateGiftImageUrl('');
+                fetchVouchers();
+            } else {
+                message.error(response.message || 'Failed to create voucher');
+            }
+        } catch (error: any) {
+            message.error(error.message || 'Failed to create voucher');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
-  // Edit
-  const openEdit = (voucher: VoucherResponse) => {
-    setEditingVoucher(voucher);
-    setEditGiftImageUrl(voucher.giftImageUrl || '');
-    editForm.setFieldsValue({
-      description: voucher.description,
-      applicableProduct: voucher.applicableProduct,
-      discountType: voucher.discountType,
-      discountValue: voucher.discountValue,
-      maxDiscountValue: voucher.maxDiscountValue,
-      minOrderValue: voucher.minOrderValue,
-      giftDescription: voucher.giftDescription,
-      startDate: voucher.startDate ? dayjs(voucher.startDate) : null,
-      endDate: voucher.endDate ? dayjs(voucher.endDate) : null,
-      usageLimit: voucher.usageLimit,
-      maxUsagePerUser: voucher.maxUsagePerUser,
-      status: voucher.status,
-    });
-    setEditOpen(true);
-  };
+    // Edit
+    const openEdit = (voucher: VoucherResponse) => {
+        setEditingVoucher(voucher);
+        setEditGiftImageUrl(voucher.giftImageUrl || '');
+        editForm.setFieldsValue({
+            description: voucher.description,
+            applicableProduct: voucher.applicableProduct,
+            discountType: voucher.discountType,
+            discountValue: voucher.discountValue,
+            maxDiscountValue: voucher.maxDiscountValue,
+            minOrderValue: voucher.minOrderValue,
+            giftDescription: voucher.giftDescription,
+            startDate: voucher.startDate ? dayjs(voucher.startDate) : null,
+            endDate: voucher.endDate ? dayjs(voucher.endDate) : null,
+            usageLimit: voucher.usageLimit,
+            status: voucher.status,
+            pointCost: voucher.pointCost || 0,
+        });
+        setEditOpen(true);
+    };
 
-  const handleUpdate = async (values: any) => {
-    if (!editingVoucher) return;
-    setSubmitting(true);
-    try {
-      const data: UpdateVoucherRequest = {
-        description: values.description,
-        applicableProduct: values.applicableProduct,
-        startDate: values.startDate?.toISOString(),
-        endDate: values.endDate?.toISOString(),
-        usageLimit: values.usageLimit,
-        maxUsagePerUser: values.maxUsagePerUser,
-        status: values.status,
-      };
-      if (editVoucherType === 'DISCOUNT') {
-        data.discountType = values.discountType;
-        data.discountValue = values.discountValue;
-        data.maxDiscountValue = values.maxDiscountValue;
-        data.minOrderValue = values.minOrderValue;
-      } else if (editVoucherType === 'GIFT_PRODUCT') {
-        data.giftDescription = values.giftDescription;
-        data.giftImageUrl = editGiftImageUrl || undefined;
-      }
-      const response = await vendorVoucherService.update(editingVoucher.id, data);
-      if (response.success) {
-        message.success('Voucher updated successfully');
-        setEditOpen(false);
-        setEditingVoucher(null);
-        setEditGiftImageUrl('');
-        fetchVouchers();
-      } else {
-        message.error(response.message || 'Failed to update voucher');
-      }
-    } catch (error: any) {
-      message.error(error.message || 'Failed to update voucher');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    const handleUpdate = async (values: any) => {
+        if (!editingVoucher) return;
+        setSubmitting(true);
+        try {
+            const data: UpdateVoucherRequest = {
+                description: values.description,
+                applicableProduct: values.applicableProduct,
+                startDate: values.startDate?.toISOString(),
+                endDate: values.endDate?.toISOString(),
+                usageLimit: values.usageLimit,
+                status: values.status,
+                pointCost: values.pointCost || 0,
+            };
+            if (editVoucherType === 'DISCOUNT') {
+                data.discountType = values.discountType;
+                data.discountValue = values.discountValue;
+                data.maxDiscountValue = values.maxDiscountValue;
+                data.minOrderValue = values.minOrderValue;
+            } else if (editVoucherType === 'GIFT_PRODUCT') {
+                data.giftDescription = values.giftDescription;
+                data.giftImageUrl = editGiftImageUrl || undefined;
+            }
+            const response = await vendorVoucherService.update(editingVoucher.id, data);
+            if (response.success) {
+                message.success('Voucher updated successfully');
+                setEditOpen(false);
+                setEditingVoucher(null);
+                setEditGiftImageUrl('');
+                fetchVouchers();
+            } else {
+                message.error(response.message || 'Failed to update voucher');
+            }
+        } catch (error: any) {
+            message.error(error.message || 'Failed to update voucher');
+        } finally {
+            setSubmitting(false);
+        }
+    };
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
@@ -276,71 +272,82 @@ export default function VouchersPage() {
     }
   };
 
-  const columns = [
-    {
-      title: 'Voucher Code',
-      dataIndex: 'code',
-      key: 'code',
-      render: (text: string) => (
-        <div className="flex items-center gap-2">
-          <GiftOutlined className="text-primary" />
-          <span className="font-mono font-bold text-primary">{text}</span>
-        </div>
-      ),
-    },
-    {
-      title: 'Type',
-      dataIndex: 'voucherType',
-      key: 'voucherType',
-      render: (type: VoucherType) => <Tag color={voucherTypeColors[type]}>{voucherTypeLabels[type]}</Tag>,
-    },
-    {
-      title: 'Value',
-      key: 'value',
-      ellipsis: true,
-      width: 160,
-      render: (_: any, record: VoucherResponse) => (
-        <span title={getDiscountDisplay(record)}>{getDiscountDisplay(record)}</span>
-      ),
-    },
-    {
-      title: 'Product',
-      dataIndex: 'applicableProduct',
-      key: 'applicableProduct',
-      render: (product: ApplicableProduct) => applicableProductLabels[product],
-    },
-    {
-      title: 'Usage',
-      key: 'usage',
-      render: (_: any, record: VoucherResponse) => `${record.usageCount}/${record.usageLimit}`,
-    },
-    {
-      title: 'Period',
-      key: 'period',
-      render: (_: any, record: VoucherResponse) => (
-        <span className="text-xs">
-          {new Date(record.startDate).toLocaleDateString('vi-VN')} —{' '}
-          {new Date(record.endDate).toLocaleDateString('vi-VN')}
-        </span>
-      ),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: VoucherStatus) => <Tag color={statusColors[status]}>{status}</Tag>,
-    },
-    {
-      title: 'Actions',
-      key: 'action',
-      render: (_: any, record: VoucherResponse) => (
-        <Space size="small">
-          <Button type="text" icon={<EditOutlined />} title="Edit" onClick={() => openEdit(record)} />
-          <Button type="text" icon={<DeleteOutlined />} title="Delete" danger onClick={() => setDeleteTarget(record)} />
-        </Space>
-      ),
-    },
-  ];
+    const columns = [
+        {
+            title: 'Voucher Code',
+            dataIndex: 'code',
+            key: 'code',
+            render: (text: string) => (
+                <div className="flex items-center gap-2">
+                    <GiftOutlined className="text-primary" />
+                    <span className="font-mono font-bold text-primary">{text}</span>
+                </div>
+            ),
+        },
+        {
+            title: 'Type',
+            dataIndex: 'voucherType',
+            key: 'voucherType',
+            render: (type: VoucherType) => (
+                <Tag color={voucherTypeColors[type]}>{voucherTypeLabels[type]}</Tag>
+            ),
+        },
+        {
+            title: 'Value',
+            key: 'value',
+            ellipsis: true,
+            width: 160,
+            render: (_: any, record: VoucherResponse) => (
+                <span title={getDiscountDisplay(record)}>{getDiscountDisplay(record)}</span>
+            ),
+        },
+        {
+            title: 'Product',
+            dataIndex: 'applicableProduct',
+            key: 'applicableProduct',
+            render: (product: ApplicableProduct) => applicableProductLabels[product],
+        },
+        {
+            title: 'Point Cost',
+            dataIndex: 'pointCost',
+            key: 'pointCost',
+            render: (cost: number) => (
+                <span className="font-bold text-amber-600">{cost?.toLocaleString() || 0}</span>
+            ),
+        },
+        {
+            title: 'Usage',
+            key: 'usage',
+            render: (_: any, record: VoucherResponse) => `${record.usageCount}/${record.usageLimit}`,
+        },
+        {
+            title: 'Period',
+            key: 'period',
+            render: (_: any, record: VoucherResponse) => (
+                <span className="text-xs">
+                    {new Date(record.startDate).toLocaleDateString('vi-VN')} — {new Date(record.endDate).toLocaleDateString('vi-VN')}
+                </span>
+            ),
+        },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: VoucherStatus) => (
+                <Tag color={statusColors[status]}>{status}</Tag>
+            ),
+        },
+        {
+            title: 'Actions',
+            key: 'action',
+            render: (_: any, record: VoucherResponse) => (
+                <Space size="small">
+                    <Button type="text" icon={<EditOutlined />} title="Edit" onClick={() => openEdit(record)} />
+                    <Button type="text" icon={<DeleteOutlined />} title="Delete" danger onClick={() => setDeleteTarget(record)} />
+                </Space>
+            ),
+        },
+    ];
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
@@ -570,57 +577,37 @@ export default function VouchersPage() {
             </>
           )}
 
-          {/* Time & Usage */}
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="startDate"
-              label="Start Date"
-              rules={[
-                { required: true, message: 'Start date is required' },
-                {
-                  validator: (_, value) =>
-                    value && value.isBefore(dayjs()) ? Promise.reject('Must be present or future') : Promise.resolve(),
-                },
-              ]}
-            >
-              <DatePicker showTime className="w-full" disabledDate={(d) => d && d.isBefore(dayjs().startOf('day'))} />
-            </Form.Item>
-            <Form.Item
-              name="endDate"
-              label="End Date"
-              dependencies={['startDate']}
-              rules={[
-                { required: true, message: 'End date is required' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value) return Promise.resolve();
-                    if (value.isBefore(dayjs())) return Promise.reject('Must be in the future');
-                    const start = getFieldValue('startDate');
-                    if (start && !value.isAfter(start)) return Promise.reject('Must be after start date');
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime className="w-full" disabledDate={(d) => d && d.isBefore(dayjs().startOf('day'))} />
-            </Form.Item>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="usageLimit"
-              label="Usage Limit"
-              rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}
-            >
-              <InputNumber min={1} className="w-full" placeholder="Total limit" />
-            </Form.Item>
-            <Form.Item
-              name="maxUsagePerUser"
-              label="Max Per User"
-              rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}
-            >
-              <InputNumber min={1} className="w-full" placeholder="Per user limit" />
-            </Form.Item>
-          </div>
+                    {/* Time & Usage */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item name="startDate" label="Start Date" rules={[
+                            { required: true, message: 'Start date is required' },
+                            { validator: (_, value) => value && value.isBefore(dayjs()) ? Promise.reject('Must be present or future') : Promise.resolve() },
+                        ]}>
+                            <DatePicker showTime className="w-full" disabledDate={(d) => d && d.isBefore(dayjs().startOf('day'))} />
+                        </Form.Item>
+                        <Form.Item name="endDate" label="End Date" dependencies={['startDate']} rules={[
+                            { required: true, message: 'End date is required' },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value) return Promise.resolve();
+                                    if (value.isBefore(dayjs())) return Promise.reject('Must be in the future');
+                                    const start = getFieldValue('startDate');
+                                    if (start && !value.isAfter(start)) return Promise.reject('Must be after start date');
+                                    return Promise.resolve();
+                                },
+                            }),
+                        ]}>
+                            <DatePicker showTime className="w-full" disabledDate={(d) => d && d.isBefore(dayjs().startOf('day'))} />
+                        </Form.Item>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item name="usageLimit" label="Usage Limit" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
+                            <InputNumber min={1} className="w-full" placeholder="Total limit" />
+                        </Form.Item>
+                        <Form.Item name="pointCost" label="Point Cost" rules={[{ type: 'number', min: 0, message: 'Must be ≥ 0' }]}>
+                            <InputNumber min={0} className="w-full" placeholder="Points needed" />
+                        </Form.Item>
+                    </div>
 
           <div className="flex justify-end gap-2 mt-4">
             <Button
@@ -775,50 +762,37 @@ export default function VouchersPage() {
             </>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item name="startDate" label="Start Date">
-              <DatePicker showTime className="w-full" />
-            </Form.Item>
-            <Form.Item
-              name="endDate"
-              label="End Date"
-              dependencies={['startDate']}
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value) return Promise.resolve();
-                    const start = getFieldValue('startDate');
-                    if (start && !value.isAfter(start)) return Promise.reject('Must be after start date');
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker showTime className="w-full" />
-            </Form.Item>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Form.Item
-              name="usageLimit"
-              label="Usage Limit"
-              rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}
-            >
-              <InputNumber min={1} className="w-full" />
-            </Form.Item>
-            <Form.Item
-              name="maxUsagePerUser"
-              label="Max Per User"
-              rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}
-            >
-              <InputNumber min={1} className="w-full" />
-            </Form.Item>
-          </div>
-          <Form.Item name="status" label="Status">
-            <Select>
-              <Option value="ACTIVE">Active</Option>
-              <Option value="INACTIVE">Inactive</Option>
-            </Select>
-          </Form.Item>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item name="startDate" label="Start Date">
+                            <DatePicker showTime className="w-full" />
+                        </Form.Item>
+                        <Form.Item name="endDate" label="End Date" dependencies={['startDate']} rules={[
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value) return Promise.resolve();
+                                    const start = getFieldValue('startDate');
+                                    if (start && !value.isAfter(start)) return Promise.reject('Must be after start date');
+                                    return Promise.resolve();
+                                },
+                            }),
+                        ]}>
+                            <DatePicker showTime className="w-full" />
+                        </Form.Item>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item name="usageLimit" label="Usage Limit" rules={[{ type: 'number', min: 1, message: 'Must be ≥ 1' }]}>
+                            <InputNumber min={1} className="w-full" />
+                        </Form.Item>
+                        <Form.Item name="pointCost" label="Point Cost" rules={[{ type: 'number', min: 0, message: 'Must be ≥ 0' }]}>
+                            <InputNumber min={0} className="w-full" />
+                        </Form.Item>
+                    </div>
+                    <Form.Item name="status" label="Status">
+                        <Select>
+                            <Option value="ACTIVE">Active</Option>
+                            <Option value="INACTIVE">Inactive</Option>
+                        </Select>
+                    </Form.Item>
 
           <div className="flex justify-end gap-2 mt-4">
             <Button

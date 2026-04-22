@@ -114,7 +114,7 @@ export function AdminLayout() {
       ],
     },
     { label: 'Vé', path: '/admin/tickets', icon: <Ticket className="w-5 h-5" /> },
-    { label: 'Voucher nền tảng', path: '/admin/vouchers/platform', icon: <BadgePercent className="w-5 h-5" /> },
+    { label: 'Voucher hệ thống', path: '/admin/vouchers/platform', icon: <BadgePercent className="w-5 h-5" /> },
     { label: 'Báo cáo', path: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
     {
       label: 'Sự kiện',
@@ -184,6 +184,39 @@ export function AdminLayout() {
           { label: 'Chi tiết', path: path },
         ];
       }
+    }
+
+    // Dynamic voucher routes
+    if (path.startsWith('/admin/vouchers/')) {
+        const parts = path.split('/');
+        // /admin/vouchers/create
+        if (parts.length === 4 && parts[3] === 'create') {
+            return [
+                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+                { label: 'Tạo mới', path: path }
+            ];
+        }
+        // /admin/vouchers/deleted
+        if (parts.length === 4 && parts[3] === 'deleted') {
+            return [
+                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+                { label: 'Đã xóa', path: path }
+            ];
+        }
+        // /admin/vouchers/:id/edit
+        if (parts.length === 5 && parts[4] === 'edit') {
+            return [
+                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+                { label: 'Chỉnh sửa', path: path }
+            ];
+        }
+        // /admin/vouchers/:id
+        if (parts.length === 4 && parts[3] !== 'platform' && parts[3] !== 'vendor' && parts[3] !== 'create' && parts[3] !== 'deleted') {
+            return [
+                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+                { label: 'Chi tiết', path: path }
+            ];
+        }
     }
 
     return [{ label: 'Hệ thống', path: '/admin' }];
