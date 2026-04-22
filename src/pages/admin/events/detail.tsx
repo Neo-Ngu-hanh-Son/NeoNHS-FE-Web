@@ -419,7 +419,7 @@ export default function EventDetailPage() {
                     <div className="absolute inset-0 z-10 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                       <div className="bg-white/95 text-sm font-semibold px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 shadow-lg text-slate-800 scale-95 group-hover:scale-100">
                         {updatingLocation ? <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> : <MapPin className="w-4 h-4 text-indigo-600" />}
-                        {updatingLocation ? "Updating..." : "Click to pick location"}
+                        {updatingLocation ? "Đang cập nhật..." : "Nhấn để chọn vị trí"}
                       </div>
                     </div>
                     {event.latitude && event.longitude ? (

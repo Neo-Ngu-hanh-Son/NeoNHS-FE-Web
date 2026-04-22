@@ -26,11 +26,11 @@ export function useEvent(id: string): UseEventReturn {
             if (response.success) {
                 setEvent(response.data);
             } else {
-                message.error(response.message || 'Failed to fetch event');
+                message.error(response.message || 'Lấy sự kiện thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch event: ' + (err.message || 'Unknown error'));
+            message.error('Lấy sự kiện thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }

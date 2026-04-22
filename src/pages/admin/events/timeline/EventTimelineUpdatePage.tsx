@@ -55,7 +55,7 @@ const toInputTime = (time?: string): string => {
   return time.length >= 5 ? time.slice(0, 5) : time;
 };
 
-const summaryValue = (value: string): string => (value.trim() ? value.trim() : 'Not provided');
+const summaryValue = (value: string): string => (value.trim() ? value.trim() : 'Không có');
 
 const buildEventPointPayload = (form: FormData): UpdateEventTimelineRequest['eventPoint'] | undefined => {
   const name = form.destinationName.trim();
@@ -167,7 +167,7 @@ export default function EventTimelineUpdatePage() {
 
       if (!timeline) {
         setInitializing(false);
-        message.error('Timeline entry not found.');
+        message.error('Không tìm thấy timeline.');
         navigate(`/admin/events/${eventId}?tab=timeline`, { replace: true });
         return;
       }
@@ -193,30 +193,30 @@ export default function EventTimelineUpdatePage() {
   const validate = (stage: 'timeline' | 'submit' = 'submit'): boolean => {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
 
-    if (!form.name.trim()) newErrors.name = 'Name is required';
-    if (!form.date) newErrors.date = 'Date is required';
-    if (!form.startTime) newErrors.startTime = 'Start time is required';
-    if (!form.endTime) newErrors.endTime = 'End time is required';
+    if (!form.name.trim()) newErrors.name = 'Vui lòng nhập tên';
+    if (!form.date) newErrors.date = 'Vui lòng chọn ngày';
+    if (!form.startTime) newErrors.startTime = 'Vui lòng chọn thời gian bắt đầu';
+    if (!form.endTime) newErrors.endTime = 'Vui lòng chọn thời gian kết thúc';
     if (form.startTime && form.endTime && form.startTime >= form.endTime) {
-      newErrors.endTime = 'End time must be after start time';
+      newErrors.endTime = 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đầu';
     }
 
-    if (form.organizer && form.organizer.length > 100) {
-      newErrors.organizer = 'Organizer name must be less than 100 characters';
+    if (form.organizer && form.organizer.length > 255) {
+      newErrors.organizer = 'Tên đơn vị tổ chức không được vượt quá 255 ký tự';
     }
-    if (form.coOrganizer && form.coOrganizer.length > 100) {
-      newErrors.coOrganizer = 'Co-organizer name must be less than 100 characters';
+    if (form.coOrganizer && form.coOrganizer.length > 255) {
+      newErrors.coOrganizer = 'Tên đơn vị phối hợp không được vượt quá 255 ký tự';
     }
 
     if (event?.startTime && form.date && form.startTime) {
       const eventStartDT = dayjs(event.startTime);
       const minDate = eventStartDT.format('YYYY-MM-DD');
       if (form.date < minDate) {
-        newErrors.date = `Date must be at or after ${minDate}`;
+        newErrors.date = `Ngày phải từ ngày ${minDate} trở đi`;
       } else if (form.date === minDate) {
         const minTime = eventStartDT.format('HH:mm');
         if (form.startTime < minTime) {
-          newErrors.startTime = `Must be at or after ${minTime} on the start date`;
+          newErrors.startTime = `Thời gian bắt đầu phải từ ${minTime} trở đi`;
         }
       }
     }
@@ -225,34 +225,34 @@ export default function EventTimelineUpdatePage() {
       const eventEndDT = dayjs(event.endTime);
       const maxDate = eventEndDT.format('YYYY-MM-DD');
       if (form.date > maxDate) {
-        newErrors.date = `Date must be at or before ${maxDate}`;
+        newErrors.date = `Ngày phải từ ngày ${maxDate} trở về trước`;
       } else if (form.date === maxDate && form.endTime) {
         const maxTime = eventEndDT.format('HH:mm');
         if (form.endTime > maxTime) {
-          newErrors.endTime = `Must be at or before ${maxTime} on the end date`;
+          newErrors.endTime = `Thời gian bắt đầu phải từ ${maxTime} trở về trước`;
         }
       }
     }
 
     if (stage === 'submit') {
       if (!form.destinationName.trim()) {
-        newErrors.destinationName = 'Destination name is required';
+        newErrors.destinationName = 'Tên điểm đến không được để trống';
       }
 
       if (!form.destinationLatitude.trim()) {
-        newErrors.destinationLatitude = 'Latitude is required';
+        newErrors.destinationLatitude = 'Tọa độ vĩ độ không được để trống';
       } else if (!Number.isFinite(Number.parseFloat(form.destinationLatitude))) {
-        newErrors.destinationLatitude = 'Latitude must be a valid number';
+        newErrors.destinationLatitude = 'Tọa độ vĩ độ phải là một số hợp lệ';
       }
 
       if (!form.destinationLongitude.trim()) {
-        newErrors.destinationLongitude = 'Longitude is required';
+        newErrors.destinationLongitude = 'Tọa độ kinh độ không được để trống';
       } else if (!Number.isFinite(Number.parseFloat(form.destinationLongitude))) {
-        newErrors.destinationLongitude = 'Longitude must be a valid number';
+        newErrors.destinationLongitude = 'Tọa độ kinh độ phải là một số hợp lệ';
       }
 
       if (!form.destinationTagName.trim()) {
-        newErrors.destinationTagName = 'Tag name is required';
+        newErrors.destinationTagName = 'Tên thẻ không được để trống';
       }
     }
 
@@ -297,8 +297,13 @@ export default function EventTimelineUpdatePage() {
   };
 
   const uploadMarkerInBackground = async (): Promise<void> => {
+    if (form.eventPointTagId.trim() && form.destinationMarkerIconUrl.trim()) {
+      setIsMarkerUploading(false);
+      return;
+    }
+
     if (!markerUploaderRef.current) {
-      setMarkerUploadError('Unable to initialize marker upload. Please try again.');
+      setMarkerUploadError('Không thể khởi tạo upload marker. Vui lòng thử lại.');
       return;
     }
 
@@ -308,10 +313,10 @@ export default function EventTimelineUpdatePage() {
     const iconUrl = await markerUploaderRef.current.generateMarkerIcon();
 
     if (!iconUrl) {
-      setMarkerUploadError('Unable to generate and upload marker icon. Please retry.');
+      setMarkerUploadError('Không thể tạo và upload marker icon. Vui lòng thử lại.');
       setErrors((prev) => ({
         ...prev,
-        destinationMarkerIconUrl: 'Failed to upload marker icon. Please try again.',
+        destinationMarkerIconUrl: 'Không thể tạo và upload marker icon. Vui lòng thử lại.',
       }));
       setIsMarkerUploading(false);
       return;
@@ -325,7 +330,7 @@ export default function EventTimelineUpdatePage() {
   const handleSubmit = async () => {
     if (!validate('submit')) {
       if (!form.destinationTagName.trim()) {
-        message.warning('Please enter a required tag name before updating.');
+        message.warning('Vui lòng nhập tên thẻ trước khi cập nhật.');
       }
       return;
     }
@@ -336,12 +341,12 @@ export default function EventTimelineUpdatePage() {
 
   const handleFinalConfirm = async () => {
     if (isMarkerUploading) {
-      message.info('Marker is still uploading. Please wait.');
+      message.info('Đang tải ảnh đánh dấu lên. Vui lòng chờ.');
       return;
     }
 
     if (markerUploadError || !form.destinationMarkerIconUrl.trim()) {
-      message.warning('Marker upload is not ready. Please retry before final confirmation.');
+      message.warning('Ảnh đánh dấu chưa được tải lên xong. Vui lòng tải lại trước khi xác nhận.');
       return;
     }
 
@@ -351,7 +356,7 @@ export default function EventTimelineUpdatePage() {
   if (!eventId || !currentTimelineId) {
     return (
       <div className="max-w-6xl mx-auto">
-        <p className="text-sm text-muted-foreground">Invalid event id or timeline id.</p>
+        <p className="text-sm text-muted-foreground">ID sự kiện hoặc timeline không hợp lệ.</p>
       </div>
     );
   }
@@ -370,14 +375,14 @@ export default function EventTimelineUpdatePage() {
     <div className="max-w-6xl mx-auto space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Update Timeline Entry</h1>
+          <h1 className="text-2xl font-bold">Cập nhật Timeline Entry</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {event ? `Event: ${event.name}` : 'Update this timeline entry.'}
+            {event ? `Sự kiện: ${event.name}` : 'Cập nhật timeline entry này.'}
           </p>
         </div>
         <Button variant="outline" onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}>
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Event
+          Quay lại Sự kiện
         </Button>
       </div>
 
@@ -389,21 +394,21 @@ export default function EventTimelineUpdatePage() {
                 value="timeline"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                1. Update event timeline
+                1. Cập nhật timeline sự kiện
               </TabsTrigger>
               <TabsTrigger
                 value="point"
                 disabled={step !== 'point'}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                2. Set event timeline location
+                2. Cập nhật địa điểm sự kiện
               </TabsTrigger>
               <TabsTrigger
                 value="visual"
                 disabled={step !== 'visual'}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                3. Visual identity
+                3. Tạo thẻ địa điểm
               </TabsTrigger>
             </TabsList>
 
@@ -444,7 +449,7 @@ export default function EventTimelineUpdatePage() {
                 onClick={() => setStep(step === 'visual' ? 'point' : 'timeline')}
                 disabled={loading}
               >
-                Back
+                Quay lại
               </Button>
             ) : (
               <Button
@@ -452,18 +457,18 @@ export default function EventTimelineUpdatePage() {
                 onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}
                 disabled={loading}
               >
-                Cancel
+                Hủy
               </Button>
             )}
 
             {step === 'timeline' || step === 'point' ? (
               <Button onClick={handleNextStep} disabled={loading}>
-                Next
+                Tiếp tục
               </Button>
             ) : (
               <Button onClick={handleSubmit} disabled={loading}>
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Update
+                Cập nhật
               </Button>
             )}
           </div>
@@ -473,62 +478,62 @@ export default function EventTimelineUpdatePage() {
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent className="max-w-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Final Confirmation</AlertDialogTitle>
-            <AlertDialogDescription>Review all information below before final update.</AlertDialogDescription>
+            <AlertDialogTitle>Xác nhận cập nhật</AlertDialogTitle>
+            <AlertDialogDescription>Xem lại tất cả thông tin dưới đây trước khi cập nhật.</AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4">
             <div className={`rounded-md border p-3 ${isMarkerUploading ? 'opacity-60' : ''}`}>
-              <p className="text-sm font-medium">Marker Upload Status</p>
+              <p className="text-sm font-medium">Trạng thái Tải lên Ảnh đánh dấu</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {isMarkerUploading
-                  ? 'Uploading marker icon in the background...'
+                  ? 'Đang tải ảnh đánh dấu lên hệ thống...'
                   : markerUploadError
                     ? markerUploadError
-                    : 'Marker icon uploaded successfully and ready for final update.'}
+                    : 'Tải ảnh đánh dấu thành công và sẵn sàng cập nhật.'}
               </p>
             </div>
 
             <div className="max-h-[360px] overflow-auto rounded-md border bg-muted/20 p-4 space-y-4">
               <section className="space-y-2">
-                <p className="text-sm font-semibold">Timeline Details</p>
+                <p className="text-sm font-semibold">Chi tiết timeline</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Timeline name" value={summaryValue(form.name)} />
-                  <SummaryItem label="Date" value={summaryValue(form.date)} />
-                  <SummaryItem label="Start time" value={summaryValue(form.startTime)} />
-                  <SummaryItem label="End time" value={summaryValue(form.endTime)} />
-                  <SummaryItem label="Description" value={summaryValue(form.description)} />
+                  <SummaryItem label="Tên timeline" value={summaryValue(form.name)} />
+                  <SummaryItem label="Ngày" value={summaryValue(form.date)} />
+                  <SummaryItem label="Giờ bắt đầu" value={summaryValue(form.startTime)} />
+                  <SummaryItem label="Giờ kết thúc" value={summaryValue(form.endTime)} />
+                  <SummaryItem label="Mô tả" value={summaryValue(form.description)} />
                 </div>
               </section>
 
               <section className="space-y-2">
-                <p className="text-sm font-semibold">People</p>
+                <p className="text-sm font-semibold">Người tổ chức</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Organizer" value={summaryValue(form.organizer)} />
-                  <SummaryItem label="Co-organizer" value={summaryValue(form.coOrganizer)} />
+                  <SummaryItem label="Đơn vị tổ chức" value={summaryValue(form.organizer)} />
+                  <SummaryItem label="Đơn vị đồng tổ chức" value={summaryValue(form.coOrganizer)} />
                 </div>
               </section>
 
               <section className="space-y-2">
-                <p className="text-sm font-semibold">Location</p>
+                <p className="text-sm font-semibold">Địa điểm sự kiện</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Destination name" value={summaryValue(form.destinationName)} />
-                  <SummaryItem label="Address" value={summaryValue(form.destinationAddress)} />
-                  <SummaryItem label="Latitude" value={summaryValue(form.destinationLatitude)} />
-                  <SummaryItem label="Longitude" value={summaryValue(form.destinationLongitude)} />
+                  <SummaryItem label="Địa điểm tổ chức sự kiện" value={summaryValue(form.destinationName)} />
+                  <SummaryItem label="Địa chỉ" value={summaryValue(form.destinationAddress)} />
+                  <SummaryItem label="Vĩ độ" value={summaryValue(form.destinationLatitude)} />
+                  <SummaryItem label="Kinh độ" value={summaryValue(form.destinationLongitude)} />
                 </div>
               </section>
 
               <section className="space-y-2">
-                <p className="text-sm font-semibold">Tag Visual Identity</p>
+                <p className="text-sm font-semibold">Thẻ địa điểm sự kiện</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Tag name" value={summaryValue(form.destinationTagName)} />
-                  <SummaryItem label="Tag color" value={summaryValue(form.destinationTagColor)} />
+                  <SummaryItem label="Tên thẻ địa điểm sự kiện" value={summaryValue(form.destinationTagName)} />
+                  <SummaryItem label="Màu thẻ địa điểm sự kiện" value={summaryValue(form.destinationTagColor)} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <div className="rounded-md border p-3">
-                    <p className="text-xs text-muted-foreground mb-2">Destination image</p>
+                    <p className="text-xs text-muted-foreground mb-2">Ảnh địa điểm sự kiện</p>
                     {form.destinationImageUrl.trim() ? (
                       <img
                         src={form.destinationImageUrl}
@@ -536,12 +541,12 @@ export default function EventTimelineUpdatePage() {
                         className="h-24 w-full object-cover rounded"
                       />
                     ) : (
-                      <p className="text-sm text-muted-foreground">No destination image</p>
+                      <p className="text-sm text-muted-foreground">Không có ảnh điểm đến</p>
                     )}
                   </div>
 
                   <div className="rounded-md border p-3">
-                    <p className="text-xs text-muted-foreground mb-2">Marker preview</p>
+                    <p className="text-xs text-muted-foreground mb-2">Marker địa điểm sự kiện</p>
                     {form.destinationMarkerIconUrl.trim() ? (
                       <div className="h-24 flex items-center justify-center">
                         <img
@@ -551,7 +556,7 @@ export default function EventTimelineUpdatePage() {
                         />
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">Marker will appear after upload</p>
+                      <p className="text-sm text-muted-foreground">Marker sẽ hiển thị sau khi upload</p>
                     )}
                   </div>
                 </div>
@@ -560,7 +565,7 @@ export default function EventTimelineUpdatePage() {
           </div>
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading || isMarkerUploading}>Close</AlertDialogCancel>
+            <AlertDialogCancel disabled={loading || isMarkerUploading}>Đóng</AlertDialogCancel>
             <AlertDialogAction
               onClick={(event) => {
                 event.preventDefault();
@@ -570,7 +575,7 @@ export default function EventTimelineUpdatePage() {
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Final Confirm Update
+              Xác nhận cập nhật
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

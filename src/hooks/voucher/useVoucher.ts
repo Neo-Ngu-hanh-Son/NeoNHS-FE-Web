@@ -27,11 +27,11 @@ export function useVoucher(id: string | undefined, scope: VoucherScope = 'PLATFO
             if (response.success) {
                 setVoucher(response.data);
             } else {
-                message.error(response.message || 'Failed to fetch voucher');
+                message.error(response.message || 'Lấy voucher thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch voucher: ' + (err.message || 'Unknown error'));
+            message.error('Lấy voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }

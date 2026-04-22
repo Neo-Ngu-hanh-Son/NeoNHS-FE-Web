@@ -30,13 +30,13 @@ function handlePointApiError(error: unknown, fallback: string): void {
 
   if (status === 401) {
     localStorage.removeItem('token');
-    message.error('Session expired. Please sign in again.');
+    message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
     window.location.href = '/login';
     return;
   }
 
   if (status === 403) {
-    message.error('Access denied. ADMIN role is required to manage event points.');
+    message.error('Từ chối truy cập. Cần có quyền ADMIN để quản lý điểm sự kiện.');
     return;
   }
 
@@ -45,7 +45,7 @@ function handlePointApiError(error: unknown, fallback: string): void {
     return;
   }
 
-  message.error(`${fallback}: ${err?.message || 'Unknown error'}`);
+  message.error(`${fallback}: ${err?.message || 'Lỗi không xác định'}`);
 }
 
 export function useEventPoints(): UseEventPointsReturn {
@@ -59,10 +59,10 @@ export function useEventPoints(): UseEventPointsReturn {
       if (response.success) {
         setPoints(response.data);
       } else {
-        message.error(response.message || 'Failed to fetch event points');
+        message.error(response.message || 'Lấy sự kiện thất bại points');
       }
     } catch (error: unknown) {
-      handlePointApiError(error, 'Failed to fetch event points');
+      handlePointApiError(error, 'Lấy sự kiện thất bại points');
     } finally {
       setLoading(false);
     }
@@ -81,10 +81,10 @@ export function useEventPoints(): UseEventPointsReturn {
         return true;
       }
 
-      message.error(response.message || 'Failed to create event point');
+      message.error(response.message || 'Tạo sự kiện thất bại point');
       return false;
     } catch (error: unknown) {
-      handlePointApiError(error, 'Failed to create event point');
+      handlePointApiError(error, 'Tạo sự kiện thất bại point');
       return false;
     }
   }, [fetchPoints]);
@@ -98,10 +98,10 @@ export function useEventPoints(): UseEventPointsReturn {
         return true;
       }
 
-      message.error(response.message || 'Failed to update event point');
+      message.error(response.message || 'Cập nhật sự kiện thất bại point');
       return false;
     } catch (error: unknown) {
-      handlePointApiError(error, 'Failed to update event point');
+      handlePointApiError(error, 'Cập nhật sự kiện thất bại point');
       return false;
     }
   }, [fetchPoints]);
@@ -115,10 +115,10 @@ export function useEventPoints(): UseEventPointsReturn {
         return true;
       }
 
-      message.error(response.message || 'Failed to delete event point');
+      message.error(response.message || 'Xóa sự kiện thất bại point');
       return false;
     } catch (error: unknown) {
-      handlePointApiError(error, 'Failed to delete event point');
+      handlePointApiError(error, 'Xóa sự kiện thất bại point');
       return false;
     }
   }, [fetchPoints]);

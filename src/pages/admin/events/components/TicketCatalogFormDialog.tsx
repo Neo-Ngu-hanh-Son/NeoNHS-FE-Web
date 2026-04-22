@@ -104,8 +104,8 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
 
     const validate = (): boolean => {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
-        if (!form.name.trim()) newErrors.name = 'Name is required';
-        if (!form.price || Number(form.price) <= 0) newErrors.price = 'Price must be > 0';
+        if (!form.name.trim()) newErrors.name = 'Tên là bắt buộc';
+        if (!form.price || Number(form.price) <= 0) newErrors.price = 'Giá phải > 0';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };

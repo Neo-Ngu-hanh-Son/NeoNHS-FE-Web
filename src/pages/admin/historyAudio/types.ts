@@ -11,28 +11,34 @@ export interface ForcedAlignmentWord {
   loss?: number;
 }
 
+// Back end audio related APIs
+export interface CreateTextToSpeechRequest {
+  voiceId: string;
+  text: string;
+  modelId: string;
+  outputFormat: string;
+  languageCode: string;
+}
+
 export interface ForcedAlignmentResponse {
   words: ForcedAlignmentWord[];
   loss?: number;
 }
 
-// Google Gemini translation request / response types
-export interface GeminiTranslationRequest {
+export interface HistoryAudioTranslationRequest {
   title: string;
   author: string;
   script: string;
   requiredLanguages: string[];
 }
 
-// Google Gemini translation response type
-export interface GeminiTranslationObject {
+export interface HistoryAudioTranslationObject {
   title: string;
   author: string;
   script: string;
   language: string;
 }
 
-//  Eleven lab generation responses
 export interface ElevenLabsAudioGenerationResponse {
   audioUrl: string;
   audioBlob: Blob;

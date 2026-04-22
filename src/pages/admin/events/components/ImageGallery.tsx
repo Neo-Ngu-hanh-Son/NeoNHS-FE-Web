@@ -64,12 +64,12 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
         const fileArray = Array.from(files);
         const invalid = fileArray.find(f => !f.type.startsWith('image/'));
         if (invalid) {
-            message.error('Only image files are allowed');
+            message.error('Chỉ hỗ trợ file hình ảnh');
             return;
         }
         const tooLarge = fileArray.find(f => f.size > 10 * 1024 * 1024);
         if (tooLarge) {
-            message.error('Each image must be under 10MB');
+            message.error('Mỗi ảnh phải dưới 10MB');
             return;
         }
 
@@ -92,14 +92,14 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
         try {
             const res = await eventService.uploadEventImages(eventId, stagedFiles);
             if (res.success) {
-                message.success(`${stagedFiles.length} image(s) uploaded successfully`);
+                message.success(`Đã tải lên thành công ${stagedFiles.length} ảnh`);
                 setStagedFiles([]);
                 await refreshImages();
             } else {
-                message.error(res.message || 'Failed to upload images');
+                message.error(res.message || 'Lỗi tải ảnh lên');
             }
         } catch {
-            message.error('An error occurred while uploading images');
+            message.error('Đã xảy ra lỗi khi tải ảnh lên');
         } finally {
             setUploading(false);
         }
@@ -111,7 +111,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
         try {
             const res = await eventService.deleteEventImage(eventId, imageId);
             if (res.success) {
-                message.success('Image deleted successfully');
+                message.success('Đã xóa ảnh thành công');
                 // Close lightbox if the deleted image was being viewed
                 if (lightboxIndex !== null) {
                     const idx = images.findIndex(i => i.id === imageId);
@@ -120,10 +120,10 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                 }
                 await refreshImages();
             } else {
-                message.error(res.message || 'Failed to delete image');
+                message.error(res.message || 'Lỗi khi xóa ảnh');
             }
         } catch {
-            message.error('Cannot delete this image. It might be the current thumbnail.');
+            message.error('Không thể xóa ảnh này. Có thể đây đang là ảnh đại diện.');
         } finally {
             setDeletingId(null);
             setConfirmDeleteId(null);
@@ -136,13 +136,13 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
         try {
             const res = await eventService.setEventThumbnail(eventId, imageId);
             if (res.success) {
-                message.success('Thumbnail updated successfully');
+                message.success('Đã đặt ảnh đại diện thành công');
                 await refreshImages();
             } else {
-                message.error(res.message || 'Failed to set thumbnail');
+                message.error(res.message || 'Lỗi khi đặt ảnh đại diện');
             }
         } catch {
-            message.error('An error occurred while setting thumbnail');
+            message.error('Đã xảy ra lỗi khi đặt ảnh đại diện');
         } finally {
             setSettingThumbnailId(null);
         }
@@ -161,15 +161,15 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
         try {
             const res = await eventService.deleteMultipleEventImages(eventId, selectedIds);
             if (res.success) {
-                message.success(`${selectedIds.length} image(s) deleted successfully`);
+                message.success(`Đã xóa thành công ${selectedIds.length} ảnh`);
                 setSelectedIds([]);
                 setIsSelectionMode(false);
                 await refreshImages();
             } else {
-                message.error(res.message || 'Failed to delete images');
+                message.error(res.message || 'Lỗi khi xóa ảnh');
             }
         } catch {
-            message.error('An error occurred. Ensure no thumbnail is selected.');
+            message.error('Đã xảy ra lỗi. Đảm bảo không có ảnh đại diện nào được chọn.');
         } finally {
             setIsBulkDeleting(null as any); // just resetting
             setIsBulkDeleting(false);
@@ -208,7 +208,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
             {/* Upload area */}
             <div className="flex items-center justify-between mb-4">
                 <p className="text-sm text-muted-foreground">
-                    {images.length} image{images.length !== 1 ? 's' : ''} in gallery
+                    {images.length} ảnh trong thư viện
                 </p>
                 <div>
                     <input
@@ -229,7 +229,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                     else setIsSelectionMode(true);
                                 }}
                             >
-                                {isSelectionMode ? "Cancel Selection" : "Select"}
+                                {isSelectionMode ? "Hủy chọn" : "Chọn ảnh"}
                             </Button>
                         )}
                         <Button
@@ -239,7 +239,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                             disabled={uploading}
                         >
                             <ImagePlus className="h-4 w-4 mr-2" />
-                            Select Images
+                            Tải ảnh lên
                         </Button>
                     </div>
                 </div>
@@ -250,11 +250,11 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                 <div className="mb-4 p-4 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
                     <div className="flex items-center justify-between mb-3">
                         <p className="text-sm font-medium text-primary">
-                            {stagedFiles.length} image(s) selected — ready to upload
+                            Đã chọn {stagedFiles.length} ảnh — Sẵn sàng tải lên
                         </p>
                         <div className="flex gap-2">
                             <Button variant="ghost" size="sm" onClick={clearStaged} disabled={uploading}>
-                                <X className="h-4 w-4 mr-1" /> Clear
+                                <X className="h-4 w-4 mr-1" /> Hủy
                             </Button>
                             <Button size="sm" onClick={handleConfirmUpload} disabled={uploading}>
                                 {uploading ? (
@@ -262,7 +262,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                 ) : (
                                     <Upload className="h-4 w-4 mr-2" />
                                 )}
-                                {uploading ? 'Uploading...' : 'Confirm Upload'}
+                                {uploading ? 'Đang tải lên...' : 'Xác nhận'}
                             </Button>
                         </div>
                     </div>
@@ -294,10 +294,10 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                 <div className="mb-4 flex items-center justify-between p-3 bg-slate-100 rounded-lg border border-slate-200 sticky top-0 z-10 shadow-sm animate-in fade-in slide-in-from-top-2">
                     <div className="flex items-center gap-3">
                         <Badge variant="secondary" className="px-2 py-1">
-                            {selectedIds.length} selected
+                            Đã chọn {selectedIds.length}
                         </Badge>
                         <Button variant="ghost" size="sm" onClick={() => setSelectedIds([])} className="h-8 text-xs">
-                            Deselect all
+                            Bỏ chọn tất cả
                         </Button>
                     </div>
                     <Button
@@ -308,7 +308,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                         disabled={isBulkDeleting}
                     >
                         {isBulkDeleting ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Trash2 className="h-3.5 w-3.5 mr-2" />}
-                        Delete Selected
+                        Xóa mục đã chọn
                     </Button>
                 </div>
             )}
@@ -320,8 +320,8 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                     onClick={() => fileInputRef.current?.click()}
                 >
                     <ImagePlus className="h-12 w-12 mb-3 opacity-30" />
-                    <p className="text-sm font-medium">No images uploaded</p>
-                    <p className="text-xs mt-1">Click here or the button above to add images</p>
+                    <p className="text-sm font-medium">Chưa có ảnh nào được tải lên</p>
+                    <p className="text-xs mt-1">Nhấp vào đây hoặc nút bên trên để thêm ảnh</p>
                 </div>
             )}
 
@@ -374,7 +374,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                             {img.isThumbnail && (
                                 <Badge className="absolute top-1.5 left-1.5 text-[10px] px-1.5 py-0.5 bg-yellow-500/90 hover:bg-yellow-500/90 pointer-events-none">
                                     <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
-                                    Thumbnail
+                                    Ảnh đại diện
                                 </Badge>
                             )}
 
@@ -395,7 +395,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                         ) : (
                                             <Star className="h-3 w-3 mr-1" />
                                         )}
-                                        Set Thumbnail
+                                        Đặt làm đại diện
                                     </Button>
                                 )}
                                 {img.isThumbnail && <span />}
@@ -426,14 +426,14 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
             {hasMore && (
                 <div className="mt-3 text-center">
                     <Button variant="outline" size="sm" onClick={() => setShowAll(true)}>
-                        Show all {images.length} images
+                        Hiển thị tất cả {images.length} ảnh
                     </Button>
                 </div>
             )}
             {showAll && images.length > INITIAL_DISPLAY && (
                 <div className="mt-3 text-center">
                     <Button variant="ghost" size="sm" onClick={() => setShowAll(false)}>
-                        Show less
+                        Thu gọn
                     </Button>
                 </div>
             )}
@@ -484,7 +484,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                     {lightboxIndex + 1} / {images.length}
                                     {currentLightboxImage.isThumbnail && (
                                         <Badge className="ml-2 text-[10px] px-1.5 py-0 bg-yellow-500/90 hover:bg-yellow-500/90">
-                                            <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Thumbnail
+                                            <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Ảnh đại diện
                                         </Badge>
                                     )}
                                 </span>
@@ -503,7 +503,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                                 ) : (
                                                     <Star className="h-3.5 w-3.5 mr-1.5" />
                                                 )}
-                                                Set Thumbnail
+                                                Đặt làm đại diện
                                             </Button>
                                             <Button
                                                 variant="destructive"
@@ -517,7 +517,7 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
                                                 ) : (
                                                     <Trash2 className="h-3.5 w-3.5 mr-1.5" />
                                                 )}
-                                                Delete
+                                                Xóa
                                             </Button>
                                         </>
                                     )}
@@ -532,20 +532,20 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
             <AlertDialog open={!!confirmDeleteId} onOpenChange={(open) => !open && setConfirmDeleteId(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Image</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa ảnh</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete this image? This action cannot be undone.
+                            Bạn có chắc chắn muốn xóa ảnh này? Thao tác này không thể hoàn tác.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={!!deletingId}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={!!deletingId}>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             onClick={() => confirmDeleteId && handleDelete(confirmDeleteId)}
                             disabled={!!deletingId}
                         >
                             {deletingId ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                            Delete
+                            Xóa
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -554,20 +554,20 @@ export function ImageGallery({ eventId, images: initialImages, onImagesChange }:
             <AlertDialog open={confirmBulkDelete} onOpenChange={(open) => !open && setConfirmBulkDelete(false)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Multiple Images</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa nhiều ảnh</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete {selectedIds.length} selected images? This action cannot be undone.
+                            Bạn có chắc chắn muốn xóa {selectedIds.length} ảnh đã chọn? Thao tác này không thể hoàn tác.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isBulkDeleting}>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             onClick={handleBulkDelete}
                             disabled={isBulkDeleting}
                         >
                             {isBulkDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
-                            Delete {selectedIds.length} Images
+                            Xóa {selectedIds.length} ảnh
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

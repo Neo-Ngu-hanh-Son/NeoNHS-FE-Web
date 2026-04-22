@@ -107,13 +107,6 @@ export function useQuickCreateAudioGeneration({
 
       try {
         options?.onStageChange?.('generating');
-        // console.log(`[useQuickCreateAudioGeneration] Creating audio with config: `, {
-        //   voiceId: entry.metadata.voiceId,
-        //   modelId: entry.metadata.model,
-        //   text: script,
-        //   languageCode: entry.metadata.language,
-        //   useMock,
-        // });
         const generated = await generateQuickCreateAudioAndTiming({
           text: script,
           voiceId: entry.metadata.voiceId,

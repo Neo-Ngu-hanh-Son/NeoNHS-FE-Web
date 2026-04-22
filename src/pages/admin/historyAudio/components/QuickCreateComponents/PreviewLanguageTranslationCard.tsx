@@ -137,15 +137,6 @@ export default function ManageQuickCreateHistoryAudiosCard({
     message.success(`Đã gỡ ${currentEntry.metadata.language.toUpperCase()} khỏi danh sách biên tập`);
   };
 
-  const handleProceed = async () => {
-    const isValid = await form.trigger('entries');
-    if (!isValid) {
-      message.warning('Vui lòng kiểm tra lại thông tin bản dịch trước khi tiếp tục');
-      return;
-    }
-    onProceed?.(form.getValues());
-  };
-
   return (
     <Card className="w-full mt-6">
       <CardHeader className="border-b bg-muted/20">
