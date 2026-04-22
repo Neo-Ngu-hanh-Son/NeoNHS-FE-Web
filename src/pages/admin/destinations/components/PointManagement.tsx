@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Pin, Upload, MapPin, Edit, Trash2, ChevronLeft, ChevronRight, Search, RefreshCcw } from 'lucide-react';
+import { Plus, Pin, MapPin, Edit, Trash2, ChevronLeft, ChevronRight, Search, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -18,7 +18,6 @@ interface PointManagementProps {
   onDeletePoint: (id: string, isSoftDeleted?: boolean) => void;
   onRestorePoint: (id: string) => void;
   onFocus: (lat: number, lng: number) => void;
-  onImportPoints: (file: File) => void;
   pagination: {
     currentPage: number;
     pageSize: number;
@@ -41,7 +40,6 @@ export function PointManagement({
   onDeletePoint,
   onRestorePoint,
   onFocus,
-  onImportPoints,
   pagination,
   searchText,
   onSearchChange,
@@ -79,20 +77,7 @@ export function PointManagement({
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <label className="flex cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-muted/60">
-                <Upload className="h-4 w-4 text-primary" />
-                <span>Nhập Excel</span>
-                <input
-                  type="file"
-                  accept=".xlsx,.xls"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) onImportPoints(file);
-                    e.target.value = '';
-                  }}
-                />
-              </label>
+
               <Button type="button" className="font-medium transition-colors" onClick={onAddPoint}>
                 <Plus className="mr-2 h-4 w-4" />
                 Thêm điểm
