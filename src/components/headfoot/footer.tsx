@@ -51,7 +51,7 @@ const Footer: FunctionComponent = () => {
           {/* Brand Section — wider */}
           <div className="lg:col-span-2 space-y-6">
             <Link to="/" className="flex items-center gap-3 group">
-              <img src="/src/assets/images/NeoNHSLogo_Optimized.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
+            <img src="https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776956348/NeoNHSLogo_Optimized_m2ieop.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
               <span className="text-xl font-bold tracking-tight text-white">NeoNHS</span>
             </Link>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs">
