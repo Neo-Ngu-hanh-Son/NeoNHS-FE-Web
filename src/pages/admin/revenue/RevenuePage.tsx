@@ -130,7 +130,7 @@ const RevenuePage = () => {
             dataIndex: 'id',
             key: 'id',
             render: (text: string) => (
-                <span className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground">#{text}</span>
+                <span className="rounded-md bg-muted px-2 py-1 font-mono text-[11px] text-muted-foreground">{text}</span>
             ),
         },
         {
@@ -146,12 +146,34 @@ const RevenuePage = () => {
             render: (text: string) => <span className="text-xs text-muted-foreground">{text}</span>,
         },
         {
-            title: 'Số tiền',
+            title: 'Doanh thu gộp',
             dataIndex: 'gross',
             key: 'gross',
             align: 'right',
             render: (value: number) => (
                 <span className="font-semibold tabular-nums text-slate-900 dark:text-slate-100">{formatVND(value)}</span>
+            ),
+        },
+        {
+            title: 'Hoa hồng',
+            dataIndex: 'fee',
+            key: 'fee',
+            align: 'right',
+            render: (value: number) => (
+                <span className="font-medium tabular-nums text-amber-600 dark:text-amber-400">
+                    {value > 0 ? `+${formatVND(value)}` : formatVND(value)}
+                </span>
+            ),
+        },
+        {
+            title: 'Thực nhận',
+            dataIndex: 'net',
+            key: 'net',
+            align: 'right',
+            render: (value: number) => (
+                <span className="font-medium tabular-nums text-emerald-600 dark:text-emerald-400">
+                    {formatVND(value)}
+                </span>
             ),
         },
         {
@@ -260,9 +282,9 @@ const RevenuePage = () => {
                                 trend={
                                     data.summary.revenueGrowth !== undefined
                                         ? {
-                                              value: Math.abs(data.summary.revenueGrowth),
-                                              isPositive: data.summary.revenueGrowth >= 0,
-                                          }
+                                            value: Math.abs(data.summary.revenueGrowth),
+                                            isPositive: data.summary.revenueGrowth >= 0,
+                                        }
                                         : undefined
                                 }
                             />
@@ -277,9 +299,9 @@ const RevenuePage = () => {
                                 trend={
                                     data.summary.netRevenueGrowth !== undefined
                                         ? {
-                                              value: Math.abs(data.summary.netRevenueGrowth),
-                                              isPositive: data.summary.netRevenueGrowth >= 0,
-                                          }
+                                            value: Math.abs(data.summary.netRevenueGrowth),
+                                            isPositive: data.summary.netRevenueGrowth >= 0,
+                                        }
                                         : undefined
                                 }
                             />
@@ -302,9 +324,9 @@ const RevenuePage = () => {
                                 trend={
                                     data.summary.avgOrderValueGrowth !== undefined
                                         ? {
-                                              value: Math.abs(data.summary.avgOrderValueGrowth),
-                                              isPositive: data.summary.avgOrderValueGrowth >= 0,
-                                          }
+                                            value: Math.abs(data.summary.avgOrderValueGrowth),
+                                            isPositive: data.summary.avgOrderValueGrowth >= 0,
+                                        }
                                         : undefined
                                 }
                             />
