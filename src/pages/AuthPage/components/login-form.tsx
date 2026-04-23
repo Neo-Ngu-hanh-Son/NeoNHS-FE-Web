@@ -15,10 +15,13 @@ import { Link } from "react-router-dom";
 import { LoginCredentials } from "@/services/api/authService";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthLocale } from "../i18n/AuthLocaleContext";
+import { authErrorDesc } from "../i18n/authApiErrorDescription";
 
 export function LoginForm({ className, ...props }: React.ComponentProps<"form">) {
   // Navigation is now handled by the parent LoginPage
   const { login, loginGoogle } = useAuth();
+  const { t } = useAuthLocale();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,8 +52,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       // Show success notification
       api.success({
-        message: "Login Successful",
-        description: "Welcome back! You have logged in successfully.",
+        message: t("login.successTitle"),
+        description: t("login.successDesc"),
         placement: "topRight",
         duration: 3,
       });
@@ -59,16 +62,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       // The redirection is now handled by the parent LoginPage
       // via AuthContext's isAuthenticated state for better consistency.
-    } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        "Login failed. Please check your credentials.";
+    } catch (err: unknown) {
+      const errorMessage = authErrorDesc(err, t, "login.failDefault");
       setError(errorMessage);
 
       // Show error notification
       api.error({
-        message: "Login Failed",
+        message: t("login.failTitle"),
         description: errorMessage,
         placement: "topRight",
         duration: 4,
@@ -84,7 +84,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
     const idToken = credentialResponse.credential;
 
     if (!idToken) {
-      const errorMessage = "Cannot retrieve Google ID Token.";
+      const errorMessage = t("login.googleNoToken");
       setError(errorMessage);
       return;
     }
@@ -100,22 +100,21 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
       // Show success notification
       api.success({
-        message: "Login Successful",
-        description: "Welcome! You have logged in with Google successfully.",
+        message: t("login.googleSuccessTitle"),
+        description: t("login.googleSuccessDesc"),
         placement: "topRight",
         duration: 3,
       });
 
       // Redirection handled by LoginPage via AuthContext
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Backend Google Login Error:", err);
-      const errorMessage =
-        err.response?.data?.message || err.message || "Google login failed on server.";
+      const errorMessage = authErrorDesc(err, t, "login.googleServerFail");
       setError(errorMessage);
 
       // Show error notification
       api.error({
-        message: "Google Login Failed",
+        message: t("login.googleFailTitle"),
         description: errorMessage,
         placement: "topRight",
         duration: 4,
@@ -126,12 +125,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
   };
 
   const handleGoogleError = () => {
-    const errorMessage = "Google Login failed connection.";
+    const errorMessage = t("login.googleConnectionFail");
     setError(errorMessage);
 
     // Show error notification
     api.error({
-      message: "Google Login Failed",
+      message: t("login.googleFailTitle"),
       description: errorMessage,
       placement: "topRight",
       duration: 4,
@@ -147,9 +146,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
             <UserOutlined className="text-2xl text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t("login.title")}</h1>
           <p className="text-gray-500">
-            Sign in to explore <span className="text-emerald-600 font-semibold">Ngu Hanh Son</span>
+            {t("login.subtitle")}{" "}
+            <span className="text-emerald-600 font-semibold">{t("common.nguHanhSon")}</span>
           </p>
         </div>
 
@@ -173,12 +173,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                 className="text-sm font-medium text-gray-700 flex items-center gap-2"
               >
                 <MailOutlined className="text-gray-400" />
-                Email Address
+                {t("login.email")}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t("login.emailPlaceholder")}
                 required
                 value={formData.email}
                 onChange={handleInputChange}
@@ -195,13 +195,13 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                   className="text-sm font-medium text-gray-700 flex items-center gap-2"
                 >
                   <LockOutlined className="text-gray-400" />
-                  Password
+                  {t("login.password")}
                 </label>
                 <Link
                   to="/forgot-password"
                   className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
                 >
-                  Forgot password?
+                  {t("login.forgotPassword")}
                 </Link>
               </div>
               <div className="relative">
@@ -209,7 +209,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                   id="password"
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="Enter your password"
+                  placeholder={t("login.passwordPlaceholder")}
                   value={formData.password}
                   onChange={handleInputChange}
                   disabled={isLoading}
@@ -240,10 +240,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <LoadingOutlined className="animate-spin" />
-                    Signing in...
+                    {t("login.signingIn")}
                   </span>
                 ) : (
-                  "Sign In"
+                  t("login.signIn")
                 )}
               </Button>
             </div>
@@ -255,7 +255,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or continue with</span>
+              <span className="px-4 bg-white text-gray-500">{t("login.orContinue")}</span>
             </div>
           </div>
 
@@ -274,12 +274,12 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
 
           {/* Sign Up Link */}
           <p className="mt-8 text-center text-gray-600">
-            Don&apos;t have an account?{" "}
+            {t("login.noAccount")}{" "}
             <Link
               to="/register"
               className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
             >
-              Create account
+              {t("login.createAccount")}
             </Link>
           </p>
         </form>

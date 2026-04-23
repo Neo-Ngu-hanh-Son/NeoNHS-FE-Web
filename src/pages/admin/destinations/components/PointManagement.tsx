@@ -204,6 +204,11 @@ export function PointManagement({
                               >
                                 {p.name}
                               </span>
+                              {p.address && (
+                                <span className="line-clamp-1 text-[11px] text-muted-foreground" title={p.address}>
+                                  {p.address}
+                                </span>
+                              )}
                               {p.deletedAt && (
                                 <span className="text-[10px] font-semibold text-destructive uppercase tracking-wider">
                                   Đã xóa tạm thời

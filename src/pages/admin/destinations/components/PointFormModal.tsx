@@ -71,11 +71,14 @@ export function PointFormModal({
     description: '',
     latitude: 0,
     longitude: 0,
+    address: '',
     type: 'GENERAL' as PointType,
     orderIndex: 1,
     estTimeSpent: 30,
     thumbnailUrl: '',
     attractionId: '',
+    difficulty: 'MODERATE',
+    vibe: 'SPIRITUAL',
   });
   const [activeTab, setActiveTab] = useState<TabValue>('point');
 
@@ -100,6 +103,7 @@ export function PointFormModal({
         description: editingPoint.description,
         latitude: editingPoint.latitude,
         longitude: editingPoint.longitude,
+        address: editingPoint.address || '',
         type: editingPoint.type,
         orderIndex: editingPoint.orderIndex,
         estTimeSpent: editingPoint.estTimeSpent,
@@ -107,6 +111,8 @@ export function PointFormModal({
         attractionId:
           editingPoint.attractionId || (editingPoint as { attraction?: { id: string } }).attraction?.id || '',
         googlePlaceId: editingPoint.googlePlaceId || '',
+        difficulty: editingPoint.difficulty || 'MODERATE',
+        vibe: editingPoint.vibe || 'SPIRITUAL',
       });
     } else {
       setFormData({
@@ -114,11 +120,14 @@ export function PointFormModal({
         description: '',
         latitude: 0,
         longitude: 0,
+        address: '',
         type: 'GENERAL' as PointType,
         orderIndex: 1,
         estTimeSpent: 30,
         thumbnailUrl: '',
         attractionId: initialDestinationId || '',
+        difficulty: 'MODERATE',
+        vibe: 'SPIRITUAL',
       });
     }
   }, [editingPoint, open, initialDestinationId]);
@@ -191,33 +200,29 @@ export function PointFormModal({
 
           <TabsContent value="point" className={tabPanelClass}>
             <div
-              className={`mb-6 flex items-start gap-3 rounded-2xl border p-4 transition-colors ${
-                outOfBoundary
-                  ? 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30'
-                  : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40'
-              }`}
+              className={`mb-6 flex items-start gap-3 rounded-2xl border p-4 transition-colors ${outOfBoundary
+                ? 'border-red-200 bg-red-50 dark:border-red-900/50 dark:bg-red-950/30'
+                : 'border-slate-100 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40'
+                }`}
             >
               <div
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
-                  outOfBoundary
-                    ? 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
-                    : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
-                }`}
+                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${outOfBoundary
+                  ? 'bg-red-100 text-red-600 dark:bg-red-950/50 dark:text-red-400'
+                  : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400'
+                  }`}
               >
                 {outOfBoundary ? <AlertTriangle className="h-5 w-5" /> : <MapPin className="h-5 w-5" />}
               </div>
               <div className="min-w-0 flex-1">
                 <p
-                  className={`text-xs font-semibold uppercase tracking-wide ${
-                    outOfBoundary ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'
-                  }`}
+                  className={`text-xs font-semibold uppercase tracking-wide ${outOfBoundary ? 'text-red-600 dark:text-red-400' : 'text-slate-500 dark:text-slate-400'
+                    }`}
                 >
                   {outOfBoundary ? 'Cảnh báo ranh giới' : 'Tọa độ hiện tại'}
                 </p>
                 <p
-                  className={`mt-1 font-mono text-sm font-semibold ${
-                    outOfBoundary ? 'text-red-800 dark:text-red-200' : 'text-slate-800 dark:text-slate-100'
-                  }`}
+                  className={`mt-1 font-mono text-sm font-semibold ${outOfBoundary ? 'text-red-800 dark:text-red-200' : 'text-slate-800 dark:text-slate-100'
+                    }`}
                 >
                   {Number(formData.latitude || 0).toFixed(6)}, {Number(formData.longitude || 0).toFixed(6)}
                 </p>
@@ -278,8 +283,21 @@ export function PointFormModal({
                     </div>
 
                     <div className="space-y-2">
+                      <Label htmlFor="address" className="text-sm font-medium">
+                        Địa chỉ cụ thể
+                      </Label>
+                      <Input
+                        id="address"
+                        className="h-10"
+                        value={formData.address}
+                        onChange={(e) => handleChange('address', e.target.value)}
+                        placeholder="Ví dụ: 81 Huyền Trân Công Chúa, Ngũ Hành Sơn, Đà Nẵng"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
                       <Label htmlFor="description" className="text-sm font-medium">
-                        Mô tả / địa chỉ
+                        Mô tả chi tiết
                       </Label>
                       <Textarea
                         id="description"
@@ -324,6 +342,46 @@ export function PointFormModal({
                           value={formData.estTimeSpent ?? 30}
                           onChange={(e) => handleChange('estTimeSpent', parseInt(e.target.value, 10) || 0)}
                         />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="difficulty" className="text-sm font-medium">
+                          Độ khó tham quan
+                        </Label>
+                        <Select
+                          value={formData.difficulty || 'MODERATE'}
+                          onValueChange={(value) => handleChange('difficulty', value)}
+                        >
+                          <SelectTrigger id="difficulty" className="h-10 bg-background">
+                            <SelectValue placeholder="Chọn độ khó" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="EASY">Dễ (Easy)</SelectItem>
+                            <SelectItem value="MODERATE">Trung bình (Moderate)</SelectItem>
+                            <SelectItem value="HARD">Khó (Hard)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="vibe" className="text-sm font-medium">
+                          Không khí (Vibe)
+                        </Label>
+                        <Select
+                          value={formData.vibe || 'SPIRITUAL'}
+                          onValueChange={(value) => handleChange('vibe', value)}
+                        >
+                          <SelectTrigger id="vibe" className="h-10 bg-background">
+                            <SelectValue placeholder="Chọn không khí" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="SPIRITUAL">Tâm linh (Spiritual)</SelectItem>
+                            <SelectItem value="RELAXING">Thư giãn (Relaxing)</SelectItem>
+                            <SelectItem value="ENERGETIC">Sôi động (Energetic)</SelectItem>
+                            <SelectItem value="SCENIC">Cảnh nét (Scenic)</SelectItem>
+                            <SelectItem value="HISTORICAL">Lịch sử (Historical)</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </CardContent>

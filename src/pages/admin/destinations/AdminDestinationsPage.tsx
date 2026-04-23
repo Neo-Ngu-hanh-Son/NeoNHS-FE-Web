@@ -18,6 +18,7 @@ import { MapPin } from 'lucide-react';
 
 export default function AdminDestinationsPage() {
   const {
+    destinations,
     filteredDestinations,
     allPoints,
     pointsLoading,
@@ -89,7 +90,8 @@ export default function AdminDestinationsPage() {
             latitude: pickerCoord[0],
             longitude: pickerCoord[1],
             name: geocodedData.name || prev?.name || '',
-            description: geocodedData.address || prev?.description || '',
+            address: geocodedData.address || prev?.address || '',
+            description: prev?.description || '',
             googlePlaceId: geocodedData.googlePlaceId || prev?.googlePlaceId || '',
             thumbnailUrl: geocodedData.photoUrl || prev?.thumbnailUrl || '',
           }) as any,
@@ -204,7 +206,7 @@ export default function AdminDestinationsPage() {
         open={isPointModalVisible}
         onOpenChange={setIsPointModalVisible}
         editingPoint={editingPoint}
-        destinations={filteredDestinations}
+        destinations={destinations}
         initialDestinationId={currentPointDestination?.id}
         onSave={handleSavePoint}
         onOpenMapPicker={() => {
