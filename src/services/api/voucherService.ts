@@ -129,11 +129,11 @@ export const vendorVoucherService = {
     },
 
     create: async (data: CreateVoucherRequest): Promise<ApiResponse<VoucherResponse>> => {
-        return apiClient.post<ApiResponse<VoucherResponse>>('/vendor/vouchers/create', data);
+        return apiClient.post<ApiResponse<VoucherResponse>>('/vendor/vouchers', data);
     },
 
     update: async (id: string, data: UpdateVoucherRequest): Promise<ApiResponse<VoucherResponse>> => {
-        return apiClient.put<ApiResponse<VoucherResponse>>(`/vendor/vouchers/update/${id}`, data);
+        return apiClient.put<ApiResponse<VoucherResponse>>(`/vendor/vouchers/${id}`, data);
     },
 
     delete: async (id: string): Promise<ApiResponse<void>> => {

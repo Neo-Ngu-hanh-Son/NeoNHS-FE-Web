@@ -52,7 +52,6 @@ export default function AdminDestinationsPage() {
     handleDeletePoint,
     handleHardDeletePoint,
     handleRestorePoint,
-    handleImportPoints,
     handleSelectDiscovery,
     isSaving,
   } = useAdminDestinations();
@@ -185,7 +184,6 @@ export default function AdminDestinationsPage() {
               onDeletePoint={(id, isSoftDeleted) => setDeleteTarget({ id, type: 'point', isSoftDeleted })}
               onRestorePoint={handleRestorePoint}
               onFocus={handleFocusWithScroll}
-              onImportPoints={handleImportPoints}
               pagination={{
                 currentPage,
                 pageSize,

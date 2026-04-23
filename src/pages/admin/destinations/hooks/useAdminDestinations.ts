@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { message } from 'antd';
-import * as XLSX from 'xlsx';
 import { attractionService } from '@/services/api/attractionService';
 import { adminPointService } from '@/services/api/pointService';
 import { uploadImageToBackend, uploadVideoToBackend } from '@/utils/cloudinary';
@@ -146,11 +145,7 @@ export function useAdminDestinations() {
   };
 
   const handleSavePoint = async (values: PointRequest) => {
-    setPointsLoading(true);
     setIsSaving(true);
-    console.log('--- ATTEMPTING TO SAVE POINT ---');
-    console.log('Payload:', values);
-
     try {
       const sanitizedValues = {
         ...values,
@@ -160,15 +155,10 @@ export function useAdminDestinations() {
 
       let response;
       if (editingPoint && editingPoint.id) {
-        console.log('Action: Update - ID:', editingPoint.id);
         response = await adminPointService.updatePoint(editingPoint.id, sanitizedValues);
       } else {
-        console.log('Action: Create');
         response = await adminPointService.createPoint(sanitizedValues);
       }
-
-      console.log('Response Status:', response.success);
-      console.log('Full Response Data:', response);
 
       if (response.success) {
         message.success(editingPoint ? 'Point updated successfully' : 'Point added successfully');
@@ -176,7 +166,6 @@ export function useAdminDestinations() {
         setIsPointModalVisible(false);
         setPreviewPos(null);
       } else {
-        // This shouldn't normally happen if errors are caught, but just in case
         message.error('Save failed: ' + (response.message || 'Unknown server error'));
       }
     } catch (error: any) {
@@ -193,7 +182,6 @@ export function useAdminDestinations() {
         message.error('Failed to save point: ' + errorMsg);
       }
     } finally {
-      console.log('--- SAVE OPERATION COMPLETE ---');
       setPointsLoading(false);
       setIsSaving(false);
     }
@@ -223,60 +211,16 @@ export function useAdminDestinations() {
     }
   };
 
-  const handleImportPoints = async (file: File) => {
-    if (!currentPointDestination) {
-      message.warning('Please select a destination to import points into.');
-      return;
-    }
-    setPointsLoading(true);
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const data = new Uint8Array(e.target?.result as ArrayBuffer);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-        let successCount = 0;
-        let failCount = 0;
-
-        for (const row of jsonData as any[]) {
-          try {
-            const pointData: PointRequest = {
-              name: row.name || row.Name,
-              description: row.description || row.Description,
-              // history: row.history || row.History || '',
-              latitude: Number(Number(row.latitude || row.Latitude).toFixed(6)),
-              longitude: Number(Number(row.longitude || row.Longitude).toFixed(6)),
-              orderIndex: Number(row.orderIndex || row.OrderIndex || row.order || 1),
-              estTimeSpent: Number(row.estTimeSpent || row.EstTimeSpent || 30),
-              type: row.type || row.Type || 'GENERAL',
-              attractionId: currentPointDestination.id,
-            };
-
-            if (!pointData.name || isNaN(pointData.latitude) || isNaN(pointData.longitude)) {
-              failCount++;
-              continue;
-            }
-
-            const response = await adminPointService.createPoint(pointData);
-            if (response.success) successCount++;
-            else failCount++;
-          } catch {
-            failCount++;
-          }
-        }
-
-        message.success(`Import completed: ${successCount} successful, ${failCount} failed.`);
+  const handleHardDeletePoint = async (pointId: string) => {
+    try {
+      const response = await adminPointService.hardDeletePoint(pointId);
+      if (response.success) {
+        message.success('Point permanently deleted');
         fetchPoints();
-      } catch (error) {
-        message.error('Failed to parse Excel file.');
-      } finally {
-        setPointsLoading(false);
       }
-    };
-    reader.readAsArrayBuffer(file);
+    } catch (error: any) {
+      message.error('Failed to permanently delete point: ' + error.message);
+    }
   };
 
   const filteredDestinations = useMemo(
@@ -360,7 +304,7 @@ export function useAdminDestinations() {
     handleSavePoint,
     handleDeletePoint,
     handleRestorePoint,
-    handleImportPoints,
+    handleHardDeletePoint,
     handleSelectDiscovery,
   };
 }
