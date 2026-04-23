@@ -53,9 +53,9 @@ const values = [
 
 const teamMembers = [
   {
-    name: 'Châu Thành Đạt',
-    role: 'Trưởng nhóm',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+    name: 'Nguyễn Quang Huy',
+    role: 'Thành viên',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776956670/huynguyen_uvs8fx.webp',
   },
   {
     name: 'Phạm Minh Kiệt',
@@ -63,19 +63,19 @@ const teamMembers = [
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',
   },
   {
-    name: 'Nguyễn Quang Huy',
-    role: 'Thành viên',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&q=80',
-  },
-  {
-    name: 'Đoàn Trần Quang Huy',
-    role: 'Thành viên',
-    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&q=80',
+    name: 'Châu Thành Đạt',
+    role: 'Trưởng nhóm',
+    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
   },
   {
     name: 'Lê Nhật Trường',
     role: 'Thành viên',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776873896/me_cmrd2e.jpg',
+  },
+  {
+    name: 'Đoàn Trần Quang Huy',
+    role: 'Thành viên',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776955886/huydoan_fwfhmt.webp',
   },
 ];
 
@@ -199,7 +199,7 @@ export function AboutUs() {
             </motion.div>
             <motion.div variants={fadeUp} className="order-1 lg:order-2 relative">
               <img
-                src="https://images.unsplash.com/photo-1552353617-3bfd679b3bdd?w=800&q=80"
+                src="https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755614/dong-huyen-khong-da-nang-lac-vao-chon-bong-lai-tien-canh-giua-nui-ngu-hanh-son-01-1636292911_ccwxej.webp"
                 alt="Sứ mệnh NeoNHS"
                 className="w-full h-[480px] object-cover rounded-[2.5rem] shadow-xl"
               />
