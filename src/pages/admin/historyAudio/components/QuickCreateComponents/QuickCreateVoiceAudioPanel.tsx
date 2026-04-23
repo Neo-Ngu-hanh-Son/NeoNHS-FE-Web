@@ -123,7 +123,7 @@ export default function QuickCreateVoiceAudioPanel({
               ) : isUploaded ? (
                 <CheckCircle2 className="h-5 w-5" />
               ) : isUploading ? (
-                <Upload className="h-5 w-5 animate-spin" />
+                <Upload className="h-5 w-5" />
               ) : (
                 <Sparkles className="h-5 w-5" />
               )}

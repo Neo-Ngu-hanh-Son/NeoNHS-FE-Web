@@ -85,8 +85,10 @@ export default function QuickCreateComponent({ pointId, onSubmittedAll }: Props)
     setIsTranslating(true);
     try {
       const translations = await AITranslationService.translate(requestData);
+      console.log('Translation resposne: ', translations)
       const entries = formData.languageSelections.map((selection, index) => {
-        const translated = translations[index] ?? translations.find((item) => item.language === selection.language);
+        const translated = translations.find((item) => item.language === selection.language);
+        console.log('Current selection language: ', selection.language, ' Translated language ', translated?.language)
         const voice = ELEVEN_LABS_VOICES.find((item) => item.id === selection.voiceId);
         const model =
           ELEVEN_LABS_VOICES.find((item) => item.id === selection.voiceId)?.model || 'eleven_multilingual_v2';
