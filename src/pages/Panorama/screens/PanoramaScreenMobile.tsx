@@ -12,7 +12,7 @@ import { panoramaService } from '@/services/api/panoramaService';
 import type { PointPanoramaResponse, PanoramaHotSpotResponse } from '@/types';
 import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButton';
 import { PointResponse } from '@/types/point';
-import adminPointService from '@/services/api/pointService';
+import adminPointService, { pointService } from '@/services/api/pointService';
 import { PanoramaHelper } from '@/utils/PanoramaHelper';
 import ErrorModal from '../components/ErrorModal';
 
@@ -97,7 +97,7 @@ export default function PanoramaScreenMobile() {
         if (!firstVisitRef.current) {
           setIsLoading(true);
         }
-        const response = await adminPointService.getPointById(placeId);
+        const response = await pointService.getPointById(placeId);
         if (cancelled) return;
         setCurrentPlace(response.data);
 
