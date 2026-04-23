@@ -63,12 +63,12 @@ export const VOUCHER_SCOPE_OPTIONS: { value: VoucherScope; label: string }[] = [
 
 export const discountTypeLabels: Record<DiscountType, string> = {
     PERCENT: 'Phần trăm',
-    FIXED_AMOUNT: 'Số tiền cố định',
+    FIXED: 'Số tiền cố định',
 };
 
 export const DISCOUNT_TYPE_OPTIONS: { value: DiscountType; label: string }[] = [
     { value: 'PERCENT', label: 'Phần trăm (%)' },
-    { value: 'FIXED_AMOUNT', label: 'Số tiền cố định (₫)' },
+    { value: 'FIXED', label: 'Số tiền cố định (₫)' },
 ];
 
 // --- Applicable Product ---

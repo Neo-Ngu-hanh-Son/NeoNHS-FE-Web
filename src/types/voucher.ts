@@ -7,7 +7,7 @@
 export type VoucherType = 'DISCOUNT' | 'GIFT_PRODUCT';
 export type VoucherScope = 'PLATFORM' | 'VENDOR';
 export type VoucherStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
-export type DiscountType = 'PERCENT' | 'FIXED_AMOUNT';
+export type DiscountType = 'PERCENT' | 'FIXED';
 export type ApplicableProduct = 'ALL' | 'TICKET' | 'WORKSHOP' | 'EVENT_TICKET';
 
 // --- Response Types ---
@@ -45,6 +45,7 @@ export interface VoucherResponse {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    pointCost: number;
 }
 
 export interface UserVoucherResponse {
@@ -69,6 +70,7 @@ export interface UserVoucherResponse {
     status: VoucherStatus;
     vendorId: string | null;
     vendorName: string | null;
+    pointCost: number;
 }
 
 // --- Request Types ---
@@ -93,6 +95,7 @@ export interface CreateVoucherRequest {
     startDate?: string;
     endDate?: string;
     usageLimit?: number;
+    pointCost?: number;
 }
 
 export interface UpdateVoucherRequest {
@@ -108,6 +111,7 @@ export interface UpdateVoucherRequest {
     endDate?: string;
     usageLimit?: number;
     status?: VoucherStatus;
+    pointCost?: number;
 }
 
 // --- Pagination ---
