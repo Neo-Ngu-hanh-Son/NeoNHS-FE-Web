@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { LockOutlined, EyeInvisibleOutlined, EyeOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuthLocale } from "../i18n/AuthLocaleContext";
 
 interface SetPasswordFormProps extends Omit<React.ComponentProps<"form">, "onSubmit"> {
     onSubmit: (password: string) => void;
@@ -20,6 +21,7 @@ export function SetPasswordForm({
     token,
     ...props
 }: SetPasswordFormProps) {
+    const { t } = useAuthLocale();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -28,9 +30,9 @@ export function SetPasswordForm({
     const [validationError, setValidationError] = useState("");
 
     const validatePassword = (pass: string) => {
-        if (pass.length < 8) return "Password must be at least 8 characters.";
-        if (!/[A-Za-z]/.test(pass)) return "Password must contain at least one letter.";
-        if (!/\d/.test(pass)) return "Password must contain at least one number.";
+        if (pass.length < 8) return t('setPwd.errMin');
+        if (!/[A-Za-z]/.test(pass)) return t('setPwd.errLetter');
+        if (!/\d/.test(pass)) return t('setPwd.errNumber');
         return null;
     };
 
@@ -46,7 +48,7 @@ export function SetPasswordForm({
         }
 
         if (password !== confirmPassword) {
-            setValidationError("Passwords do not match.");
+            setValidationError(t('setPwd.errMismatch'));
             return;
         }
 
@@ -60,9 +62,10 @@ export function SetPasswordForm({
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 shadow-lg">
                     <LockOutlined className="text-2xl text-white" />
                 </div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Setup Your Password</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('setPwd.title')}</h1>
                 <p className="text-gray-500">
-                    Create a strong password to secure your <span className="text-indigo-600 font-semibold">Vendor Account</span>
+                    {t('setPwd.subtitle')}{' '}
+                    <span className="text-indigo-600 font-semibold">{t('common.vendorAccount')}</span>
                 </p>
             </div>
 
@@ -81,7 +84,7 @@ export function SetPasswordForm({
                     <div className="w-5 h-5 rounded-full bg-yellow-100 flex items-center justify-center shrink-0 mt-0.5">
                         <span className="text-yellow-600 text-xs font-bold">!</span>
                     </div>
-                    <p className="text-sm text-yellow-700">Invalid setup link. Token is missing.</p>
+                    <p className="text-sm text-yellow-700">{t('setPwd.invalidLink')}</p>
                 </div>
             )}
 
@@ -98,7 +101,7 @@ export function SetPasswordForm({
                             <Input
                                 type={showPassword ? "text" : "password"}
                                 required
-                                placeholder="Enter new password"
+                                placeholder={t('setPwd.newPasswordPh')}
                                 value={password}
                                 onChange={(e) => {
                                     setPassword(e.target.value);
@@ -117,7 +120,7 @@ export function SetPasswordForm({
                             </button>
                         </div>
                         <p className="text-xs text-gray-500 mt-1 pl-1">
-                            Minimum 8 characters, at least 1 letter and 1 number.
+                            {t('setPwd.hint')}
                         </p>
                     </div>
 
@@ -131,7 +134,7 @@ export function SetPasswordForm({
                             <Input
                                 type={showConfirmPassword ? "text" : "password"}
                                 required
-                                placeholder="Confirm new password"
+                                placeholder={t('setPwd.confirmPasswordPh')}
                                 value={confirmPassword}
                                 onChange={(e) => {
                                     setConfirmPassword(e.target.value);
@@ -161,10 +164,10 @@ export function SetPasswordForm({
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <LoadingOutlined className="animate-spin" />
-                                    Setting Password...
+                                    {t('setPwd.saving')}
                                 </span>
                             ) : (
-                                "Save Password"
+                                t('setPwd.save')
                             )}
                         </Button>
                     </div>
@@ -172,9 +175,9 @@ export function SetPasswordForm({
 
                 {/* Back to Login Link */}
                 <p className="mt-8 text-center text-gray-600">
-                    Remembered your password?{" "}
+                    {t('setPwd.remembered')}{' '}
                     <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
-                        Sign in
+                        {t('setPwd.signIn')}
                     </Link>
                 </p>
             </form>

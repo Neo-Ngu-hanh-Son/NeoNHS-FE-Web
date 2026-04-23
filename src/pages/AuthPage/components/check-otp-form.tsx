@@ -22,6 +22,8 @@ import { useState, useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { notification } from "antd"
 import { authService } from "@/services/api/authService"
+import { useAuthLocale } from "../i18n/AuthLocaleContext"
+import { authErrorDesc } from "../i18n/authApiErrorDescription"
 
 type OTPFlow = "register" | "forgot-password"
 
@@ -39,6 +41,7 @@ interface LocationState {
 export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div">) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useAuthLocale()
   const state = location.state as LocationState | null
 
   const [otp, setOtp] = useState("")
@@ -75,8 +78,8 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
     e.preventDefault()
     if (otp.length !== 6) {
       api.error({
-        title: 'Invalid OTP',
-        description: "Please enter a 6-digit verification code.",
+        title: t('otp.invalidTitle'),
+        description: t('otp.invalidDesc'),
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
         duration: 3,
@@ -90,8 +93,8 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
         // Verify OTP for forgot password flow
         await authService.verifyOTP(email, otp)
         api.success({
-          title: 'OTP Verified!',
-          description: 'Your OTP has been successfully verified.',
+          title: t('otp.verifiedTitle'),
+          description: t('otp.verifiedDesc'),
           icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
           placement: 'topRight',
           duration: 3,
@@ -102,8 +105,8 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
         // For register flow - verify and complete registration
         await authService.verifyRegistrationOTP(email, otp)
         api.success({
-          title: 'Registration Successful!',
-          description: 'Your account has been created. Redirecting to login...',
+          title: t('otp.registerOkTitle'),
+          description: t('otp.registerOkDesc'),
           icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
           placement: 'topRight',
           duration: 3,
@@ -114,8 +117,8 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
       }
     } catch (err: any) {
       api.error({
-        title: 'Failed to Verify OTP',
-        description: err.response?.data?.message || "Invalid OTP, please try again.",
+        title: t('otp.verifyFailTitle'),
+        description: err.response?.data?.message || t('otp.verifyFailDefault'),
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
         duration: 3,
@@ -136,16 +139,16 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
       setCountDown(60)
       setIsCounting(true)
       api.success({
-        title: 'OTP Resent!',
-        description: 'A new verification code has been sent to your email.',
+        title: t('otp.resentTitle'),
+        description: t('otp.resentDesc'),
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
         duration: 3,
       })
-    } catch (err: any) {
+    } catch (err: unknown) {
       api.error({
-        title: 'Failed to Resend OTP',
-        description: err.response?.data?.message || "Failed to resend OTP, please try again.",
+        title: t('otp.resendFailTitle'),
+        description: authErrorDesc(err, t, 'otp.resendFailDefault'),
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
         duration: 3,
@@ -164,13 +167,11 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
   }
 
   const getTitle = () => {
-    return flow === "register" ? "Verify Your Email" : "Enter Verification Code"
+    return flow === "register" ? t('otp.titleRegister') : t('otp.titleForgot')
   }
 
   const getDescription = () => {
-    return flow === "register"
-      ? "We've sent a verification code to complete your registration."
-      : "We sent a 6-digit code to reset your password."
+    return flow === "register" ? t('otp.descRegister') : t('otp.descForgot')
   }
 
   return (
@@ -188,7 +189,8 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
                 {getDescription()}
               </p>
               <p className="text-sm mt-2">
-                Code sent to <span className="font-medium text-emerald-600">{email}</span>
+                {t('otp.codeSentTo')}{' '}
+                <span className="font-medium text-emerald-600">{email}</span>
               </p>
             </div>
 
@@ -219,7 +221,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
                 </InputOTPGroup>
               </InputOTP>
               <FieldDescription className="text-center mt-3">
-                Enter the 6-digit code sent to your email.
+                {t('otp.hint')}
               </FieldDescription>
             </Field>
 
@@ -228,14 +230,18 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
               className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
               disabled={loading}
             >
-              {loading ? "Verifying..." : "Verify"}
+              {loading ? t('otp.verifying') : t('otp.verify')}
             </Button>
 
             <FieldDescription className="text-center">
-              Didn&apos;t receive the code?{" "}
+              {t('otp.didntReceive')}{' '}
               {isCounting ? (
                 <span className="text-gray-400">
-                  Resend in <span className="font-semibold">{countDown}s</span>
+                  {t('otp.resendIn')}{' '}
+                  <span className="font-semibold">
+                    {countDown}
+                    {t('otp.secondsShort')}
+                  </span>
                 </span>
               ) : (
                 <button
@@ -244,7 +250,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
                   className="underline underline-offset-4 hover:text-foreground text-emerald-600"
                   disabled={loading}
                 >
-                  Resend
+                  {t('otp.resend')}
                 </button>
               )}
             </FieldDescription>
@@ -256,7 +262,7 @@ export function CheckOTPForm({ className, ...props }: React.ComponentProps<"div"
               disabled={loading}
             >
               <ArrowLeftOutlined />
-              {flow === "register" ? "Back to Register" : "Change email"}
+              {flow === "register" ? t('otp.backRegister') : t('otp.changeEmail')}
             </button>
           </FieldGroup>
         </form>
