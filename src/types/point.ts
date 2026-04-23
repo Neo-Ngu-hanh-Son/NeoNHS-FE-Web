@@ -23,11 +23,14 @@ export interface PointRequest {
     thumbnailUrl?: string;
     latitude: number;
     longitude: number;
+    address?: string;
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
-    googlePlaceId?: string
+    googlePlaceId?: string;
+    difficulty?: string;
+    vibe?: string;
 }
 
 export interface PointResponse {
@@ -37,11 +40,14 @@ export interface PointResponse {
     thumbnailUrl?: string;
     latitude: number;
     longitude: number;
+    address?: string;
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
     googlePlaceId?: string;
+    difficulty?: string;
+    vibe?: string;
     panoramaImageUrl?: string | null;
     defaultYaw?: number | null;
     defaultPitch?: number | null;

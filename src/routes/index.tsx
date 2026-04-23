@@ -47,11 +47,11 @@ import WorkshopTemplateEditPage from '@/pages/vendor/WorkshopTemplates/WorkshopT
 import WorkshopSessionsPage from '@/pages/vendor/WorkshopSessions/WorkshopSessionsPage';
 import WorkshopCalendarPage from '@/pages/vendor/WorkshopCalendar/CalendarPage.tsx';
 import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPage';
-import VendorVouchersPage from '@/pages/vendor/vouchers/index';
-import VendorVoucherCreatePage from '@/pages/vendor/vouchers/create';
-import VendorVoucherEditPage from '@/pages/vendor/vouchers/edit';
-import VendorVoucherDetailPage from '@/pages/vendor/vouchers/detail';
-import VendorDeletedVouchersPage from '@/pages/vendor/vouchers/DeletedVouchersPage';
+import VendorVouchersPage from '@/pages/vendor/Vouchers/index';
+import VendorVoucherCreatePage from '@/pages/vendor/Vouchers/create';
+import VendorVoucherEditPage from '@/pages/vendor/Vouchers/edit';
+import VendorVoucherDetailPage from '@/pages/vendor/Vouchers/detail';
+import VendorDeletedVouchersPage from '@/pages/vendor/Vouchers/DeletedVouchersPage';
 import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage';
 import ManageBlogPage from '@/pages/admin/blog/ManageBlogPage';
 import BlogCreationPage from '@/pages/admin/blog/BlogCreationPage';

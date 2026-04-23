@@ -56,6 +56,7 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [usageLimit, setUsageLimit] = useState<string>('');
+    const [pointCost, setPointCost] = useState<string>('0');
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -94,6 +95,10 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             e.usageLimit = 'Phải là số nguyên dương';
         }
 
+        if (pointCost && (Number(pointCost) < 0 || !Number.isInteger(Number(pointCost)))) {
+            e.pointCost = 'Phải là số nguyên không âm';
+        }
+
         setErrors(e);
         return Object.keys(e).length === 0;
     };
@@ -117,6 +122,7 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
             if (initialData.startDate) setStartDate(initialData.startDate.slice(0, 16));
             if (initialData.endDate) setEndDate(initialData.endDate.slice(0, 16));
             if (initialData.usageLimit != null) setUsageLimit(String(initialData.usageLimit));
+            if (initialData.pointCost != null) setPointCost(String(initialData.pointCost));
         }
     }, [initialData]);
 
@@ -131,6 +137,7 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                 startDate: startDate || undefined,
                 endDate: endDate || undefined,
                 usageLimit: usageLimit ? Number(usageLimit) : undefined,
+                pointCost: pointCost ? Number(pointCost) : 0,
             };
             // Add type-specific fields
             if (voucherType === 'DISCOUNT') {
@@ -152,6 +159,7 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                 startDate: startDate || undefined,
                 endDate: endDate || undefined,
                 usageLimit: usageLimit ? Number(usageLimit) : undefined,
+                pointCost: pointCost ? Number(pointCost) : 0,
             };
             if (voucherType === 'DISCOUNT') {
                 data.discountType = discountType;
@@ -245,6 +253,20 @@ export function VoucherForm({ mode, initialData, onSubmit, loading }: VoucherFor
                             maxLength={1000}
                         />
                         {errors.description && <p className="text-xs text-destructive mt-1">{errors.description}</p>}
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="pointCost">Chi phí điểm (Point Cost)</Label>
+                        <Input
+                            id="pointCost"
+                            type="number"
+                            value={pointCost}
+                            onChange={(e) => { setPointCost(e.target.value); if (errors.pointCost) setErrors(prev => ({ ...prev, pointCost: '' })); }}
+                            placeholder="Số điểm cần để đổi (0 nếu miễn phí)"
+                            min={0}
+                        />
+                        {errors.pointCost && <p className="text-xs text-destructive mt-1">{errors.pointCost}</p>}
+                        <p className="text-[10px] text-muted-foreground">User cần dùng số điểm này để đổi lấy voucher (0 = Miễn phí)</p>
                     </div>
                 </CardContent>
             </Card>

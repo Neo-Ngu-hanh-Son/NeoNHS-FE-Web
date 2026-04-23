@@ -17,14 +17,6 @@ import {
     applicableProductLabels, discountTypeLabels,
 } from '@/pages/admin/vouchers/constants';
 import { StatsCard } from '@/components/dashboard/StatsCard';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 function formatDateTime(dateStr: string | null | undefined) {
     if (!dateStr) return '—';

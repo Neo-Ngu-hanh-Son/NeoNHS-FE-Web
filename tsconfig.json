@@ -26,7 +26,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    /** Consistent casing in file names (blog != Blog) */
+    /** Consistent casing in file names (blog != Blog) (Vercel deploys using linux so we need to becareful) */
     "forceConsistentCasingInFileNames": true
   },
   "include": ["src"]
