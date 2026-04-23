@@ -24,6 +24,7 @@ export interface ChatRoom {
   id: string;
   name: string | null;
   participants: string[];
+  roomType?: 'STANDARD' | 'SYSTEM_SUPPORT' | 'VENDOR_CHAT';
   createdAt: string;
   lastMessageAt: string | null;
   lastMessagePreview: string | null;
@@ -90,7 +91,8 @@ export class ChatWebSocketService {
   private stompClient: Client | null = null;
   private token: string;
   private subscription: any | null = null;
-  private isConnected = false;
+  private typingSubscription: any | null = null;
+  public isConnected = false;
 
   constructor(token: string) {
     this.token = token;
@@ -148,7 +150,64 @@ export class ChatWebSocketService {
     }
   }
 
+  sendTypingStart(chatRoomId: string) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: '/app/chat.typing.start',
+        body: JSON.stringify({ chatRoomId })
+      });
+    }
+  }
+
+  sendTypingStop(chatRoomId: string) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: '/app/chat.typing.stop',
+        body: JSON.stringify({ chatRoomId })
+      });
+    }
+  }
+
+  subscribeToRoomTyping(
+    roomId: string,
+    onTyping: (data: { isTyping: boolean; senderId: string }) => void
+  ): () => void {
+    if (!this.stompClient || !this.stompClient.connected) return () => { };
+
+    if (this.typingSubscription) {
+      this.typingSubscription.unsubscribe();
+    }
+
+    this.typingSubscription = this.stompClient.subscribe(
+      `/topic/room/${roomId}/typing`,
+      (frame) => {
+        onTyping(JSON.parse(frame.body));
+      }
+    );
+
+    return () => {
+      if (this.typingSubscription) {
+        this.typingSubscription.unsubscribe();
+        this.typingSubscription = null;
+      }
+    };
+  }
+
+  sendReadReceipt(chatRoomId: string, lastReadMessageId: string) {
+    if (this.stompClient && this.stompClient.connected) {
+      this.stompClient.publish({
+        destination: '/app/chat.read',
+        body: JSON.stringify({ chatRoomId, lastReadMessageId })
+      });
+    }
+  }
+
   disconnect() {
+    if (this.typingSubscription) {
+      this.typingSubscription.unsubscribe();
+      this.typingSubscription = null;
+    }
+
     if (this.subscription) {
       this.subscription.unsubscribe();
       this.subscription = null;

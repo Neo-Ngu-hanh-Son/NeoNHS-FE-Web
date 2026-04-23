@@ -34,7 +34,7 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
 
       <TableCell>
         <span className="text-sm font-medium text-gray-600 line-clamp-2">
-          {tag.description || "No description provided."}
+          {tag.description || "Không có mô tả."}
         </span>
       </TableCell>
 
@@ -70,11 +70,11 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
             variant={isDeleted ? "secondary" : "default"}
             className={
               isDeleted
-                ? "bg-secondary text-muted-foreground hover:bg-secondary rounded-full"
-                : "bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full"
+                ? "bg-secondary text-muted-foreground hover:bg-secondary rounded-full whitespace-nowrap"
+                : "bg-primary/15 text-primary hover:bg-primary/15 border-primary/20 rounded-full whitespace-nowrap"
             }
           >
-            {isDeleted ? "Deleted" : "Active"}
+            {isDeleted ? "Đã xóa" : "Hoạt động"}
           </Badge>
         </TableCell>
       )}
@@ -94,7 +94,7 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
                     <Pencil className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Edit tag</TooltipContent>
+                <TooltipContent>Sửa nhãn</TooltipContent>
               </Tooltip>
             )}
 
@@ -110,7 +110,7 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
                     <RotateCcw className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Restore tag</TooltipContent>
+                <TooltipContent>Khôi phục nhãn</TooltipContent>
               </Tooltip>
             ) : (
               <Tooltip>
@@ -125,7 +125,7 @@ export function TagTableRowItem({ kind, tag, onEdit, onDelete, onRestore }: TagT
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {kind === "event" ? "Delete tag" : "Delete tag permanently"}
+                  {kind === "event" ? "Xóa nhãn" : "Xóa nhãn vĩnh viễn"}
                 </TooltipContent>
               </Tooltip>
             )}

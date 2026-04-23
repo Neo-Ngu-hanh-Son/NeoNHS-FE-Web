@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar as CalendarIcon, PlusCircle, Search, List, CalendarDays } from 'lucide-react'
+import { Calendar as CalendarIcon, PlusCircle, Plus, Search, List, CalendarDays, RefreshCcw, Loader2 } from 'lucide-react'
 import { notification } from 'antd'
 import { WorkshopSessionResponse, SessionStatus } from './types'
 import { SessionCard } from './components/session-card'
@@ -12,15 +12,33 @@ import { EditSessionDialog } from './components/edit-session-dialog'
 import { ViewSessionDialog } from './components/view-session-dialog'
 import { SessionCalendar } from './components/calendar'
 import { formatDate, parseSessionInstant } from './utils/formatters'
+import {
+  applySessionFilters,
+  distinctVietnamDateKeysNewestFirst,
+  sessionsVisibleForDaySlice,
+} from './utils/sessionListLazy'
+import {
+  canCompleteWorkshopSession,
+  canStartWorkshopSession,
+  mapWorkshopSessionErrorToVi,
+} from './utils/workshopSessionRules'
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage'
 import { WorkshopSessionService } from '@/services/api/workshopSessionService'
+
+const PAGE_SIZE = 100
 
 export default function WorkshopSessionsPage() {
   const [sessions, setSessions] = useState<WorkshopSessionResponse[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [apiPage, setApiPage] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  /** Số ngày (có phiên) hiển thị: 7, 14, 21… — các ngày mới nhất trước */
+  const [visibleDayCount, setVisibleDayCount] = useState(7)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [view, setView] = useState<'list' | 'calendar'>('list')
-  
+
   const [createDialog, setCreateDialog] = useState(false)
   const [preselectedDate, setPreselectedDate] = useState<Date | undefined>()
   const [editDialog, setEditDialog] = useState<{ open: boolean; session: WorkshopSessionResponse | null }>({
@@ -38,62 +56,69 @@ export default function WorkshopSessionsPage() {
 
   // Fetch sessions on mount
   useEffect(() => {
-    fetchSessions()
+    void fetchSessions()
   }, [])
 
-  const fetchSessions = async () => {
+  /** Đổi bộ lọc → reset phần “lazy theo ngày” */
+  useEffect(() => {
+    setVisibleDayCount(7)
+  }, [searchQuery, statusFilter])
+
+  const fetchSessions = useCallback(async () => {
     try {
       setLoading(true)
       const response = await WorkshopSessionService.getMySessions({
         page: 0,
-        size: 100, // Get all for now
+        size: PAGE_SIZE,
         sortBy: 'startTime',
-        sortDirection: 'ASC',
+        sortDirection: 'DESC',
       })
       setSessions(response.content || [])
-    } catch (error: any) {
+      setApiPage(response.number ?? 0)
+      setTotalPages(response.totalPages ?? 1)
+      setVisibleDayCount(7)
+    } catch (error: unknown) {
       console.error('Failed to fetch sessions:', error)
       notification.error({
-        message: 'Failed to Load Sessions',
-        description: error.message || 'Unable to fetch workshop sessions. Please try again.',
+        message: 'Tải dữ liệu thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể tải danh sách phiên. Vui lòng thử lại.')),
       })
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  // Filter and sort sessions
-  const filteredSessions = useMemo(() => {
-    let filtered = sessions
+  /** Phiên sau khi lọc tìm kiếm + trạng thái (dùng cho lịch và thống kê) */
+  const baseFiltered = useMemo(
+    () => applySessionFilters(sessions, searchQuery, statusFilter),
+    [sessions, searchQuery, statusFilter],
+  )
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(s => 
-        s.workshopTemplate.name.toLowerCase().includes(query) ||
-        s.workshopTemplate.shortDescription.toLowerCase().includes(query)
-      )
-    }
+  /** Các ngày có phiên (mới nhất trước) */
+  const dateKeysNewestFirst = useMemo(
+    () => distinctVietnamDateKeysNewestFirst(baseFiltered),
+    [baseFiltered],
+  )
 
-    // Status filter
-    if (statusFilter && statusFilter !== 'all') {
-      filtered = filtered.filter(s => s.status === statusFilter)
-    }
+  /** Danh sách: chỉ các phiên thuộc N ngày đầu tiên trong dateKeysNewestFirst */
+  const sessionsForList = useMemo(
+    () => sessionsVisibleForDaySlice(baseFiltered, dateKeysNewestFirst, visibleDayCount),
+    [baseFiltered, dateKeysNewestFirst, visibleDayCount],
+  )
 
-    // Sort by start time (newest first)
-    filtered = [...filtered].sort(
-      (a, b) =>
-        parseSessionInstant(b.startTime).getTime() -
-        parseSessionInstant(a.startTime).getTime()
-    )
+  const sortedListSessions = useMemo(
+    () =>
+      [...sessionsForList].sort(
+        (a, b) =>
+          parseSessionInstant(b.startTime).getTime() - parseSessionInstant(a.startTime).getTime(),
+      ),
+    [sessionsForList],
+  )
 
-    return filtered
-  }, [sessions, searchQuery, statusFilter])
-
-  // Group sessions by date for list view
+  // Group sessions by date for list view (chỉ phần đang lazy-load)
   const groupedSessions = useMemo(() => {
     const groups: { [key: string]: WorkshopSessionResponse[] } = {}
-    filteredSessions.forEach(session => {
+    sortedListSessions.forEach((session) => {
       const dateKey = formatDate(session.startTime)
       if (!groups[dateKey]) {
         groups[dateKey] = []
@@ -101,7 +126,77 @@ export default function WorkshopSessionsPage() {
       groups[dateKey].push(session)
     })
     return groups
-  }, [filteredSessions])
+  }, [sortedListSessions])
+
+  /** Thứ tự nhóm ngày: mới nhất trước */
+  const orderedGroupEntries = useMemo(() => {
+    return Object.entries(groupedSessions).sort(([, sessionsA], [, sessionsB]) => {
+      const ta = parseSessionInstant(sessionsA[0].startTime).getTime()
+      const tb = parseSessionInstant(sessionsB[0].startTime).getTime()
+      return tb - ta
+    })
+  }, [groupedSessions])
+
+  const canLoadMoreDays =
+    visibleDayCount < dateKeysNewestFirst.length || apiPage < totalPages - 1
+
+  const handleLoadMoreDays = async () => {
+    const next = visibleDayCount + 7
+    if (next <= dateKeysNewestFirst.length) {
+      setVisibleDayCount(next)
+      return
+    }
+    /** Đã có thêm ngày trong bộ nhớ nhưng chưa “mở” hết (vd. xin 14 ngày mà chỉ có 10 ngày tổng) */
+    if (visibleDayCount < dateKeysNewestFirst.length) {
+      setVisibleDayCount(next)
+      return
+    }
+    if (apiPage >= totalPages - 1) {
+      notification.info({
+        message: 'Đã hiển thị đủ',
+        description: 'Không còn phiên hoặc ngày nào khác để tải thêm.',
+      })
+      return
+    }
+
+    setLoadingMore(true)
+    try {
+      let merged = [...sessions]
+      let p = apiPage
+      let tp = totalPages
+      let keys = distinctVietnamDateKeysNewestFirst(
+        applySessionFilters(merged, searchQuery, statusFilter),
+      )
+
+      while (keys.length < next && p < tp - 1) {
+        p += 1
+        const res = await WorkshopSessionService.getMySessions({
+          page: p,
+          size: PAGE_SIZE,
+          sortBy: 'startTime',
+          sortDirection: 'DESC',
+        })
+        merged = [...merged, ...(res.content || [])]
+        tp = res.totalPages ?? tp
+        keys = distinctVietnamDateKeysNewestFirst(
+          applySessionFilters(merged, searchQuery, statusFilter),
+        )
+      }
+      setSessions(merged)
+      setApiPage(p)
+      setTotalPages(tp)
+      setVisibleDayCount(next)
+    } catch (error: unknown) {
+      notification.error({
+        message: 'Tải thêm thất bại',
+        description: mapWorkshopSessionErrorToVi(
+          getApiErrorMessage(error, 'Không thể tải thêm dữ liệu. Vui lòng thử lại.'),
+        ),
+      })
+    } finally {
+      setLoadingMore(false)
+    }
+  }
 
   const handleView = (sessionId: string) => {
     const session = sessions.find(s => s.id === sessionId)
@@ -129,61 +224,75 @@ export default function WorkshopSessionsPage() {
     if (cancelDialog.session) {
       try {
         await WorkshopSessionService.cancelSession(cancelDialog.session.id)
-        
+
         // Update local state
-        setSessions(prev => prev.map(s => 
-          s.id === cancelDialog.session!.id 
+        setSessions(prev => prev.map(s =>
+          s.id === cancelDialog.session!.id
             ? { ...s, status: SessionStatus.CANCELLED }
             : s
         ))
-        
+
         setCancelDialog({ open: false, session: null })
         notification.success({
-          message: 'Session Cancelled',
-          description: `Session for "${cancelDialog.session.workshopTemplate.name}" has been cancelled.`
+          message: 'Đã Hủy Phiên',
+          description: `Phiên "${cancelDialog.session.workshopTemplate.name}" đã được hủy thành công.`
         })
       } catch (error: any) {
         console.error('Cancel failed:', error)
         notification.error({
-          message: 'Cancellation Failed',
-          description: error.message || 'Failed to cancel session. Please try again.',
+          message: 'Hủy Thất Bại',
+          description: error.message || 'Không thể hủy phiên. Vui lòng thử lại.',
         })
       }
     }
   }
 
   const handleStartSession = async (session: WorkshopSessionResponse) => {
+    if (!canStartWorkshopSession(session)) {
+      notification.warning({
+        message: 'Chưa thể bắt đầu phiên',
+        description: 'Vui lòng đảm bảo đã có khách đăng ký và chỉ thao tác trong khoảng ±30 phút quanh giờ bắt đầu.',
+      })
+      return
+    }
     try {
       await WorkshopSessionService.updateSessionStatus(session.id, 'ONGOING')
       setSessions(prev => prev.map(s =>
         s.id === session.id ? { ...s, status: SessionStatus.ONGOING } : s
       ))
       notification.success({
-        message: 'Session Started',
-        description: `"${session.workshopTemplate.name}" is now ongoing.`,
+        message: 'Đã bắt đầu phiên',
+        description: `"${session.workshopTemplate.name}" hiện đang diễn ra.`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       notification.error({
-        message: 'Failed to Start Session',
-        description: error.message || 'Please try again.',
+        message: 'Bắt đầu thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể cập nhật trạng thái. Vui lòng thử lại.')),
       })
     }
   }
 
   const handleCompleteSession = async (session: WorkshopSessionResponse) => {
+    if (!canCompleteWorkshopSession(session)) {
+      notification.warning({
+        message: 'Chưa thể hoàn thành phiên',
+        description: 'Chỉ được hoàn thành khi phiên đang diễn ra và trong khoảng ±30 phút quanh giờ kết thúc.',
+      })
+      return
+    }
     try {
       await WorkshopSessionService.updateSessionStatus(session.id, 'COMPLETED')
       setSessions(prev => prev.map(s =>
         s.id === session.id ? { ...s, status: SessionStatus.COMPLETED } : s
       ))
       notification.success({
-        message: 'Session Completed',
-        description: `"${session.workshopTemplate.name}" has been marked as completed.`,
+        message: 'Đã hoàn thành phiên',
+        description: `"${session.workshopTemplate.name}" đã được đánh dấu hoàn thành.`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       notification.error({
-        message: 'Failed to Complete Session',
-        description: error.message || 'Please try again.',
+        message: 'Hoàn thành thất bại',
+        description: mapWorkshopSessionErrorToVi(getApiErrorMessage(error, 'Không thể cập nhật trạng thái. Vui lòng thử lại.')),
       })
     }
   }
@@ -214,19 +323,21 @@ export default function WorkshopSessionsPage() {
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Workshop Sessions</h1>
-          <p className="text-muted-foreground">Manage your scheduled workshop sessions</p>
+      <div className="rounded-2xl border border-slate-200 dark:border-white/10 bg-gradient-to-b from-slate-50 to-white dark:from-white/5 dark:to-transparent p-6 shadow-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Danh Sách Các Phiên</h1>
+            <p className="mt-1 text-slate-500 dark:text-slate-400">Quản lý lịch trình hoạt động Workshop của bạn</p>
+          </div>
+          <Button
+            size="lg"
+            onClick={() => handleCreateSession()}
+            className="gap-2 rounded-xl"
+          >
+            <Plus className="w-5 h-5" />
+            Hẹn Lịch Phiên Mới
+          </Button>
         </div>
-        <Button
-          size="lg"
-          onClick={() => handleCreateSession()}
-          className="gap-2"
-        >
-          <PlusCircle className="w-5 h-5" />
-          Create New Session
-        </Button>
       </div>
 
       {/* Filters and View Toggle */}
@@ -235,7 +346,7 @@ export default function WorkshopSessionsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search sessions..."
+            placeholder="Tìm kiếm phiên workshop..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -245,43 +356,62 @@ export default function WorkshopSessionsPage() {
         {/* Status Filter */}
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-full sm:w-[180px]">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value={SessionStatus.SCHEDULED}>Scheduled</SelectItem>
-            <SelectItem value={SessionStatus.ONGOING}>Ongoing</SelectItem>
-            <SelectItem value={SessionStatus.COMPLETED}>Completed</SelectItem>
-            <SelectItem value={SessionStatus.CANCELLED}>Cancelled</SelectItem>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value={SessionStatus.SCHEDULED}>Đã lên lịch</SelectItem>
+            <SelectItem value={SessionStatus.ONGOING}>Đang diễn ra</SelectItem>
+            <SelectItem value={SessionStatus.COMPLETED}>Đã hoàn thành</SelectItem>
+            <SelectItem value={SessionStatus.CANCELLED}>Đã hủy</SelectItem>
           </SelectContent>
         </Select>
 
         {/* View Toggle */}
-        <div className="flex gap-2 bg-secondary rounded-lg p-1">
+        <div className="flex gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           <Button
             size="sm"
             variant={view === 'list' ? 'default' : 'ghost'}
             onClick={() => setView('list')}
-            className="gap-1"
+            className="gap-1 rounded-md"
           >
             <List className="w-4 h-4" />
-            List
+            Danh Sách
           </Button>
           <Button
             size="sm"
             variant={view === 'calendar' ? 'default' : 'ghost'}
             onClick={() => setView('calendar')}
-            className="gap-1"
+            className="gap-1 rounded-md"
           >
             <CalendarDays className="w-4 h-4" />
-            Calendar
+            Lịch
+          </Button>
+        </div>
+        <div className="flex gap-2 dark:bg-slate-800 rounded-lg p-1">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={fetchSessions}
+            className="gap-1 rounded-md w-full"
+          >
+            <RefreshCcw className="w-4 h-4" />
+            Làm mới
           </Button>
         </div>
       </div>
 
       {/* Results count */}
-      <div className="text-sm text-muted-foreground">
-        Showing {filteredSessions.length} of {sessions.length} session{sessions.length !== 1 ? 's' : ''}
+      <div className="text-sm text-muted-foreground font-medium">
+        {view === 'list' ? (
+          <>
+             Hiển thị: {sessionsForList.length} phiên
+             </>
+        ) : (
+          <>
+            Lịch: {baseFiltered.length} phiên sau lọc · đã tải {sessions.length} phiên từ máy chủ
+          </>
+        )}
       </div>
 
       {/* Sessions Display */}
@@ -289,22 +419,22 @@ export default function WorkshopSessionsPage() {
         <div className="flex items-center justify-center p-12">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading sessions...</p>
+            <p className="text-muted-foreground">Đang tải danh sách phiên...</p>
           </div>
         </div>
-      ) : filteredSessions.length > 0 ? (
+      ) : baseFiltered.length > 0 ? (
         view === 'list' ? (
           // List View - Grouped by Date
           <div className="space-y-6">
-            {Object.entries(groupedSessions).map(([date, dateSessions]) => (
+            {orderedGroupEntries.map(([date, dateSessions]) => (
               <div key={date} className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <CalendarIcon className="w-5 h-5 text-primary" />
+                  <CalendarIcon className="w-5 h-5 text-blue-500" />
                   <h2 className="text-lg font-semibold">{date}</h2>
                   <div className="flex-1 h-px bg-border" />
-                  <span className="text-sm text-muted-foreground">{dateSessions.length} session{dateSessions.length !== 1 ? 's' : ''}</span>
+                  <span className="text-sm text-muted-foreground font-medium">{dateSessions.length} phiên</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3">
                   {dateSessions.map((session) => (
                     <SessionCard
                       key={session.id}
@@ -335,11 +465,30 @@ export default function WorkshopSessionsPage() {
                 </div>
               </div>
             ))}
+            <div className="flex justify-center pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                size="lg"
+                className="rounded-xl gap-2 min-w-[220px]"
+                disabled={!canLoadMoreDays || loadingMore}
+                onClick={() => void handleLoadMoreDays()}
+              >
+                {loadingMore ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Đang tải...
+                  </>
+                ) : (
+                  <>Tải thêm</>
+                )}
+              </Button>
+            </div>
           </div>
         ) : (
           // Calendar View
           <SessionCalendar
-            sessions={filteredSessions}
+            sessions={baseFiltered}
             onSessionClick={handleCalendarSessionView}
             onDateClick={handleCalendarDateClick}
             onSessionEdit={handleCalendarSessionEdit}
@@ -349,19 +498,19 @@ export default function WorkshopSessionsPage() {
         )
       ) : (
         // Empty State
-        <div className="text-center py-12 border-2 border-dashed rounded-lg">
-          <CalendarIcon className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No sessions found</h3>
-          <p className="text-muted-foreground mb-4">
+        <div className="text-center py-16 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900">
+          <CalendarIcon className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-700 mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Không tìm thấy phiên nào</h3>
+          <p className="text-muted-foreground mb-6">
             {searchQuery || statusFilter !== 'all'
-              ? "Try adjusting your filters"
-              : "Get started by creating your first workshop session"
+              ? "Vui lòng thử điều chỉnh bộ lọc của bạn"
+              : "Bắt đầu bằng cách tạo lịch trình phiên đầu tiên"
             }
           </p>
           {!searchQuery && statusFilter === 'all' && (
-            <Button onClick={() => handleCreateSession()}>
+            <Button onClick={() => handleCreateSession()} className="rounded-xl">
               <PlusCircle className="w-4 h-4 mr-2" />
-              Create Session
+              Tạo Phiên Mới
             </Button>
           )}
         </div>

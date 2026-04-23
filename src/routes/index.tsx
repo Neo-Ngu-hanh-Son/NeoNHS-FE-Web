@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { RootLayout } from '@/layouts/RootLayout';
 import { AppLayout } from '@/layouts/AppLayout';
 import { BlankLayout } from '@/layouts/BlankLayout';
@@ -9,12 +9,12 @@ import Register from '@/pages/AuthPage/Register';
 import VerifyOTP from '@/pages/AuthPage/VerifyOTP';
 import NewPassword from '@/pages/AuthPage/NewPassword';
 import SetPasswordPage from '@/pages/AuthPage/SetPasswordPage';
+import { AuthRoutesLayout } from '@/pages/AuthPage/AuthRoutesLayout';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import UserProfilePage from '@/pages/ProfilePage/UserProfilePage';
 import VendorProfilePage from '@/pages/ProfilePage/VendorProfilePage';
 import { AboutUs } from '@/pages/AboutUs';
-import { ContactUs } from '@/pages/ContactUs';
 import { AdminLayout } from '@/layouts/admin/AdminLayout';
 import { VendorLayout } from '@/layouts/vendor/VendorLayout';
 // Dashboard Pages
@@ -27,7 +27,6 @@ import AdminVendorTemplatesPage from '@/pages/admin/vendorTemplate/AdminVendorTe
 import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage';
 import AdminVouchersPage from '@/pages/admin/vouchers';
 import PlatformVouchersPage from '@/pages/admin/vouchers/PlatformVouchers';
-import VendorVouchersPage from '@/pages/admin/vouchers/VendorVouchers';
 import VoucherCreatePage from '@/pages/admin/vouchers/create';
 import VoucherDetailPage from '@/pages/admin/vouchers/detail';
 import VoucherEditPage from '@/pages/admin/vouchers/edit';
@@ -48,10 +47,12 @@ import WorkshopTemplateEditPage from '@/pages/vendor/WorkshopTemplates/WorkshopT
 import WorkshopSessionsPage from '@/pages/vendor/WorkshopSessions/WorkshopSessionsPage';
 import WorkshopCalendarPage from '@/pages/vendor/WorkshopCalendar/CalendarPage.tsx';
 import TicketVerificationPage from '@/pages/vendor/Tickets/TicketVerificationPage';
-import VouchersPage from '@/pages/vendor/Vouchers/VouchersPage';
+import VendorVouchersPage from '@/pages/vendor/Vouchers/index';
+import VendorVoucherCreatePage from '@/pages/vendor/Vouchers/create';
+import VendorVoucherEditPage from '@/pages/vendor/Vouchers/edit';
+import VendorVoucherDetailPage from '@/pages/vendor/Vouchers/detail';
 import VendorDeletedVouchersPage from '@/pages/vendor/Vouchers/DeletedVouchersPage';
 import BlogCategoryPage from '@/pages/admin/blog-categories/BlogCategoryPage';
-import SimpleMapView from '@/pages/SimpleMapView';
 import ManageBlogPage from '@/pages/admin/blog/ManageBlogPage';
 import BlogCreationPage from '@/pages/admin/blog/BlogCreationPage';
 import AdminBlogDetailPage from '@/pages/admin/blog/AdminBlogDetailPage';
@@ -65,6 +66,7 @@ import PanoramaScreenMobile from '@/pages/Panorama/screens/PanoramaScreenMobile'
 import ManageHistoryAudioPage from '@/pages/admin/historyAudio/screens/ManageHistoryAudioPage.tsx';
 import AdminCheckinPointsPage from '@/pages/admin/checkin-points/AdminCheckinPointsPage';
 import ChatPage from '@/pages/Chat/ChatPage';
+import KnowledgeBasePage from '@/pages/admin/knowledge-base/KnowledgeBasePage';
 import { RequireRole } from '@/routes/RequireRole';
 import { UserRole } from '@/types';
 import EventTimelineCreatePage from '@/pages/admin/events/timeline/EventTimelineCreatePage';
@@ -77,23 +79,19 @@ export const router = createBrowserRouter([
       {
         element: <BlankLayout />,
         children: [
-          { path: '/login', element: <Login /> },
-          { path: '/forgot-password', element: <Forgot /> },
-          { path: '/register', element: <Register /> },
-          { path: '/verify-otp', element: <VerifyOTP /> },
-          { path: '/new-password', element: <NewPassword /> },
-          { path: '/set-password', element: <SetPasswordPage /> },
-          { path: '/simple-map', element: <SimpleMapView /> },
+          {
+            element: <AuthRoutesLayout />,
+            children: [
+              { path: '/login', element: <Login /> },
+              { path: '/forgot-password', element: <Forgot /> },
+              { path: '/register', element: <Register /> },
+              { path: '/verify-otp', element: <VerifyOTP /> },
+              { path: '/new-password', element: <NewPassword /> },
+              { path: '/set-password', element: <SetPasswordPage /> },
+            ],
+          },
           { path: '/places/:placeId/panorama', element: <PanoramaScreen /> },
-          {
-            path: '/places/:pointId/checkin-points/:checkinPointId/panorama',
-            element: <PanoramaScreen />,
-          },
           { path: '/places/panorama/mobile', element: <PanoramaScreenMobile /> },
-          {
-            path: '/places/checkin-points/panorama/mobile',
-            element: <PanoramaScreenMobile />,
-          },
         ],
       },
       {
@@ -101,7 +99,6 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <HomePage /> },
           { path: '/about-us', element: <AboutUs /> },
-          { path: '/contact-us', element: <ContactUs /> },
           { path: '/blog/:id', element: <BlogDetailsPage /> },
 
           // Profile Routes - Auto-redirect based on role
@@ -119,6 +116,7 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
         children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
           { path: 'dashboard', element: <VendorDashboardPage /> },
           { path: 'profile', element: <VendorProfilePage /> },
           { path: 'workshop-templates', element: <WorkshopTemplatesPage /> },
@@ -129,8 +127,11 @@ export const router = createBrowserRouter([
           { path: 'workshop-calendar', element: <WorkshopCalendarPage /> },
           { path: 'messages', element: <ChatPage /> },
           { path: 'ticket-verification', element: <TicketVerificationPage /> },
-          { path: 'vouchers', element: <VouchersPage /> },
+          { path: 'vouchers', element: <VendorVouchersPage /> },
+          { path: 'vouchers/create', element: <VendorVoucherCreatePage /> },
           { path: 'vouchers/deleted', element: <VendorDeletedVouchersPage /> },
+          { path: 'vouchers/:id', element: <VendorVoucherDetailPage /> },
+          { path: 'vouchers/:id/edit', element: <VendorVoucherEditPage /> },
         ],
       },
       {
@@ -141,6 +142,7 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
         children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
           { path: 'dashboard', element: <AdminDashboardPage /> },
           { path: 'destinations', element: <AdminDestinationsPage /> },
           { path: 'checkin-points', element: <AdminCheckinPointsPage /> },
@@ -149,9 +151,8 @@ export const router = createBrowserRouter([
           { path: 'vendors', element: <AdminVendorsPage /> },
           { path: 'vendors/templates', element: <AdminVendorTemplatesPage /> },
           { path: 'tickets', element: <AdminTicketsPage /> },
-          { path: 'vouchers', element: <AdminVouchersPage /> },
+          { path: 'vouchers', element: <Navigate to="platform" replace /> },
           { path: 'vouchers/platform', element: <PlatformVouchersPage /> },
-          { path: 'vouchers/vendor', element: <VendorVouchersPage /> },
           { path: 'vouchers/create', element: <VoucherCreatePage /> },
           { path: 'vouchers/deleted', element: <AdminDeletedVouchersPage /> },
           { path: 'vouchers/:id', element: <VoucherDetailPage /> },
@@ -178,6 +179,7 @@ export const router = createBrowserRouter([
             element: <AdminPanoramaEditorPage />,
           },
           { path: 'messages', element: <ChatPage /> },
+          { path: 'knowledge-base', element: <KnowledgeBasePage /> },
         ],
       },
     ],

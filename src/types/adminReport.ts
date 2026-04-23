@@ -6,7 +6,7 @@ export interface SpringPage<T> {
     number: number;
 }
 
-export type ReportStatus = 'PENDING' | 'REVIEWING' | 'RESOLVED' | 'REJECTED';
+export type ReportStatus = 'PENDING' | 'RESOLVED' | 'REJECTED';
 export type ReportTargetType = 'POINT' | 'EVENT' | 'WORKSHOP' | 'ALL';
 
 export interface AdminReport {

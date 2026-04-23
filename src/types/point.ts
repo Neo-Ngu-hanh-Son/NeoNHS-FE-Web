@@ -1,9 +1,10 @@
+import type { PointPanoramaResponse } from './panorama';
+
 export const PointType = {
     PAGODA: 'PAGODA',
     CAVE: 'CAVE',
     VIEWPOINT: 'VIEWPOINT',
     GENERAL: 'GENERAL',
-    CHECKIN: 'CHECKIN',
     STATUE: 'STATUE',
     GATE: 'GATE',
     SHOP: 'SHOP',
@@ -22,11 +23,14 @@ export interface PointRequest {
     thumbnailUrl?: string;
     latitude: number;
     longitude: number;
+    address?: string;
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
-    googlePlaceId?: string
+    googlePlaceId?: string;
+    difficulty?: string;
+    vibe?: string;
 }
 
 export interface PointResponse {
@@ -36,15 +40,19 @@ export interface PointResponse {
     thumbnailUrl?: string;
     latitude: number;
     longitude: number;
+    address?: string;
     orderIndex: number;
     estTimeSpent?: number;
     attractionId?: string;
     type: PointType;
     googlePlaceId?: string;
+    difficulty?: string;
+    vibe?: string;
     panoramaImageUrl?: string | null;
     defaultYaw?: number | null;
     defaultPitch?: number | null;
     checkinPoints?: unknown[] | null;
+    panoramas?: PointPanoramaResponse[] | null;
     historyAudioCount: number;
     deletedAt?: string | null;
 }

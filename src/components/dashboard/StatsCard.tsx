@@ -1,16 +1,16 @@
-import { ReactNode } from 'react';
-import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons';
+import type { ReactNode } from 'react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface StatsCardProps {
     title: string;
     value: string | number;
     icon: ReactNode;
+    iconBg: string;
     trend?: {
         value: number;
         isPositive: boolean;
     };
-    gradientFrom?: string;
-    gradientTo?: string;
     subtitle?: string;
 }
 
@@ -18,34 +18,41 @@ export function StatsCard({
     title,
     value,
     icon,
+    iconBg,
     trend,
-    gradientFrom = 'border-primary text-primary',
     subtitle,
 }: StatsCardProps) {
     return (
-        <div className={`bg-[#F4F9F6] dark:bg-sidebar-bg/20 p-6 rounded-2xl border-l-4 ${gradientFrom.split(' ')[0]} shadow-sm h-full hover:shadow-md transition-shadow`}>
-            <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 bg-black/5 dark:bg-white/10 rounded-lg flex items-center justify-center w-10 h-10 ${gradientFrom.split(' ')[1] || 'text-primary'}`}>
-                    {icon}
+        <Card className="relative h-full overflow-hidden border border-slate-100 bg-card shadow-sm transition-shadow hover:shadow-md dark:border-slate-700">
+            <CardContent className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1 space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">{title}</p>
+                        <p className="text-2xl font-bold tracking-tight tabular-nums text-foreground">{value}</p>
+                        {subtitle ? (
+                            <p className="truncate text-xs text-muted-foreground" title={subtitle}>
+                                {subtitle}
+                            </p>
+                        ) : null}
+                        {trend ? (
+                            <div className="flex items-center gap-1 pt-1 text-xs">
+                                {trend.isPositive ? (
+                                    <TrendingUp className="h-3 w-3 shrink-0 text-emerald-500" />
+                                ) : (
+                                    <TrendingDown className="h-3 w-3 shrink-0 text-red-500" />
+                                )}
+                                <span className={trend.isPositive ? 'font-medium text-emerald-600' : 'font-medium text-red-500'}>
+                                    {trend.isPositive ? '+' : ''}
+                                    {trend.value}%
+                                </span>
+                            </div>
+                        ) : null}
+                    </div>
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
+                        {icon}
+                    </div>
                 </div>
-                {trend && (
-                    <span className={`text-xs font-bold flex items-center gap-1 ${trend.isPositive ? 'text-primary' : 'text-red-500'}`}>
-                        {trend.isPositive ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
-                        {Math.abs(trend.value)}%
-                    </span>
-                )}
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{title}</p>
-            <div className="flex items-baseline gap-2">
-                <h3 className="text-2xl font-bold mt-1 text-sidebar-bg dark:text-white tabular-nums">
-                    {value}
-                </h3>
-            </div>
-            {subtitle && (
-                <p className="text-[11px] text-gray-500 font-medium mt-1 truncate" title={subtitle}>
-                    {subtitle}
-                </p>
-            )}
-        </div>
+            </CardContent>
+        </Card>
     );
 }

@@ -80,9 +80,9 @@ export function EventFilters({
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-semibold">Filters</span>
+                    <span className="text-sm font-semibold">Bộ lọc</span>
                     {hasActiveFilters && (
-                        <Badge variant="secondary" className="text-xs">Active</Badge>
+                        <Badge variant="secondary" className="text-xs">Đang áp dụng</Badge>
                     )}
                 </div>
                 <Button
@@ -91,7 +91,7 @@ export function EventFilters({
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     className="text-xs"
                 >
-                    Advanced Filters
+                    Bộ lọc nâng cao
                     {showAdvanced ? <ChevronUp className="ml-1 h-3 w-3" /> : <ChevronDown className="ml-1 h-3 w-3" />}
                 </Button>
             </div>
@@ -99,7 +99,7 @@ export function EventFilters({
             {/* Row 1: Search, Status, Delete filter */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <Input
-                    placeholder="Search by name..."
+                    placeholder="Tìm kiếm theo tên..."
                     icon={<Search className="h-4 w-4" />}
                     value={draft.searchName}
                     onChange={(e) => handleDraftChange('searchName', e.target.value)}
@@ -110,9 +110,9 @@ export function EventFilters({
                     value={draft.filterStatus || '__all__'}
                     onValueChange={(v) => handleDraftChange('filterStatus', v === '__all__' ? undefined : v)}
                 >
-                    <SelectTrigger><SelectValue placeholder="All Statuses" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="Tất cả trạng thái" /></SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="__all__">All Statuses</SelectItem>
+                        <SelectItem value="__all__">Tất cả trạng thái</SelectItem>
                         {EVENT_STATUS_OPTIONS.map((opt) => (
                             <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
                         ))}
@@ -125,9 +125,9 @@ export function EventFilters({
                 >
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="deleted">Hidden</SelectItem>
-                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="active">Đang hoạt động</SelectItem>
+                        <SelectItem value="deleted">Đã ẩn</SelectItem>
+                        <SelectItem value="all">Tất cả</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -139,15 +139,15 @@ export function EventFilters({
                     <div className="flex items-center gap-2">
                         <Input
                             type="date"
-                            placeholder="Start date"
+                            placeholder="Ngày bắt đầu"
                             value={draft.startDate}
                             onChange={(e) => handleDraftChange('startDate', e.target.value)}
                             className="w-full"
                         />
-                        <span className="text-muted-foreground text-xs shrink-0">to</span>
+                        <span className="text-muted-foreground text-xs shrink-0">đến</span>
                         <Input
                             type="date"
-                            placeholder="End date"
+                            placeholder="Ngày kết thúc"
                             value={draft.endDate}
                             onChange={(e) => handleDraftChange('endDate', e.target.value)}
                             className="w-full"
@@ -158,7 +158,7 @@ export function EventFilters({
                     <div className="flex items-center gap-2">
                         <Input
                             type="number"
-                            placeholder="Min price"
+                            placeholder="Giá tối thiểu"
                             value={draft.minPrice ?? ''}
                             onChange={(e) => handleDraftChange('minPrice', e.target.value ? Number(e.target.value) : undefined)}
                             min={0}
@@ -167,7 +167,7 @@ export function EventFilters({
                         <span className="text-muted-foreground text-xs shrink-0">-</span>
                         <Input
                             type="number"
-                            placeholder="Max price"
+                            placeholder="Giá tối đa"
                             value={draft.maxPrice ?? ''}
                             onChange={(e) => handleDraftChange('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
                             min={0}
@@ -184,15 +184,15 @@ export function EventFilters({
             <div className="flex gap-2 mt-4">
                 <Button size="sm" onClick={handleSearch} disabled={loading}>
                     <Search className={`h-4 w-4 mr-1`} />
-                    Search
+                    Tìm kiếm
                 </Button>
                 <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
                     <RotateCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
+                    Làm mới
                 </Button>
                 <Button variant="ghost" size="sm" onClick={onClearFilters} disabled={!hasActiveFilters}>
                     <X className="h-4 w-4 mr-1" />
-                    Clear Filters
+                    Xóa bộ lọc
                 </Button>
             </div>
         </div>

@@ -6,16 +6,16 @@ export { Separator } from './separator'
 export { Textarea } from './textarea'
 export { Select, SelectGroup, SelectValue, SelectTrigger, SelectContent, SelectLabel, SelectItem, SelectSeparator } from './select'
 export { Badge, badgeVariants } from './badge'
-export { 
-  AlertDialog, 
-  AlertDialogTrigger, 
-  AlertDialogContent, 
-  AlertDialogHeader, 
-  AlertDialogFooter, 
-  AlertDialogTitle, 
-  AlertDialogDescription, 
-  AlertDialogAction, 
-  AlertDialogCancel 
+export {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel
 } from './alert-dialog'
 export {
   Form,
@@ -50,3 +50,25 @@ export {
   DialogTitle,
   DialogDescription,
 } from './dialog'
+export { Switch } from './switch'
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+} from './table'
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip'
+export {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from './pagination'
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'

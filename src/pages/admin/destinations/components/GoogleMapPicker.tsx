@@ -23,6 +23,109 @@ export interface GoogleMapSelectedPoint {
   types?: string[];
 }
 
+/** Nhãn tiếng Việt cho `types[0]` từ Google Places API */
+const GOOGLE_PLACE_TYPE_VI: Record<string, string> = {
+  tourist_attraction: 'Danh lam thắng cảnh',
+  point_of_interest: 'Điểm quan tâm',
+  establishment: 'Địa điểm',
+  park: 'Công viên',
+  natural_feature: 'Thiên nhiên',
+  museum: 'Bảo tàng',
+  art_gallery: 'Phòng trưng bày nghệ thuật',
+  church: 'Nhà thờ',
+  hindu_temple: 'Đền Hindu',
+  mosque: 'Nhà thờ Hồi giáo',
+  synagogue: 'Giáo đường Do Thái',
+  buddhist_temple: 'Chùa',
+  place_of_worship: 'Nơi thờ tự',
+  restaurant: 'Nhà hàng',
+  cafe: 'Quán cà phê',
+  bar: 'Quán bar',
+  bakery: 'Tiệm bánh',
+  meal_takeaway: 'Mang đi',
+  meal_delivery: 'Giao món',
+  lodging: 'Lưu trú',
+  hotel: 'Khách sạn',
+  store: 'Cửa hàng',
+  shopping_mall: 'Trung tâm thương mại',
+  supermarket: 'Siêu thị',
+  school: 'Trường học',
+  university: 'Đại học',
+  hospital: 'Bệnh viện',
+  pharmacy: 'Nhà thuốc',
+  gym: 'Phòng gym',
+  spa: 'Spa',
+  beauty_salon: 'Tiệm làm đẹp',
+  zoo: 'Sở thú',
+  amusement_park: 'Công viên giải trí',
+  aquarium: 'Thủy cung',
+  stadium: 'Sân vận động',
+  movie_theater: 'Rạp chiếu phim',
+  library: 'Thư viện',
+  cemetery: 'Nghĩa trang',
+  campground: 'Khu cắm trại',
+  rv_park: 'Bãi xe RV',
+  night_club: 'Vũ trường',
+  casino: 'Sòng bạc',
+  airport: 'Sân bay',
+  train_station: 'Ga tàu',
+  bus_station: 'Bến xe buýt',
+  subway_station: 'Ga metro',
+  transit_station: 'Trạm giao thông',
+  locality: 'Địa phương',
+  political: 'Hành chính',
+  premise: 'Trụ sở',
+  subpremise: 'Phần trong tòa nhà',
+  street_address: 'Địa chỉ đường',
+  route: 'Tuyến đường',
+  intersection: 'Giao lộ',
+  neighborhood: 'Khu phố',
+  administrative_area_level_1: 'Tỉnh / thành',
+  administrative_area_level_2: 'Quận / huyện',
+  administrative_area_level_3: 'Phường / xã',
+  country: 'Quốc gia',
+  postal_code: 'Mã bưu chính',
+  geocode: 'Mã địa lý',
+  finance: 'Tài chính',
+  bank: 'Ngân hàng',
+  atm: 'ATM',
+  gas_station: 'Trạm xăng',
+  parking: 'Bãi đỗ xe',
+  car_rental: 'Thuê xe',
+  car_dealer: 'Đại lý xe',
+  car_repair: 'Sửa xe',
+  laundry: 'Giặt là',
+  florist: 'Tiệm hoa',
+  lawyer: 'Văn phòng luật',
+  real_estate_agency: 'Bất động sản',
+  insurance_agency: 'Bảo hiểm',
+  travel_agency: 'Du lịch',
+  food: 'Ẩm thực',
+  health: 'Sức khỏe',
+  doctor: 'Phòng khám',
+  dentist: 'Nha khoa',
+  veterinary_care: 'Thú y',
+  physiotherapist: 'Vật lý trị liệu',
+  electrician: 'Điện',
+  plumber: 'Ống nước',
+  roofing_contractor: 'Mái nhà',
+  general_contractor: 'Xây dựng',
+  moving_company: 'Chuyển nhà',
+  storage: 'Kho bãi',
+  post_office: 'Bưu điện',
+  city_hall: 'Ủy ban',
+  courthouse: 'Tòa án',
+  embassy: 'Đại sứ quán',
+  fire_station: 'Cứu hỏa',
+  police: 'Công an',
+  local_government_office: 'Cơ quan nhà nước',
+};
+
+function formatGooglePlaceTypeVi(type: string): string {
+  const key = type.trim().toLowerCase();
+  return GOOGLE_PLACE_TYPE_VI[key] ?? 'Địa điểm';
+}
+
 interface GoogleMapPickerProps {
   apiLoading: boolean;
   apiError: string | null;
@@ -56,16 +159,16 @@ export function GoogleMapPicker({
         {apiLoading && (
           <div className="absolute inset-0 z-[50] bg-slate-50/80 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
             <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-            <p className="text-sm font-bold text-slate-600">Waking up Google Engine...</p>
+            <p className="text-sm font-bold text-slate-600">Khởi động Google Engine...</p>
           </div>
         )}
 
         {apiError && (
           <div className="absolute inset-0 z-[50] bg-white flex flex-col items-center justify-center p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Google Maps Failed to Load</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Google Maps Không tải được</h3>
             <p className="text-sm text-slate-500 mb-6">{apiError}</p>
-            <Button onClick={() => window.location.reload()}>Retry Connection</Button>
+            <Button onClick={() => window.location.reload()}>Thử lại</Button>
           </div>
         )}
 
@@ -82,7 +185,7 @@ export function GoogleMapPicker({
         <div className="absolute top-4 right-4 z-[10] flex flex-col gap-2">
           <div className="bg-white/90 backdrop-blur-sm px-3 py-2 rounded-xl border border-white/50 shadow-lg flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-indigo-500/20 border-2 border-indigo-500"></div>
-            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Boundary Restricted</span>
+            <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider">Ranh giới Ngũ Hành Sơn</span>
           </div>
         </div>
 
@@ -108,7 +211,7 @@ export function GoogleMapPicker({
                     ) : (
                       <div className="flex flex-col items-center gap-1 opacity-40">
                         <Building2 className="w-8 h-8" />
-                        <span className="text-[8px] font-bold uppercase">No Photo</span>
+                        <span className="text-[8px] font-bold uppercase">Không có ảnh</span>
                       </div>
                     )}
                   </div>
@@ -122,14 +225,13 @@ export function GoogleMapPicker({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1.5">
                     <h4 className="text-lg font-black text-slate-800 truncate leading-none">{selectedPoint.name}</h4>
-                    {selectedPoint.placeId && (
-                      <Badge className="bg-indigo-600 hover:bg-indigo-700 text-[9px] h-4.5 px-1.5 rounded-full border-none">
-                        Google POI
-                      </Badge>
-                    )}
                   </div>
-                  <p className="text-sm text-slate-500 line-clamp-1 mb-3 font-medium">{selectedPoint.address}</p>
-
+                  <p className="text-sm text-slate-500 line-clamp-1 font-medium">{selectedPoint.address}</p>
+                  {selectedPoint.placeId && (
+                    <Badge className="bg-indigo-600 hover:bg-indigo-700 text-[9px] h-4.5 px-1.5 rounded-full border-none mb-2">
+                      Điểm đánh dấu trên Google Maps
+                    </Badge>
+                  )}
                   <div className="flex flex-wrap items-center gap-2">
                     <div className="px-2.5 py-1 bg-slate-100 rounded-lg flex items-center gap-1.5">
                       <MapIcon className="w-3 h-3 text-slate-400" />
@@ -138,9 +240,9 @@ export function GoogleMapPicker({
                       </span>
                     </div>
                     {selectedPoint.types && selectedPoint.types.length > 0 && (
-                      <div className="px-2.5 py-1 bg-indigo-50 rounded-lg flex items-center gap-1.5 border border-indigo-100/50">
-                        <span className="text-[9px] font-bold text-indigo-600 uppercase tracking-tighter">
-                          {selectedPoint.types[0].replace(/_/g, ' ')}
+                      <div className="flex items-center gap-1.5 rounded-lg border border-indigo-100/50 bg-indigo-50 px-2.5 py-1 dark:border-indigo-900/40 dark:bg-indigo-950/40">
+                        <span className="text-[10px] font-semibold capitalize leading-tight text-indigo-700 dark:text-indigo-300">
+                          {formatGooglePlaceTypeVi(selectedPoint.types[0])}
                         </span>
                       </div>
                     )}
@@ -156,12 +258,12 @@ export function GoogleMapPicker({
                     {processingImage ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Processing...
+                        Đang xử lý...
                       </>
                     ) : (
                       <>
                         <Check className="w-4 h-4 mr-2" />
-                        Use this Place
+                        Sử dụng địa điểm này
                       </>
                     )}
                   </Button>
@@ -170,7 +272,7 @@ export function GoogleMapPicker({
                     onClick={onDiscardSelection}
                     className="text-slate-400 font-bold hover:text-slate-600 hover:bg-slate-100 h-10 rounded-xl"
                   >
-                    Discard Selection
+                    Bỏ chọn
                   </Button>
                 </div>
               </div>
@@ -183,14 +285,14 @@ export function GoogleMapPicker({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Ready</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hệ thống sẵn sàng</span>
           </div>
           <p className="text-[11px] text-slate-400 font-medium italic border-l pl-4 border-slate-100">
-            POI ID mapping active for persistence
+            Định danh POI đang hoạt động để lưu trữ
           </p>
         </div>
         <Button variant="outline" onClick={onClose} className="rounded-xl font-bold border-slate-200 text-slate-600">
-          Close Explorer
+          Đóng
         </Button>
       </div>
     </div>

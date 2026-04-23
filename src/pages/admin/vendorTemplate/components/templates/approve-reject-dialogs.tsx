@@ -14,7 +14,6 @@ import { useState } from "react"
 import type { AdminWorkshopTemplateResponse } from "./types"
 import { CheckCircle, XCircle } from "lucide-react"
 
-// Approve Template Dialog
 interface ApproveTemplateDialogProps {
   template: AdminWorkshopTemplateResponse | null
   open: boolean
@@ -38,58 +37,58 @@ export function ApproveTemplateDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-2xl">
+      <AlertDialogContent className="max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-700">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-green-600 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5" />
-            Approve Workshop Template
+          <AlertDialogTitle className="flex items-center gap-2 text-green-600 dark:text-green-400">
+            <CheckCircle className="h-5 w-5" />
+            Duyệt mẫu workshop
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className="space-y-3">
-              <p>
-                You are about to approve <strong>{template.name}</strong> by{" "}
+            <div className="space-y-3 text-foreground">
+              <p className="text-sm">
+                Bạn sắp duyệt <strong>{template.name}</strong> của{" "}
                 <strong>{template.vendorName}</strong>.
               </p>
 
-              <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-lg p-3 text-sm">
-                <p className="text-green-800 dark:text-green-200 font-medium mb-2">
-                  ✓ This action will:
+              <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950/20">
+                <p className="mb-2 font-medium text-green-800 dark:text-green-200">
+                  Thao tác này sẽ:
                 </p>
-                <ul className="space-y-1 pl-4 list-disc text-green-700 dark:text-green-300">
+                <ul className="list-disc space-y-1 pl-4 text-green-700 dark:text-green-300">
                   <li>
-                    Make the workshop template <strong>publicly visible</strong>
+                    Cho phép mẫu workshop <strong>hiển thị</strong> theo quy tắc hệ thống
                   </li>
                   <li>
-                    Allow the vendor to <strong>schedule sessions</strong> for this workshop
+                    Cho phép Đối tác <strong>tạo phiên</strong> từ mẫu này
                   </li>
                   <li>
-                    Enable customers to <strong>book and enroll</strong> in sessions
+                    Cho phép khách hàng <strong>đặt / đăng ký</strong> phiên (khi đã mở bán)
                   </li>
                   <li>
-                    Send a <strong>notification email</strong> to the vendor
+                    Gửi <strong>email thông báo</strong> tới Đối tác (nếu hệ thống bật)
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 text-sm">
-                <p className="text-blue-800 dark:text-blue-200 font-medium">
-                  📋 Template Details:
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm dark:border-blue-800 dark:bg-blue-950/20">
+                <p className="font-medium text-blue-800 dark:text-blue-200">
+                  Thông tin mẫu:
                 </p>
                 <div className="mt-2 space-y-1 text-blue-700 dark:text-blue-300">
                   <p>
-                    <strong>Duration:</strong> {template.estimatedDuration} minutes
+                    <strong>Thời lượng:</strong> {template.estimatedDuration} phút
                   </p>
                   <p>
-                    <strong>Price:</strong>{" "}
+                    <strong>Giá:</strong>{" "}
                     {template.defaultPrice.toLocaleString("vi-VN")} VND
                   </p>
                   <p>
-                    <strong>Capacity:</strong> {template.minParticipants}-
-                    {template.maxParticipants} participants
+                    <strong>Sức chứa:</strong> {template.minParticipants}–
+                    {template.maxParticipants} người
                   </p>
                   <p>
-                    <strong>Vendor Status:</strong>{" "}
-                    {template.vendorVerified ? "✓ Verified" : "⚠ Not Verified"}
+                    <strong>Đối tác:</strong>{" "}
+                    {template.vendorVerified ? "Đã xác minh" : "Chưa xác minh"}
                   </p>
                 </div>
               </div>
@@ -98,28 +97,30 @@ export function ApproveTemplateDialog({
         </AlertDialogHeader>
 
         <div className="space-y-2 py-4">
-          <Label htmlFor="approve-notes">Admin Note (Optional)</Label>
+          <Label htmlFor="approve-notes">Ghi chú quản trị (tuỳ chọn)</Label>
           <Textarea
             id="approve-notes"
-            placeholder="Add any notes about this approval..."
+            placeholder="Ghi chú nội bộ về lần duyệt này…"
             value={adminNote}
             onChange={(e) => setAdminNote(e.target.value)}
             rows={3}
             className="resize-none"
           />
           <p className="text-xs text-muted-foreground">
-            This note is optional and for record-keeping purposes.
+            Ghi chú là tuỳ chọn, chỉ phục vụ lưu hồ sơ nội bộ.
           </p>
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setAdminNote("")}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="transition-colors" onClick={() => setAdminNote("")}>
+            Hủy
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 transition-colors hover:bg-green-700"
           >
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Approve Template
+            <CheckCircle className="mr-2 h-4 w-4" />
+            Duyệt mẫu
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -127,7 +128,6 @@ export function ApproveTemplateDialog({
   )
 }
 
-// Reject Template Dialog
 interface RejectTemplateDialogProps {
   template: AdminWorkshopTemplateResponse | null
   open: boolean
@@ -146,11 +146,11 @@ export function RejectTemplateDialog({
 
   const handleConfirm = () => {
     if (reason.trim().length < 10) {
-      setError("Please provide a detailed reason (minimum 10 characters)")
+      setError("Vui lòng nhập lý do chi tiết (tối thiểu 10 ký tự).")
       return
     }
     onConfirm(reason)
-    setReason("") // Reset reason after confirmation
+    setReason("")
     setError("")
   }
 
@@ -164,54 +164,54 @@ export function RejectTemplateDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-2xl">
+      <AlertDialogContent className="max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-700">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-600 flex items-center gap-2">
-            <XCircle className="w-5 h-5" />
-            Reject Workshop Template
+          <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
+            <XCircle className="h-5 w-5" />
+            Từ chối mẫu workshop
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className="space-y-3">
-              <p>
-                You are about to reject <strong>{template.name}</strong> by{" "}
+            <div className="space-y-3 text-foreground">
+              <p className="text-sm">
+                Bạn sắp từ chối <strong>{template.name}</strong> của{" "}
                 <strong>{template.vendorName}</strong>.
               </p>
 
-              <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg p-3 text-sm">
-                <p className="text-red-800 dark:text-red-200 font-medium mb-2">
-                  ⚠ This action will:
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm dark:border-red-800 dark:bg-red-950/20">
+                <p className="mb-2 font-medium text-red-800 dark:text-red-200">
+                  Thao tác này sẽ:
                 </p>
-                <ul className="space-y-1 pl-4 list-disc text-red-700 dark:text-red-300">
+                <ul className="list-disc space-y-1 pl-4 text-red-700 dark:text-red-300">
                   <li>
-                    Set the template status to <strong>REJECTED</strong>
+                    Đặt trạng thái mẫu thành <strong>REJECTED</strong>
                   </li>
                   <li>
-                    Send your rejection reason to the vendor via <strong>email</strong>
+                    Gửi lý do từ chối tới Đối tác qua <strong>email</strong>
                   </li>
                   <li>
-                    Allow the vendor to <strong>edit and resubmit</strong> the template
+                    Cho phép Đối tác <strong>chỉnh sửa và gửi lại</strong>
                   </li>
                   <li>
-                    Keep the template <strong>hidden from customers</strong>
+                    Giữ mẫu <strong>ẩn với khách hàng</strong>
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm">
-                <p className="text-amber-800 dark:text-amber-200 font-medium">
-                  💡 Please provide constructive feedback:
+              <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm dark:border-amber-800 dark:bg-amber-950/20">
+                <p className="font-medium text-amber-800 dark:text-amber-200">
+                  Gợi ý phản hồi mang tính xây dựng:
                 </p>
-                <ul className="mt-2 space-y-1 pl-4 list-disc text-amber-700 dark:text-amber-300 text-xs">
+                <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-amber-700 dark:text-amber-300">
                   <li>
-                    Explain <strong>why</strong> the template is being rejected
+                    Giải thích <strong>vì sao</strong> mẫu bị từ chối
                   </li>
                   <li>
-                    List <strong>specific issues</strong> that need to be addressed
+                    Nêu <strong>vấn đề cụ thể</strong> cần khắc phục
                   </li>
                   <li>
-                    Provide <strong>guidance</strong> on how to improve the template
+                    Gợi ý <strong>hướng chỉnh sửa</strong> rõ ràng
                   </li>
-                  <li>Be <strong>professional and constructive</strong></li>
+                  <li>Giữ <strong>thái độ chuyên nghiệp</strong></li>
                 </ul>
               </div>
             </div>
@@ -219,12 +219,12 @@ export function RejectTemplateDialog({
         </AlertDialogHeader>
 
         <div className="space-y-2 py-4">
-          <Label htmlFor="reject-reason" className="text-red-600">
-            Rejection Reason (Required) *
+          <Label htmlFor="reject-reason" className="text-red-600 dark:text-red-400">
+            Lý do từ chối (bắt buộc) *
           </Label>
           <Textarea
             id="reject-reason"
-            placeholder="Example: The images provided are low quality. Please upload higher resolution images showing the workshop activities clearly. Also, the full description needs more detail about what equipment participants need to bring."
+            placeholder="Ví dụ: Hình ảnh độ phân giải thấp. Vui lòng tải ảnh rõ hơn thể hiện hoạt động workshop. Phần mô tả chi tiết cần bổ sung trang bị mang theo."
             value={reason}
             onChange={(e) => {
               setReason(e.target.value)
@@ -234,26 +234,26 @@ export function RejectTemplateDialog({
             className={`resize-none ${error ? "border-red-500" : ""}`}
           />
           {error && (
-            <p className="text-xs text-red-600 font-medium">{error}</p>
+            <p className="text-xs font-medium text-red-600">{error}</p>
           )}
           <p className="text-xs text-muted-foreground">
-            This reason will be sent to the vendor and displayed in their dashboard. Be
-            specific and helpful.
+            Lý do sẽ được gửi tới Đối tác và có thể hiển thị trên bảng điều khiển của họ. Hãy cụ thể và hữu ích.
           </p>
         </div>
 
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="transition-colors" onClick={handleCancel}>
+            Hủy
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-red-600 transition-colors hover:bg-red-700"
           >
-            <XCircle className="w-4 h-4 mr-2" />
-            Reject Template
+            <XCircle className="mr-2 h-4 w-4" />
+            Từ chối mẫu
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   )
 }
-

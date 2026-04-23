@@ -5,8 +5,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { message } from 'antd';
-import { adminVoucherService, AdminVoucherQueryParams } from '@/services/api/voucherService';
-import type { VoucherResponse } from '@/types/voucher';
+import { adminVoucherService, vendorVoucherService, AdminVoucherQueryParams } from '@/services/api/voucherService';
+import type { VoucherResponse, VoucherScope } from '@/types/voucher';
 
 interface UseVouchersReturn {
     vouchers: VoucherResponse[];
@@ -17,34 +17,35 @@ interface UseVouchersReturn {
     deleteVoucher: (id: string) => Promise<boolean>;
 }
 
-export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn {
+export function useVouchers(params: AdminVoucherQueryParams, scope: VoucherScope = 'PLATFORM'): UseVouchersReturn {
     const [vouchers, setVouchers] = useState<VoucherResponse[]>([]);
     const [loading, setLoading] = useState(false);
     const [totalElements, setTotalElements] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
     const paramsRef = useRef<string>('');
-    const paramsKey = JSON.stringify(params);
+    const paramsKey = JSON.stringify({ ...params, scope });
+
+    const service = scope === 'PLATFORM' ? adminVoucherService : vendorVoucherService;
 
     const fetchVouchers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await adminVoucherService.getAll(params);
+            const response = await service.getAll(params);
             if (response.success) {
                 setVouchers(response.data.content);
                 setTotalElements(response.data.totalElements);
                 setTotalPages(response.data.totalPages);
             } else {
-                message.error(response.message || 'Failed to fetch vouchers');
+                message.error(response.message || 'Lấy danh sách voucher thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch vouchers: ' + (err.message || 'Unknown error'));
+            message.error('Lấy danh sách voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [paramsKey]);
+    }, [paramsKey, service, params]);
 
     useEffect(() => {
         if (paramsRef.current !== paramsKey) {
@@ -55,21 +56,21 @@ export function useVouchers(params: AdminVoucherQueryParams): UseVouchersReturn 
 
     const deleteVoucher = useCallback(async (id: string): Promise<boolean> => {
         try {
-            const response = await adminVoucherService.delete(id);
+            const response = await service.delete(id);
             if (response.success) {
-                message.success('Voucher deleted successfully');
+                message.success('Xóa voucher thành công');
                 await fetchVouchers();
                 return true;
             } else {
-                message.error(response.message || 'Failed to delete voucher');
+                message.error(response.message || 'Xóa voucher thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to delete voucher: ' + (err.message || 'Unknown error'));
+            message.error('Xóa voucher thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
-    }, [fetchVouchers]);
+    }, [fetchVouchers, service]);
 
     return { vouchers, loading, totalElements, totalPages, fetchVouchers, deleteVoucher };
 }

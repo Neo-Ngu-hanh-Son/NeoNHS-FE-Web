@@ -1,5 +1,5 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,58 +10,65 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { ArrowLeft, Save, Trash2, Eye } from "lucide-react";
-import type { PointPanoramaResponse } from "@/types";
+} from '@/components/ui/alert-dialog';
+import { ArrowLeft, Save, Trash2, Eye } from 'lucide-react';
+import type { PointPanoramaResponse } from '@/types';
 
 interface PanoramaEditorHeaderProps {
+  variant?: 'page' | 'embedded';
   panorama: PointPanoramaResponse | null;
-  targetId: string;
-  entityLabel: string;
+  targetPointId: string;
   saving: boolean;
   hasImage: boolean;
   onSave: () => void;
   onDelete: () => void;
+  /** Tên điểm từ modal POI (ưu tiên hiển thị khi nhúng) */
+  pointName?: string;
+  onBackToParent?: () => void;
 }
 
 export default function PanoramaEditorHeader({
+  variant = 'page',
   panorama,
-  targetId,
-  entityLabel,
+  targetPointId,
   saving,
   hasImage,
   onSave,
   onDelete,
+  pointName,
+  onBackToParent,
 }: PanoramaEditorHeaderProps) {
-  const navigate = useNavigate();
+  const embedded = variant === 'embedded';
+
+  const pointLabel = (pointName?.trim() || '').trim();
+  const panoramaLabel = (panorama?.title?.trim() || '').trim();
+  const titleSuffix = panoramaLabel ? `: ${panoramaLabel}` : pointLabel ? `: ${pointLabel}` : '';
+  const deleteTargetLabel = pointLabel || panoramaLabel || 'mục đã chọn';
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-1">
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-        <div>
-          <h1 className="text-xl font-bold">
-            {panorama ? "Edit" : "Create"} Panorama for: {panorama?.name && `${panorama.name}`}
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+        <div className="min-w-0">
+          <h1
+            className={
+              embedded ? 'text-lg font-semibold tracking-tight text-slate-900 dark:text-white' : 'text-xl font-bold'
+            }
+          >
+            {panorama ? 'Chỉnh sửa ảnh' : 'Tạo mới ảnh'} panorama{titleSuffix}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {entityLabel} · {targetId}
-          </p>
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {hasImage && (
           <Button
             variant="outline"
             size="sm"
-            onClick={() => window.open(`/panorama/${targetId}`, "_blank")}
+            onClick={() => window.open(`/places/${targetPointId}/panorama`, '_blank')}
             className="gap-1"
           >
             <Eye className="h-4 w-4" />
-            Preview
+            Xem trước
           </Button>
         )}
 
@@ -70,20 +77,20 @@ export default function PanoramaEditorHeader({
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm" className="gap-1">
                 <Trash2 className="h-4 w-4" />
-                Delete
+                Xóa
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete Panorama?</AlertDialogTitle>
+                <AlertDialogTitle>Xóa panorama?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This will permanently remove the panorama image and all hot spots for this{" "}
-                  {entityLabel.toLowerCase()}. This action cannot be undone.
+                  Thao tác này sẽ xóa vĩnh viễn ảnh panorama và mọi điểm nóng tại {deleteTargetLabel}. Không thể hoàn
+                  tác.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+                <AlertDialogCancel>Hủy</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete}>Xóa</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -91,7 +98,7 @@ export default function PanoramaEditorHeader({
 
         <Button onClick={onSave} disabled={saving} size="sm" className="gap-1">
           <Save className="h-4 w-4" />
-          {saving ? "Saving…" : "Save Panorama"}
+          {saving ? 'Đang lưu…' : 'Lưu panorama'}
         </Button>
       </div>
     </div>

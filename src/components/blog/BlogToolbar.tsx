@@ -43,7 +43,7 @@ export function BlogToolbar({
           <Input
             id="blog-search-input"
             icon={<Search className="h-4 w-4" />}
-            placeholder="Search blogs..."
+            placeholder="Tìm kiếm bài viết..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onSearch(query)}
@@ -56,12 +56,12 @@ export function BlogToolbar({
           onValueChange={(val) => onStatusChange(val === "_all" ? "" : (val as BlogStatus))}
         >
           <SelectTrigger id="blog-status-filter" className="w-[160px] h-9">
-            <SelectValue placeholder="Status: All" />
+            <SelectValue placeholder="Trạng thái: Tất cả" />
           </SelectTrigger>
           <SelectContent>
             {BLOG_STATUS_OPTIONS.map((o) => (
               <SelectItem key={o.value || "_all"} value={o.value || "_all"}>
-                Status: {o.label}
+                Trạng thái: {o.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -69,12 +69,12 @@ export function BlogToolbar({
 
         <Select value={String(sortIndex)} onValueChange={(val) => onSortChange(Number(val))}>
           <SelectTrigger id="blog-sort-filter" className="w-[170px] h-9">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder="Sắp xếp" />
           </SelectTrigger>
           <SelectContent>
             {BLOG_SORT_OPTIONS.map((o, i) => (
               <SelectItem key={i} value={String(i)}>
-                Sort: {o.label}
+                Sắp xếp: {o.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -82,7 +82,7 @@ export function BlogToolbar({
 
         <Button size="default" onClick={() => onSearch(query)} className="h-9">
           <Search className="h-3.5 w-3.5" />
-          Search
+          Tìm kiếm
         </Button>
       </div>
 
@@ -90,7 +90,7 @@ export function BlogToolbar({
       <div className="flex items-center gap-2 flex-wrap">
         <Button size="default" onClick={() => navigate("/admin/blog/create")} className="h-9">
           <Plus className="h-3.5 w-3.5" />
-          New Blog
+          Bài viết mới
         </Button>
 
         <TooltipProvider delayDuration={200}>
@@ -105,7 +105,7 @@ export function BlogToolbar({
                 <Download className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Export blogs to CSV</TooltipContent>
+            <TooltipContent>Xuất danh sách blog ra CSV</TooltipContent>
           </Tooltip>
         </TooltipProvider>
       </div>

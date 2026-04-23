@@ -98,11 +98,11 @@ import type {
 // ];
 
 export const notifications: NotificationItem[] = [
-    { id: 1, type: 'booking', message: 'New booking for Pottery Making by John Doe', time: '5 min ago', read: false },
-    { id: 2, type: 'system', message: 'Your workshop "Silk Weaving" has been approved', time: '1 hour ago', read: false },
-    { id: 3, type: 'review', message: 'New 5-star review on Cooking Class', time: '2 hours ago', read: false },
-    { id: 4, type: 'payment', message: 'Payment of $200 received for Silk Weaving', time: '3 hours ago', read: true },
-    { id: 5, type: 'system', message: 'System maintenance scheduled for March 10', time: '5 hours ago', read: true },
-    { id: 6, type: 'booking', message: 'Booking cancelled for Lantern Making by Tom', time: '6 hours ago', read: true },
-    { id: 7, type: 'review', message: 'New 4-star review on Pottery Making', time: '1 day ago', read: true },
+    { id: 1, type: 'booking', message: 'Đặt chỗ mới cho workshop Làm gốm — khách John Doe', time: '5 phút trước', read: false },
+    { id: 2, type: 'system', message: 'Workshop "Dệt lụa" của bạn đã được duyệt', time: '1 giờ trước', read: false },
+    { id: 3, type: 'review', message: 'Đánh giá 5 sao mới cho lớp Nấu ăn', time: '2 giờ trước', read: false },
+    { id: 4, type: 'payment', message: 'Đã nhận thanh toán 200 USD cho Dệt lụa', time: '3 giờ trước', read: true },
+    { id: 5, type: 'system', message: 'Bảo trì hệ thống dự kiến ngày 10 tháng 3', time: '5 giờ trước', read: true },
+    { id: 6, type: 'booking', message: 'Hủy đặt chỗ Làm đèn lồng — khách Tom', time: '6 giờ trước', read: true },
+    { id: 7, type: 'review', message: 'Đánh giá 4 sao mới cho Làm gốm', time: '1 ngày trước', read: true },
 ];

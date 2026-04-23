@@ -5,6 +5,7 @@ import { ChangePasswordForm } from "@/components/profile/ChangePasswordForm";
 import type { User, VendorProfile } from "@/types";
 import VendorService from "@/services/api/vendorService";
 import { useAuth } from "@/hooks/auth/useAuth";
+import { Store, ShieldCheck } from "lucide-react";
 
 export default function VendorProfilePage() {
   const { user, updateUser } = useAuth();
@@ -23,7 +24,7 @@ export default function VendorProfilePage() {
       const vendorData = await VendorService.getVendorProfile();
       setVendor(vendorData);
     } catch (error: any) {
-      message.error("Failed to load vendor data");
+      message.error("Không thể tải dữ liệu đối tác");
     } finally {
       setLoading(false);
     }
@@ -36,49 +37,54 @@ export default function VendorProfilePage() {
 
   if (loading || !user) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex flex-col items-center justify-center p-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Đang tải...</p>
       </div>
     );
   }
 
   if (!vendor) return null;
 
+  const tabs = [
+    {
+      id: "business",
+      label: "Hồ sơ kinh doanh",
+      icon: <Store className="w-4 h-4" />,
+    },
+    {
+      id: "security",
+      label: "Bảo mật tài khoản",
+      icon: <ShieldCheck className="w-4 h-4" />,
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Vendor Page Content */}
-      <div className="space-y-8">
-        {/* Content Tabs */}
-        <div className="border-b border-slate-200 dark:border-slate-800 flex items-center gap-8 px-2">
-          <button
-            onClick={() => setActiveTab("business")}
-            className={`pb-4 px-2 text-sm font-bold transition-all relative ${
-              activeTab === "business"
-                ? "text-primary"
-                : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
-            }`}
-          >
-            Business Profile
-            {activeTab === "business" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-            )}
-          </button>
-          <button
-            onClick={() => setActiveTab("security")}
-            className={`pb-4 px-2 text-sm font-bold transition-all relative ${
-              activeTab === "security"
-                ? "text-primary"
-                : "text-slate-500 hover:text-slate-800 dark:hover:text-white"
-            }`}
-          >
-            Security Settings
-            {activeTab === "security" && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
-            )}
-          </button>
+      <div className="space-y-6">
+        {/* Tab Navigation */}
+        <div className="border-b border-slate-200 dark:border-slate-700 flex items-center gap-6 px-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`pb-3 px-1 text-sm font-semibold transition-colors relative flex items-center gap-2 ${
+                activeTab === tab.id
+                  ? "text-emerald-600 dark:text-emerald-400"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+              {activeTab === tab.id && (
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-full" />
+              )}
+            </button>
+          ))}
         </div>
 
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {/* Tab Content */}
+        <div>
           {activeTab === "business" ? (
             <VendorEditForm vendor={vendor} onSaved={handleVendorSaved} />
           ) : (

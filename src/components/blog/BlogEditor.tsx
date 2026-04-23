@@ -27,9 +27,9 @@ import ToolbarModal from "./editor/ToolbarElements/ToolbarModal";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import ClickableLinkPlugin from "./editor/ClickableLinkPlugin";
 import { BlogEditorRef, EditorSaveResult } from "./type";
-import { $getRoot, LexicalEditor } from "lexical";
+import { $getRoot, $insertNodes, LexicalEditor } from "lexical";
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
 import EditorRefPlugin from "./editor/EditorRefPlugin";
-import { $generateHtmlFromNodes } from "@lexical/html";
 
 // --- Props ---
 type BlogEditorProps = {
@@ -37,6 +37,10 @@ type BlogEditorProps = {
   onImageUpload?: ImageUploadHandler;
   /** Optional initial editor state as JSON string. */
   initialEditorState?: string;
+  /** Optional initial HTML content to populate the editor. */
+  initialHtml?: string;
+  /** Optional placeholder text. */
+  placeholder?: string;
   /** Optional callback called when editor state changes. */
   onChange?: (editorStateJSON: string) => void;
   /** Optional callback called when editor state is saved. */
@@ -70,13 +74,13 @@ function onError(error: Error) {
 }
 
 // --- Placeholder component ---
-function EditorPlaceholder() {
-  return <div className="blog-editor-placeholder">Start writing your blog post…</div>;
+function EditorPlaceholder({ text }: { text?: string }) {
+  return <div className="blog-editor-placeholder">{text || "Start writing..."}</div>;
 }
 import CharacterCountPlugin from "./editor/CharacterCountPlugin";
 
 const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
-  ({ onSave, onImageUpload, initialEditorState }, ref) => {
+  ({ onSave, onImageUpload, initialEditorState, initialHtml, placeholder }, ref) => {
     const editorRef = useRef<LexicalEditor | null>(null);
     const [open, setOpen] = useState(false);
     const initialConfig = {
@@ -84,7 +88,20 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
       theme: editorTheme,
       nodes: EDITOR_NODES,
       onError,
-      ...(initialEditorState ? { editorState: initialEditorState } : {}),
+      editorState: (editor: LexicalEditor) => {
+        if (initialEditorState) {
+          editor.setEditorState(editor.parseEditorState(initialEditorState));
+          return;
+        }
+
+        if (initialHtml) {
+          const parser = new DOMParser();
+          const dom = parser.parseFromString(initialHtml, "text/html");
+          const nodes = $generateNodesFromDOM(editor, dom);
+          $getRoot().select();
+          $insertNodes(nodes);
+        }
+      },
     };
 
     useImperativeHandle(ref, () => ({
@@ -120,7 +137,7 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
               contentEditable={
                 <ContentEditable className="blog-editor-content" spellCheck={false} />
               }
-              placeholder={<EditorPlaceholder />}
+              placeholder={<EditorPlaceholder text={placeholder} />}
               ErrorBoundary={LexicalErrorBoundary}
             />
           </div>

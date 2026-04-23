@@ -36,8 +36,8 @@ export default function WorkshopTemplateEditPage() {
     } catch (error: any) {
       console.error('Failed to fetch template:', error)
       notification.error({
-        message: 'Failed to Load Template',
-        description: error.message || 'Unable to fetch template details.',
+        message: 'Tải Mẫu Thất Bại',
+        description: error.message || 'Không thể lấy thông tin chi tiết của mẫu.',
       })
     } finally {
       setLoading(false)
@@ -48,7 +48,7 @@ export default function WorkshopTemplateEditPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-        <p className="text-muted-foreground">Loading template...</p>
+        <p className="text-muted-foreground">Đang tải mẫu...</p>
       </div>
     )
   }
@@ -56,10 +56,10 @@ export default function WorkshopTemplateEditPage() {
   if (!template) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <h2 className="text-2xl font-bold">Template Not Found</h2>
-        <p className="text-muted-foreground">The workshop template you're trying to edit doesn't exist.</p>
+        <h2 className="text-2xl font-bold">Không Tìm Thấy Mẫu</h2>
+        <p className="text-muted-foreground">Mẫu workshop bạn đang cố chỉnh sửa không tồn tại.</p>
         <Button onClick={() => navigate("/vendor/workshop-templates")}>
-          Back to Templates
+          Về Danh Sách Mẫu
         </Button>
       </div>
     )
@@ -79,29 +79,29 @@ export default function WorkshopTemplateEditPage() {
             <ArrowLeftOutlined />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold">Cannot Edit Template</h1>
+            <h1 className="text-2xl font-bold">Không Thể Chỉnh Sửa Mẫu</h1>
             <p className="text-muted-foreground">{template.name}</p>
           </div>
         </div>
 
         <Card className="border-yellow-200 bg-yellow-50 dark:bg-yellow-950/20">
           <CardContent className="pt-6">
-            <p className="font-medium">
-              This template is currently <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" /> and cannot be edited.
+            <p className="font-medium flex items-center gap-2 flex-wrap">
+              Mẫu này hiện đang ở trạng thái <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" /> và không thể chỉnh sửa.
             </p>
             <p className="text-sm mt-2 text-muted-foreground">
               {template.status === WorkshopStatus.PENDING
-                ? "The template is under admin review. Please wait for approval or rejection."
+                ? "Mẫu đang chờ admin xem xét. Vui lòng đợi phê duyệt hoặc bị từ chối."
                 : template.isPublished
-                  ? "This template is active and published. Contact admin to make changes."
-                  : "This template is approved. Contact admin to make changes."
+                  ? "Mẫu này đang hoạt động và đã được xuất bản. Liên hệ admin để thay đổi."
+                  : "Mẫu này đã được phê duyệt. Liên hệ admin để thay đổi."
               }
             </p>
             <Button
               className="mt-4"
               onClick={() => navigate(`/vendor/workshop-templates/${id}`)}
             >
-              View Template Details
+              Xem Chi Tiết Mẫu
             </Button>
           </CardContent>
         </Card>
@@ -132,16 +132,16 @@ export default function WorkshopTemplateEditPage() {
       const updatedTemplate = await WorkshopTemplateService.updateTemplate(id, updateRequest)
 
       notification.success({
-        message: 'Template Updated',
-        description: `Template "${updatedTemplate.name}" has been updated successfully.`
+        message: 'Cập Nhật Mẫu Thành Công',
+        description: `Mẫu "${updatedTemplate.name}" đã được cập nhật thành công.`
       })
 
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
       console.error('Update failed:', error)
       notification.error({
-        message: 'Update Failed',
-        description: error.message || 'Failed to update template. Please try again.',
+        message: 'Cập Nhật Thất Bại',
+        description: error.message || 'Không thể cập nhật mẫu. Vui lòng thử lại.',
       })
     } finally {
       setSubmitting(false)
@@ -159,16 +159,16 @@ export default function WorkshopTemplateEditPage() {
       await WorkshopTemplateService.submitForApproval(id)
 
       notification.success({
-        message: 'Submitted for Approval',
-        description: 'Template has been submitted for admin review.'
+        message: 'Đã Gửi Phê Duyệt',
+        description: 'Mẫu đã được gửi cho admin xem xét.'
       })
 
       navigate(`/vendor/workshop-templates/${id}`)
     } catch (error: any) {
       console.error('Submit failed:', error)
       notification.error({
-        message: 'Submission Failed',
-        description: error.message || 'Failed to submit template. Please try again.',
+        message: 'Gửi Thất Bại',
+        description: error.message || 'Không thể gửi mẫu. Vui lòng thử lại.',
       })
     }
   }
@@ -188,7 +188,7 @@ export default function WorkshopTemplateEditPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight">Edit Template</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Chỉnh Sửa Mẫu</h1>
               <TemplateStatusBadge status={template.status} isPublished={template.isPublished} size="sm" />
             </div>
             <p className="text-sm text-muted-foreground mt-0.5">{template.name}</p>
@@ -201,7 +201,7 @@ export default function WorkshopTemplateEditPage() {
           className="gap-2"
         >
           <SendOutlined />
-          Submit for Approval
+          Gửi Phê Duyệt
         </Button>
       </div>
 
@@ -214,8 +214,8 @@ export default function WorkshopTemplateEditPage() {
       <div className="flex items-start gap-3 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 px-4 py-3">
         <Lightbulb className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
         <p className="text-sm text-blue-800 dark:text-blue-200">
-          <strong>Tip:</strong> After saving your changes, you can submit this template for admin approval.
-          Once submitted, you won't be able to edit it until it's approved or rejected.
+          <strong>Mẹo:</strong> Sau khi lưu thay đổi, bạn có thể gửi mẫu này cho admin phê duyệt.
+          Sau khi gửi, bạn sẽ không thể chỉnh sửa cho đến khi nó được phê duyệt hoặc bị từ chối.
         </p>
       </div>
 

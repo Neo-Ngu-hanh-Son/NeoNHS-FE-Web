@@ -50,7 +50,7 @@ export interface CreateEventRequest {
     isTicketRequired?: boolean;
     price?: number;
     maxParticipants?: number;
-    thumbnailUrl: string;
+    thumbnailUrl?: string;
     tagIds?: string[];
 }
 

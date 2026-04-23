@@ -6,7 +6,7 @@ export default function BlogContent({ html }: BlogContentProps) {
   if (!html) {
     return (
       <p className="text-muted-foreground italic py-12 text-center">
-        No content available for this post.
+        Bài viết chưa có nội dung.
       </p>
     );
   }

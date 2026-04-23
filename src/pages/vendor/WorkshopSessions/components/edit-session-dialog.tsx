@@ -6,13 +6,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { SessionForm } from "./session-form"
-import { WorkshopSessionFormData, UpdateWorkshopSessionRequest, WorkshopSessionResponse, SessionStatus } from "../types"
+import { WorkshopSessionFormData, UpdateWorkshopSessionRequest, WorkshopSessionResponse } from "../types"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle } from "lucide-react"
+import { AlertTriangle, Pencil } from "lucide-react"
 import { WorkshopSessionService } from "@/services/api/workshopSessionService"
 import { WorkshopTemplateService } from "@/services/api/workshopTemplateService"
 import { WorkshopTemplateResponse } from "../../WorkshopTemplates/types"
 import { formatDateForApi } from "../utils/formatters"
+import {
+  canEditWorkshopSession,
+  getEditWorkshopSessionBlockReason,
+  mapWorkshopSessionErrorToVi,
+} from "../utils/workshopSessionRules"
+import { getApiErrorMessage } from "@/utils/getApiErrorMessage"
 import { notification } from "antd"
 import { useState, useEffect } from "react"
 
@@ -41,10 +47,17 @@ export function EditSessionDialog({
 
   if (!session) return null
 
-  // Can only edit SCHEDULED sessions
-  const canEdit = session.status === SessionStatus.SCHEDULED
+  const canEdit = canEditWorkshopSession(session)
+  const editBlockReason = getEditWorkshopSessionBlockReason(session)
 
   const handleSubmit = async (data: WorkshopSessionFormData) => {
+    if (!canEditWorkshopSession(session)) {
+      notification.warning({
+        message: "Không thể cập nhật",
+        description: editBlockReason ?? "Phiên không cho phép chỉnh sửa.",
+      })
+      return
+    }
     // Transform form data to API request format
     const updateRequest: UpdateWorkshopSessionRequest = {
       startTime: formatDateForApi(data.startTime),
@@ -58,20 +71,22 @@ export function EditSessionDialog({
       const updatedSession = await WorkshopSessionService.updateSession(session.id, updateRequest)
       
       notification.success({
-        message: 'Session Updated',
+        message: 'Cập nhật thành công',
         description: updatedSession?.workshopTemplate?.name
-          ? `Session for "${updatedSession.workshopTemplate.name}" has been updated successfully.`
-          : 'Workshop session has been updated successfully.'
+          ? `Đã cập nhật phiên cho "${updatedSession.workshopTemplate.name}".`
+          : 'Đã cập nhật phiên workshop thành công.',
       })
       
       // Close dialog and refresh
       onOpenChange(false)
       if (onSuccess) onSuccess()
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Update failed:', error)
       notification.error({
-        message: 'Update Failed',
-        description: error.message || 'Failed to update session. Please try again.',
+        message: 'Cập nhật thất bại',
+        description: mapWorkshopSessionErrorToVi(
+          getApiErrorMessage(error, 'Không thể cập nhật phiên. Vui lòng thử lại.'),
+        ),
       })
     } finally {
       setSubmitting(false)
@@ -84,23 +99,32 @@ export function EditSessionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Workshop Session</DialogTitle>
-          <DialogDescription>
-            Update the schedule, pricing, or capacity for this session.
-          </DialogDescription>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto sm:rounded-2xl border-slate-100 p-0">
+        <DialogHeader className="p-6 pb-0">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-500/20 flex items-center justify-center">
+              <Pencil className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl">Chỉnh Sửa Phiên Workshop</DialogTitle>
+              <DialogDescription className="text-xs pt-1">
+                Cập nhật lịch trình, mức giá hoặc số lượng người tham gia của phiên này.
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         
-        {!canEdit ? (
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4" />
-            <AlertTitle>Cannot Edit Session</AlertTitle>
-            <AlertDescription>
-              Only SCHEDULED sessions can be edited. This session is {session.status}.
-            </AlertDescription>
-          </Alert>
-        ) : (
+        <div className="px-6 pb-6 pt-4">
+          {!canEdit ? (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Không thể chỉnh sửa</AlertTitle>
+              <AlertDescription>
+                {editBlockReason ??
+                  `Chỉ phiên ở trạng thái "Đã lên lịch" và chưa có khách đăng ký mới được sửa. Trạng thái hiện tại: ${session.status}.`}
+              </AlertDescription>
+            </Alert>
+          ) : (
           <SessionForm
             key={session.id}
             defaultValues={session}
@@ -111,6 +135,7 @@ export function EditSessionDialog({
             template={template}
           />
         )}
+        </div>
       </DialogContent>
     </Dialog>
   )

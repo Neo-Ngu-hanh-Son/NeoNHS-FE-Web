@@ -59,15 +59,15 @@ export function TagTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-              <TableHead className="font-semibold text-gray-600 w-[200px]">Name</TableHead>
-              <TableHead className="font-semibold text-gray-600">Description</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[130px]">Color</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[120px]">Icon</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[200px]">Tên</TableHead>
+              <TableHead className="font-semibold text-gray-600">Mô tả</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[130px]">Màu</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[120px]">Biểu tượng</TableHead>
               {kind === "event" && (
-                <TableHead className="font-semibold text-gray-600 w-[90px]">Status</TableHead>
+                <TableHead className="font-semibold text-gray-600 w-[110px] whitespace-nowrap">Trạng thái</TableHead>
               )}
               <TableHead className="font-semibold text-gray-600 w-[140px] text-right">
-                Actions
+                Thao tác
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -90,7 +90,7 @@ export function TagTable({
       {totalElements > 0 && (
         <div className="flex items-center justify-between px-1">
           <p className="text-sm text-gray-500">
-            Showing {rangeStart} to {rangeEnd} of {totalElements} results
+            Hiển thị {rangeStart} đến {rangeEnd} trên {totalElements} kết quả
           </p>
           <div className="flex items-center gap-1.5">
             <Button
@@ -100,7 +100,7 @@ export function TagTable({
               onClick={() => onPageChange(currentPage - 1)}
               className="h-8 px-3 text-xs"
             >
-              Previous
+              Trước
             </Button>
             {Array.from({ length: totalPages }).map((_, index) => (
               <Button
@@ -120,7 +120,7 @@ export function TagTable({
               onClick={() => onPageChange(currentPage + 1)}
               className="h-8 px-3 text-xs"
             >
-              Next
+              Tiếp
             </Button>
           </div>
         </div>

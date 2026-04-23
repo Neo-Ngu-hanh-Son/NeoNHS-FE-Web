@@ -104,8 +104,8 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
 
     const validate = (): boolean => {
         const newErrors: Partial<Record<keyof FormData, string>> = {};
-        if (!form.name.trim()) newErrors.name = 'Name is required';
-        if (!form.price || Number(form.price) <= 0) newErrors.price = 'Price must be > 0';
+        if (!form.name.trim()) newErrors.name = 'Tên là bắt buộc';
+        if (!form.price || Number(form.price) <= 0) newErrors.price = 'Giá phải > 0';
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -135,43 +135,43 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{isEdit ? 'Edit Ticket Type' : 'Add Ticket Type'}</DialogTitle>
+                    <DialogTitle>{isEdit ? 'Chỉnh sửa loại vé' : 'Thêm loại vé'}</DialogTitle>
                     <DialogDescription>
-                        {isEdit ? 'Update the ticket type details.' : 'Create a new ticket type for this event.'}
+                        {isEdit ? 'Cập nhật thông tin chi tiết của loại vé.' : 'Tạo một loại vé mới cho sự kiện này.'}
                     </DialogDescription>
                 </DialogHeader>
 
                 <div className="space-y-4 py-2">
                     <div>
-                        <Label htmlFor="tc-name">Name *</Label>
-                        <Input id="tc-name" value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="e.g. General Admission" />
+                        <Label htmlFor="tc-name">Tên *</Label>
+                        <Input id="tc-name" value={form.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="VD: Vé thông thường" />
                         {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
                     </div>
 
                     <div>
-                        <Label htmlFor="tc-desc">Description</Label>
-                        <Textarea id="tc-desc" value={form.description} onChange={(e) => handleChange('description', e.target.value)} placeholder="Ticket description..." />
+                        <Label htmlFor="tc-desc">Mô tả</Label>
+                        <Textarea id="tc-desc" value={form.description} onChange={(e) => handleChange('description', e.target.value)} placeholder="Mô tả vé..." />
                     </div>
 
                     <div>
-                        <Label htmlFor="tc-customerType">Customer Type</Label>
-                        <Input id="tc-customerType" value={form.customerType} onChange={(e) => handleChange('customerType', e.target.value)} placeholder="e.g. Adult, Child, Student" />
+                        <Label htmlFor="tc-customerType">Đối tượng khách hàng</Label>
+                        <Input id="tc-customerType" value={form.customerType} onChange={(e) => handleChange('customerType', e.target.value)} placeholder="VD: Người lớn, Trẻ em, Sinh viên" />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="tc-price">Price (VND) *</Label>
+                            <Label htmlFor="tc-price">Giá (VND) *</Label>
                             <Input id="tc-price" type="number" min={0} value={form.price} onChange={(e) => handleChange('price', e.target.value)} placeholder="50000" />
                             {errors.price && <p className="text-xs text-destructive mt-1">{errors.price}</p>}
                         </div>
                         <div>
-                            <Label htmlFor="tc-originalPrice">Original Price</Label>
+                            <Label htmlFor="tc-originalPrice">Giá gốc</Label>
                             <Input id="tc-originalPrice" type="number" min={0} value={form.originalPrice} onChange={(e) => handleChange('originalPrice', e.target.value)} placeholder="80000" />
                         </div>
                     </div>
 
                     <div>
-                        <Label>Apply On Days</Label>
+                        <Label>Áp dụng vào các ngày</Label>
                         <div className="flex flex-wrap gap-1.5 mt-1">
                             {WEEKDAY_OPTIONS.map((day) => (
                                 <Badge
@@ -188,22 +188,22 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="tc-validFrom">Valid From</Label>
+                            <Label htmlFor="tc-validFrom">Hợp lệ từ</Label>
                             <Input id="tc-validFrom" type="datetime-local" value={form.validFromDate} onChange={(e) => handleChange('validFromDate', e.target.value)} />
                         </div>
                         <div>
-                            <Label htmlFor="tc-validTo">Valid To</Label>
+                            <Label htmlFor="tc-validTo">Hợp lệ đến</Label>
                             <Input id="tc-validTo" type="datetime-local" value={form.validToDate} onChange={(e) => handleChange('validToDate', e.target.value)} />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <Label htmlFor="tc-totalQuota">Total Quota</Label>
+                            <Label htmlFor="tc-totalQuota">Tổng số lượng</Label>
                             <Input id="tc-totalQuota" type="number" min={0} value={form.totalQuota} onChange={(e) => handleChange('totalQuota', e.target.value)} placeholder="100" />
                         </div>
                         <div>
-                            <Label htmlFor="tc-status">Status</Label>
+                            <Label htmlFor="tc-status">Trạng thái</Label>
                             <Select value={form.status} onValueChange={(v) => handleChange('status', v)} disabled={catalog?.status === 'SOLD_OUT'}>
                                 <SelectTrigger id="tc-status"><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -217,10 +217,10 @@ export function TicketCatalogFormDialog({ open, onOpenChange, catalog, onSubmit 
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Hủy</Button>
                     <Button onClick={handleSubmit} disabled={loading}>
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isEdit ? 'Update' : 'Create'}
+                        {isEdit ? 'Cập nhật' : 'Tạo'}
                     </Button>
                 </DialogFooter>
             </DialogContent>

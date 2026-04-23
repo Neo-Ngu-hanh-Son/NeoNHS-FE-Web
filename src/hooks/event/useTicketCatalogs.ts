@@ -34,11 +34,11 @@ export function useTicketCatalogs(eventId: string): UseTicketCatalogsReturn {
             if (response.success) {
                 setCatalogs(response.data);
             } else {
-                message.error(response.message || 'Failed to fetch ticket catalogs');
+                message.error(response.message || 'Lấy danh mục vé thất bại');
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to fetch ticket catalogs: ' + (err.message || 'Unknown error'));
+            message.error('Lấy danh mục vé thất bại: ' + (err.message || 'Lỗi không xác định'));
         } finally {
             setLoading(false);
         }
@@ -52,16 +52,16 @@ export function useTicketCatalogs(eventId: string): UseTicketCatalogsReturn {
         try {
             const response = await ticketCatalogService.create(eventId, data);
             if (response.success) {
-                message.success('Ticket type created successfully');
+                message.success('Tạo loại vé thành công');
                 await fetchCatalogs();
                 return true;
             } else {
-                message.error(response.message || 'Failed to create ticket type');
+                message.error(response.message || 'Tạo loại vé thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to create ticket type: ' + (err.message || 'Unknown error'));
+            message.error('Tạo loại vé thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [eventId, fetchCatalogs]);
@@ -70,16 +70,16 @@ export function useTicketCatalogs(eventId: string): UseTicketCatalogsReturn {
         try {
             const response = await ticketCatalogService.update(eventId, id, data);
             if (response.success) {
-                message.success('Ticket type updated successfully');
+                message.success('Cập nhật loại vé thành công');
                 await fetchCatalogs();
                 return true;
             } else {
-                message.error(response.message || 'Failed to update ticket type');
+                message.error(response.message || 'Cập nhật loại vé thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to update ticket type: ' + (err.message || 'Unknown error'));
+            message.error('Cập nhật loại vé thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [eventId, fetchCatalogs]);
@@ -88,16 +88,16 @@ export function useTicketCatalogs(eventId: string): UseTicketCatalogsReturn {
         try {
             const response = await ticketCatalogService.delete(eventId, id);
             if (response.success) {
-                message.success('Ticket type deleted successfully');
+                message.success('Xóa loại vé thành công');
                 await fetchCatalogs();
                 return true;
             } else {
-                message.error(response.message || 'Failed to delete ticket type');
+                message.error(response.message || 'Xóa loại vé thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to delete ticket type: ' + (err.message || 'Unknown error'));
+            message.error('Xóa loại vé thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [eventId, fetchCatalogs]);
@@ -106,16 +106,16 @@ export function useTicketCatalogs(eventId: string): UseTicketCatalogsReturn {
         try {
             const response = await ticketCatalogService.restore(eventId, id);
             if (response.success) {
-                message.success('Ticket type restored successfully');
+                message.success('Khôi phục loại vé thành công');
                 await fetchCatalogs();
                 return true;
             } else {
-                message.error(response.message || 'Failed to restore ticket type');
+                message.error(response.message || 'Khôi phục loại vé thất bại');
                 return false;
             }
         } catch (error: unknown) {
             const err = error as Error;
-            message.error('Failed to restore ticket type: ' + (err.message || 'Unknown error'));
+            message.error('Khôi phục loại vé thất bại: ' + (err.message || 'Lỗi không xác định'));
             return false;
         }
     }, [eventId, fetchCatalogs]);

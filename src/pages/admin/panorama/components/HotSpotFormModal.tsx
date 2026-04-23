@@ -1,25 +1,14 @@
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { hotSpotSchema, type HotSpotFormValues } from "../schema";
+import { useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { hotSpotSchema, type HotSpotFormValues } from '../schema';
+import LinkingPanoramaCombobox from './LinkingPanoramaCombobox';
 
 interface HotSpotFormModalProps {
   open: boolean;
@@ -29,16 +18,19 @@ interface HotSpotFormModalProps {
   initialData?: HotSpotFormValues | null;
   /** 0-based index being edited (for display purposes) */
   editIndex?: number | null;
+  currentPanoramaId: string | null;
 }
 
 const defaultValues: HotSpotFormValues = {
   yaw: 0,
   pitch: 0,
-  tooltip: "",
-  title: "",
-  description: "",
-  imageUrl: "",
+  tooltip: '',
+  title: '',
+  description: '',
+  imageUrl: '',
   orderIndex: 0,
+  type: 'INFO',
+  targetPanoramaId: '',
 };
 
 export default function HotSpotFormModal({
@@ -47,6 +39,7 @@ export default function HotSpotFormModal({
   onSubmit,
   initialData,
   editIndex,
+  currentPanoramaId,
 }: HotSpotFormModalProps) {
   const isEditing = editIndex != null;
 
@@ -65,39 +58,63 @@ export default function HotSpotFormModal({
   const handleSubmit = (data: HotSpotFormValues) => {
     onSubmit({
       ...data,
-      imageUrl: data.imageUrl?.trim() || "",
+      imageUrl: data.imageUrl?.trim() || '',
+      tooltip: data.tooltip?.trim() || data.title.trim().slice(0, 100), // Fallback tooltip to truncated title if empty
+      targetPanoramaId: data.type === 'LINK' ? data.targetPanoramaId : '', // Clear targetPanoramaId if not LINK
     });
     onClose();
   };
 
+  const currentType = form.watch('type');
+
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg overflow-visible">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? `Edit Hot Spot #${editIndex! + 1}` : "Add Hot Spot"}
-          </DialogTitle>
+          <DialogTitle>{isEditing ? `Sửa điểm nóng #${editIndex! + 1}` : 'Thêm điểm nóng'}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-2">
-            {/* Position */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* 1. Type Selector (Moved to Top) */}
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs">
+                    Loại hotspot <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Chọn loại hotspot" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INFO">INFO - Điểm thông tin</SelectItem>
+                        <SelectItem value="LINK">LINK - Chuyển panorama</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Hidden Position Fields (Yaw & Pitch) */}
+            <div className="hidden">
               <FormField
                 control={form.control}
                 name="yaw"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Yaw (horizontal angle)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        step="0.01"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
@@ -106,121 +123,138 @@ export default function HotSpotFormModal({
                 name="pitch"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Pitch (vertical angle)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        step="0.01"
                         {...field}
                         onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                       />
                     </FormControl>
-                    <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
-            {/* Tooltip */}
-            <FormField
-              control={form.control}
-              name="tooltip"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">
-                    Tooltip <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Short hover label (max 100 chars)" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Title */}
+            {/* 2. Common Required Fields (Title) */}
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-xs">
-                    Title <span className="text-red-500">*</span>
+                    Tiêu đề <span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
-                    <Input placeholder="Info panel heading" {...field} />
+                    <Input placeholder="Tiêu đề hiển thị..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">
-                    Description <span className="text-red-500">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Full description shown when visitor clicks this hot spot..."
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* 3. LINK Specific Fields */}
+            {currentType === 'LINK' && (
+              <FormField
+                control={form.control}
+                name="targetPanoramaId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs">
+                      Panorama đích <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <LinkingPanoramaCombobox
+                        currentPanoramaId={currentPanoramaId}
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
-            {/* Image URL */}
-            <FormField
-              control={form.control}
-              name="imageUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">Image URL (optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="url"
-                      placeholder="https://example.com/image.jpg"
-                      {...field}
-                      value={field.value ?? ""}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* 4. INFO Specific Fields */}
+            {currentType === 'INFO' && (
+              <div className="space-y-4 animate-in fade-in duration-300">
+                <FormField
+                  control={form.control}
+                  name="tooltip"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Chú thích (tooltip)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Nhãn ngắn khi di chuột (tối đa 100 ký tự)" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            {/* Order index */}
-            <FormField
-              control={form.control}
-              name="orderIndex"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-xs">Order Index</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      value={field.value ?? 0}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Mô tả</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Nội dung đầy đủ hiển thị khi khách chọn điểm nóng này…"
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <DialogFooter>
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">URL ảnh (tùy chọn)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="url"
+                          placeholder="https://example.com/image.jpg"
+                          {...field}
+                          value={field.value ?? ''}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="orderIndex"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs">Thứ tự hiển thị</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          value={field.value ?? 0}
+                          onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
+
+            <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                Hủy
               </Button>
-              <Button type="submit">{isEditing ? "Update" : "Add"}</Button>
+              <Button type="submit">{isEditing ? 'Cập nhật' : 'Thêm'}</Button>
             </DialogFooter>
           </form>
         </Form>

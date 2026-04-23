@@ -11,7 +11,7 @@ type BlockTypeDropdownProps = {
 
 export default function BlockTypeDropdown({ blockType, onChange }: BlockTypeDropdownProps) {
   const currentLabel =
-    BLOCK_TYPES.find((b) => b.value === blockType)?.label ?? 'Normal';
+    BLOCK_TYPES.find((b) => b.value === blockType)?.label ?? 'Đoạn văn';
 
   return (
     <DropdownMenu>
@@ -19,7 +19,7 @@ export default function BlockTypeDropdown({ blockType, onChange }: BlockTypeDrop
         <Button
           variant="outline"
           className="gap-2 min-w-[150px] justify-start"
-          title="Block type"
+          title="Kiểu khối"
         >
           <span>{currentLabel}</span>
           <ChevronDown className="h-4 w-4 opacity-70" />

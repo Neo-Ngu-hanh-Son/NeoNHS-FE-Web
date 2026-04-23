@@ -89,7 +89,7 @@ export function useVendorDashboard() {
             const data = await vendorDashboardService.getStats();
             setStats(data);
         } catch (err) {
-            message.error('Failed to load dashboard stats');
+            message.error('Không tải được thống kê bảng điều khiển');
         }
     }, []);
 
@@ -108,7 +108,7 @@ export function useVendorDashboard() {
                 );
             }
         } catch (err: any) {
-            setRevenueError(err?.message ?? 'Failed to load revenue data');
+            setRevenueError(err?.message ?? 'Không tải được dữ liệu doanh thu');
             setRevenueData([]);
         }
     }, []);
@@ -120,7 +120,7 @@ export function useVendorDashboard() {
                 data.map((d) => ({ name: d.name, value: d.value })),
             );
         } catch (err) {
-            message.error('Failed to load workshop status');
+            message.error('Không tải được trạng thái workshop');
         }
     }, []);
 
@@ -139,7 +139,7 @@ export function useVendorDashboard() {
                 })),
             );
         } catch (err) {
-            message.error('Failed to load transactions');
+            message.error('Không tải được danh sách giao dịch');
         }
     }, []);
 
@@ -151,11 +151,11 @@ export function useVendorDashboard() {
                     workshop: r.workshopName,
                     totalReviews: r.totalReviews,
                     avgRating: r.averageRating,
-                    recent: `+${r.newReviewsInWindow} this week`,
+                    recent: `+${r.newReviewsInWindow} tuần này`,
                 })),
             );
         } catch (err) {
-            message.error('Failed to load workshop reviews');
+            message.error('Không tải được đánh giá workshop');
         }
     }, []);
 
@@ -164,7 +164,7 @@ export function useVendorDashboard() {
             const data = await vendorDashboardService.getSessions();
             setSessionsData(data);
         } catch (err) {
-            message.error('Failed to load session data');
+            message.error('Không tải được dữ liệu phiên');
         }
     }, []);
 
@@ -205,7 +205,7 @@ export function useVendorDashboard() {
         const start = new Date(s.startAt);
         const end = new Date(s.endAt);
         const fmt = (d: Date) =>
-            d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
         return {
             workshopName: s.workshopName,
             workshopId: s.workshopId,

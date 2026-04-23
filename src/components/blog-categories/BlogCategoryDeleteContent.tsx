@@ -22,9 +22,9 @@ export default function BlogCategoryDeleteContent({
         <TriangleAlert className="h-7 w-7 text-destructive" />
       </div>
 
-      <h3 className="text-lg font-bold text-foreground mb-1">Delete Category</h3>
+      <h3 className="text-lg font-bold text-foreground mb-1">Xóa danh mục</h3>
       <p className="text-sm text-muted-foreground mb-3">
-        Are you sure you want to delete this category?
+        Bạn có chắc muốn xóa danh mục này?
       </p>
 
       {/* Category info card */}
@@ -37,14 +37,13 @@ export default function BlogCategoryDeleteContent({
             {category.name}
           </p>
           <p className="text-xs text-muted-foreground">
-            {category.postCount} post{category.postCount !== 1 ? 's' : ''}{' '}
-            associated
+            {category.postCount} bài viết liên quan
           </p>
         </div>
       </div>
 
       <p className="text-xs text-destructive mt-3">
-        This action cannot be undone.
+        Không thể hoàn tác thao tác này.
       </p>
     </div>
   );

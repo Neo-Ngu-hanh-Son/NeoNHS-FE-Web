@@ -4,7 +4,7 @@
 
 // --- Enums ---
 
-export type VoucherType = 'DISCOUNT' | 'GIFT_PRODUCT' | 'BONUS_POINTS' | 'FREE_SERVICE';
+export type VoucherType = 'DISCOUNT' | 'GIFT_PRODUCT';
 export type VoucherScope = 'PLATFORM' | 'VENDOR';
 export type VoucherStatus = 'ACTIVE' | 'INACTIVE' | 'EXPIRED';
 export type DiscountType = 'PERCENT' | 'FIXED';
@@ -30,19 +30,11 @@ export interface VoucherResponse {
     giftDescription: string | null;
     giftImageUrl: string | null;
 
-    // BONUS_POINTS fields
-    bonusPointsValue: number | null;
-
-    // FREE_SERVICE fields
-    freeTicketCatalogId: string | null;
-    freeTicketCatalogName: string | null;
-
     // Time & Usage
     startDate: string;
     endDate: string;
     usageLimit: number;
     usageCount: number;
-    maxUsagePerUser: number;
 
     // Status & Meta
     status: VoucherStatus;
@@ -53,6 +45,7 @@ export interface VoucherResponse {
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;
+    pointCost: number;
 }
 
 export interface UserVoucherResponse {
@@ -72,12 +65,12 @@ export interface UserVoucherResponse {
     minOrderValue: number | null;
     giftDescription: string | null;
     giftImageUrl: string | null;
-    bonusPointsValue: number | null;
     startDate: string;
     endDate: string;
     status: VoucherStatus;
     vendorId: string | null;
     vendorName: string | null;
+    pointCost: number;
 }
 
 // --- Request Types ---
@@ -98,17 +91,11 @@ export interface CreateVoucherRequest {
     giftDescription?: string;
     giftImageUrl?: string;
 
-    // BONUS_POINTS
-    bonusPointsValue?: number;
-
-    // FREE_SERVICE
-    freeTicketCatalogId?: string;
-
     // Time & Usage
     startDate?: string;
     endDate?: string;
     usageLimit?: number;
-    maxUsagePerUser?: number;
+    pointCost?: number;
 }
 
 export interface UpdateVoucherRequest {
@@ -120,13 +107,11 @@ export interface UpdateVoucherRequest {
     minOrderValue?: number;
     giftDescription?: string;
     giftImageUrl?: string;
-    bonusPointsValue?: number;
-    freeTicketCatalogId?: string;
     startDate?: string;
     endDate?: string;
     usageLimit?: number;
-    maxUsagePerUser?: number;
     status?: VoucherStatus;
+    pointCost?: number;
 }
 
 // --- Pagination ---

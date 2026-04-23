@@ -7,8 +7,8 @@ export default function EventCreatePage() {
     const navigate = useNavigate();
     const { createEvent, loading } = useCreateEvent();
 
-    const handleSubmit = async (data: CreateEventRequest) => {
-        const result = await createEvent(data);
+    const handleSubmit = async (data: CreateEventRequest, file?: File) => {
+        const result = await createEvent(data, file);
         if (result) {
             navigate('/admin/events');
         }
@@ -17,8 +17,8 @@ export default function EventCreatePage() {
     return (
         <div className="max-w-6xl mx-auto">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">Create Event</h1>
-                <p className="text-muted-foreground text-sm mt-1">Create a new event by filling in the details below.</p>
+                <h1 className="text-2xl font-bold">Tạo sự kiện</h1>
+                <p className="text-muted-foreground text-sm mt-1">Tạo một sự kiện mới bằng cách điền các thông tin dưới đây.</p>
             </div>
             <EventForm mode="create" onSubmit={handleSubmit as any} loading={loading} />
         </div>

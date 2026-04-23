@@ -1,4 +1,5 @@
 import { FunctionComponent } from 'react';
+import { Link } from 'react-router-dom';
 import {
   FacebookFilled,
   TwitterOutlined,
@@ -12,20 +13,24 @@ import {
 import { Separator } from '@/components/ui/separator';
 
 const Footer: FunctionComponent = () => {
-  const quickLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'About Us', href: '/about' },
-    { label: 'Destinations', href: '/destinations' },
-    { label: 'Workshops', href: '/workshops' },
+  const productLinks = [
+    { label: 'Tính năng', href: '/#features' },
+    { label: 'Workshop', href: '/#workshops' },
+    { label: 'Panorama 360°', href: '/#panorama' },
+    { label: 'AI Guide', href: '/#ai-guide' },
+  ];
+
+  const companyLinks = [
+    { label: 'Về chúng tôi', href: '/about-us' },
     { label: 'Blog', href: '/blog' },
+    { label: 'Liên hệ', href: '/about-us#contact' },
   ];
 
   const supportLinks = [
-    { label: 'Help Center', href: '/help' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Privacy Policy', href: '/privacy' },
-    { label: 'FAQ', href: '/faq' },
-    { label: 'Contact Us', href: '/contact' },
+    { label: 'Trung tâm hỗ trợ', href: '/help' },
+    { label: 'Điều khoản dịch vụ', href: '/terms' },
+    { label: 'Chính sách bảo mật', href: '/privacy' },
+    { label: 'Câu hỏi thường gặp', href: '/#faq' },
   ];
 
   const socialLinks = [
@@ -36,20 +41,21 @@ const Footer: FunctionComponent = () => {
   ];
 
   return (
-    <footer className="w-full bg-gray-900 text-white font-[Poppins]">
+    <footer className="w-full bg-[#020617] text-white font-[Inter]">
+      {/* Gradient divider — smooth transition from dark CTA */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
       <div className="max-w-7xl mx-auto px-6 py-16">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          {/* Brand Section */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">N</span>
-              </div>
-              <span className="text-2xl font-bold tracking-tight">NeoNHS</span>
-            </div>
-            <p className="text-gray-400 text-base leading-relaxed">
-              Connecting heritage, experiences, and commerce in Ngu Hanh Son Ward.
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
+          {/* Brand Section — wider */}
+          <div className="lg:col-span-2 space-y-6">
+            <Link to="/" className="flex items-center gap-3 group">
+              <img src="/src/assets/images/NeoNHSLogo_Optimized.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
+              <span className="text-xl font-bold tracking-tight text-white">NeoNHS</span>
+            </Link>
+            <p className="text-white/40 text-sm leading-relaxed max-w-xs">
+              Hệ sinh thái du lịch thông minh kết nối du khách với giá trị văn hoá và làng nghề truyền thống tại Ngũ Hành Sơn, Đà Nẵng.
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
@@ -57,7 +63,7 @@ const Footer: FunctionComponent = () => {
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="w-10 h-10 bg-gray-800 hover:bg-emerald-600 rounded-lg flex items-center justify-center transition-colors duration-300"
+                  className="w-10 h-10 bg-white/5 hover:bg-emerald-600 rounded-xl flex items-center justify-center transition-all duration-300 text-white/50 hover:text-white"
                 >
                   {social.icon}
                 </a>
@@ -65,15 +71,15 @@ const Footer: FunctionComponent = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Quick Links</h3>
+          {/* Product Links */}
+          <div className="space-y-5">
+            <h3 className="text-xs font-bold tracking-widest uppercase text-white/30">Sản phẩm</h3>
             <ul className="space-y-3">
-              {quickLinks.map((link) => (
+              {productLinks.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-base"
+                    className="text-white/50 hover:text-white transition-colors duration-300 text-sm"
                   >
                     {link.label}
                   </a>
@@ -82,15 +88,32 @@ const Footer: FunctionComponent = () => {
             </ul>
           </div>
 
-          {/* Support */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Support</h3>
+          {/* Company Links */}
+          <div className="space-y-5">
+            <h3 className="text-xs font-bold tracking-widest uppercase text-white/30">Công ty</h3>
+            <ul className="space-y-3">
+              {companyLinks.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    to={link.href}
+                    className="text-white/50 hover:text-white transition-colors duration-300 text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Support Links */}
+          <div className="space-y-5">
+            <h3 className="text-xs font-bold tracking-widest uppercase text-white/30">Hỗ trợ</h3>
             <ul className="space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-base"
+                    className="text-white/50 hover:text-white transition-colors duration-300 text-sm"
                   >
                     {link.label}
                   </a>
@@ -98,56 +121,18 @@ const Footer: FunctionComponent = () => {
               ))}
             </ul>
           </div>
-
-          {/* Contact Info */}
-          <div className="space-y-6">
-            <h3 className="text-lg font-semibold">Contact Info</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3">
-                <EnvironmentOutlined className="text-emerald-400 text-lg mt-1" />
-                <span className="text-gray-300 text-base leading-relaxed">
-                  Ngu Hanh Son Ward, Da Nang, Vietnam
-                </span>
-              </li>
-              <li className="flex items-center gap-3">
-                <PhoneOutlined className="text-emerald-400 text-lg" />
-                <a
-                  href="tel:+842363961114"
-                  className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-base"
-                >
-                  +84 236 3961 114
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <MailOutlined className="text-emerald-400 text-lg" />
-                <a
-                  href="mailto:info@ccte-nhs.com"
-                  className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-base"
-                >
-                  info@ccte-nhs.com
-                </a>
-              </li>
-              <li className="flex items-center gap-3">
-                <GlobalOutlined className="text-emerald-400 text-lg" />
-                <a
-                  href="https://www.ccte-nhs.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-300 hover:text-emerald-400 transition-colors duration-300 text-base"
-                >
-                  www.ccte-nhs.com
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {/* Bottom Section */}
-        <Separator className="my-8 bg-gray-700" />
-        <div className="text-center">
-          <p className="text-gray-500 text-base">
-            © {new Date().getFullYear()} CCTE - Ngu Hanh Son Cultural Tourism Experience. All rights reserved.
+        <div className="h-px bg-white/5 my-10" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-white/30 text-sm">
+            © {new Date().getFullYear()} NeoNHS — Hệ sinh thái Du lịch Ngũ Hành Sơn. All rights reserved.
           </p>
+          <a href="mailto:contact@neonhs.vn" className="text-white/30 hover:text-white/60 transition-colors text-sm flex items-center gap-2">
+            <MailOutlined />
+            contact@neonhs.vn
+          </a>
         </div>
       </div>
     </footer>
@@ -155,4 +140,3 @@ const Footer: FunctionComponent = () => {
 };
 
 export default Footer;
-      			

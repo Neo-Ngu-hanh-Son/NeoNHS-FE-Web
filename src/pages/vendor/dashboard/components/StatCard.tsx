@@ -29,7 +29,7 @@ export function StatCard({ title, value, icon: Icon, trend, iconBg }: StatCardPr
                                     {trend.isPositive ? '+' : ''}
                                     {trend.value}%
                                 </span>
-                                <span className="text-muted-foreground">vs last period</span>
+                                <span className="text-muted-foreground">so với kỳ trước</span>
                             </div>
                         )} */}
                     </div>

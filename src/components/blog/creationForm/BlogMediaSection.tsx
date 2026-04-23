@@ -1,17 +1,17 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { message } from "antd";
-import { Controller, UseFormReturn } from "react-hook-form";
-import { z } from "zod";
-import { formSchema } from "@/components/blog/type";
-import { Label } from "@/components/ui/label";
-import DragImageUploader from "@/components/common/DragImageUploader";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { message } from 'antd';
+import { Controller, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import { BlogFormSchema } from '@/components/blog/type';
+import { Label } from '@/components/ui/label';
+import DragImageUploader from '@/components/common/DragImageUploader';
 
-export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof formSchema>> }) {
+export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer<typeof BlogFormSchema>> }) {
   const [messageApi] = message.useMessage();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Media</CardTitle>
+        <CardTitle>Phương tiện</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
         {/* Thumbnail */}
@@ -20,12 +20,12 @@ export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer
           control={form.control}
           render={({ field, fieldState }) => (
             <div className="space-y-1.5">
-              <Label className="text-sm">Thumbnail</Label>
+              <Label className="text-sm">Ảnh đại diện</Label>
               <DragImageUploader
                 value={field.value}
                 onUpload={field.onChange}
                 onError={(msg) => messageApi.error(msg)}
-                placeholder="Drag & drop a thumbnail image"
+                placeholder="Kéo thả ảnh đại diện vào đây"
                 minHeight={140}
                 imageClassName="object-cover h-[140px]"
               />
@@ -40,12 +40,12 @@ export default function BlogMediaSection({ form }: { form: UseFormReturn<z.infer
           control={form.control}
           render={({ field, fieldState }) => (
             <div className="space-y-1.5">
-              <Label className="text-sm">Banner</Label>
+              <Label className="text-sm">Ảnh bìa</Label>
               <DragImageUploader
                 value={field.value}
                 onUpload={field.onChange}
                 onError={(msg) => messageApi.error(msg)}
-                placeholder="Drag & drop a banner image"
+                placeholder="Kéo thả ảnh bìa vào đây"
                 minHeight={120}
                 imageClassName="object-cover h-[120px]"
               />

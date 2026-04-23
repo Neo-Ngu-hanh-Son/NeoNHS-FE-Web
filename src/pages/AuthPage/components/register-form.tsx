@@ -17,6 +17,8 @@ import { Link, useNavigate } from "react-router-dom"
 import { useState } from "react"
 import { notification } from "antd"
 import { authService } from "@/services/api/authService"
+import { useAuthLocale } from "../i18n/AuthLocaleContext"
+import { authErrorDesc } from "../i18n/authApiErrorDescription"
 
 export function RegisterForm({
   className,
@@ -32,6 +34,7 @@ export function RegisterForm({
   const [confirmPassword, setConfirmPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [api, contextHolder] = notification.useNotification()
+  const { t } = useAuthLocale();
 
   // Password validation
   const passwordChecks = {
@@ -49,8 +52,8 @@ export function RegisterForm({
     // Validate password requirements
     if (!allChecksPassed) {
       api.error({
-        title: 'Invalid Password',
-        description: "Password does not meet requirements.",
+        title: t('register.invalidPasswordTitle'),
+        description: t('register.invalidPasswordDesc'),
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
         duration: 3,
@@ -61,8 +64,8 @@ export function RegisterForm({
     // Validate password match
     if (!passwordsMatch) {
       api.error({
-        title: 'Password Mismatch',
-        description: "Passwords do not match.",
+        title: t('register.mismatchTitle'),
+        description: t('register.mismatchDesc'),
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
         duration: 3,
@@ -75,8 +78,8 @@ export function RegisterForm({
       // Register and send OTP
       await authService.register({ fullname, phone, email, password })
       api.success({
-        title: 'Registration Submitted!',
-        description: 'A verification code has been sent to your email.',
+        title: t('register.successTitle'),
+        description: t('register.successDesc'),
         icon: <CheckCircleOutlined style={{ color: '#10b981' }} />,
         placement: 'topRight',
         duration: 3,
@@ -92,10 +95,10 @@ export function RegisterForm({
             }
           })
       }, 1500)
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || "Registration failed. Please try again."
+    } catch (err: unknown) {
+      const errorMessage = authErrorDesc(err, t, 'register.failDefault')
       api.error({
-        title: 'Registration Failed',
+        title: t('register.failTitle'),
         description: errorMessage,
         icon: <CloseCircleOutlined style={{ color: '#ef4444' }} />,
         placement: 'topRight',
@@ -115,9 +118,9 @@ export function RegisterForm({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 mb-4 shadow-lg">
             <UserOutlined className="text-2xl text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('register.title')}</h1>
           <p className="text-gray-500">
-            Join us to explore <span className="text-emerald-600 font-semibold">Ngu Hanh Son</span>
+            {t('register.subtitle')} <span className="text-emerald-600 font-semibold">{t('common.nguHanhSon')}</span>
           </p>
         </div>
 
@@ -130,12 +133,12 @@ export function RegisterForm({
               <div className="space-y-2">
                 <label htmlFor="name" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <UserOutlined className="text-gray-400" />
-                  Full Name
+                  {t('register.fullName')}
                 </label>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter your full name"
+                  placeholder={t('register.fullNamePh')}
                   required
                   value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
@@ -147,12 +150,12 @@ export function RegisterForm({
               <div className="space-y-2">
                 <label htmlFor="phone" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <PhoneOutlined className="text-gray-400" />
-                  Phone Number
+                  {t('register.phone')}
                 </label>
                 <Input
                   id="phone"
                   type="tel"
-                  placeholder="Enter your phone number"
+                  placeholder={t('register.phonePh')}
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
@@ -165,12 +168,12 @@ export function RegisterForm({
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                 <MailOutlined className="text-gray-400" />
-                Email Address
+                {t('register.email')}
               </label>
               <Input
                 id="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder={t('register.emailPh')}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -184,13 +187,13 @@ export function RegisterForm({
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <LockOutlined className="text-gray-400" />
-                  Password
+                  {t('register.password')}
                 </label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder={t('register.passwordPh')}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -210,13 +213,13 @@ export function RegisterForm({
               <div className="space-y-2">
                 <label htmlFor="confirm-password" className="text-sm font-medium text-gray-700 flex items-center gap-2">
                   <LockOutlined className="text-gray-400" />
-                  Confirm Password
+                  {t('register.confirmPassword')}
                 </label>
                 <div className="relative">
                   <Input
                     id="confirm-password"
                     type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
+                    placeholder={t('register.confirmPasswordPh')}
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -236,13 +239,13 @@ export function RegisterForm({
                 {confirmPassword.length > 0 && !passwordsMatch && (
                   <p className="text-sm text-red-500 flex items-center gap-1.5">
                     <CloseCircleFilled className="text-xs" />
-                    Passwords do not match
+                    {t('register.passwordsMismatch')}
                   </p>
                 )}
                 {passwordsMatch && (
                   <p className="text-sm text-emerald-600 flex items-center gap-1.5">
                     <CheckCircleFilled className="text-xs" />
-                    Passwords match
+                    {t('register.passwordsMatch')}
                   </p>
                 )}
               </div>
@@ -251,9 +254,9 @@ export function RegisterForm({
             {/* Password Requirements - Full Width */}
             {password.length > 0 && (
               <div className="p-3 rounded-lg bg-gray-50 flex flex-wrap gap-x-6 gap-y-1.5">
-                <PasswordCheck passed={passwordChecks.length} text="At least 8 characters" />
-                <PasswordCheck passed={passwordChecks.hasLetter} text="Contains a letter" />
-                <PasswordCheck passed={passwordChecks.hasNumber} text="Contains a number" />
+                <PasswordCheck passed={passwordChecks.length} text={t('register.ruleLength')} />
+                <PasswordCheck passed={passwordChecks.hasLetter} text={t('register.ruleLetter')} />
+                <PasswordCheck passed={passwordChecks.hasNumber} text={t('register.ruleNumber')} />
               </div>
             )}
 
@@ -264,19 +267,19 @@ export function RegisterForm({
                 disabled={loading}
                 className="h-10 px-12 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 text-lg"
               >
-                {loading ? "Registering..." : "Register"}
+                {loading ? t('register.submitting') : t('register.submit')}
               </Button>
             </div>
           </div>
 
           {/* Login Link */}
           <p className="mt-8 text-center text-gray-600">
-            Already have an account?{" "}
+            {t('register.hasAccount')}{' '}
             <Link
               to="/login"
               className="font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
             >
-              Sign in
+              {t('register.signIn')}
             </Link>
           </p>
         </form>

@@ -24,12 +24,12 @@ export function TagToolbar({ title, sortIndex, onSortChange, onAdd }: TagToolbar
       <div className="flex items-center gap-2 flex-wrap">
         <Select value={String(sortIndex)} onValueChange={(value) => onSortChange(Number(value))}>
           <SelectTrigger className="w-[180px] h-9">
-            <SelectValue placeholder="Sort by" />
+            <SelectValue placeholder="Sắp xếp" />
           </SelectTrigger>
           <SelectContent>
             {TAG_SORT_OPTIONS.map((option, index) => (
               <SelectItem key={option.label} value={String(index)}>
-                Sort: {option.label}
+                Sắp xếp theo: {option.label}
               </SelectItem>
             ))}
           </SelectContent>
@@ -37,7 +37,7 @@ export function TagToolbar({ title, sortIndex, onSortChange, onAdd }: TagToolbar
 
         <Button size="default" onClick={onAdd} className="h-9">
           <Plus className="h-3.5 w-3.5" />
-          Add Tag
+          Thêm nhãn
         </Button>
       </div>
     </div>

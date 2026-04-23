@@ -115,9 +115,17 @@ export const adminVoucherService = {
 // --- Vendor Voucher Service ---
 
 export const vendorVoucherService = {
-    getMyVouchers: async (params: VendorVoucherQueryParams = {}): Promise<ApiResponse<PagedVoucherResponse>> => {
+    getAll: async (params: VendorVoucherQueryParams = {}): Promise<ApiResponse<PagedVoucherResponse>> => {
         const url = `/vendor/vouchers/my${buildQuery(params)}`;
         return apiClient.get<ApiResponse<PagedVoucherResponse>>(url);
+    },
+    getMyVouchers: (params?: VendorVoucherQueryParams) => {
+        // Alias for backward compatibility during refactor
+        return vendorVoucherService.getAll(params);
+    },
+
+    getById: async (id: string): Promise<ApiResponse<VoucherResponse>> => {
+        return apiClient.get<ApiResponse<VoucherResponse>>(`/vendor/vouchers/${id}`);
     },
 
     create: async (data: CreateVoucherRequest): Promise<ApiResponse<VoucherResponse>> => {

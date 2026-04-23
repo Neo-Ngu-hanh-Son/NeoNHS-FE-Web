@@ -58,7 +58,7 @@ export function RevenueOverviewCard({
         tooltip: {
             items: [
                 (d: RevenuePoint) => ({
-                    name: 'Revenue',
+                    name: 'Doanh thu',
                     value: new Intl.NumberFormat('vi-VN').format(d.revenue) + ' VNĐ',
                 }),
             ],
@@ -69,17 +69,17 @@ export function RevenueOverviewCard({
         <Card className="h-full flex flex-col">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
-                    <CardTitle className="text-base">Revenue Overview</CardTitle>
-                    <CardDescription>Track your earnings over time</CardDescription>
+                    <CardTitle className="text-base">Tổng quan doanh thu</CardTitle>
+                    <CardDescription>Theo dõi thu nhập theo thời gian</CardDescription>
                 </div>
                 <Select value={revenueFilter} onValueChange={(v) => onRevenueFilterChange(v as RevenueFilter)}>
                     <SelectTrigger className="w-[120px] h-8 text-xs">
-                        <SelectValue placeholder="Select period" />
+                        <SelectValue placeholder="Chọn kỳ" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="week">This Week</SelectItem>
-                        <SelectItem value="month">This Month</SelectItem>
-                        <SelectItem value="year">This Year</SelectItem>
+                        <SelectItem value="week">Tuần này</SelectItem>
+                        <SelectItem value="month">Tháng này</SelectItem>
+                        <SelectItem value="year">Năm nay</SelectItem>
                     </SelectContent>
                 </Select>
             </CardHeader>
@@ -88,7 +88,7 @@ export function RevenueOverviewCard({
                     {revenueError ? (
                         <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm py-8">
                             <AlertCircle className="w-8 h-8 text-destructive/60" />
-                            <p className="font-medium">Revenue data unavailable</p>
+                            <p className="font-medium">Không tải được dữ liệu doanh thu</p>
                             <p className="text-xs text-center max-w-[240px]">{revenueError}</p>
                         </div>
                     ) : hasData ? (
@@ -98,7 +98,7 @@ export function RevenueOverviewCard({
                     ) : (
                         <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm py-8">
                             <BarChart2 className="w-8 h-8 opacity-30" />
-                            <p>No revenue data for this period</p>
+                            <p>Chưa có dữ liệu doanh thu trong kỳ này</p>
                         </div>
                     )}
                 </div>

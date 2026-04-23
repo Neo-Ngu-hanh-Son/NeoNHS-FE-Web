@@ -21,6 +21,15 @@ import {
   formatDuration,
   calculateDuration
 } from "../utils/formatters"
+import {
+  canCompleteWorkshopSession,
+  canStartWorkshopSession,
+  getCompleteWorkshopSessionBlockReason,
+  getStartWorkshopSessionBlockReason,
+} from "../utils/workshopSessionRules"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Info } from "lucide-react"
 
 interface ViewSessionDialogProps {
   open: boolean
@@ -50,20 +59,20 @@ export function ViewSessionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto sm:rounded-2xl border-slate-100 p-0">
+        <DialogHeader className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-2xl">{session.workshopTemplate?.name || 'Unnamed Workshop'}</DialogTitle>
+              <DialogTitle className="text-2xl">{session.workshopTemplate?.name || 'Workshop chưa phân loại'}</DialogTitle>
               <p className="text-sm text-muted-foreground mt-1">
-                {session.workshopTemplate?.shortDescription || 'No description available'}
+                {session.workshopTemplate?.shortDescription || 'Chưa có mô tả'}
               </p>
             </div>
             <SessionStatusBadge status={session.status} size="lg" />
           </div>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="px-6 pb-6 pt-4 space-y-6">
           {/* Image Gallery */}
           {images.length > 0 && (
             <div className="space-y-3">
@@ -105,21 +114,21 @@ export function ViewSessionDialog({
 
           {/* Schedule Information */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Schedule</h3>
+            <h3 className="text-lg font-semibold">Lịch Trình</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 mt-0.5 text-primary" />
+              <div className="flex items-start gap-3 bg-slate-50 dark:bg-slate-800/30 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                <Calendar className="w-5 h-5 mt-0.5 text-blue-500" />
                 <div>
-                  <p className="font-medium">Date & Time</p>
-                  <p className="text-muted-foreground">{formatFullDateTime(session.startTime)}</p>
+                  <p className="font-medium">Ngày & Giờ</p>
+                  <p className="text-muted-foreground mt-0.5">{formatFullDateTime(session.startTime)}</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3">
-                <Clock className="w-5 h-5 mt-0.5 text-primary" />
+              <div className="flex items-start gap-3 bg-slate-50 dark:bg-slate-800/30 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                <Clock className="w-5 h-5 mt-0.5 text-blue-500" />
                 <div>
-                  <p className="font-medium">Time Range</p>
-                  <p className="text-muted-foreground">{formatTimeRange(session.startTime, session.endTime)}</p>
-                  <p className="text-xs text-muted-foreground">Duration: {formatDuration(duration)}</p>
+                  <p className="font-medium">Khung Giờ</p>
+                  <p className="text-muted-foreground mt-0.5">{formatTimeRange(session.startTime, session.endTime)}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 font-medium text-amber-600">Thời lượng: {formatDuration(duration)}</p>
                 </div>
               </div>
             </div>
@@ -129,11 +138,13 @@ export function ViewSessionDialog({
 
           {/* Pricing */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Pricing</h3>
+            <h3 className="text-lg font-semibold">Chi Phí</h3>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-primary" />
-              <span className="text-2xl font-bold text-primary">{formatPrice(session.price)}</span>
-              <span className="text-sm text-muted-foreground">per participant</span>
+              <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/20 flex items-center justify-center font-semibold">
+                <DollarSign className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              </div>
+              <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">{formatPrice(session.price)}</span>
+              <span className="text-sm text-muted-foreground mt-1">/ người tham gia</span>
             </div>
           </div>
 
@@ -141,20 +152,20 @@ export function ViewSessionDialog({
 
           {/* Enrollment Status */}
           <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Enrollment Status</h3>
-            <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Tình Trạng Đăng Ký</h3>
+            <div className="space-y-3 bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-primary" />
+                  <Users className="w-5 h-5 text-emerald-600" />
                   <span className="font-medium">
-                    {session.currentEnrollments} / {session.maxParticipants} participants enrolled
+                    {session.currentEnrollments} / {session.maxParticipants} học viên tham gia
                   </span>
                 </div>
-                <span className="text-muted-foreground">{enrollmentPercentage}% filled</span>
+                <span className="text-muted-foreground font-semibold text-emerald-600">{enrollmentPercentage}%</span>
               </div>
-              <Progress value={enrollmentPercentage} className="h-3" />
-              <p className={`text-sm font-medium ${session.availableSlots === 0 ? 'text-red-500' : 'text-green-600'}`}>
-                {formatAvailability(session.availableSlots)}
+              <Progress value={enrollmentPercentage} className="h-2 bg-slate-200 dark:bg-slate-700" />
+              <p className={`text-sm font-medium ${session.availableSlots === 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                {session.availableSlots === 0 ? 'Đã hết chỗ trống' : `Còn lại ${session.availableSlots} chỗ trống`}
               </p>
             </div>
           </div>
@@ -164,8 +175,8 @@ export function ViewSessionDialog({
           {/* Workshop Description */}
           {session.workshopTemplate?.fullDescription && (
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold">About This Workshop</h3>
-              <div className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+              <h3 className="text-lg font-semibold">Giới Thiệu Workshop</h3>
+              <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line bg-slate-50 dark:bg-slate-800/20 p-4 rounded-xl border border-slate-100 dark:border-slate-800/50">
                 {session.workshopTemplate.fullDescription}
               </div>
             </div>
@@ -176,7 +187,7 @@ export function ViewSessionDialog({
             <>
               <Separator />
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Categories</h3>
+                <h3 className="text-lg font-semibold">Danh Mục Tag</h3>
                 <div className="flex flex-wrap gap-2">
                   {session.workshopTemplate.tags.map((tag) => (
                     <Badge
@@ -201,22 +212,22 @@ export function ViewSessionDialog({
             <>
               <Separator />
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold">Hosted By</h3>
-                <div className="flex items-start gap-4">
+                <h3 className="text-lg font-semibold">Người Tổ Chức</h3>
+                <div className="flex items-start gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
                   {session.vendor.avatar && (
                     <img
                       src={session.vendor.avatar}
                       alt={session.vendor.name}
-                      className="w-12 h-12 rounded-full"
+                      className="w-12 h-12 rounded-full border shadow-sm"
                     />
                   )}
                   <div className="space-y-1 text-sm">
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">{session.vendor.name}</span>
+                      <User className="w-4 h-4 text-slate-400" />
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{session.vendor.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <Mail className="w-4 h-4 text-slate-400" />
                       <span className="text-muted-foreground">{session.vendor.email}</span>
                     </div>
                   </div>
@@ -226,55 +237,97 @@ export function ViewSessionDialog({
           )}
 
           {/* Rating (if available) */}
-          {session.workshopTemplate?.averageRating && (
+          {session.workshopTemplate?.averageRating ? (
             <>
               <Separator />
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">Rating</h3>
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">Đánh Giá Từ Học Viên</h3>
                 <div className="flex items-center gap-2">
-                  <span className="text-yellow-500 text-2xl">★</span>
+                  <span className="text-amber-500 text-2xl">★</span>
                   <span className="text-2xl font-bold">{session.workshopTemplate.averageRating.toFixed(1)}</span>
                   <span className="text-sm text-muted-foreground">
-                    ({session.workshopTemplate.totalReview} reviews)
+                    ({session.workshopTemplate.totalRatings || session.workshopTemplate.totalReview} đánh giá)
                   </span>
                 </div>
               </div>
             </>
-          )}
+          ) : null}
 
-          {/* Status Action Buttons */}
+          {/* Status Action Buttons — khớp quy tắc backend (đăng ký, cửa sổ ±30 phút) */}
           {(session.status === SessionStatus.SCHEDULED || session.status === SessionStatus.ONGOING) && (
             <>
               <Separator />
-              <div className="flex gap-3 justify-end">
-                {session.status === SessionStatus.SCHEDULED && onStart && (
-                  <Button
-                    onClick={() => { onStart(session); onOpenChange(false) }}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Session
-                  </Button>
-                )}
-                {session.status === SessionStatus.ONGOING && onComplete && (
-                  <Button
-                    onClick={() => { onComplete(session); onOpenChange(false) }}
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Complete Session
-                  </Button>
-                )}
-                {onCancel && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => { onCancel(session); onOpenChange(false) }}
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Cancel Session
-                  </Button>
-                )}
-              </div>
+              <Alert className="border-amber-200 bg-amber-50/90 dark:border-amber-900 dark:bg-amber-950/30">
+                <Info className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                <AlertTitle className="text-amber-900 dark:text-amber-100">Lưu ý thao tác trạng thái</AlertTitle>
+                <AlertDescription className="text-sm text-amber-900/90 dark:text-amber-200/90">
+                  <strong>Bắt đầu:</strong> cần có ít nhất một khách đăng ký và chỉ được bấm trong khoảng ±30 phút quanh giờ bắt đầu.
+                  <br />
+                  <strong>Hoàn thành:</strong> chỉ khi phiên đang diễn ra và trong khoảng ±30 phút quanh giờ kết thúc.
+                </AlertDescription>
+              </Alert>
+              <TooltipProvider delayDuration={200}>
+                <div className="-mx-6 -mb-6 flex flex-wrap items-center justify-end gap-3 rounded-b-2xl border-t border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  {session.status === SessionStatus.SCHEDULED && onStart &&
+                    (canStartWorkshopSession(session) ? (
+                      <Button
+                        onClick={() => { onStart(session); onOpenChange(false) }}
+                        className="bg-emerald-600 text-white shadow-sm hover:bg-emerald-700"
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        Bắt đầu phiên này
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button disabled className="bg-emerald-600/70 text-white">
+                              <Play className="mr-2 h-4 w-4" />
+                              Bắt đầu phiên này
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-left">
+                          <p>{getStartWorkshopSessionBlockReason(session)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  {session.status === SessionStatus.ONGOING && onComplete &&
+                    (canCompleteWorkshopSession(session) ? (
+                      <Button
+                        onClick={() => { onComplete(session); onOpenChange(false) }}
+                        className="bg-blue-600 text-white shadow-sm hover:bg-blue-700"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Hoàn thành phiên
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <Button disabled className="bg-blue-600/70 text-white">
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Hoàn thành phiên
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="max-w-xs text-left">
+                          <p>{getCompleteWorkshopSessionBlockReason(session)}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  {onCancel && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => { onCancel(session); onOpenChange(false) }}
+                      className="shadow-sm"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Hủy phiên này
+                    </Button>
+                  )}
+                </div>
+              </TooltipProvider>
             </>
           )}
         </div>

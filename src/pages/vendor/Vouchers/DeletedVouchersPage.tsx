@@ -14,9 +14,9 @@ import {
 import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { useVendorVouchers } from '@/hooks/voucher';
+import { useVouchers } from '@/hooks/voucher';
 import { vendorVoucherService } from '@/services/api/voucherService';
-import type { VendorVoucherQueryParams } from '@/services/api/voucherService';
+import type { AdminVoucherQueryParams } from '@/services/api/voucherService';
 import type { VoucherResponse } from '@/types/voucher';
 import { message } from 'antd';
 import {
@@ -50,13 +50,13 @@ export default function DeletedVouchersPage() {
     const [permanentDeleteTarget, setPermanentDeleteTarget] = useState<VoucherResponse | null>(null);
     const [processing, setProcessing] = useState(false);
 
-    const queryParams = useMemo<VendorVoucherQueryParams>(() => ({
+    const queryParams = useMemo<AdminVoucherQueryParams>(() => ({
         page: currentPage - 1,
         size: pageSize,
         deleted: true,
     }), [currentPage, pageSize]);
 
-    const { vouchers, loading, totalElements, fetchVouchers } = useVendorVouchers(queryParams);
+    const { vouchers, loading, totalElements, fetchVouchers } = useVouchers(queryParams, 'VENDOR');
     const totalPages = Math.ceil(totalElements / pageSize) || 1;
 
     const handleRestore = async () => {
@@ -65,13 +65,13 @@ export default function DeletedVouchersPage() {
         try {
             const response = await vendorVoucherService.restore(restoreTarget.id);
             if (response.success) {
-                message.success('Voucher restored successfully');
+                message.success('Khôi phục voucher thành công');
                 fetchVouchers();
             } else {
-                message.error(response.message || 'Failed to restore voucher');
+                message.error(response.message || 'Khôi phục voucher thất bại');
             }
         } catch (error: any) {
-            message.error(error?.response?.data?.message || 'Failed to restore voucher');
+            message.error(error?.response?.data?.message || 'Khôi phục voucher thất bại');
         } finally {
             setProcessing(false);
             setRestoreTarget(null);
@@ -84,13 +84,13 @@ export default function DeletedVouchersPage() {
         try {
             const response = await vendorVoucherService.permanentDelete(permanentDeleteTarget.id);
             if (response.success) {
-                message.success('Voucher permanently deleted');
+                message.success('Đã xóa vĩnh viễn voucher');
                 fetchVouchers();
             } else {
-                message.error(response.message || 'Failed to permanently delete voucher');
+                message.error(response.message || 'Xóa vĩnh viễn voucher thất bại');
             }
         } catch (error: any) {
-            message.error(error?.response?.data?.message || 'Failed to permanently delete voucher');
+            message.error(error?.response?.data?.message || 'Xóa vĩnh viễn voucher thất bại');
         } finally {
             setProcessing(false);
             setPermanentDeleteTarget(null);
@@ -98,17 +98,22 @@ export default function DeletedVouchersPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex items-center gap-3">
+                <Button variant="ghost" size="icon" onClick={() => navigate('/vendor/vouchers')} className="h-9 w-9">
+                    <ArrowLeft className="h-5 w-5" />
+                </Button>
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Voucher đã xóa</h1>
+                    <p className="text-muted-foreground font-mono">Thùng rác</p>
+                </div>
+            </div>
+
             <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                    <div className="flex items-center gap-3">
-                        <Button variant="ghost" size="icon" onClick={() => navigate('/vendor/vouchers')}>
-                            <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                        <div>
-                            <CardTitle className="text-xl">Deleted Vouchers</CardTitle>
-                            <CardDescription>Manage soft-deleted vouchers — restore or permanently remove them</CardDescription>
-                        </div>
+                    <div>
+                        <CardTitle className="text-xl">Danh sách tạm xóa</CardTitle>
+                        <CardDescription>Quản lý các voucher đã tạm xóa — khôi phục hoặc loại bỏ vĩnh viễn</CardDescription>
                     </div>
                 </CardHeader>
                 <CardContent>
@@ -118,8 +123,8 @@ export default function DeletedVouchersPage() {
                         </div>
                     ) : vouchers.length === 0 ? (
                         <div className="text-center py-20 text-muted-foreground">
-                            <p className="text-lg font-medium">No deleted vouchers</p>
-                            <p className="text-sm mt-1">All vouchers are active. Nothing in the trash.</p>
+                            <p className="text-lg font-medium">Thùng rác trống</p>
+                            <p className="text-sm mt-1">Tất cả voucher của bạn đều đang ở trạng thái hoạt động.</p>
                         </div>
                     ) : (
                         <div className="space-y-4">
@@ -127,12 +132,12 @@ export default function DeletedVouchersPage() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead>Code</TableHead>
-                                            <TableHead>Type</TableHead>
-                                            <TableHead>Status</TableHead>
-                                            <TableHead>Period</TableHead>
-                                            <TableHead>Deleted At</TableHead>
-                                            <TableHead className="text-right">Actions</TableHead>
+                                            <TableHead>Mã</TableHead>
+                                            <TableHead>Loại</TableHead>
+                                            <TableHead>Trạng thái</TableHead>
+                                            <TableHead>Thời hạn</TableHead>
+                                            <TableHead>Đã xóa lúc</TableHead>
+                                            <TableHead className="text-right">Thao tác</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -160,10 +165,10 @@ export default function DeletedVouchersPage() {
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-1">
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Restore" onClick={() => setRestoreTarget(v)}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600 hover:text-green-700" title="Khôi phục" onClick={() => setRestoreTarget(v)}>
                                                             <RotateCcw className="h-4 w-4" />
                                                         </Button>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Permanent Delete" onClick={() => setPermanentDeleteTarget(v)}>
+                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" title="Xóa vĩnh viễn" onClick={() => setPermanentDeleteTarget(v)}>
                                                             <Ban className="h-4 w-4" />
                                                         </Button>
                                                     </div>
@@ -177,7 +182,7 @@ export default function DeletedVouchersPage() {
                             {/* Pagination */}
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <span>Rows per page</span>
+                                    <span>Hiển thị</span>
                                     <Select value={String(pageSize)} onValueChange={(val) => { setPageSize(Number(val)); setCurrentPage(1); }}>
                                         <SelectTrigger className="h-8 w-[70px]">
                                             <SelectValue />
@@ -188,15 +193,15 @@ export default function DeletedVouchersPage() {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <span>Total: {totalElements}</span>
+                                    <span>Tổng số: {totalElements}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
-                                        Previous
+                                        Trước
                                     </Button>
-                                    <span className="text-sm">Page {currentPage} / {totalPages}</span>
+                                    <span className="text-sm">Trang {currentPage} / {totalPages}</span>
                                     <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
-                                        Next
+                                        Sau
                                     </Button>
                                 </div>
                             </div>
@@ -209,16 +214,16 @@ export default function DeletedVouchersPage() {
             <AlertDialog open={!!restoreTarget} onOpenChange={(open) => !open && setRestoreTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Restore Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Khôi phục Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to restore voucher "<strong className="font-mono">{restoreTarget?.code}</strong>"? It will be set back to ACTIVE status.
+                            Bạn có chắc chắn muốn khôi phục voucher "<strong className="font-mono">{restoreTarget?.code}</strong>"? Nó sẽ quay lại trạng thái ĐANG HOẠT ĐỘNG.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handleRestore} disabled={processing}>
                             {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
-                            Restore
+                            Khôi phục
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -228,20 +233,20 @@ export default function DeletedVouchersPage() {
             <AlertDialog open={!!permanentDeleteTarget} onOpenChange={(open) => !open && setPermanentDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Permanently Delete Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa vĩnh viễn Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will <strong>permanently</strong> delete voucher "<strong className="font-mono">{permanentDeleteTarget?.code}</strong>". This action <strong>cannot be undone</strong>.
+                            Hành động này sẽ xóa <strong>vĩnh viễn</strong> voucher "<strong className="font-mono">{permanentDeleteTarget?.code}</strong>". Không thể khôi phục thao tác này.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handlePermanentDelete}
                             disabled={processing}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {processing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                            Permanently Delete
+                            Xóa vĩnh viễn
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -111,36 +111,36 @@ export default function ContextMenuToolbarPlugin() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" sideOffset={6} className="blog-context-menu-vertical">
-        <DropdownMenuLabel>Text</DropdownMenuLabel>
-        <DropdownMenuItem onSelect={() => applyTextFormat("bold")}>Bold</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyTextFormat("italic")}>Italic</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyTextFormat("underline")}>Underline</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyTextFormat("strikethrough")}>Strikethrough</DropdownMenuItem>
+        <DropdownMenuLabel>Văn bản</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => applyTextFormat("bold")}>In đậm</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyTextFormat("italic")}>In nghiêng</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyTextFormat("underline")}>Gạch chân</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyTextFormat("strikethrough")}>Gạch ngang</DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>Block</DropdownMenuLabel>
+        <DropdownMenuLabel>Khối</DropdownMenuLabel>
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Heading</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>Tiêu đề</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem onSelect={() => applyBlockType("h1")}>Heading 1</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => applyBlockType("h2")}>Heading 2</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => applyBlockType("h3")}>Heading 3</DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => applyBlockType("h4")}>Heading 4</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => applyBlockType("h1")}>Tiêu đề 1</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => applyBlockType("h2")}>Tiêu đề 2</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => applyBlockType("h3")}>Tiêu đề 3</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => applyBlockType("h4")}>Tiêu đề 4</DropdownMenuItem>
           </DropdownMenuSubContent>
         </DropdownMenuSub>
-        <DropdownMenuItem onSelect={() => applyBlockType("paragraph")}>Paragraph</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyBlockType("quote")}>Quote</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyList("bullet")}>Bullet List</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyList("number")}>Numbered List</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyBlockType("paragraph")}>Đoạn văn</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyBlockType("quote")}>Trích dẫn</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyList("bullet")}>Danh sách dấu đầu dòng</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyList("number")}>Danh sách đánh số</DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuLabel>Align</DropdownMenuLabel>
-        <DropdownMenuItem onSelect={() => applyAlignment("left")}>Left</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyAlignment("center")}>Center</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyAlignment("right")}>Right</DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => applyAlignment("justify")}>Justify</DropdownMenuItem>
+        <DropdownMenuLabel>Căn lề</DropdownMenuLabel>
+        <DropdownMenuItem onSelect={() => applyAlignment("left")}>Trái</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyAlignment("center")}>Giữa</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyAlignment("right")}>Phải</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => applyAlignment("justify")}>Đều hai bên</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

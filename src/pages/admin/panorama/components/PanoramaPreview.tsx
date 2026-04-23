@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
-import { Viewer } from "@photo-sphere-viewer/core";
-import { MarkersPlugin } from "@photo-sphere-viewer/markers-plugin";
-import "@photo-sphere-viewer/core/index.css";
-import "@photo-sphere-viewer/markers-plugin/index.css";
-import type { HotSpotFormValues } from "../schema";
-import { getNormalMarkerHTML } from "@/pages/Panorama/helpers/panoramaHelpers";
-import { Button } from "@/components/ui/button";
-import { Camera, Check, X } from "lucide-react";
+import { useEffect, useRef } from 'react';
+import { Viewer } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import '@photo-sphere-viewer/core/index.css';
+import '@photo-sphere-viewer/markers-plugin/index.css';
+import type { HotSpotFormValues } from '../schema';
+import { getLinkMarkerHTML, getNormalMarkerHTML } from '@/pages/Panorama/helpers/panoramaHelpers';
+import { Button } from '@/components/ui/button';
+import { Camera, Check, X } from 'lucide-react';
 
 interface PanoramaPreviewProps {
   imageUrl: string;
@@ -55,35 +55,36 @@ export default function PanoramaPreview({
       viewer = new Viewer({
         container: containerRef.current,
         panorama: imageUrl,
-        navbar: ["zoom", "caption"],
+        navbar: ['zoom', 'caption'],
         plugins: [[MarkersPlugin, {}]],
         minFov: 30,
         maxFov: 120,
         defaultZoomLvl: 50,
         defaultYaw: defaultYaw ?? 0,
         defaultPitch: defaultPitch ?? 0,
-        canvasBackground: "#1a1a1a",
-        loadingTxt: "Loading preview…",
+        canvasBackground: '#1a1a1a',
+        loadingTxt: 'Đang tải xem trước…',
       });
 
       const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
 
       // Render preview markers
       hotSpots.forEach((hs, i) => {
+        const isLink = hs.type === 'LINK';
         markersPlugin.addMarker({
           id: `preview-${i}`,
           position: { yaw: hs.yaw, pitch: hs.pitch },
-          tooltip: hs.tooltip || `Hot spot #${i + 1}`,
-          anchor: "bottom center",
+          tooltip: hs.tooltip || `Điểm nóng #${i + 1}`,
+          anchor: 'bottom center',
           size: { width: 24, height: 24 },
-          html: getNormalMarkerHTML(),
+          html: isLink ? getLinkMarkerHTML() : getNormalMarkerHTML(),
         });
       });
 
       // Click on panorama → report position for placing a new hot spot
       // Only fires in normal (non-view-selection) mode
       if (onClickPosition) {
-        viewer.addEventListener("click", ({ data }) => {
+        viewer.addEventListener('click', ({ data }) => {
           if (!viewSelectionModeRef.current) {
             onClickPosition(data.yaw, data.pitch);
           }
@@ -113,9 +114,7 @@ export default function PanoramaPreview({
   if (!imageUrl) {
     return (
       <div className="rounded-lg border border-dashed border-gray-300 h-[400px] flex items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Enter a panorama image URL to see a preview.
-        </p>
+        <p className="text-sm text-muted-foreground">Vui lòng tải lên ảnh panorama để xem trước.</p>
       </div>
     );
   }
@@ -124,15 +123,11 @@ export default function PanoramaPreview({
     <div className="space-y-2">
       <p className="text-xs text-muted-foreground">
         {viewSelectionMode
-          ? "Rotate the view to the angle visitors should see first, then confirm."
-          : "Click anywhere on the preview to place a new hot spot."}
+          ? 'Xoay khung hình đến góc khách cần thấy trước, rồi xác nhận.'
+          : 'Bấm bất kỳ đâu trên ảnh xem trước để đặt điểm nóng mới.'}
       </p>
       <div className="relative">
-        <div
-          ref={containerRef}
-          className="rounded-lg overflow-hidden border border-gray-200"
-          style={{ height: 400 }}
-        />
+        <div ref={containerRef} className="rounded-lg overflow-hidden border border-gray-200" style={{ height: 400 }} />
 
         {/* View-selection mode overlay */}
         {viewSelectionMode && (
@@ -155,7 +150,7 @@ export default function PanoramaPreview({
                 onClick={onCancelViewSelection}
               >
                 <X className="h-4 w-4 mr-1" />
-                Cancel
+                Hủy
               </Button>
               <Button
                 size="sm"
@@ -163,7 +158,7 @@ export default function PanoramaPreview({
                 onClick={handleCaptureView}
               >
                 <Check className="h-4 w-4 mr-1" />
-                Confirm View
+                Xác nhận góc nhìn
               </Button>
             </div>
           </>

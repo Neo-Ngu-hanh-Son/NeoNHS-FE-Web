@@ -44,7 +44,7 @@ export function BlogCategoryTable({
 }: BlogCategoryTableProps) {
   const handleDelete = (category: BlogCategoryResponse) => {
     if (category.status === "ARCHIVED") {
-      message.error("Category is already archived, please update the status to ACTIVE");
+      message.error("Danh mục đã ở trạng thái lưu trữ. Vui lòng chuyển về Đang hoạt động trước khi xóa.");
       return;
     }
     onDelete(category);
@@ -67,7 +67,7 @@ export function BlogCategoryTable({
           onClick={onRetry}
           className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
-          Try Again
+          Thử lại
         </Button>
       </div>
     );
@@ -80,8 +80,8 @@ export function BlogCategoryTable({
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 mb-4">
           <Tags className="h-7 w-7 text-gray-400" />
         </div>
-        <h3 className="text-base font-semibold text-gray-900 mb-1">No blog categories found.</h3>
-        <p className="text-sm text-gray-500">Try adjusting your search or filters.</p>
+        <h3 className="text-base font-semibold text-gray-900 mb-1">Không có danh mục blog.</h3>
+        <p className="text-sm text-gray-500">Thử đổi từ khóa tìm kiếm hoặc bộ lọc.</p>
       </div>
     );
   }
@@ -97,16 +97,16 @@ export function BlogCategoryTable({
         <Table>
           <TableHeader>
             <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
-              <TableHead className="font-semibold text-gray-600 w-[200px]">Category Name</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[200px]">Tên danh mục</TableHead>
 
-              <TableHead className="font-semibold text-gray-600">Description</TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[80px]">Status</TableHead>
+              <TableHead className="font-semibold text-gray-600">Mô tả</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[100px]">Trạng thái</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[120px] text-center">
-                Posts
+                Bài viết
               </TableHead>
-              <TableHead className="font-semibold text-gray-600 w-[140px]">Created Date</TableHead>
+              <TableHead className="font-semibold text-gray-600 w-[140px]">Ngày tạo</TableHead>
               <TableHead className="font-semibold text-gray-600 w-[120px] text-right">
-                Actions
+                Thao tác
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -126,7 +126,7 @@ export function BlogCategoryTable({
                 {/* Description */}
                 <TableCell>
                   <span className="text-sm font-medium text-gray-600 line-clamp-2">
-                    {cat.description || "No description provided."}
+                    {cat.description || "Không có mô tả."}
                   </span>
                 </TableCell>
 
@@ -140,7 +140,7 @@ export function BlogCategoryTable({
                         : "bg-secondary text-muted-foreground hover:bg-secondary border-border rounded-full"
                     }
                   >
-                    {cat.status === "ACTIVE" ? "Active" : "Archived"}
+                    {cat.status === "ACTIVE" ? "Hoạt động" : "Lưu trữ"}
                   </Badge>
                 </TableCell>
 
@@ -170,7 +170,7 @@ export function BlogCategoryTable({
                             <Eye className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>View details</TooltipContent>
+                        <TooltipContent>Xem chi tiết</TooltipContent>
                       </Tooltip>
 
                       <Tooltip>
@@ -185,7 +185,7 @@ export function BlogCategoryTable({
                             <Pencil className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Edit category</TooltipContent>
+                        <TooltipContent>Sửa danh mục</TooltipContent>
                       </Tooltip>
 
                       <Tooltip>
@@ -200,7 +200,7 @@ export function BlogCategoryTable({
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Delete category</TooltipContent>
+                        <TooltipContent>Xóa danh mục</TooltipContent>
                       </Tooltip>
                     </div>
                   </TooltipProvider>
@@ -215,7 +215,7 @@ export function BlogCategoryTable({
       {totalElements > 0 && (
         <div className="flex items-center justify-between px-1">
           <p className="text-sm text-gray-500">
-            Showing {rangeStart} to {rangeEnd} of {totalElements} results
+            Hiển thị {rangeStart}–{rangeEnd} / {totalElements} kết quả
           </p>
           <div className="flex items-center gap-1.5">
             <Button
@@ -225,7 +225,7 @@ export function BlogCategoryTable({
               onClick={() => onPageChange(currentPage - 1)}
               className="h-8 px-3 text-xs"
             >
-              Previous
+              Trước
             </Button>
             {Array.from({ length: totalPages }).map((_, i) => (
               <Button
@@ -245,7 +245,7 @@ export function BlogCategoryTable({
               onClick={() => onPageChange(currentPage + 1)}
               className="h-8 px-3 text-xs"
             >
-              Next
+              Tiếp
             </Button>
           </div>
         </div>

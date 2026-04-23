@@ -13,15 +13,15 @@ export const voucherStatusBadgeStyles: Record<VoucherStatus, string> = {
 };
 
 export const voucherStatusLabels: Record<VoucherStatus, string> = {
-    ACTIVE: 'Active',
-    INACTIVE: 'Inactive',
-    EXPIRED: 'Expired',
+    ACTIVE: 'Đang hoạt động',
+    INACTIVE: 'Ngưng hoạt động',
+    EXPIRED: 'Hết hạn',
 };
 
 export const VOUCHER_STATUS_OPTIONS: { value: VoucherStatus; label: string }[] = [
-    { value: 'ACTIVE', label: 'Active' },
-    { value: 'INACTIVE', label: 'Inactive' },
-    { value: 'EXPIRED', label: 'Expired' },
+    { value: 'ACTIVE', label: 'Đang hoạt động' },
+    { value: 'INACTIVE', label: 'Ngưng hoạt động' },
+    { value: 'EXPIRED', label: 'Hết hạn' },
 ];
 
 // --- Voucher Type ---
@@ -29,66 +29,60 @@ export const VOUCHER_STATUS_OPTIONS: { value: VoucherStatus; label: string }[] =
 export const voucherTypeBadgeStyles: Record<VoucherType, string> = {
     DISCOUNT: 'bg-blue-100 text-blue-800 border-blue-200',
     GIFT_PRODUCT: 'bg-purple-100 text-purple-800 border-purple-200',
-    BONUS_POINTS: 'bg-amber-100 text-amber-800 border-amber-200',
-    FREE_SERVICE: 'bg-teal-100 text-teal-800 border-teal-200',
 };
 
 export const voucherTypeLabels: Record<VoucherType, string> = {
-    DISCOUNT: 'Discount',
-    GIFT_PRODUCT: 'Gift Product',
-    BONUS_POINTS: 'Bonus Points',
-    FREE_SERVICE: 'Free Service',
+    DISCOUNT: 'Giảm giá',
+    GIFT_PRODUCT: 'Quà tặng sản phẩm',
 };
 
 export const VOUCHER_TYPE_OPTIONS: { value: VoucherType; label: string }[] = [
-    { value: 'DISCOUNT', label: 'Discount' },
-    { value: 'GIFT_PRODUCT', label: 'Gift Product' },
-    { value: 'BONUS_POINTS', label: 'Bonus Points' },
-    { value: 'FREE_SERVICE', label: 'Free Service' },
+    { value: 'DISCOUNT', label: 'Giảm giá' },
+    { value: 'GIFT_PRODUCT', label: 'Quà tặng sản phẩm' },
 ];
 
 // Vendor can only create DISCOUNT and GIFT_PRODUCT
 export const VENDOR_VOUCHER_TYPE_OPTIONS: { value: VoucherType; label: string }[] = [
-    { value: 'DISCOUNT', label: 'Discount' },
-    { value: 'GIFT_PRODUCT', label: 'Gift Product' },
+    { value: 'DISCOUNT', label: 'Giảm giá' },
+    { value: 'GIFT_PRODUCT', label: 'Quà tặng sản phẩm' },
 ];
 
 // --- Scope ---
 
 export const voucherScopeLabels: Record<VoucherScope, string> = {
-    PLATFORM: 'Platform',
-    VENDOR: 'Vendor',
+    PLATFORM: 'Hệ thống',
+    VENDOR: 'Đối tác',
 };
 
 export const VOUCHER_SCOPE_OPTIONS: { value: VoucherScope; label: string }[] = [
-    { value: 'PLATFORM', label: 'Platform' },
-    { value: 'VENDOR', label: 'Vendor' },
+    { value: 'PLATFORM', label: 'Hệ thống' },
+    { value: 'VENDOR', label: 'Đối tác' },
 ];
 
 // --- Discount Type ---
 
 export const discountTypeLabels: Record<DiscountType, string> = {
-    PERCENT: 'Percentage',
-    FIXED: 'Fixed Amount',
+    PERCENT: 'Phần trăm',
+    FIXED: 'Số tiền cố định',
 };
 
 export const DISCOUNT_TYPE_OPTIONS: { value: DiscountType; label: string }[] = [
-    { value: 'PERCENT', label: 'Percentage (%)' },
-    { value: 'FIXED', label: 'Fixed Amount (₫)' },
+    { value: 'PERCENT', label: 'Phần trăm (%)' },
+    { value: 'FIXED', label: 'Số tiền cố định (₫)' },
 ];
 
 // --- Applicable Product ---
 
 export const applicableProductLabels: Record<ApplicableProduct, string> = {
-    ALL: 'Universal',
-    TICKET: 'Tickets',
-    WORKSHOP: 'Workshops',
-    EVENT_TICKET: 'Event Tickets',
+    ALL: 'Tất cả',
+    TICKET: 'Vé tham quan',
+    WORKSHOP: 'Workshop',
+    EVENT_TICKET: 'Vé sự kiện',
 };
 
 export const APPLICABLE_PRODUCT_OPTIONS: { value: ApplicableProduct; label: string }[] = [
-    { value: 'ALL', label: 'Universal' },
-    { value: 'TICKET', label: 'Tickets' },
-    { value: 'WORKSHOP', label: 'Workshops' },
-    { value: 'EVENT_TICKET', label: 'Event Tickets' },
+    { value: 'ALL', label: 'Tất cả' },
+    { value: 'TICKET', label: 'Vé tham quan' },
+    { value: 'WORKSHOP', label: 'Workshop' },
+    { value: 'EVENT_TICKET', label: 'Vé sự kiện' },
 ];

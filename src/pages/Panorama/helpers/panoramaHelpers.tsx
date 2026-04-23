@@ -24,6 +24,18 @@ export const getNormalMarkerHTML = () => {
   `.trim();
 };
 
+export const getLinkMarkerHTML = () => {
+  return `
+    <div class="relative flex items-center justify-center transition-transform duration-200 ease-in-out hover:scale-110 cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" 
+        class="lucide lucide-arrow-up w-full h-full rounded-full bg-blue-600 text-white border-2 border-white shadow-lg p-1" aria-hidden="true">
+        <path d="m5 12 7-7 7 7"></path>
+        <path d="M12 19V5"></path>
+      </svg>
+    </div>
+  `.trim();
+};
+
 // <!-- The Solid Center Dot -->
 // <span class="relative inline-flex rounded-full h-4 w-4 bg-green-600 border-2 border-white shadow-lg">
 // </span>

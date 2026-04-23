@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Trash2, Tag, Clock, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { StatsCard } from '@/components/dashboard/StatsCard';
 import {
     AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
     AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -101,65 +102,48 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
         <div className="max-w-7xl mx-auto space-y-6">
             {/* Quick Stats Header */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">Total Vouchers</p>
-                                <h3 className="text-2xl font-bold">{stats.total}</h3>
-                            </div>
-                            <Tag className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">Active Usage</p>
-                                <h3 className="text-2xl font-bold">{stats.used}</h3>
-                            </div>
-                            <Clock className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className={`border-l-4 ${scope === 'PLATFORM' ? 'border-l-accent-gold' : 'border-l-primary'}`}>
-                    <CardContent className="pt-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">Success Rate</p>
-                                <h3 className="text-2xl font-bold">
-                                    {stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%
-                                </h3>
-                            </div>
-                            <BarChart2 className={`h-8 w-8 ${scope === 'PLATFORM' ? 'text-accent-gold' : 'text-primary'} opacity-20`} />
-                        </div>
-                    </CardContent>
-                </Card>
+                <StatsCard
+                    title="Tổng Voucher"
+                    value={stats.total}
+                    icon={<Tag className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-blue-500 to-indigo-600"
+                />
+                <StatsCard
+                    title="Lượt sử dụng"
+                    value={stats.used}
+                    icon={<Clock className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-emerald-500 to-green-600"
+                />
+                <StatsCard
+                    title="Tỷ lệ sử dụng"
+                    value={`${stats.total > 0 ? Math.round((stats.used / stats.total) * 100) : 0}%`}
+                    icon={<BarChart2 className="h-6 w-6 text-white" />}
+                    iconBg="bg-gradient-to-br from-amber-500 to-orange-600"
+                />
             </div>
 
             <Card className={`overflow-hidden border-t-4 ${scope === 'PLATFORM' ? 'border-t-accent-gold' : 'border-t-primary'}`}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                     <div>
                         <CardTitle className="text-xl">
-                            {scope === 'PLATFORM' ? 'Platform Voucher Management' : 
-                             scope === 'VENDOR' ? 'Vendor Voucher Management' : 
-                             'Voucher Management'}
+                            {scope === 'PLATFORM' ? 'Quản lý Voucher Hệ thống' : 
+                             scope === 'VENDOR' ? 'Quản lý Voucher Đối tác' : 
+                             'Quản lý Voucher'}
                         </CardTitle>
                         <CardDescription>
-                            {scope === 'PLATFORM' ? 'Manage official vouchers from Ngũ Hành Sơn' : 
-                             scope === 'VENDOR' ? 'Manage vouchers from partners and vendors' : 
-                             'Manage all vouchers in the system'}
+                            {scope === 'PLATFORM' ? 'Quản lý các mã giảm giá chính thức từ hệ thống Ngũ Hành Sơn' : 
+                             scope === 'VENDOR' ? 'Quản lý các mã giảm giá từ các đối tác' : 
+                             'Quản lý tất cả voucher trong hệ thống'}
                         </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" onClick={() => navigate('/admin/vouchers/deleted')}>
                             <Trash2 className="mr-2 h-4 w-4" />
-                            Deleted Vouchers
+                            Voucher đã xóa
                         </Button>
                         <Button onClick={() => navigate('/admin/vouchers/create')}>
                             <Plus className="mr-2 h-4 w-4" />
-                            Create Voucher
+                            Tạo Voucher
                         </Button>
                     </div>
                 </CardHeader>
@@ -193,15 +177,15 @@ export default function AdminVouchersPage({ scope }: AdminVouchersPageProps) {
             <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Voucher</AlertDialogTitle>
+                        <AlertDialogTitle>Xóa Voucher</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Are you sure you want to delete voucher "{deleteTarget?.code}"? This action can be undone later.
+                            Bạn có chắc chắn muốn xóa voucher "{deleteTarget?.code}"? Hành động này có thể khôi phục sau.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                            Delete
+                            Xóa
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -30,22 +30,22 @@ function handleTagApiError(error: unknown, fallback: string): void {
 
   if (status === 401) {
     localStorage.removeItem('token');
-    message.error('Session expired. Please sign in again.');
+    message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
     window.location.href = '/login';
     return;
   }
 
   if (status === 403) {
-    message.error('Access denied. ADMIN role is required to manage event point tags.');
+    message.error('Từ chối truy cập. Cần có quyền ADMIN để quản lý thẻ điểm sự kiện.');
     return;
   }
 
   if (status === 404) {
-    message.error('The requested event point tag was not found.');
+    message.error('Không tìm thấy thẻ điểm sự kiện yêu cầu.');
     return;
   }
 
-  message.error(`${fallback}: ${err?.message || 'Unknown error'}`);
+  message.error(`${fallback}: ${err?.message || 'Lỗi không xác định'}`);
 }
 
 export function useEventPointTags(): UseEventPointTagsReturn {
@@ -59,10 +59,10 @@ export function useEventPointTags(): UseEventPointTagsReturn {
       if (response.success) {
         setTags(response.data);
       } else {
-        message.error(response.message || 'Failed to fetch event point tags');
+        message.error(response.message || 'Lấy sự kiện thất bại point tags');
       }
     } catch (error: unknown) {
-      handleTagApiError(error, 'Failed to fetch event point tags');
+      handleTagApiError(error, 'Lấy sự kiện thất bại point tags');
     } finally {
       setLoading(false);
     }
@@ -76,15 +76,15 @@ export function useEventPointTags(): UseEventPointTagsReturn {
     try {
       const response = await eventPointTagService.create(data);
       if (response.success) {
-        message.success('Event point tag created successfully');
+        message.success('Tạo thẻ điểm sự kiện thành công');
         await fetchTags();
         return true;
       }
 
-      message.error(response.message || 'Failed to create event point tag');
+      message.error(response.message || 'Tạo sự kiện thất bại point tag');
       return false;
     } catch (error: unknown) {
-      handleTagApiError(error, 'Failed to create event point tag');
+      handleTagApiError(error, 'Tạo sự kiện thất bại point tag');
       return false;
     }
   }, [fetchTags]);
@@ -93,15 +93,15 @@ export function useEventPointTags(): UseEventPointTagsReturn {
     try {
       const response = await eventPointTagService.update(id, data);
       if (response.success) {
-        message.success('Event point tag updated successfully');
+        message.success('Cập nhật thẻ điểm sự kiện thành công');
         await fetchTags();
         return true;
       }
 
-      message.error(response.message || 'Failed to update event point tag');
+      message.error(response.message || 'Cập nhật sự kiện thất bại point tag');
       return false;
     } catch (error: unknown) {
-      handleTagApiError(error, 'Failed to update event point tag');
+      handleTagApiError(error, 'Cập nhật sự kiện thất bại point tag');
       return false;
     }
   }, [fetchTags]);
@@ -110,15 +110,15 @@ export function useEventPointTags(): UseEventPointTagsReturn {
     try {
       const response = await eventPointTagService.delete(id);
       if (response.success) {
-        message.success('Event point tag deleted successfully');
+        message.success('Xóa thẻ điểm sự kiện thành công');
         await fetchTags();
         return true;
       }
 
-      message.error(response.message || 'Failed to delete event point tag');
+      message.error(response.message || 'Xóa sự kiện thất bại point tag');
       return false;
     } catch (error: unknown) {
-      handleTagApiError(error, 'Failed to delete event point tag');
+      handleTagApiError(error, 'Xóa sự kiện thất bại point tag');
       return false;
     }
   }, [fetchTags]);

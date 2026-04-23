@@ -62,9 +62,9 @@ export function CreateVendorDialog({
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Create New Vendor Account</DialogTitle>
+                    <DialogTitle>Tạo tài khoản Đối tác mới</DialogTitle>
                     <DialogDescription>
-                        Register a new vendor and their business profile. A secure setup link will be sent to their email to set their password.
+                        Đăng ký một Đối tác mới và hồ sơ doanh nghiệp của họ. Một liên kết thiết lập bảo mật sẽ được gửi đến email của họ để đặt mật khẩu.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -72,10 +72,10 @@ export function CreateVendorDialog({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* Account Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Account Information</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Thông tin tài khoản</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="email">Địa chỉ Email <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -87,10 +87,10 @@ export function CreateVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="fullname">Vendor Full Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="fullname">Họ tên Đối tác <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="fullname"
-                                    placeholder="e.g. John Doe"
+                                    placeholder="Ví dụ: Nguyễn Văn A"
                                     {...register("fullname")}
                                     className={errors.fullname ? "border-red-500" : ""}
                                 />
@@ -98,10 +98,10 @@ export function CreateVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="phoneNumber">Phone Number</Label>
+                                <Label htmlFor="phoneNumber">Số điện thoại</Label>
                                 <Input
                                     id="phoneNumber"
-                                    placeholder="e.g. 0905123456"
+                                    placeholder="Ví dụ: 0905123456"
                                     {...register("phoneNumber")}
                                 />
                             </div>
@@ -109,13 +109,13 @@ export function CreateVendorDialog({
 
                         {/* Business Info */}
                         <div className="space-y-4">
-                            <h3 className="font-semibold text-sm border-b pb-1">Business Profile</h3>
+                            <h3 className="font-semibold text-sm border-b pb-1">Hồ sơ doanh nghiệp</h3>
 
                             <div className="space-y-2">
-                                <Label htmlFor="businessName">Business Name <span className="text-red-500">*</span></Label>
+                                <Label htmlFor="businessName">Tên doanh nghiệp <span className="text-red-500">*</span></Label>
                                 <Input
                                     id="businessName"
-                                    placeholder="e.g. NeoNHS Pottery Studio"
+                                    placeholder="Ví dụ: Xưởng gốm NeoNHS"
                                     {...register("businessName")}
                                     className={errors.businessName ? "border-red-500" : ""}
                                 />
@@ -123,28 +123,28 @@ export function CreateVendorDialog({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="taxCode">Tax Code</Label>
+                                <Label htmlFor="taxCode">Mã số thuế</Label>
                                 <Input
                                     id="taxCode"
-                                    placeholder="Optional"
+                                    placeholder="Tùy chọn"
                                     {...register("taxCode")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="address">Business Address</Label>
+                                <Label htmlFor="address">Địa chỉ doanh nghiệp</Label>
                                 <Input
                                     id="address"
-                                    placeholder="e.g. 123 Marble Mt, Da Nang"
+                                    placeholder="Ví dụ: 123 Ngũ Hành Sơn, Đà Nẵng"
                                     {...register("address")}
                                 />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="bankName">Bank Name</Label>
+                                <Label htmlFor="bankName">Tên ngân hàng</Label>
                                 <Input
                                     id="bankName"
-                                    placeholder="e.g. Vietcombank"
+                                    placeholder="Ví dụ: Vietcombank"
                                     {...register("bankName")}
                                 />
                             </div>
@@ -152,10 +152,10 @@ export function CreateVendorDialog({
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">Business Description</Label>
+                        <Label htmlFor="description">Mô tả doanh nghiệp</Label>
                         <Textarea
                             id="description"
-                            placeholder="Briefly describe the vendor's products or services..."
+                            placeholder="Mô tả ngắn gọn các sản phẩm hoặc dịch vụ của Đối tác..."
                             {...register("description")}
                             rows={3}
                         />
@@ -163,18 +163,18 @@ export function CreateVendorDialog({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="bankAccountNumber">Bank Account Number</Label>
+                            <Label htmlFor="bankAccountNumber">Số tài khoản ngân hàng</Label>
                             <Input
                                 id="bankAccountNumber"
-                                placeholder="Account digits"
+                                placeholder="Các chữ số tài khoản"
                                 {...register("bankAccountNumber")}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="bankAccountName">Bank Account Holder Name</Label>
+                            <Label htmlFor="bankAccountName">Tên chủ tài khoản</Label>
                             <Input
                                 id="bankAccountName"
-                                placeholder="In ALL CAPS"
+                                placeholder="VIẾT IN HOA"
                                 {...register("bankAccountName")}
                             />
                         </div>
@@ -187,16 +187,16 @@ export function CreateVendorDialog({
                             onClick={() => onOpenChange(false)}
                             disabled={isSubmitting}
                         >
-                            Cancel
+                            Hủy
                         </Button>
                         <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
                             {isSubmitting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Creating...
+                                    Đang tạo...
                                 </>
                             ) : (
-                                "Create Vendor"
+                                "Tạo Đối tác"
                             )}
                         </Button>
                     </DialogFooter>
