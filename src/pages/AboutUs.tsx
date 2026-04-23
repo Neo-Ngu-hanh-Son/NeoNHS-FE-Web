@@ -60,12 +60,12 @@ const teamMembers = [
   {
     name: 'Phạm Minh Kiệt',
     role: 'Thành viên',
-    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&q=80',
+    image: ' https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776957949/kiet_aikwyj.webp',
   },
   {
     name: 'Châu Thành Đạt',
     role: 'Trưởng nhóm',
-    image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776958360/anhdat_pn5orb.webp',
   },
   {
     name: 'Lê Nhật Trường',
