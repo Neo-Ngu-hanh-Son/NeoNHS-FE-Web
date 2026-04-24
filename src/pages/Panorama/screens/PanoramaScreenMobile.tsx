@@ -12,7 +12,7 @@ import { panoramaService } from '@/services/api/panoramaService';
 import type { PointPanoramaResponse, PanoramaHotSpotResponse } from '@/types';
 import PanoramaBackButton from '../components/ScreenComponents/PanoramaBackButton';
 import { PointResponse } from '@/types/point';
-import adminPointService from '@/services/api/pointService';
+import adminPointService, { pointService } from '@/services/api/pointService';
 import { PanoramaHelper } from '@/utils/PanoramaHelper';
 import ErrorModal from '../components/ErrorModal';
 
@@ -97,7 +97,7 @@ export default function PanoramaScreenMobile() {
         if (!firstVisitRef.current) {
           setIsLoading(true);
         }
-        const response = await adminPointService.getPointById(placeId);
+        const response = await pointService.getPointById(placeId);
         if (cancelled) return;
         setCurrentPlace(response.data);
 
@@ -139,6 +139,7 @@ export default function PanoramaScreenMobile() {
           let newPanoramaPlaceId = activePanoData.placeId;
           // If the new panorama doesn't belong to the current place, we need to update the place data as well to reflect the correct hotspots and info panel content
           if (newPanoramaPlaceId !== placeId) {
+            setCurrentPlace(null);
             setPlaceId(newPanoramaPlaceId);
           }
         }
@@ -236,12 +237,13 @@ export default function PanoramaScreenMobile() {
    * This way we can minimize unnecessary updates and provide a smoother experience for users navigating between closely linked panoramas.
    */
   useEffect(() => {
-    if (!currentPlace || !currentPano || !viewerRef.current) return;
-
+    if (!currentPlace || !currentPano || !viewerRef.current || currentPano.placeId !== currentPlace.id) {
+      return;
+    }
     let cancelled = false;
     const viewer = viewerRef.current;
 
-    (async () => {
+    const updatePanorama = async () => {
       const markersPlugin = viewer.getPlugin<MarkersPlugin>(MarkersPlugin);
       markersPlugin.clearMarkers();
       await viewer.setPanorama(currentPano.panoramaImageUrl, {
@@ -280,7 +282,9 @@ export default function PanoramaScreenMobile() {
           description: currentPlace.description ?? '',
         };
       });
-    })();
+    };
+
+    updatePanorama();
 
     return () => {
       cancelled = true;
