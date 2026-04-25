@@ -26,15 +26,15 @@ export function SubmitApprovalDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Submit template for approval?</AlertDialogTitle>
+          <AlertDialogTitle>Gửi mẫu workshop cho phê duyệt?</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2">
             <p>
-              You are about to submit <span className="font-semibold text-foreground">"{templateName}"</span> for admin approval.
+              Bạn đang chuẩn bị gửi mẫu workshop <span className="font-semibold text-foreground">"{templateName}"</span> cho admin phê duyệt.
             </p>
             <p className="font-medium text-yellow-600 dark:text-yellow-500">
-              ⚠️ Once submitted, you will not be able to edit this template until it is approved or rejected.
+              ⚠️ Sau khi gửi, bạn sẽ không thể chỉnh sửa mẫu này cho đến khi nó được phê duyệt hoặc bị từ chối.
             </p>
-            <p>Do you want to proceed?</p>
+            <p>Bạn có muốn tiếp tục?</p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -43,7 +43,7 @@ export function SubmitApprovalDialog({
             onClick={onConfirm}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            Submit for Approval
+            Gửi Cho Phê Duyệt
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
