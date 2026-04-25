@@ -67,7 +67,7 @@ export function SingleSessionForm({
 
   useEffect(() => {
     if (externalTemplateId) {
-       form.setValue("workshopTemplateId", externalTemplateId, { shouldValidate: true })
+      form.setValue("workshopTemplateId", externalTemplateId, { shouldValidate: true })
     }
   }, [externalTemplateId, form])
 
@@ -183,9 +183,11 @@ export function SingleSessionForm({
 
           {durationMismatch && (
             <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 py-2">
-              <TriangleAlert className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800 dark:text-amber-300 font-medium text-xs">
-                Lưu ý: Thời lượng phiên này ({durationDiffMins} phút) đang chênh lệch so với thời lượng tiêu chuẩn ({activeTemplate.estimatedDuration} phút).
+                <p>
+                  <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium">Lưu ý:</span> Thời lượng phiên này ({formatDuration(durationDiffMins)}) đang chênh lệch so với thời lượng tiêu chuẩn ({formatDuration(activeTemplate.estimatedDuration)}).
+                </p>
               </AlertDescription>
             </Alert>
           )}
