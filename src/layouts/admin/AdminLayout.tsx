@@ -113,7 +113,7 @@ export function AdminLayout() {
         },
       ],
     },
-    { label: 'Vé', path: '/admin/tickets', icon: <Ticket className="w-5 h-5" /> },
+    // { label: 'Vé', path: '/admin/tickets', icon: <Ticket className="w-5 h-5" /> },
     { label: 'Voucher hệ thống', path: '/admin/vouchers/platform', icon: <BadgePercent className="w-5 h-5" /> },
     { label: 'Báo cáo', path: '/admin/reports', icon: <BarChart3 className="w-5 h-5" /> },
     {
@@ -188,35 +188,35 @@ export function AdminLayout() {
 
     // Dynamic voucher routes
     if (path.startsWith('/admin/vouchers/')) {
-        const parts = path.split('/');
-        // /admin/vouchers/create
-        if (parts.length === 4 && parts[3] === 'create') {
-            return [
-                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
-                { label: 'Tạo mới', path: path }
-            ];
-        }
-        // /admin/vouchers/deleted
-        if (parts.length === 4 && parts[3] === 'deleted') {
-            return [
-                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
-                { label: 'Đã xóa', path: path }
-            ];
-        }
-        // /admin/vouchers/:id/edit
-        if (parts.length === 5 && parts[4] === 'edit') {
-            return [
-                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
-                { label: 'Chỉnh sửa', path: path }
-            ];
-        }
-        // /admin/vouchers/:id
-        if (parts.length === 4 && parts[3] !== 'platform' && parts[3] !== 'vendor' && parts[3] !== 'create' && parts[3] !== 'deleted') {
-            return [
-                { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
-                { label: 'Chi tiết', path: path }
-            ];
-        }
+      const parts = path.split('/');
+      // /admin/vouchers/create
+      if (parts.length === 4 && parts[3] === 'create') {
+        return [
+          { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+          { label: 'Tạo mới', path: path }
+        ];
+      }
+      // /admin/vouchers/deleted
+      if (parts.length === 4 && parts[3] === 'deleted') {
+        return [
+          { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+          { label: 'Đã xóa', path: path }
+        ];
+      }
+      // /admin/vouchers/:id/edit
+      if (parts.length === 5 && parts[4] === 'edit') {
+        return [
+          { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+          { label: 'Chỉnh sửa', path: path }
+        ];
+      }
+      // /admin/vouchers/:id
+      if (parts.length === 4 && parts[3] !== 'platform' && parts[3] !== 'vendor' && parts[3] !== 'create' && parts[3] !== 'deleted') {
+        return [
+          { label: 'Voucher hệ thống', path: '/admin/vouchers/platform' },
+          { label: 'Chi tiết', path: path }
+        ];
+      }
     }
 
     return [{ label: 'Hệ thống', path: '/admin' }];
@@ -257,8 +257,7 @@ export function AdminLayout() {
                   to={item.path}
                   title={isCollapsed ? item.label : ''}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${
-                      isCollapsed ? 'justify-center' : ''
+                    `flex items-center gap-3 p-2.5 rounded-lg transition-all cursor-pointer ${isCollapsed ? 'justify-center' : ''
                     } ${isActive ? 'bg-white/10 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'}`
                   }
                 >
@@ -277,9 +276,8 @@ export function AdminLayout() {
         >
           <div
             onClick={() => navigate('/')}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-white/60 hover:bg-white/5 hover:text-white cursor-pointer transition-colors ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-white/60 hover:bg-white/5 hover:text-white cursor-pointer transition-colors ${isCollapsed ? 'justify-center' : ''
+              }`}
             title={isCollapsed ? 'Trang chủ' : ''}
           >
             <Home className="w-5 h-5 shrink-0" />
@@ -287,9 +285,8 @@ export function AdminLayout() {
           </div>
           <div
             onClick={handleLogout}
-            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors ${
-              isCollapsed ? 'justify-center' : ''
-            }`}
+            className={`flex items-center gap-3 p-2.5 rounded-lg text-red-400 hover:bg-red-500/10 cursor-pointer transition-colors ${isCollapsed ? 'justify-center' : ''
+              }`}
             title={isCollapsed ? 'Đăng xuất' : ''}
           >
             <LogOut className="w-5 h-5 shrink-0" />

@@ -269,6 +269,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"form">)
               shape="pill"
               width="100%"
               text="signin_with"
+
             />
           </div>
 
