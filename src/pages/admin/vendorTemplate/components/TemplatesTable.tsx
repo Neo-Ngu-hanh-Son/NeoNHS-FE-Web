@@ -1,7 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Calendar, Clock, DollarSign, AlertCircle, Building2, CheckCircle, FileText } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Calendar, Clock, AlertCircle, Building2, CheckCircle, ChevronDown, FileText } from "lucide-react"
 import { AdminWorkshopTemplateResponse, WorkshopStatus } from "./templates/types"
 import { formatDate, formatDuration, formatPrice } from "@/pages/vendor/WorkshopTemplates/utils/formatters"
 
@@ -48,14 +54,14 @@ const getStatusBadge = (status: WorkshopStatus) => {
   }
 }
 
-/** Cột «Mẫu workshop» rộng nhất bảng; các % cộng lại = 100% (table-fixed). */
-const colTemplate = "w-[28%] min-w-[14rem] p-3 align-top"
-const colVendor = "w-[18%] min-w-0 p-3 align-top"
-const colDuration = "w-[12%] min-w-[5.5rem] whitespace-nowrap p-3 align-top"
-const colPrice = "w-[10%] min-w-[6.5rem] whitespace-nowrap p-3 align-top"
-const colStatus = "w-[11%] min-w-[7.5rem] p-3 align-top"
-const colDate = "w-[12%] min-w-[6.5rem] whitespace-nowrap p-3 align-top"
-const colActions = "w-[9%] min-w-[10.5rem] p-3 align-top"
+/** Các % cộng = 100% (table-fixed). Cột hành động: menu «Thao tác» (PENDING) hoặc nút «Xem». */
+const colTemplate = "w-[26%] min-w-[12rem] p-3 align-top"
+const colVendor = "w-[16%] min-w-0 p-3 align-top"
+const colDuration = "w-[10%] min-w-[5.5rem] whitespace-nowrap p-3 align-top"
+const colPrice = "w-[8%] min-w-[6rem] whitespace-nowrap p-3 align-top"
+const colStatus = "w-[10%] min-w-[7.5rem] p-3 align-top"
+const colDate = "w-[10%] min-w-[6.5rem] whitespace-nowrap p-3 align-top"
+const colActions = "w-[10%] min-w-[8.5rem] p-3 align-top"
 
 function SkeletonRow() {
   return (
@@ -80,8 +86,8 @@ function SkeletonRow() {
       <td className={colStatus}><Skeleton className="h-6 w-20 rounded-full" /></td>
       <td className={colDate}><Skeleton className="h-4 w-24" /></td>
       <td className={colActions}>
-        <div className="flex justify-end gap-2">
-          <Skeleton className="h-8 w-16 rounded-md" />
+        <div className="flex w-full min-w-0 items-center justify-end">
+          <Skeleton className="h-8 w-24 shrink-0 rounded-md" />
         </div>
       </td>
     </tr>
@@ -194,7 +200,6 @@ export function TemplatesTable({
                   </td>
                   <td className={`${colPrice} text-sm font-medium`}>
                     <div className="flex items-center gap-1.5">
-                      <DollarSign className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                       <span className="truncate">{formatPrice(template.defaultPrice)}</span>
                     </div>
                   </td>
@@ -208,33 +213,48 @@ export function TemplatesTable({
                     </div>
                   </td>
                   <td className={colActions}>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="transition-colors"
-                        onClick={() => onView(template.id)}
-                      >
-                        Xem
-                      </Button>
-                      {template.status === WorkshopStatus.PENDING && (
-                        <>
-                          <Button
-                            size="sm"
-                            className="bg-green-600 transition-colors hover:bg-green-700"
-                            onClick={() => onApproveClick(template)}
-                          >
-                            Duyệt
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            className="transition-colors"
-                            onClick={() => onRejectClick(template)}
-                          >
-                            Từ chối
-                          </Button>
-                        </>
+                    <div className="flex w-full min-w-0 items-center justify-end">
+                      {template.status === WorkshopStatus.PENDING ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="shrink-0 gap-1 transition-colors"
+                            >
+                              Thao tác
+                              <ChevronDown className="h-3.5 w-3.5 opacity-60" aria-hidden />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-[9.5rem]">
+                            <DropdownMenuItem onSelect={() => onView(template.id)}>
+                              Xem
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => onApproveClick(template)}
+                              className="text-green-600 focus:bg-green-50 focus:text-green-700 dark:focus:bg-green-950/30"
+                            >
+                              Duyệt
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onSelect={() => onRejectClick(template)}
+                              className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                            >
+                              Từ chối
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="shrink-0 transition-colors"
+                          onClick={() => onView(template.id)}
+                        >
+                          Xem
+                        </Button>
                       )}
                     </div>
                   </td>
