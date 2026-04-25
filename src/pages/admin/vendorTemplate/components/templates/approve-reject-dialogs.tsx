@@ -183,10 +183,10 @@ export function RejectTemplateDialog({
                 </p>
                 <ul className="list-disc space-y-1 pl-4 text-red-700 dark:text-red-300">
                   <li>
-                    Đặt trạng thái mẫu thành <strong>REJECTED</strong>
+                    Đặt trạng thái mẫu thành <strong>TỪ CHỐI</strong>
                   </li>
                   <li>
-                    Gửi lý do từ chối tới Đối tác qua <strong>email</strong>
+                    Gửi lý do từ chối tới Đối tác
                   </li>
                   <li>
                     Cho phép Đối tác <strong>chỉnh sửa và gửi lại</strong>
