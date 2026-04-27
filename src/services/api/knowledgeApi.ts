@@ -1,6 +1,9 @@
 import api from './apiClient';
 
-export type KnowledgeType = 'INFORMATION' | 'SYSTEM_PROMPT';
+/** Loại tri thức dùng trong bảng RAG (form + API), không bao gồm cấu hình System Prompt. */
+export type RagKnowledgeType = 'INFORMATION' | 'REGULATION' | 'GUIDE';
+
+export type KnowledgeType = RagKnowledgeType | 'SYSTEM_PROMPT';
 
 export interface KnowledgeDocument {
     id: string;
