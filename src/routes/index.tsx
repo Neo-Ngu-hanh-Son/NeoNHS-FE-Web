@@ -24,7 +24,6 @@ import AdminUsersPage from '@/pages/admin/users/AdminUsersPage';
 import AdminDestinationsPage from '@/pages/admin/destinations/AdminDestinationsPage';
 import AdminVendorsPage from '@/pages/admin/vendors/AdminVendorsPage';
 import AdminVendorTemplatesPage from '@/pages/admin/vendorTemplate/AdminVendorTemplatesPage';
-import AdminTicketsPage from '@/pages/admin/tickets/AdminTicketsPage';
 import AdminVouchersPage from '@/pages/admin/vouchers';
 import PlatformVouchersPage from '@/pages/admin/vouchers/PlatformVouchers';
 import VoucherCreatePage from '@/pages/admin/vouchers/create';
@@ -150,7 +149,6 @@ export const router = createBrowserRouter([
           { path: 'users', element: <AdminUsersPage /> },
           { path: 'vendors', element: <AdminVendorsPage /> },
           { path: 'vendors/templates', element: <AdminVendorTemplatesPage /> },
-          { path: 'tickets', element: <AdminTicketsPage /> },
           { path: 'vouchers', element: <Navigate to="platform" replace /> },
           { path: 'vouchers/platform', element: <PlatformVouchersPage /> },
           { path: 'vouchers/create', element: <VoucherCreatePage /> },
