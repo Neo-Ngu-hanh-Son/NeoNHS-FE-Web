@@ -14,10 +14,24 @@ import {
   DialogTitle,
   Input,
   Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Textarea,
 } from '@/components/ui';
 
-import { knowledgeApi, type KnowledgeDocument } from '@/services/api/knowledgeApi';
+import { knowledgeApi, type KnowledgeDocument, type RagKnowledgeType } from '@/services/api/knowledgeApi';
+import { RAG_KNOWLEDGE_TYPE_OPTIONS } from '../constants';
+
+function toRagKnowledgeType(doc: KnowledgeDocument | null): RagKnowledgeType {
+  const t = doc?.knowledgeType;
+  if (t === 'REGULATION' || t === 'GUIDE' || t === 'INFORMATION') {
+    return t;
+  }
+  return 'INFORMATION';
+}
 
 type KnowledgeDocumentDialogProps = {
   open: boolean;
@@ -34,19 +48,28 @@ export function KnowledgeDocumentDialog({
 }: KnowledgeDocumentDialogProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [knowledgeType, setKnowledgeType] = useState<RagKnowledgeType>('INFORMATION');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (editingDoc) {
       setTitle(editingDoc.title);
       setContent(editingDoc.content);
+      setKnowledgeType(toRagKnowledgeType(editingDoc));
     } else {
       setTitle('');
       setContent('');
+      setKnowledgeType('INFORMATION');
     }
   }, [editingDoc, open]);
 
   const handleSave = async () => {
+    const payload = {
+      title,
+      content,
+      knowledgeType,
+      isActive: editingDoc?.isActive ?? true,
+    };
     if (!title.trim() || !content.trim()) {
       message.warning('Vui lòng nhập đầy đủ tiêu đề và nội dung');
       return;
@@ -55,20 +78,11 @@ export function KnowledgeDocumentDialog({
     try {
       setLoading(true);
       if (editingDoc) {
-        await knowledgeApi.updateDocument(editingDoc.id, {
-          title,
-          content,
-          knowledgeType: 'INFORMATION',
-          isActive: editingDoc.isActive,
-        });
+        await knowledgeApi.updateDocument(editingDoc.id, payload);
       } else {
-        await knowledgeApi.createDocument({
-          title,
-          content,
-          knowledgeType: 'INFORMATION',
-          isActive: true,
-        });
+        await knowledgeApi.createDocument(payload);
       }
+      console.log("Data", payload);
       message.success('Đã lưu tài liệu thành công');
       onOpenChange(false);
       onSaved();
@@ -78,6 +92,7 @@ export function KnowledgeDocumentDialog({
       setLoading(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,17 +117,41 @@ export function KnowledgeDocumentDialog({
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="kb-title" className="text-sm font-semibold">
-              Tiêu đề bài viết
-            </Label>
-            <Input
-              id="kb-title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: Chính sách hoàn hủy vé tại Ngũ Hành Sơn"
-              className="border-slate-200 focus:ring-indigo-500"
-            />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-end sm:gap-3">
+            <div className="grid min-w-0 gap-2 sm:col-span-9">
+              <Label htmlFor="kb-title" className="text-sm font-semibold">
+                Tiêu đề bài viết
+              </Label>
+              <Input
+                id="kb-title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="VD: Chính sách hoàn hủy vé tại Ngũ Hành Sơn"
+                className="w-full min-w-0 border-slate-200 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="grid w-full min-w-0 gap-2 sm:col-span-3 sm:max-w-[12rem] sm:justify-self-end">
+              <Label className="text-sm font-semibold">Loại tri thức</Label>
+              <Select
+                value={knowledgeType}
+                onValueChange={(v) => setKnowledgeType(v as RagKnowledgeType)}
+              >
+                <SelectTrigger
+                  id="kb-type"
+                  className="h-9 w-full border-slate-200"
+                  aria-label="Chọn loại tri thức"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {RAG_KNOWLEDGE_TYPE_OPTIONS.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="kb-content" className="text-sm font-semibold">
