@@ -27,7 +27,7 @@ import type {
  * or a plain day number ("3").
  */
 function groupMonthByWeeks(
-    points: { label: string; revenue: number }[],
+    points: { label: string; revenue: number; netAmount: number }[],
     referenceDate: Date,
 ): RevenuePoint[] {
     const year = referenceDate.getFullYear();
@@ -35,9 +35,13 @@ function groupMonthByWeeks(
     const monthDisplay = month + 1;         // for label (1-indexed)
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    // Build day-number → revenue map; accumulate in case of duplicate labels
+    // Build day-number → revenue & netAmount map; accumulate in case of duplicate labels
     const dayRevenue: Record<number, number> = {};
-    for (let d = 1; d <= daysInMonth; d++) dayRevenue[d] = 0;
+    const dayNetAmount: Record<number, number> = {};
+    for (let d = 1; d <= daysInMonth; d++) {
+        dayRevenue[d] = 0;
+        dayNetAmount[d] = 0;
+    }
 
     for (const p of points) {
         // Extract the day number from labels like "2026-04-03", "03", or "3"
@@ -45,30 +49,35 @@ function groupMonthByWeeks(
         const day = parseInt(raw, 10);
         if (!isNaN(day) && day >= 1 && day <= daysInMonth) {
             dayRevenue[day] += p.revenue;
+            dayNetAmount[day] += p.netAmount;
         }
     }
 
     // Split days into week buckets; a new week starts when getDay() === 0 (Sunday)
-    const weeks: { start: number; end: number; revenue: number }[] = [];
+    const weeks: { start: number; end: number; revenue: number; netAmount: number }[] = [];
     let weekStart = 1;
     let weekRevenue = 0;
+    let weekNetAmount = 0;
 
     for (let d = 1; d <= daysInMonth; d++) {
         const dayOfWeek = new Date(year, month, d).getDay(); // 0 = Sunday
         if (d > 1 && dayOfWeek === 0) {
             // Close the previous week on Saturday, open new week on Sunday
-            weeks.push({ start: weekStart, end: d - 1, revenue: weekRevenue });
+            weeks.push({ start: weekStart, end: d - 1, revenue: weekRevenue, netAmount: weekNetAmount });
             weekStart = d;
             weekRevenue = 0;
+            weekNetAmount = 0;
         }
         weekRevenue += dayRevenue[d];
+        weekNetAmount += dayNetAmount[d];
     }
     // Flush the final (possibly partial) week
-    weeks.push({ start: weekStart, end: daysInMonth, revenue: weekRevenue });
+    weeks.push({ start: weekStart, end: daysInMonth, revenue: weekRevenue, netAmount: weekNetAmount });
 
     return weeks.map((w, i) => ({
         name: `${w.start}-${w.end}`,
         revenue: w.revenue,
+        netAmount: w.netAmount,
     }));
 }
 
@@ -104,7 +113,7 @@ export function useVendorDashboard() {
                 setRevenueData(groupMonthByWeeks(points, new Date()));
             } else {
                 setRevenueData(
-                    points.map((p) => ({ name: p.label, revenue: p.revenue })),
+                    points.map((p) => ({ name: p.label, revenue: p.revenue, netAmount: p.netAmount })),
                 );
             }
         } catch (err: any) {
