@@ -143,10 +143,8 @@ export function KnowledgeArticlesTab({
         <Info className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
         <AlertTitle className="text-indigo-900 dark:text-indigo-100">Tri thức AI (RAG)</AlertTitle>
         <AlertDescription className="text-indigo-800/95 dark:text-indigo-200/90">
-          Các bài viết ở đây cung cấp <strong>nguồn kiến thức</strong> để hệ thống tìm và trích đoạn liên
-          quan trước khi gửi cho AI — khác với{' '}
-          <strong>System Prompt</strong> ở tab &quot;Cấu hình AI&quot;. Chỉ bài{' '}
-          <strong>đang hoạt động</strong> được đưa vào RAG.
+          Các bài viết ở đây cung cấp <strong>nguồn kiến thức</strong> để AI có thể tìm kiếm và trả lời 
+          khi được người dùng hỏi thông tin về Ngũ Hành Sơn.
         </AlertDescription>
       </Alert>
 
