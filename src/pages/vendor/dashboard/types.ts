@@ -20,7 +20,7 @@ export interface DashboardStats {
 
 export interface RevenueSeriesResponse {
     range: RevenueFilter;
-    points: { label: string; revenue: number }[];
+    points: { label: string; revenue: number; netAmount: number }[];
 }
 
 export interface WorkshopStatusItem {
@@ -66,6 +66,7 @@ export interface SessionsResponse {
 export interface RevenuePoint {
     name: string;
     revenue: number;
+    netAmount: number;
 }
 
 export interface WorkshopStatusPoint {
