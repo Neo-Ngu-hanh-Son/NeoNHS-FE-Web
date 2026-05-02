@@ -137,7 +137,7 @@ export function TemplateReviewCard({
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-muted-foreground" />
             <span>
-              {template.minParticipants}-{template.maxParticipants} người
+              {template.maxParticipants === 999999 ? 'Không giới hạn' : `${template.minParticipants}-${template.maxParticipants} người`}
             </span>
           </div>
           <div className="flex items-center gap-2">

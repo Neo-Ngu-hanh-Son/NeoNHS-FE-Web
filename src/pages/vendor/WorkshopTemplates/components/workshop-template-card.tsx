@@ -73,7 +73,7 @@ export function WorkshopTemplateCard({
         {/* Participants */}
         <div className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400">
           <Users className="w-4 h-4 text-slate-400" />
-          <span>{template.minParticipants}-{template.maxParticipants} người tham gia</span>
+          <span>{template.maxParticipants === 999999 ? 'Không giới hạn' : `${template.minParticipants} - ${template.maxParticipants} người tham gia`}</span>
         </div>
 
         {/* Tags */}

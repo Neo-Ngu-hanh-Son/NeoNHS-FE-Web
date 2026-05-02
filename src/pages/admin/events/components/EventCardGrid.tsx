@@ -256,7 +256,7 @@ export function EventCardGrid({
                                     </span>
                                     <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                         <Users className="h-3 w-3" />
-                                        {event.currentEnrolled}/{event.maxParticipants || '∞'}
+                                        {event.currentEnrolled}/{event.maxParticipants === 999999 ? '∞' : (event.maxParticipants || '∞')}
                                     </span>
                                 </div>
 

@@ -140,35 +140,45 @@ export function ViewSessionDialog({
           <div className="space-y-3">
             <h3 className="text-lg font-semibold">Chi Phí</h3>
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-500/20 flex items-center justify-center font-semibold">
-                <DollarSign className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-semibold ${session.price === 0 ? 'bg-emerald-50 dark:bg-emerald-500/20' : 'bg-orange-50 dark:bg-orange-500/20'}`}>
+                <DollarSign className={`w-5 h-5 ${session.price === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-orange-600 dark:text-orange-400'}`} />
               </div>
-              <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">{formatPrice(session.price)}</span>
-              <span className="text-sm text-muted-foreground mt-1">/ người tham gia</span>
+              <span className={`text-2xl font-bold ${session.price === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                {session.price === 0 ? 'Miễn phí' : formatPrice(session.price)}
+              </span>
+              {session.price !== 0 && (
+                <span className="text-sm text-muted-foreground mt-1">/ người tham gia</span>
+              )}
             </div>
           </div>
 
-          <Separator />
+          {session.maxParticipants !== 999999 && (
+            <>
+              <Separator />
 
-          {/* Enrollment Status */}
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold">Tình Trạng Đăng Ký</h3>
-            <div className="space-y-3 bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center justify-between text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-emerald-600" />
-                  <span className="font-medium">
-                    {session.currentEnrollments} / {session.maxParticipants} học viên tham gia
-                  </span>
+              {/* Enrollment Status */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold">Tình Trạng Đăng Ký</h3>
+                <div className="space-y-3 bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-emerald-600" />
+                      <span className="font-medium">
+                        {session.currentEnrollments} / {session.maxParticipants} học viên tham gia
+                      </span>
+                    </div>
+                    <span className="text-muted-foreground font-semibold text-emerald-600">{enrollmentPercentage}%</span>
+                  </div>
+                  <Progress value={enrollmentPercentage} className="h-2 bg-slate-200 dark:bg-slate-700" />
+                  <p className={`text-sm font-medium ${session.availableSlots === 0 ? 'text-red-500' : 'text-emerald-600'}`}>
+                    {session.availableSlots === 0
+                      ? 'Đã hết chỗ trống'
+                      : `Còn lại ${session.availableSlots} chỗ trống`}
+                  </p>
                 </div>
-                <span className="text-muted-foreground font-semibold text-emerald-600">{enrollmentPercentage}%</span>
               </div>
-              <Progress value={enrollmentPercentage} className="h-2 bg-slate-200 dark:bg-slate-700" />
-              <p className={`text-sm font-medium ${session.availableSlots === 0 ? 'text-red-500' : 'text-emerald-600'}`}>
-                {session.availableSlots === 0 ? 'Đã hết chỗ trống' : `Còn lại ${session.availableSlots} chỗ trống`}
-              </p>
-            </div>
-          </div>
+            </>
+          )}
 
           <Separator />
 
@@ -208,7 +218,7 @@ export function ViewSessionDialog({
           )}
 
           {/* Vendor Information */}
-          {session.vendor && (
+          {/* {session.vendor && (
             <>
               <Separator />
               <div className="space-y-3">
@@ -234,7 +244,7 @@ export function ViewSessionDialog({
                 </div>
               </div>
             </>
-          )}
+          )} */}
 
           {/* Rating (if available) */}
           {session.workshopTemplate?.averageRating ? (
