@@ -163,6 +163,7 @@ export const formatFullDateTime = (isoDate: string) => {
 
 // Price Formatting
 export const formatPrice = (price: number) => {
+  if (price === 0) return 'Miễn phí'
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
     currency: 'VND'
@@ -172,6 +173,7 @@ export const formatPrice = (price: number) => {
 
 /** Hiển thị số tiền kiểu 1,234,567 VND (dấu phẩy ngăn cách hàng nghìn). */
 export function formatVndCommaAmount(price: number): string {
+  if (price === 0) return 'Miễn phí'
   return `${new Intl.NumberFormat('en-US', {
     maximumFractionDigits: 0,
   }).format(price)} VND`
