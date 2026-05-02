@@ -49,27 +49,29 @@ export function SessionForm({
       )}
 
       {/* Mode Toggle - only show when creating a new session */}
-      <div className="flex gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg w-fit">
-        <Button
-          type="button"
-          size="sm"
-          variant={!isBatchMode ? "default" : "ghost"}
-          onClick={() => setIsBatchMode(false)}
-          className="rounded-md"
-        >
-          Một Phiên
-        </Button>
+      {!isEditing && (
+        <div className="flex gap-2 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg w-fit">
+          <Button
+            type="button"
+            size="sm"
+            variant={!isBatchMode ? "default" : "ghost"}
+            onClick={() => setIsBatchMode(false)}
+            className="rounded-md"
+          >
+            Một Phiên
+          </Button>
 
-        <Button
-          type="button"
-          size="sm"
-          variant={isBatchMode ? "default" : "ghost"}
-          onClick={() => setIsBatchMode(true)}
-          className="gap-1.5 rounded-md"
-        >
-          <CalendarDays className="w-4 h-4" /> Liên Tiếp
-        </Button>
-      </div>
+          <Button
+            type="button"
+            size="sm"
+            variant={isBatchMode ? "default" : "ghost"}
+            onClick={() => setIsBatchMode(true)}
+            className="gap-1.5 rounded-md"
+          >
+            <CalendarDays className="w-4 h-4" /> Liên Tiếp
+          </Button>
+        </div>
+      )}
 
       {/* Render selected mode */}
       {isBatchMode && !isEditing && onBatchSubmit ? (
