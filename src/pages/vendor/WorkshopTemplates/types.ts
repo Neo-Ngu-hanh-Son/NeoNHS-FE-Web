@@ -120,11 +120,11 @@ export const workshopTemplateSchema = z.object({
     .min(0, "Giá phải lớn hơn hoặc bằng 0 đ"),
 
   minParticipants: z.number()
-    .positive("Must be at least 1")
+    .min(0, "Must be at least 0")
     .int("Must be a whole number"),
 
   maxParticipants: z.number()
-    .positive("Must be at least 1")
+    .min(1, "Must be at least 1")
     .int("Must be a whole number"),
 
   imageUrls: z.array(

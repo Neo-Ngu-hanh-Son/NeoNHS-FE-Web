@@ -49,7 +49,7 @@ export const TemplateDetailSidebar = ({ template }: TemplateDetailSidebarProps) 
               <TeamOutlined /> Người tham gia
             </p>
             <p className="text-base font-semibold">
-              {template.minParticipants} - {template.maxParticipants} người
+              {template.maxParticipants === 999999 ? 'Không giới hạn' : `${template.minParticipants} - ${template.maxParticipants} người`}
             </p>
           </div>
 

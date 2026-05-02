@@ -208,6 +208,8 @@ export const formatAvailability = (available: number) => {
 }
 
 export const getEnrollmentPercentage = (current: number, max: number) => {
+  if (max === 999999) return 0;
+  if (max === 0) return 0;
   return Math.round((current / max) * 100)
 }
 

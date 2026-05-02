@@ -141,7 +141,7 @@ export function DayView({
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Users className="w-4 h-4" />
-                                    {session.currentEnrollments}/{session.maxParticipants}
+                                    {session.currentEnrollments}/{session.maxParticipants === 999999 ? '∞' : session.maxParticipants}
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <DollarSign className="w-4 h-4" />
@@ -152,9 +152,9 @@ export function DayView({
                                 {/* Availability */}
                                 <div className={cn(
                                   "text-sm font-medium",
-                                  session.availableSlots === 0 ? "text-red-500" : "text-green-600"
+                                  session.availableSlots === 0 && session.maxParticipants !== 999999 ? "text-red-500" : "text-green-600"
                                 )}>
-                                  {formatAvailability(session.availableSlots)}
+                                  {session.maxParticipants === 999999 ? 'Còn chỗ (Không giới hạn)' : formatAvailability(session.availableSlots)}
                                 </div>
 
                                 {/* Tags */}
