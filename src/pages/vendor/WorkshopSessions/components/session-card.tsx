@@ -101,20 +101,36 @@ export function SessionCard({ session, onView, onEdit, onCancel, onStart, onComp
 
           {/* Price + capacity */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">
-              {formatPrice(session.price)}
+            <span className={`font-semibold tabular-nums ${session.price === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+              {session.price === 0 ? 'Miễn phí' : formatPrice(session.price)}
             </span>
-            <span className="hidden h-3 w-px bg-border sm:block" aria-hidden />
-            <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-              <Users className="h-4 w-4 shrink-0" />
-              <span className="tabular-nums font-medium text-slate-700 dark:text-slate-300">
-                {session.currentEnrollments}/{session.maxParticipants}
+            {session.maxParticipants !== 999999 && (
+              <>
+                <span className="hidden h-3 w-px bg-border sm:block" aria-hidden />
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <Users className="h-4 w-4 shrink-0" />
+                  <span className="tabular-nums font-medium text-slate-700 dark:text-slate-300">
+                    {session.currentEnrollments}/{session.maxParticipants}
+                  </span>
+                  {session.maxParticipants !== 999999 && (
+                    <span className="text-emerald-600 dark:text-emerald-400">({enrollmentPercentage}%)</span>
+                  )}
+                </span>
+              </>
+            )}
+            {session.maxParticipants === 999999 && (
+              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <Users className="h-4 w-4 shrink-0" />
+                <span className="tabular-nums font-medium text-slate-700 dark:text-slate-300">
+                  Không giới hạn
+                </span>
               </span>
-              <span className="text-emerald-600 dark:text-emerald-400">({enrollmentPercentage}%)</span>
-            </span>
+            )}
           </div>
 
-          <Progress value={enrollmentPercentage} className="h-1.5 bg-slate-100 dark:bg-slate-700" />
+          {session.maxParticipants !== 999999 && (
+            <Progress value={enrollmentPercentage} className="h-1.5 bg-slate-100 dark:bg-slate-700" />
+          )}
 
           {/* Actions — tooltip khi nút bị khóa theo quy tắc backend */}
           <TooltipProvider delayDuration={200}>

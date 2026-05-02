@@ -155,7 +155,7 @@ export function WeekView({ currentDate, sessions, onSessionClick, onDateClick }:
                           {formatTime(session.startTime)}
                         </div>
                         <div className="text-[10px] opacity-90">
-                          {session.currentEnrollments}/{session.maxParticipants}
+                          {session.currentEnrollments}/{session.maxParticipants === 999999 ? '∞' : session.maxParticipants}
                         </div>
                       </div>
                     )

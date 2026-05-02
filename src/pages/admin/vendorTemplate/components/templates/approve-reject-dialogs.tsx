@@ -64,9 +64,6 @@ export function ApproveTemplateDialog({
                   <li>
                     Cho phép khách hàng <strong>đặt / đăng ký</strong> phiên (khi đã mở bán)
                   </li>
-                  <li>
-                    Gửi <strong>email thông báo</strong> tới Đối tác (nếu hệ thống bật)
-                  </li>
                 </ul>
               </div>
 
@@ -76,18 +73,18 @@ export function ApproveTemplateDialog({
                 </p>
                 <div className="mt-2 space-y-1 text-blue-700 dark:text-blue-300">
                   <p>
-                    <strong>Thời lượng:</strong> {template.estimatedDuration} phút
+                    <strong>Thời lượng: </strong> {template.estimatedDuration} phút
                   </p>
                   <p>
-                    <strong>Giá:</strong>{" "}
-                    {template.defaultPrice.toLocaleString("vi-VN")} VND
+                    <strong>Giá: </strong>{" "}
+                     {template.defaultPrice === 0 ? "Miễn phí" : `${template.defaultPrice.toLocaleString()} VND`}
                   </p>
                   <p>
-                    <strong>Sức chứa:</strong> {template.minParticipants}–
-                    {template.maxParticipants} người
+                    <strong>Sức chứa: </strong> 
+                    {template.maxParticipants === 999999 ? "Không giới hạn" : `${template.minParticipants}-${template.maxParticipants} người`}
                   </p>
                   <p>
-                    <strong>Đối tác:</strong>{" "}
+                    <strong>Đối tác: </strong>{" "}
                     {template.vendorVerified ? "Đã xác minh" : "Chưa xác minh"}
                   </p>
                 </div>

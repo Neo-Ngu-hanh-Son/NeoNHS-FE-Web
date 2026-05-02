@@ -109,7 +109,7 @@ export default function ChatMessages({
                 <div className={`flex flex-col max-w-[70%] ${isSender ? 'items-end' : 'items-start'}`}>
                   <div
                     className={`${msg.messageType === 'IMAGE' ? 'p-1 bg-transparent border-0 shadow-none' : 'px-4 py-2.5'} rounded-2xl shadow-sm break-words text-[15px] leading-relaxed w-full ${isSender
-                      ? `${msg.messageType === 'IMAGE' ? '' : 'bg-[#0084ff] text-white'} ${showAvatar ? 'rounded-br-sm' : ''}`
+                      ? `${msg.messageType === 'IMAGE' ? '' : 'bg-emerald-600 text-white'} ${showAvatar ? 'rounded-br-sm' : ''}`
                       : `${msg.messageType === 'IMAGE' ? '' : 'bg-[#f0f2f5] dark:bg-[#2a2d31] text-[#1c1e21] dark:text-white border border-black/5 dark:border-white/5'} ${showAvatar ? 'rounded-bl-sm' : ''}`
                       }`}
                   >
@@ -140,7 +140,9 @@ export default function ChatMessages({
                       </AntImage.PreviewGroup>
                     ) : msg.messageType === 'PRODUCT_SNIPPET' && msg.metadata ? (
                       <div className="flex flex-col gap-2" key={`product-${msg.id}`}>
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        <div className={`prose prose-sm max-w-none ${isSender ? 'prose-invert prose-p:text-white prose-p:m-0' : 'dark:prose-invert prose-p:m-0'}`}>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        </div>
                         <div
                           className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition ${isSender ? 'bg-primary-foreground/10 hover:bg-primary-foreground/20' : 'bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 shadow-sm border border-border'}`}
                           onClick={() => window.open(`/vendor/workshop-templates/${msg.metadata?.workshopId}`, '_blank')}
@@ -155,7 +157,7 @@ export default function ChatMessages({
                         </div>
                       </div>
                     ) : (
-                      <div className={`prose prose-sm dark:prose-invert max-w-none ${isSender ? 'prose-p:m-0' : 'prose-p:m-0'}`} key={`text-${msg.id}`}>
+                      <div className={`prose prose-sm max-w-none ${isSender ? 'prose-invert prose-p:text-white prose-p:m-0' : 'dark:prose-invert prose-p:m-0'}`} key={`text-${msg.id}`}>
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                       </div>
                     )}

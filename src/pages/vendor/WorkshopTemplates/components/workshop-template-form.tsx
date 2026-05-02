@@ -45,6 +45,10 @@ export function WorkshopTemplateForm({
   // Initialize free mode based on default price
   const [isFreeMode, setIsFreeMode] = useState(defaultValues ? defaultValues.defaultPrice === 0 : false);
 
+  const [isUnlimitedParticipants, setIsUnlimitedParticipants] = useState(
+    defaultValues ? defaultValues.defaultPrice === 0 && defaultValues.maxParticipants === 999999 : false
+  );
+
   const form = useForm<WorkshopTemplateFormData>({
     resolver: zodResolver(workshopTemplateSchema),
     defaultValues: defaultValues
@@ -250,8 +254,13 @@ export function WorkshopTemplateForm({
                         className={!isFreeMode ? 'bg-primary text-white' : 'text-muted-foreground'}
                         onClick={() => {
                           setIsFreeMode(false);
+                          setIsUnlimitedParticipants(false);
                           if (form.getValues('defaultPrice') === 0) {
                             form.setValue('defaultPrice', 50000);
+                          }
+                          if (form.getValues('maxParticipants') === 999999) {
+                            form.setValue('maxParticipants', 10);
+                            form.setValue('minParticipants', 1);
                           }
                         }}
                       >
@@ -416,67 +425,115 @@ export function WorkshopTemplateForm({
                   </div>
                   <div>
                     <CardTitle className="text-base font-semibold">Người Tham Gia</CardTitle>
-                    <CardDescription className="text-xs">Số người tối thiểu và tối đa</CardDescription>
+                    <CardDescription className="text-xs">Số người tham gia workshop</CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="minParticipants"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Tối Thiểu <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <UserMinus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                              type="number"
-                              min="1"
-                              placeholder="5"
-                              className="pl-9"
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                {isFreeMode && (
+                  <div className="mb-4">
+                    <FormLabel className="mb-3 block">Giới Hạn Người Tham Gia</FormLabel>
+                    <div className="flex gap-3">
+                      <Button
+                        type="button"
+                        variant={!isUnlimitedParticipants ? 'default' : 'outline'}
+                        className={!isUnlimitedParticipants ? 'bg-primary text-white' : 'text-muted-foreground'}
+                        onClick={() => {
+                          setIsUnlimitedParticipants(false);
+                          if (form.getValues('maxParticipants') === 999999) {
+                            form.setValue('maxParticipants', 10);
+                            form.setValue('minParticipants', 1);
+                          }
+                        }}
+                      >
+                        Giới Hạn
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={isUnlimitedParticipants ? 'default' : 'outline'}
+                        className={
+                          isUnlimitedParticipants
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                            : 'text-blue-700 hover:text-blue-800 border-blue-200'
+                        }
+                        onClick={() => {
+                          setIsUnlimitedParticipants(true);
+                          form.setValue('minParticipants', 0, { shouldValidate: true });
+                          form.setValue('maxParticipants', 999999, { shouldValidate: true });
+                        }}
+                      >
+                        Không Giới Hạn
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
+                {!isUnlimitedParticipants && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="minParticipants"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Tối Thiểu <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <UserMinus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="5"
+                                  className="pl-9"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="maxParticipants"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Tối Đa <span className="text-red-500">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <Input
-                              type="number"
-                              min="1"
-                              placeholder="20"
-                              className="pl-9"
-                              {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name="maxParticipants"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              Tối Đa <span className="text-red-500">*</span>
+                            </FormLabel>
+                            <FormControl>
+                              <div className="relative">
+                                <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  placeholder="20"
+                                  className="pl-9"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value) || 1)}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                {form.watch('maxParticipants') < form.watch('minParticipants') && (
-                  <p className="mt-3 text-sm text-red-500 font-medium">Tối đa phải lớn hơn hoặc bằng Tối thiểu</p>
+                    {form.watch('maxParticipants') < form.watch('minParticipants') && (
+                      <p className="mt-3 text-sm text-red-500 font-medium">Tối đa phải lớn hơn hoặc bằng Tối thiểu</p>
+                    )}
+                  </>
+                )}
+                
+                {isUnlimitedParticipants && (
+                  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 text-sm">
+                    Workshop này miễn phí và không giới hạn số lượng người có thể tham gia.
+                  </div>
                 )}
               </CardContent>
             </Card>

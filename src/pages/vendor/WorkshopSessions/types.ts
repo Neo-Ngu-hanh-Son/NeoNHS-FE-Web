@@ -124,7 +124,7 @@ export const workshopSessionSchema = z.object({
   }),
 
   price: z.number()
-    .positive("Price must be greater than 0")
+    .min(0, "Price must be 0 or greater")
     .optional(),
 
   maxParticipants: z.number()
