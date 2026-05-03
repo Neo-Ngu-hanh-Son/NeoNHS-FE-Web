@@ -142,6 +142,7 @@ export function BatchSessionForm({
       price: finalPrice,
       maxParticipants: maxParts
     }))
+    console.log("Submitting Batch Session Data:", batchData)
     onBatchSubmit(batchData)
   }
 
@@ -154,7 +155,7 @@ export function BatchSessionForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={(e) => { e.preventDefault(); handleCustomSubmit(); }} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleCustomSubmit, (errors) => console.log('Batch Session Form Errors:', errors))} className="space-y-6">
         {/* Date and Time Section */}
         <div className="space-y-4">
           <div className="border-b pb-2">
@@ -318,18 +319,23 @@ export function BatchSessionForm({
                   <FormLabel>Số người tham gia tối đa</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      min={1}
+                      type={field.value === 999999 ? "text" : "number"}
+                      min={field.value === 999999 ? undefined : 1}
                       placeholder="1"
                       {...field}
-                      value={field.value || ''}
-                      onChange={e => field.onChange(parseInt(e.target.value) || undefined)}
+                      readOnly={field.value === 999999}
+                      className={field.value === 999999 ? "bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed" : ""}
+                      value={field.value === 999999 ? "Không giới hạn" : (field.value || '')}
+                      onChange={e => {
+                        if (field.value === 999999) return;
+                        field.onChange(parseInt(e.target.value) || undefined);
+                      }}
                     />
                   </FormControl>
                   <FormDescription>
-                    {activeTemplate && `Mặc định theo mẫu gốc: ${activeTemplate.maxParticipants}`}
+                    {activeTemplate && `Mặc định theo mẫu gốc: ${activeTemplate.maxParticipants === 999999 ? 'Không giới hạn' : activeTemplate.maxParticipants}`}
                   </FormDescription>
-                  {participantsExceedsTemplate && (
+                  {participantsExceedsTemplate && activeTemplate?.maxParticipants !== 999999 && (
                     <p className="text-sm font-medium text-amber-600 flex items-center gap-1.5 mt-1">
                       <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
                       Lưu ý: Vượt giới hạn mẫu gốc ({activeTemplate!.maxParticipants} người)
@@ -342,11 +348,13 @@ export function BatchSessionForm({
           </div>
 
           {isFree && (
-            <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 py-2">
-              <Info className="h-4 w-4 text-emerald-600" />
-              <AlertDescription className="text-emerald-800 font-medium text-sm">
-                Đã chọn Workshop Miễn Phí. Tất cả các phiên sinh ra sẽ có giá 0đ.
-              </AlertDescription>
+            <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 py-3 px-4">
+              <div className="flex items-center gap-3">
+                <Info className="h-5 w-5 text-emerald-600 shrink-0" />
+                <AlertDescription className="text-emerald-800 font-medium text-sm m-0">
+                  Đã chọn Workshop Miễn Phí.
+                </AlertDescription>
+              </div>
             </Alert>
           )}
         </div>

@@ -33,35 +33,76 @@ export function RevenueOverviewCard({
 
     const isMonth = revenueFilter === 'month';
 
+    // Transform data for grouped bar chart
+    const transformedData = revenueData.map((point) => ({
+        name: point.name,
+        revenue: point.revenue,
+        netAmount: point.netAmount,
+    }));
+
     const config = {
-        data: revenueData,
+        data: transformedData,
         xField: 'name',
         yField: 'revenue',
-        style: { maxWidth: isMonth ? 80 : 50 },
+        columnStyle: {
+            radius: [4, 4, 0, 0],
+        },
+        meta: {
+            revenue: {
+                alias: 'Doanh thu (VNĐ)',
+            },
+        },
+        style: { maxWidth: isMonth ? 120 : 80 },
         axis: {
             x: isMonth
                 ? {
-                      labelAutoRotate: true,
-                      labelAutoHide: false,
-                      style: { labelTransform: 'rotate(-20)' },
-                  }
+                    labelAutoRotate: true,
+                    labelAutoHide: false,
+                    style: { labelTransform: 'rotate(-20)' },
+                }
                 : undefined,
             y: {
                 labelFormatter: (v: number) =>
                     v >= 1_000_000
                         ? `${(v / 1_000_000).toFixed(1)}M`
                         : v >= 1_000
-                        ? `${(v / 1_000).toFixed(0)}K`
-                        : String(v),
+                            ? `${(v / 1_000).toFixed(0)}K`
+                            : String(v),
             },
         },
         tooltip: {
             items: [
-                (d: RevenuePoint) => ({
+                (d: any) => ({
                     name: 'Doanh thu',
                     value: new Intl.NumberFormat('vi-VN').format(d.revenue) + ' VNĐ',
                 }),
+                (d: any) => ({
+                    name: 'Tiền nhận',
+                    value: new Intl.NumberFormat('vi-VN').format(d.netAmount) + ' VNĐ',
+                }),
             ],
+        },
+        color: '#3b82f6',
+        label: {
+            position: 'top' as const,
+            style: {
+                fill: '#000000a6',
+                fontSize: 11,
+                fontWeight: 600,
+            },
+            formatter: (datum: any) => {
+                const val = datum.netAmount;
+                if (val == null) {
+                    return '';
+                }
+                if (val >= 1_000_000) {
+                    return `Tiền nhận: ${(val / 1_000_000).toFixed(1)}M`;
+                }
+                if (val >= 1_000) {
+                    return `Tiền nhận: ${(val / 1_000).toFixed(0)}K`;
+                }
+                return `Tiền nhận: ${val}`;
+            },
         },
     };
 
@@ -70,7 +111,7 @@ export function RevenueOverviewCard({
             <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div>
                     <CardTitle className="text-base">Tổng quan doanh thu</CardTitle>
-                    <CardDescription>Theo dõi thu nhập theo thời gian</CardDescription>
+                    <CardDescription>Doanh thu vs tiền vendor nhận</CardDescription>
                 </div>
                 <Select value={revenueFilter} onValueChange={(v) => onRevenueFilterChange(v as RevenueFilter)}>
                     <SelectTrigger className="w-[120px] h-8 text-xs">
@@ -84,7 +125,7 @@ export function RevenueOverviewCard({
                 </Select>
             </CardHeader>
             <CardContent className="flex-1 pb-4">
-                <div className="h-full w-full min-h-[200px] flex items-center justify-center">
+                <div className="h-full w-full min-h-[250px] flex items-center justify-center">
                     {revenueError ? (
                         <div className="flex flex-col items-center gap-2 text-muted-foreground text-sm py-8">
                             <AlertCircle className="w-8 h-8 text-destructive/60" />

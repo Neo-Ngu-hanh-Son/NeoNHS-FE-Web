@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Info, Loader2, Save } from 'lucide-react';
+import { Download, Info, Loader2, Save } from 'lucide-react';
 import { message } from 'antd';
+import { format } from 'date-fns';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 
@@ -70,6 +70,26 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
     }
   };
 
+  const handleDownloadBackup = () => {
+    if (!title.trim() && !content.trim()) {
+      message.warning('Chưa có nội dung để tải bản sao lưu');
+      return;
+    }
+    const t = (title || DEFAULT_SYSTEM_PROMPT_TITLE).trim() || 'system-prompt';
+    const body = content;
+    const stamp = format(new Date(), 'yyyy-MM-dd_HHmm');
+    const fileText = `Tiêu đề: ${t}\n` + '─'.repeat(40) + '\n\n' + body;
+    const blob = new Blob([`\uFEFF${fileText}`], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `system-prompt-backup-${stamp}.txt`;
+    a.rel = 'noopener';
+    a.click();
+    URL.revokeObjectURL(url);
+    message.success('Đã tải tệp sao lưu .txt');
+  };
+
   return (
     <div className="space-y-4">
       <Alert className="border-amber-200 bg-amber-50/90 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40">
@@ -99,6 +119,7 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
         <AlertTitle className="text-indigo-900 dark:text-indigo-100">System Prompt là gì?</AlertTitle>
         <AlertDescription className="text-indigo-800/95 dark:text-indigo-200/90">
           Đây là nơi cấu hình, đưa ra các quy tắc, hành vi để AI chatbot hoạt động. Sẽ định nghĩa được AI như thế nào khi trả lời các câu hỏi, các tác vụ.
+          Hãy hạn chế thay đổi nội dung này để AI có thể hỗ trợ trả lời 1 cách ổn định và chính xác.
 
         </AlertDescription>
       </Alert>
@@ -139,7 +160,16 @@ export function AiSystemPromptTab({ systemPromptDoc, onRefresh }: AiSystemPrompt
             />
           </div>
 
-          <div className="flex justify-end border-t pt-4">
+          <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full min-w-0 sm:w-auto"
+              onClick={handleDownloadBackup}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Tải bản sao lưu (.txt)
+            </Button>
             <Button
               className="min-w-[140px] bg-indigo-600 hover:bg-indigo-700"
               onClick={handleSave}

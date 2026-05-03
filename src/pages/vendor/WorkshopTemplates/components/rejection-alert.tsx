@@ -8,12 +8,12 @@ interface RejectionAlertProps {
 export function RejectionAlert({ adminNote }: RejectionAlertProps) {
   return (
     <Alert
-      message={<span className="text-lg font-semibold">Your template was rejected</span>}
+      message={<span className="text-lg font-semibold">Mẫu workshop của bạn đã bị từ chối</span>}
       description={
         <div className="mt-2 space-y-2">
           <p className="font-medium">{adminNote}</p>
           <p className="text-sm mt-3 text-muted-foreground">
-            Please address the issues mentioned above and resubmit your template for approval.
+            Vui lòng giải quyết các vấn đề được nêu trên và gửi lại mẫu workshop cho phê duyệt.
           </p>
         </div>
       }

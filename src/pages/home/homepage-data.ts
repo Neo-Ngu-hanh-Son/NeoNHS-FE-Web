@@ -46,28 +46,46 @@ export interface FaqCategory {
 export const landmarks: Landmark[] = [
   {
     id: 1,
-    name: 'Chùa Linh Ứng',
-    alt: 'Toàn cảnh chùa Linh Ứng với tượng Quán Thế Âm trên bán đảo Sơn Trà',
-    image:
-      'https://danangfantasticity.com/wp-content/uploads/2019/09/chua-linh-ung-chon-binh-yen-giua-long-da-nang-013-2.jpg',
-  },
-  {
-    id: 2,
     name: 'Ngũ Hành Sơn',
     alt: 'Quang cảnh núi Ngũ Hành Sơn với các hang động và chùa chiền',
     image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755613/AboutNHSCover2_dynvk6.webp',
   },
   {
-    id: 3,
+    id: 2,
     name: 'Động Âm Phủ',
     alt: 'Lối vào Động Âm Phủ bên trong Ngũ Hành Sơn',
     image: 'https://statics.vinpearl.com/Am-Phu-Cave-thumb_1753717235.jpg',
   },
   {
-    id: 4,
+    id: 3,
     name: 'Động Huyền Không',
     alt: 'Bên trong Động Huyền Không với ánh sáng chiếu qua vòm đá',
     image: 'https://statics.vinpearl.com/Huyen-Khong-Cave-in-Da-Nang_1753368020.jpg',
+  },
+  {
+    id: 4,
+    name: 'Chùa Quán Thế Âm',
+    alt: 'Toàn cảnh chùa Quán Thế Âm ',
+    image:
+      'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755612/3-can-canh-chua-quan-the-am-noi-to-chuc-le-hoi-quan-the-am-ngu-hanh-son-nam-2023_gb8kvo.webp',
+  },
+  {
+    id: 5,
+    name: 'Bảo Tàng Phật Giáo',
+    alt: 'Toàn cảnh bảo tàng Phật Giáo',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1775755612/bao_tang_phat_giao_ci0wt1.webp',
+  },
+  {
+    id: 6,
+    name: 'Chùa Linh Ứng',
+    alt: 'Chùa Linh Ứng tại núi Ngũ Hành Sơn',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776957484/chualinhung_efxcpu.webp',
+  },
+  {
+    id: 7,
+    name: 'Chùa Tam Thai',
+    alt: 'Toàn cảnh chùa Linh Ứng',
+    image: 'https://res.cloudinary.com/dsrxsfr0q/image/upload/v1770523554/NeoNHS/urulzqn0uwqb50ayi9cr.jpg',
   },
 ];
 

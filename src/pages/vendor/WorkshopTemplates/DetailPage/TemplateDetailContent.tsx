@@ -137,7 +137,7 @@ export const TemplateDetailContent = ({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <TeamOutlined />
-                        {session.currentEnrollments}/{session.maxParticipants} chỗ
+                        {session.currentEnrollments}/{session.maxParticipants === 999999 ? 'Không giới hạn' : session.maxParticipants + ' chỗ'}
                       </div>
                     </div>
                   </div>

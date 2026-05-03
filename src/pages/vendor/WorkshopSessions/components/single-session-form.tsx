@@ -67,7 +67,7 @@ export function SingleSessionForm({
 
   useEffect(() => {
     if (externalTemplateId) {
-       form.setValue("workshopTemplateId", externalTemplateId, { shouldValidate: true })
+      form.setValue("workshopTemplateId", externalTemplateId, { shouldValidate: true })
     }
   }, [externalTemplateId, form])
 
@@ -103,6 +103,7 @@ export function SingleSessionForm({
 
   const handleCustomSubmit = (data: WorkshopSessionFormData) => {
     const finalPrice = isFree ? 0 : data.price
+    console.log("Submitting Single Session Data:", { ...data, price: finalPrice })
     onSubmit({
       ...data,
       price: finalPrice
@@ -120,7 +121,7 @@ export function SingleSessionForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleCustomSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleCustomSubmit, (errors) => console.log('Single Session Form Errors:', errors))} className="space-y-6">
         {isEditing && defaultValues && (
           <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
             <Info className="h-4 w-4 text-blue-600" />
@@ -183,9 +184,11 @@ export function SingleSessionForm({
 
           {durationMismatch && (
             <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950/20 py-2">
-              <TriangleAlert className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800 dark:text-amber-300 font-medium text-xs">
-                Lưu ý: Thời lượng phiên này ({durationDiffMins} phút) đang chênh lệch so với thời lượng tiêu chuẩn ({activeTemplate.estimatedDuration} phút).
+                <p>
+                  <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
+                  <span className="font-medium">Lưu ý:</span> Thời lượng phiên này ({formatDuration(durationDiffMins)}) đang chênh lệch so với thời lượng tiêu chuẩn ({formatDuration(activeTemplate.estimatedDuration)}).
+                </p>
               </AlertDescription>
             </Alert>
           )}
@@ -264,22 +267,27 @@ export function SingleSessionForm({
               name="maxParticipants"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Số người tham gia tối đa</FormLabel>
+                  <FormLabel>Số lượng người tham gia tối đa</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      min={isEditing ? currentEnrollments : 1}
+                      type={field.value === 999999 ? "text" : "number"}
+                      min={field.value === 999999 ? undefined : (isEditing ? currentEnrollments : 1)}
                       placeholder="1"
                       {...field}
-                      value={field.value || ''}
-                      onChange={e => field.onChange(parseInt(e.target.value) || undefined)}
+                      readOnly={field.value === 999999}
+                      className={field.value === 999999 ? "bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed" : ""}
+                      value={field.value === 999999 ? "Không giới hạn" : (field.value || '')}
+                      onChange={e => {
+                        if (field.value === 999999) return;
+                        field.onChange(parseInt(e.target.value) || undefined);
+                      }}
                     />
                   </FormControl>
                   <FormDescription>
-                    {activeTemplate && `Mặc định theo mẫu gốc: ${activeTemplate.maxParticipants}`}
+                    {activeTemplate && `Mặc định theo mẫu gốc: ${activeTemplate.maxParticipants === 999999 ? 'Không giới hạn' : activeTemplate.maxParticipants}`}
                     {isEditing && currentEnrollments > 0 && ` | Đã tham gia thực tế: ${currentEnrollments}`}
                   </FormDescription>
-                  {participantsExceedsTemplate && (
+                  {participantsExceedsTemplate && activeTemplate?.maxParticipants !== 999999 && (
                     <p className="text-sm font-medium text-amber-600 flex items-center gap-1.5 mt-1">
                       <TriangleAlert className="h-3.5 w-3.5 shrink-0" />
                       Lưu ý: Vượt giới hạn mẫu gốc ({activeTemplate!.maxParticipants} người)
@@ -301,11 +309,13 @@ export function SingleSessionForm({
           )}
 
           {isFree && (
-            <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 py-2">
-              <Info className="h-4 w-4 text-emerald-600" />
-              <AlertDescription className="text-emerald-800 font-medium text-sm">
-                Đã chọn Workshop Miễn Phí. Tất cả các phiên sinh ra sẽ có giá 0đ.
-              </AlertDescription>
+            <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 py-3 px-4">
+              <div className="flex items-center gap-3">
+                <Info className="h-5 w-5 text-emerald-600 shrink-0" />
+                <AlertDescription className="text-emerald-800 font-medium text-sm m-0">
+                  Đã chọn Workshop Miễn Phí.
+                </AlertDescription>
+              </div>
             </Alert>
           )}
         </div>

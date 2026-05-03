@@ -240,7 +240,8 @@ export function useAdminDestinations() {
 
     setEditingPoint({
       name: place.name,
-      description: place.address,
+      address: place.address,
+      description: '',
       latitude: lat,
       longitude: lng,
       googlePlaceId: place.googlePlaceId,

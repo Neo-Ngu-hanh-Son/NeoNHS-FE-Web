@@ -148,11 +148,11 @@ export function TemplateSelector({ value, onChange, error, disabled }: TemplateS
                 {selectedTemplate.shortDescription}
               </p>
               <div className="flex gap-4 text-sm">
-                <span>Duration: {formatDuration(selectedTemplate.estimatedDuration)}</span>
+                <span>Thời lượng: {formatDuration(selectedTemplate.estimatedDuration)}</span>
                 <span>•</span>
-                <span>Price: {formatPrice(selectedTemplate.defaultPrice)}</span>
+                <span>Giá cả: {formatPrice(selectedTemplate.defaultPrice)}</span>
                 <span>•</span>
-                <span>Max: {selectedTemplate.maxParticipants} people</span>
+                <span>Số lượng: {selectedTemplate.maxParticipants === 999999 ? "Không giới hạn" : `${selectedTemplate.maxParticipants} people`}</span>
               </div>
             </div>
           </div>

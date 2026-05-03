@@ -9,8 +9,6 @@ import {
   Search,
   Loader2,
   Info,
-  ChevronLeft,
-  ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
@@ -55,6 +53,10 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 import { knowledgeApi, type KnowledgeDocument } from '@/services/api/knowledgeApi';
+import {
+  getRagKnowledgeTypeBadgeClass,
+  getRagKnowledgeTypeLabel,
+} from '../knowledge-helpers';
 import { cn } from '@/lib/utils';
 import { KnowledgeDocumentDialog } from './KnowledgeDocumentDialog';
 
@@ -141,10 +143,8 @@ export function KnowledgeArticlesTab({
         <Info className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
         <AlertTitle className="text-indigo-900 dark:text-indigo-100">Tri thức AI (RAG)</AlertTitle>
         <AlertDescription className="text-indigo-800/95 dark:text-indigo-200/90">
-          Các bài viết ở đây cung cấp <strong>nguồn kiến thức</strong> để hệ thống tìm và trích đoạn liên
-          quan trước khi gửi cho AI — khác với{' '}
-          <strong>System Prompt</strong> ở tab &quot;Cấu hình AI&quot;. Chỉ bài{' '}
-          <strong>đang hoạt động</strong> được đưa vào RAG.
+          Các bài viết ở đây cung cấp <strong>nguồn kiến thức</strong> để AI có thể tìm kiếm và trả lời 
+          khi được người dùng hỏi thông tin về Ngũ Hành Sơn.
         </AlertDescription>
       </Alert>
 
@@ -225,10 +225,11 @@ export function KnowledgeArticlesTab({
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow>
-                <TableHead className="w-[400px]">Tiêu đề tài liệu</TableHead>
-                <TableHead>Trạng thái AI (RAG)</TableHead>
-                <TableHead>Cập nhật cuối</TableHead>
-                <TableHead className="text-right">Thao tác</TableHead>
+                <TableHead className="w-[40%] min-w-0">Tiêu đề tài liệu</TableHead>
+                <TableHead className="w-[15%] whitespace-nowrap">Loại</TableHead>
+                <TableHead className="w-[20%]">Trạng thái AI (RAG)</TableHead>
+                <TableHead className="w-[15%] whitespace-nowrap">Cập nhật cuối</TableHead>
+                <TableHead className="w-[10%] text-right">Thao tác</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -247,8 +248,16 @@ export function KnowledgeArticlesTab({
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
                               <FileText size={20} />
                             </div>
-                            <span className="max-w-[320px] truncate">{doc.title}</span>
+                            <span className="max-w-[220px] truncate sm:max-w-[320px]">{doc.title}</span>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="secondary"
+                            className={cn('font-medium', getRagKnowledgeTypeBadgeClass(doc))}
+                          >
+                            {getRagKnowledgeTypeLabel(doc)}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           {syncingDocs[doc.id] ? (
@@ -313,7 +322,7 @@ export function KnowledgeArticlesTab({
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-64 text-center">
+                    <TableCell colSpan={5} className="h-64 text-center">
                       {loading ? (
                         <div className="flex flex-col items-center gap-2">
                           <Loader2 className="animate-spin text-indigo-600" size={32} />

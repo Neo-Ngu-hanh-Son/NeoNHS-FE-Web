@@ -71,31 +71,43 @@ export default function AdminDestinationsPage() {
   const onConfirmCoord = (geocodedData?: {
     name?: string;
     address?: string;
+    latitude?: number;
+    longitude?: number;
     googlePlaceId?: string;
     photoUrl?: string;
   }) => {
-    setPreviewPos(pickerCoord);
+    const lat = geocodedData?.latitude ?? pickerCoord[0];
+    const lng = geocodedData?.longitude ?? pickerCoord[1];
+
+    setPreviewPos([lat, lng]);
+    setPickerCoord([lat, lng]);
 
     if (geocodedData) {
-      setEditingPoint(
-        (prev) =>
-          ({
-            ...(prev || {
-              name: '',
-              description: '',
-              orderIndex: allPoints.length + 1,
-              type: 'GENERAL',
-              attractionId: currentPointDestination?.id || '',
-            }),
-            latitude: pickerCoord[0],
-            longitude: pickerCoord[1],
-            name: geocodedData.name || prev?.name || '',
-            address: geocodedData.address || prev?.address || '',
-            description: prev?.description || '',
-            googlePlaceId: geocodedData.googlePlaceId || prev?.googlePlaceId || '',
-            thumbnailUrl: geocodedData.photoUrl || prev?.thumbnailUrl || '',
-          }) as any,
-      );
+      setEditingPoint((prev) => {
+        const isEditing = !!prev?.id;
+        return {
+          ...(prev || {
+            name: '',
+            description: '',
+            orderIndex: allPoints.length + 1,
+            type: 'GENERAL',
+            attractionId: currentPointDestination?.id || '',
+          }),
+          latitude: lat,
+          longitude: lng,
+          // When editing an existing point, prioritize existing data to avoid accidental unique constraint violations
+          // (like duplicate name or same Google Place ID from a different existing point)
+          name: isEditing ? (prev?.name || geocodedData.name) : (geocodedData.name || prev?.name || ''),
+          address: isEditing ? (prev?.address || geocodedData.address) : (geocodedData.address || prev?.address || ''),
+          googlePlaceId: isEditing
+            ? prev?.googlePlaceId || geocodedData.googlePlaceId
+            : geocodedData.googlePlaceId || prev?.googlePlaceId || '',
+          thumbnailUrl: isEditing
+            ? prev?.thumbnailUrl || geocodedData.photoUrl
+            : geocodedData.photoUrl || prev?.thumbnailUrl || '',
+          description: prev?.description || '',
+        } as any;
+      });
     }
 
     setIsMapPickerVisible(false);
@@ -238,6 +250,8 @@ export default function AdminDestinationsPage() {
             onConfirmCoord({
               name: result.name,
               address: result.address,
+              latitude: result.latitude,
+              longitude: result.longitude,
               googlePlaceId: result.googlePlaceId,
               photoUrl: result.photoUrl,
             });

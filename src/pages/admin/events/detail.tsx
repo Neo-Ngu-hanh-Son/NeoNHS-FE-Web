@@ -339,7 +339,7 @@ export default function EventDetailPage() {
                     <InfoItem
                       icon={<Users className="h-4 w-4" />}
                       label="Số người tham gia"
-                      value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants}` : ''}`}
+                      value={`${event.currentEnrolled ?? 0}${event.maxParticipants ? ` / ${event.maxParticipants === 999999 ? 'Không giới hạn' : event.maxParticipants}` : ''}`}
                     />
                     <InfoItem
                       icon={<Ticket className="h-4 w-4" />}

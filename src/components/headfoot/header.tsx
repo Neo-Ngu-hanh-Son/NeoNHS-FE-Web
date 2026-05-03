@@ -98,7 +98,7 @@ const Header: FunctionComponent = () => {
         <div className="flex items-center justify-between h-16 lg:h-[72px]">
           {/* Logo Section - Left */}
           <Link to="/" className="flex items-center gap-3 group">
-            <img src="/src/assets/images/NeoNHSLogo_Optimized.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
+            <img src="https://res.cloudinary.com/dsrxsfr0q/image/upload/v1776956348/NeoNHSLogo_Optimized_m2ieop.jpg" alt="NeoNHS Logo" className="w-9 h-9 rounded-full" />
             <span className="text-xl font-bold tracking-tight text-slate-900">NeoNHS</span>
           </Link>
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { message } from 'antd';
 
@@ -23,8 +23,10 @@ export default function KnowledgeBasePage() {
   const fetchArticles = useCallback(async (p: number) => {
     setLoading(true);
     try {
-      const res = await knowledgeApi.getDocuments(p, pageSize, { knowledgeType: 'INFORMATION' });
-      const docs = extractDocuments(res);
+      const res = await knowledgeApi.getDocuments(p, pageSize);
+      const docs = extractDocuments(res).filter(
+        (d) => d.knowledgeType !== 'SYSTEM_PROMPT',
+      );
       setArticles(docs);
       setTotalElements((res as any).totalElements || 0);
       setPage(p);

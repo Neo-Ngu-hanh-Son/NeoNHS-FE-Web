@@ -365,7 +365,7 @@ export function TemplateDetailDialog({
                         Sức chứa
                       </span>
                       <span className="font-medium">
-                        {minParticipants} - {maxParticipants} người
+                        {maxParticipants === 999999 ? 'Không giới hạn' : `${minParticipants} - ${maxParticipants} người`}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-2">

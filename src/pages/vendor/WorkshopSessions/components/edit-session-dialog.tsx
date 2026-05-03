@@ -39,7 +39,13 @@ export function EditSessionDialog({
   const [template, setTemplate] = useState<WorkshopTemplateResponse | undefined>()
 
   useEffect(() => {
-    if (!session) return
+    if (!session) {
+      setTemplate(undefined)
+      return
+    }
+
+    setTemplate(undefined) // Immediately clear before fetching
+
     WorkshopTemplateService.getTemplateById(session.workshopTemplate.id)
       .then(setTemplate)
       .catch(() => setTemplate(undefined))
@@ -65,18 +71,18 @@ export function EditSessionDialog({
       price: data.price,
       maxParticipants: data.maxParticipants,
     }
-    
+
     try {
       setSubmitting(true)
       const updatedSession = await WorkshopSessionService.updateSession(session.id, updateRequest)
-      
+
       notification.success({
         message: 'Cập nhật thành công',
         description: updatedSession?.workshopTemplate?.name
           ? `Đã cập nhật phiên cho "${updatedSession.workshopTemplate.name}".`
           : 'Đã cập nhật phiên workshop thành công.',
       })
-      
+
       // Close dialog and refresh
       onOpenChange(false)
       if (onSuccess) onSuccess()
@@ -113,9 +119,14 @@ export function EditSessionDialog({
             </div>
           </div>
         </DialogHeader>
-        
+
         <div className="px-6 pb-6 pt-4">
-          {!canEdit ? (
+          {!template ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+              <p className="text-sm text-slate-500">Đang tải dữ liệu mẫu...</p>
+            </div>
+          ) : !canEdit ? (
             <Alert variant="destructive">
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Không thể chỉnh sửa</AlertTitle>
@@ -125,16 +136,16 @@ export function EditSessionDialog({
               </AlertDescription>
             </Alert>
           ) : (
-          <SessionForm
-            key={session.id}
-            defaultValues={session}
-            onSubmit={handleSubmit}
-            onCancel={handleCancel}
-            isEditing={true}
-            submitting={submitting}
-            template={template}
-          />
-        )}
+            <SessionForm
+              key={session.id}
+              defaultValues={session}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+              isEditing={true}
+              submitting={submitting}
+              template={template}
+            />
+          )}
         </div>
       </DialogContent>
     </Dialog>
