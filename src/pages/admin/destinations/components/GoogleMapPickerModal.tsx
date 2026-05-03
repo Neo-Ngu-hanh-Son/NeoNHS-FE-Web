@@ -32,6 +32,7 @@ interface GoogleMapPickerModalProps {
   onOpenChange: (open: boolean) => void;
   onSelect: (result: DiscoveryResult) => void;
   initialCoord?: [number, number];
+  initialName?: string;
 }
 
 // ─── Turf Point-in-Polygon Check ───
@@ -41,7 +42,7 @@ function isPointInBoundary(lat: number, lng: number): boolean {
   return turf.booleanPointInPolygon(point, polygon);
 }
 
-export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoord }: GoogleMapPickerModalProps) {
+export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoord, initialName }: GoogleMapPickerModalProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const googleMap = useRef<google.maps.Map | null>(null);
   const marker = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
@@ -236,7 +237,7 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
         setSelectedPoint({
           lat,
           lng,
-          name: 'Điểm đánh dấu',
+          name: initialName || 'Điểm đánh dấu',
           address: result.formatted_address,
           placeId: result.place_id,
         });
@@ -244,7 +245,7 @@ export function GoogleMapPickerModal({ open, onOpenChange, onSelect, initialCoor
         setSelectedPoint({
           lat,
           lng,
-          name: 'Unknown Location',
+          name: initialName || 'Unknown Location',
           address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
         });
       }

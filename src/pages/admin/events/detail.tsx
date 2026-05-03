@@ -72,10 +72,10 @@ export default function EventDetailPage() {
   const tabParam = searchParams.get('tab');
   const defaultTab =
     tabParam === 'timeline' ||
-    tabParam === 'gallery' ||
-    tabParam === 'tickets' ||
-    tabParam === 'points' ||
-    tabParam === 'point-tags'
+      tabParam === 'gallery' ||
+      tabParam === 'tickets' ||
+      tabParam === 'points' ||
+      tabParam === 'point-tags'
       ? tabParam
       : 'overview';
 
@@ -412,7 +412,7 @@ export default function EventDetailPage() {
                   <CardTitle>Bản đồ khu vực tổ chức sự kiện</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div 
+                  <div
                     className="aspect-square sm:aspect-video lg:aspect-square rounded-lg overflow-hidden border relative z-0 group cursor-pointer bg-slate-50"
                     onClick={() => !updatingLocation && setMapPickerOpen(true)}
                   >
@@ -519,8 +519,8 @@ export default function EventDetailPage() {
                 <p className="mt-2 text-sm max-w-sm mb-6">
                   Sự kiện này được cấu hình không yêu cầu vé. Bạn có thể bật tính năng vé tại đây để bắt đầu thêm các loại vé.
                 </p>
-                <Button 
-                  onClick={handleEnableTickets} 
+                <Button
+                  onClick={handleEnableTickets}
                   disabled={updatingTicketReq}
                   className="gap-2"
                 >
@@ -584,6 +584,7 @@ export default function EventDetailPage() {
         open={mapPickerOpen}
         onOpenChange={setMapPickerOpen}
         initialCoord={event.latitude && event.longitude ? [Number(event.latitude), Number(event.longitude)] : undefined}
+        initialName={event.locationName || event.name}
         onSelect={handleUpdateLocation}
       />
     </div>
