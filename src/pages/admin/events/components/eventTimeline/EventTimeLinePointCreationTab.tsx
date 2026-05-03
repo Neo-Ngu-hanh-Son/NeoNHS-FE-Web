@@ -67,7 +67,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         setApiLoading(false);
       })
       .catch((err) => {
-        setApiError(`Failed to load Google Maps: ${err.message}`);
+        setApiError(`Không thể tải Google Maps: ${err.message}`);
         setApiLoading(false);
       });
 
@@ -162,7 +162,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         setSelectedPoint({
           lat,
           lng,
-          name: 'Dropped Pin',
+          name: 'Vị trí đã thả',
           address: result.formatted_address,
           placeId: result.place_id,
         });
@@ -170,7 +170,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         setSelectedPoint({
           lat,
           lng,
-          name: 'Unknown Location',
+          name: 'Vị trí không xác định',
           address: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
         });
       }
@@ -249,7 +249,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
     address?: string;
     photoUrl?: string;
   }) => {
-    handleChange('destinationName', point.name || 'Selected Destination');
+    handleChange('destinationName', point.name || 'Điểm đến đã chọn');
     handleChange('destinationAddress', point.address || '');
     handleChange('destinationLatitude', point.lat.toFixed(6));
     handleChange('destinationLongitude', point.lng.toFixed(6));
@@ -269,7 +269,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
           finalPhotoUrl = backendUrl.mediaUrl;
         }
       } catch {
-        message.warning('Could not optimize selected Google image URL.');
+        message.warning('Không thể tối ưu URL ảnh Google đã chọn.');
       } finally {
         setProcessingImage(false);
       }
@@ -284,7 +284,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         const result = await fetchEventPoints();
         setExistingPoints(result);
       } catch (error: unknown) {
-        message.error(`Failed to fetch existing event points: ${(error as Error).message}`);
+        message.error(`Không thể tải các điểm sự kiện đã có: ${(error as Error).message}`);
       }
     }
     fetchPreviouslyUsedPoints();
@@ -302,7 +302,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         googleMap.current?.setZoom(19);
         applyPointToForm({ id: point.id, lat, lng, name, address, photoUrl: imageUrl });
       } else {
-        message.error('Selected event point has invalid coordinates.');
+        message.error('Điểm sự kiện đã chọn có tọa độ không hợp lệ.');
       }
     }
   };
@@ -311,11 +311,11 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
     <div className="mt-2 grid grid-cols-1 xl:grid-cols-2 gap-3">
       <section className="space-y-3 xl:pr-3">
         <div className="border-b pb-2">
-          <h3 className="text-sm font-semibold">Destination Details</h3>
+          <h3 className="text-sm font-semibold">Chi tiết điểm đến</h3>
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="point-destination-name">Name of destination</Label>
+          <Label htmlFor="point-destination-name">Tên điểm đến</Label>
           <Input
             id="point-destination-name"
             value={form.destinationName}
@@ -323,13 +323,13 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
               handleChange('destinationName', e.target.value);
               handleChange('eventPointId', '');
             }}
-            placeholder="e.g. Chua Quan The Am"
+            placeholder="VD: Chùa Quán Thế Âm"
           />
           {errors.destinationName && <p className="text-xs text-destructive">{errors.destinationName}</p>}
         </div>
 
         <div className="space-y-1">
-          <Label htmlFor="point-destination-address">Address</Label>
+          <Label htmlFor="point-destination-address">Địa chỉ</Label>
           <Input
             id="point-destination-address"
             value={form.destinationAddress}
@@ -337,13 +337,13 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
               handleChange('destinationAddress', e.target.value);
               handleChange('eventPointId', '');
             }}
-            placeholder="e.g. Ngu Hanh Son, Da Nang"
+            placeholder="VD: Ngũ Hành Sơn, Đà Nẵng"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
-            <Label htmlFor="point-latitude">Latitude</Label>
+            <Label htmlFor="point-latitude">Vĩ độ</Label>
             <Input
               id="point-latitude"
               value={form.destinationLatitude}
@@ -356,7 +356,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
             {errors.destinationLatitude && <p className="text-xs text-destructive">{errors.destinationLatitude}</p>}
           </div>
           <div className="space-y-1">
-            <Label htmlFor="point-longitude">Longitude</Label>
+            <Label htmlFor="point-longitude">Kinh độ</Label>
             <Input
               id="point-longitude"
               value={form.destinationLongitude}
@@ -371,7 +371,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
         </div>
 
         <div className="space-y-1">
-          <Label>Destination image</Label>
+          <Label>Ảnh điểm đến</Label>
           <DragImageUploader
             value={form.destinationImageUrl}
             onUpload={(url) => {
@@ -381,12 +381,12 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
             onError={(msg) => message.error(msg)}
             minHeight={110}
             imageClassName="!w-auto max-w-[220px] mx-auto"
-            placeholder="Upload destination image"
+            placeholder="Tải ảnh điểm đến"
           />
         </div>
 
         <div className="space-y-1">
-          <Label>Reusing existing event destinations</Label>
+          <Label>Sử dụng điểm đến hiện có</Label>
           <EventPointPicker
             points={existingPoints}
             selectedPointId={form.eventPointId || undefined}
@@ -397,7 +397,7 @@ export default function EventTimeLinePointCreationTab({ form, errors, handleChan
 
       <section className="space-y-2 xl:border-l xl:pl-3">
         <div className="border-b pb-2">
-          <h3 className="text-sm font-semibold">Pick Destination On Map</h3>
+          <h3 className="text-sm font-semibold">Chọn Điểm Đến trên Bản đồ</h3>
         </div>
         <div className="h-[280px] sm:h-[330px] lg:h-[380px] xl:h-[420px] overflow-hidden rounded-md border">
           <GoogleMapPickerCompact

@@ -43,7 +43,7 @@ function BlogCreationPageInner() {
   const handleSaveEditorState = async (content: EditorSaveResult) => {
     console.log('Saving editor state: ' + content);
     if (content.charCount < 30) {
-      messageApi.warning('Blog content must be at least 30 characters');
+      messageApi.warning('Nội dung bài viết phải có ít nhất 30 ký tự');
       return;
     }
     const formData = form.getValues();
@@ -58,10 +58,10 @@ function BlogCreationPageInner() {
       setLoading(true);
       const res = await blogService.createBlog(payload);
       if (res.success || res.data) {
-        messageApi.success('Blog created successfully!');
+        messageApi.success('Tạo bài viết thành công!');
         navigate('/admin/blog');
       } else {
-        messageApi.error(res.message || 'Failed to create blog');
+        messageApi.error(res.message || 'Tạo bài viết thất bại');
       }
     } catch (error) {
       console.error(error);

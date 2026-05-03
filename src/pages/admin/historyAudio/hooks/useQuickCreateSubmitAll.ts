@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react';
 import { message } from 'antd';
 import type { UseFormReturn } from 'react-hook-form';
 import type { ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
-import type { MultiQuickCreateValues } from '../schemas/QuickCreateFormSchema';
+import type { MultiQuickCreateValues } from '../components/QuickCreateComponents/schemas/QuickCreateFormSchema';
 
 type SubmitStatus = 'idle' | 'submitting' | 'success' | 'failed';
 

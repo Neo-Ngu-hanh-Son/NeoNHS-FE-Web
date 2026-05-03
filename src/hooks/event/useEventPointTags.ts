@@ -15,6 +15,11 @@ interface UseEventPointTagsReturn {
   createTag: (data: EventPointTagRequest) => Promise<boolean>;
   updateTag: (id: string, data: Partial<EventPointTagRequest>) => Promise<boolean>;
   deleteTag: (id: string) => Promise<boolean>;
+  restoreTag: (id: string) => Promise<boolean>;
+}
+
+interface UseEventPointTagsOptions {
+  autoFetch?: boolean;
 }
 
 type ApiLikeError = Error & {
@@ -48,9 +53,10 @@ function handleTagApiError(error: unknown, fallback: string): void {
   message.error(`${fallback}: ${err?.message || 'Lỗi không xác định'}`);
 }
 
-export function useEventPointTags(): UseEventPointTagsReturn {
+export function useEventPointTags(options: UseEventPointTagsOptions = {}): UseEventPointTagsReturn {
   const [tags, setTags] = useState<EventPointTagResponse[]>([]);
   const [loading, setLoading] = useState(false);
+  const { autoFetch = true } = options;
 
   const fetchTags = useCallback(async () => {
     setLoading(true);
@@ -69,59 +75,90 @@ export function useEventPointTags(): UseEventPointTagsReturn {
   }, []);
 
   useEffect(() => {
-    fetchTags();
-  }, [fetchTags]);
-
-  const createTag = useCallback(async (data: EventPointTagRequest): Promise<boolean> => {
-    try {
-      const response = await eventPointTagService.create(data);
-      if (response.success) {
-        message.success('Tạo thẻ điểm sự kiện thành công');
-        await fetchTags();
-        return true;
-      }
-
-      message.error(response.message || 'Tạo sự kiện thất bại point tag');
-      return false;
-    } catch (error: unknown) {
-      handleTagApiError(error, 'Tạo sự kiện thất bại point tag');
-      return false;
+    if (autoFetch) {
+      fetchTags();
     }
-  }, [fetchTags]);
+  }, [fetchTags, autoFetch]);
 
-  const updateTag = useCallback(async (id: string, data: Partial<EventPointTagRequest>): Promise<boolean> => {
-    try {
-      const response = await eventPointTagService.update(id, data);
-      if (response.success) {
-        message.success('Cập nhật thẻ điểm sự kiện thành công');
-        await fetchTags();
-        return true;
+  const createTag = useCallback(
+    async (data: EventPointTagRequest): Promise<boolean> => {
+      try {
+        const response = await eventPointTagService.create(data);
+        if (response.success) {
+          message.success('Tạo thẻ điểm sự kiện thành công');
+          await fetchTags();
+          return true;
+        }
+
+        message.error(response.message || 'Tạo sự kiện thất bại point tag');
+        return false;
+      } catch (error: unknown) {
+        handleTagApiError(error, 'Tạo sự kiện thất bại point tag');
+        return false;
       }
+    },
+    [fetchTags],
+  );
 
-      message.error(response.message || 'Cập nhật sự kiện thất bại point tag');
-      return false;
-    } catch (error: unknown) {
-      handleTagApiError(error, 'Cập nhật sự kiện thất bại point tag');
-      return false;
-    }
-  }, [fetchTags]);
+  const updateTag = useCallback(
+    async (id: string, data: Partial<EventPointTagRequest>): Promise<boolean> => {
+      try {
+        const response = await eventPointTagService.update(id, data);
+        if (response.success) {
+          message.success('Cập nhật thẻ điểm sự kiện thành công');
+          await fetchTags();
+          return true;
+        }
 
-  const deleteTag = useCallback(async (id: string): Promise<boolean> => {
-    try {
-      const response = await eventPointTagService.delete(id);
-      if (response.success) {
-        message.success('Xóa thẻ điểm sự kiện thành công');
-        await fetchTags();
-        return true;
+        message.error(response.message || 'Cập nhật sự kiện thất bại point tag');
+        return false;
+      } catch (error: unknown) {
+        handleTagApiError(error, 'Cập nhật sự kiện thất bại point tag');
+        return false;
       }
+    },
+    [fetchTags],
+  );
 
-      message.error(response.message || 'Xóa sự kiện thất bại point tag');
-      return false;
-    } catch (error: unknown) {
-      handleTagApiError(error, 'Xóa sự kiện thất bại point tag');
-      return false;
-    }
-  }, [fetchTags]);
+  const deleteTag = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        const response = await eventPointTagService.delete(id);
+        if (response.success) {
+          message.success('Xóa thẻ điểm sự kiện thành công');
+          await fetchTags();
+          return true;
+        }
+
+        message.error(response.message || 'Xóa sự kiện thất bại point tag');
+        return false;
+      } catch (error: unknown) {
+        handleTagApiError(error, 'Xóa sự kiện thất bại point tag');
+        return false;
+      }
+    },
+    [fetchTags],
+  );
+
+  const restoreTag = useCallback(
+    async (id: string): Promise<boolean> => {
+      try {
+        const response = await eventPointTagService.restore(id);
+        if (response.success) {
+          message.success('Khôi phục thẻ điểm sự kiện thành công');
+          await fetchTags();
+          return true;
+        }
+
+        message.error(response.message || 'Khôi phục sự kiện thất bại point tag');
+        return false;
+      } catch (error: unknown) {
+        handleTagApiError(error, 'Khôi phục sự kiện thất bại point tag');
+        return false;
+      }
+    },
+    [fetchTags],
+  );
 
   return {
     tags,
@@ -130,5 +167,6 @@ export function useEventPointTags(): UseEventPointTagsReturn {
     createTag,
     updateTag,
     deleteTag,
+    restoreTag,
   };
 }

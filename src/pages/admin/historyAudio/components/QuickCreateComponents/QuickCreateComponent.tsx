@@ -13,7 +13,7 @@ import { ELEVEN_LABS_VOICES } from '../../constants';
 import { useCallback, useMemo, useState } from 'react';
 import { useHistoryAudioMutations } from '@/hooks/historyAudio/useHistoryAudioMutations';
 import { useHistoryAudioUploadAndSave } from '@/pages/admin/historyAudio/hooks/useHistoryAudioUploadAndSave';
-import { useQuickCreateSubmitAll } from './hooks/useQuickCreateSubmitAll';
+import { useQuickCreateSubmitAll } from '../../hooks/useQuickCreateSubmitAll';
 import QuickCreateSubmitAllBar from './QuickCreateSubmitAllBar';
 import 'flag-icons/css/flag-icons.min.css';
 import QuickCreateLanguageConfigCard from './QuickCreateLanguageConfigCard';
@@ -85,10 +85,10 @@ export default function QuickCreateComponent({ pointId, onSubmittedAll }: Props)
     setIsTranslating(true);
     try {
       const translations = await AITranslationService.translate(requestData);
-      console.log('Translation resposne: ', translations)
+      console.log('Translation resposne: ', translations);
       const entries = formData.languageSelections.map((selection, index) => {
         const translated = translations.find((item) => item.language === selection.language);
-        console.log('Current selection language: ', selection.language, ' Translated language ', translated?.language)
+        console.log('Current selection language: ', selection.language, ' Translated language ', translated?.language);
         const voice = ELEVEN_LABS_VOICES.find((item) => item.id === selection.voiceId);
         const model =
           ELEVEN_LABS_VOICES.find((item) => item.id === selection.voiceId)?.model || 'eleven_multilingual_v2';

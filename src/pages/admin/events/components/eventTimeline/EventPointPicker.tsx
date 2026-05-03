@@ -23,30 +23,32 @@ export default function EventPointPicker({ points, onPointSelect, selectedPointI
           className={cn('w-full justify-between font-normal')}
           aria-expanded={openPopover}
         >
-          {points.find((p) => p.id === selectedPointId)?.name || 'Select event point...'}
+          {points.find((p) => p.id === selectedPointId)?.name || 'Chọn 1 địa điểm...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
-          <CommandInput placeholder="Search event points..." />
+          <CommandInput placeholder="Tìm các địa điểm..." />
           <CommandList>
-            <CommandEmpty>No event points found.</CommandEmpty>
+            <CommandEmpty>Không tìm thấy các địa điểm có sẵn</CommandEmpty>
             <CommandGroup>
-              {points.map((point) => (
-                <CommandItem
-                  key={point.id}
-                  value={point.name} // Command uses this for searching
-                  onSelect={() => {
-                    onPointSelect(point.id);
-                    setOpenPopover(false);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Check className={cn('mr-2 h-4 w-4', point.id === selectedPointId ? 'opacity-100' : 'opacity-0')} />
-                  {point.name}
-                </CommandItem>
-              ))}
+              {points
+                .filter((point) => !point.deletedAt)
+                .map((point) => (
+                  <CommandItem
+                    key={point.id}
+                    value={point.name} // Command uses this for searching
+                    onSelect={() => {
+                      onPointSelect(point.id);
+                      setOpenPopover(false);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Check className={cn('mr-2 h-4 w-4', point.id === selectedPointId ? 'opacity-100' : 'opacity-0')} />
+                    {point.name}
+                  </CommandItem>
+                ))}
             </CommandGroup>
           </CommandList>
         </Command>

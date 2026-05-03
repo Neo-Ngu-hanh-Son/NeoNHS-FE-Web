@@ -10,6 +10,8 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 // const API_BASE_URL = "https://fwbgft4w-5173.asse.devtunnels.ms/api"
 
+console.log('API Base URL:', API_BASE_URL);
+
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -29,7 +31,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response Interceptor: Handle Errors & Data
@@ -60,14 +62,15 @@ axiosInstance.interceptors.response.use(
     customError.status = error.response?.status;
 
     return Promise.reject(customError);
-  }
+  },
 );
 
 export const apiClient = {
   get: <T = any>(endpoint: string, config?: any) => axiosInstance.get<T, T>(endpoint, config),
   post: <T = any>(endpoint: string, data: any, config?: any) => axiosInstance.post<T, T>(endpoint, data, config),
   put: <T = any>(endpoint: string, data: any, config?: any) => axiosInstance.put<T, T>(endpoint, data, config),
-  patch: <T = any>(endpoint: string, data?: any, config?: any) => axiosInstance.patch<T, T>(endpoint, data ?? {}, config),
+  patch: <T = any>(endpoint: string, data?: any, config?: any) =>
+    axiosInstance.patch<T, T>(endpoint, data ?? {}, config),
   delete: <T = any>(endpoint: string, config?: any) => axiosInstance.delete<T, T>(endpoint, config),
 };
 

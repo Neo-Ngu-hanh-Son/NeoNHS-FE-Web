@@ -134,9 +134,7 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-muted-foreground">
-          {timelines.length} mục timeline
-        </span>
+        <span className="text-sm text-muted-foreground">{timelines.length} mục dòng thời gian</span>
         <Button size="sm" onClick={() => handleCreate(activeTab !== 'all' ? activeTab : undefined)}>
           <Plus className="h-4 w-4 mr-1" />
           Thêm mục
@@ -146,7 +144,7 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
       {timelines.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <CalendarDays className="h-10 w-10 mb-3 opacity-30" />
-          <p className="text-sm font-medium">Chưa có mục timeline nào</p>
+          <p className="text-sm font-medium">Chưa có mục dòng thời gian nào</p>
           <p className="text-xs mt-1">Tạo một mục để bắt đầu</p>
         </div>
       ) : (
@@ -189,7 +187,7 @@ export function EventTimelineList({ eventId, eventStartDate, eventEndDate }: Eve
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xóa mục timeline</AlertDialogTitle>
+            <AlertDialogTitle>Xóa mục dòng thời gian</AlertDialogTitle>
             <AlertDialogDescription className="space-y-2">
               <span className="block">Bạn có chắc chắn muốn xóa "{deleteTarget?.name}"?</span>
               <span className="block text-destructive font-medium">⚠️ Hành động này không thể hoàn tác.</span>

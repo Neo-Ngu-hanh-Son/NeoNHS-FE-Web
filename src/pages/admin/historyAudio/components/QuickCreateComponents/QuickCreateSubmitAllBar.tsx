@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Progress } from '@/components';
 import { CheckCircle2, Loader2, Save, XCircle } from 'lucide-react';
-import type { QuickCreateSubmitProgressState, QuickCreateSubmitStatusItem } from './hooks/useQuickCreateSubmitAll';
+import type { QuickCreateSubmitProgressState, QuickCreateSubmitStatusItem } from '../../hooks/useQuickCreateSubmitAll';
 
 interface QuickCreateSubmitAllBarProps {
   disabled?: boolean;

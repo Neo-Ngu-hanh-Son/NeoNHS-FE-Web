@@ -1,13 +1,8 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import {
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_TEXT_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-} from "lexical";
-import { useCallback, useEffect, useState } from "react";
-import { mergeRegister } from "@lexical/utils";
-import { Bold, Italic, Underline, Strikethrough } from "lucide-react";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, SELECTION_CHANGE_COMMAND } from 'lexical';
+import { useCallback, useEffect, useState } from 'react';
+import { mergeRegister } from '@lexical/utils';
+import { Bold, Italic, Underline, Strikethrough } from 'lucide-react';
 
 type FloatingPosition = {
   top: number;
@@ -53,10 +48,10 @@ export default function SelectionFormatToolbarPlugin() {
         top: Math.max(8, rect.top - 46),
         left: rect.left + rect.width / 2,
       });
-      setIsBold(selection.hasFormat("bold"));
-      setIsItalic(selection.hasFormat("italic"));
-      setIsUnderline(selection.hasFormat("underline"));
-      setIsStrikethrough(selection.hasFormat("strikethrough"));
+      setIsBold(selection.hasFormat('bold'));
+      setIsItalic(selection.hasFormat('italic'));
+      setIsUnderline(selection.hasFormat('underline'));
+      setIsStrikethrough(selection.hasFormat('strikethrough'));
       setIsVisible(true);
     });
   }, [editor, hideToolbar]);
@@ -68,12 +63,12 @@ export default function SelectionFormatToolbarPlugin() {
       }
     };
 
-    window.addEventListener("scroll", onViewportChange, true);
-    window.addEventListener("resize", onViewportChange);
+    window.addEventListener('scroll', onViewportChange, true);
+    window.addEventListener('resize', onViewportChange);
 
     return () => {
-      window.removeEventListener("scroll", onViewportChange, true);
-      window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener('scroll', onViewportChange, true);
+      window.removeEventListener('resize', onViewportChange);
     };
   }, [isVisible, updateToolbar]);
 
@@ -93,7 +88,7 @@ export default function SelectionFormatToolbarPlugin() {
     );
   }, [editor, updateToolbar]);
 
-  const handleTextFormat = (format: "bold" | "italic" | "underline" | "strikethrough") => {
+  const handleTextFormat = (format: 'bold' | 'italic' | 'underline' | 'strikethrough') => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
     requestAnimationFrame(() => editor.focus());
   };
@@ -110,32 +105,32 @@ export default function SelectionFormatToolbarPlugin() {
     >
       <button
         type="button"
-        className={`blog-selection-toolbar-btn ${isBold ? "active" : ""}`}
-        onClick={() => handleTextFormat("bold")}
+        className={`blog-selection-toolbar-btn ${isBold ? 'active' : ''}`}
+        onClick={() => handleTextFormat('bold')}
         aria-label="In đậm"
       >
         <Bold className="size-4" />
       </button>
       <button
         type="button"
-        className={`blog-selection-toolbar-btn ${isItalic ? "active" : ""}`}
-        onClick={() => handleTextFormat("italic")}
+        className={`blog-selection-toolbar-btn ${isItalic ? 'active' : ''}`}
+        onClick={() => handleTextFormat('italic')}
         aria-label="In nghiêng"
       >
         <Italic className="size-4" />
       </button>
       <button
         type="button"
-        className={`blog-selection-toolbar-btn ${isUnderline ? "active" : ""}`}
-        onClick={() => handleTextFormat("underline")}
-        aria-label="Underline"
+        className={`blog-selection-toolbar-btn ${isUnderline ? 'active' : ''}`}
+        onClick={() => handleTextFormat('underline')}
+        aria-label="Gạch chân"
       >
         <Underline className="size-4" />
       </button>
       <button
         type="button"
-        className={`blog-selection-toolbar-btn ${isStrikethrough ? "active" : ""}`}
-        onClick={() => handleTextFormat("strikethrough")}
+        className={`blog-selection-toolbar-btn ${isStrikethrough ? 'active' : ''}`}
+        onClick={() => handleTextFormat('strikethrough')}
         aria-label="Gạch ngang"
       >
         <Strikethrough className="size-4" />

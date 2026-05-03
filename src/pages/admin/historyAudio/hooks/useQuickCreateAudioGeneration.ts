@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from 'react';
 import { message } from 'antd';
 import type { UseFormReturn } from 'react-hook-form';
-import type { MultiQuickCreateValues } from '../schemas/QuickCreateFormSchema';
-import type { QuickCreateLanguageOption } from '../quickCreateLanguageUtils';
+import type { MultiQuickCreateValues } from '../components/QuickCreateComponents/schemas/QuickCreateFormSchema';
+import type { QuickCreateLanguageOption } from '../components/QuickCreateComponents/quickCreateLanguageUtils';
 import { generateQuickCreateAudioAndTiming } from '@/pages/admin/historyAudio/services/quickCreateElevenLabsService';
 import { uploadVideoToBackend } from '@/utils/cloudinary';
 

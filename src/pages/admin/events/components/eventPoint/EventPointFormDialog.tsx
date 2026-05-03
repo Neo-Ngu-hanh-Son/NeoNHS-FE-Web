@@ -131,22 +131,22 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
     const nextErrors: Partial<Record<keyof FormData, string>> = {};
 
     if (!form.name.trim()) {
-      nextErrors.name = 'Point name is required';
+      nextErrors.name = 'Tên điểm là bắt buộc';
     }
 
     const latitude = Number.parseFloat(form.latitude);
     const longitude = Number.parseFloat(form.longitude);
 
     if (!form.latitude.trim()) {
-      nextErrors.latitude = 'Latitude is required';
+      nextErrors.latitude = 'Vĩ độ là bắt buộc';
     } else if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90) {
-      nextErrors.latitude = 'Latitude must be between -90 and 90';
+      nextErrors.latitude = 'Vĩ độ phải trong khoảng -90 đến 90';
     }
 
     if (!form.longitude.trim()) {
-      nextErrors.longitude = 'Longitude is required';
+      nextErrors.longitude = 'Kinh độ là bắt buộc';
     } else if (!Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
-      nextErrors.longitude = 'Longitude must be between -180 and 180';
+      nextErrors.longitude = 'Kinh độ phải trong khoảng -180 đến 180';
     }
 
     setErrors(nextErrors);
@@ -181,48 +181,46 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Edit Event Point' : 'Add Event Point'}</DialogTitle>
+            <DialogTitle>{isEdit ? 'Chỉnh sửa điểm sự kiện' : 'Thêm điểm sự kiện'}</DialogTitle>
             <DialogDescription>
-              {isEdit
-                ? 'Update the selected event point details.'
-                : 'Create a reusable event point for event timelines.'}
+              {isEdit ? 'Cập nhật thông tin điểm sự kiện đã chọn.' : 'Tạo điểm sự kiện dùng chung cho dòng thời gian.'}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div>
-              <Label htmlFor="event-point-name">Name *</Label>
+              <Label htmlFor="event-point-name">Tên *</Label>
               <Input
                 id="event-point-name"
                 value={form.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                placeholder="e.g. Main Stage"
+                placeholder="vd: Sân khấu chính"
               />
               {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
             </div>
 
             <div>
-              <Label htmlFor="event-point-description">Description</Label>
+              <Label htmlFor="event-point-description">Mô tả</Label>
               <Textarea
                 id="event-point-description"
                 value={form.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 rows={3}
-                placeholder="Short details about this point"
+                placeholder="Mô tả ngắn về điểm này"
               />
             </div>
 
             <div>
-              <Label htmlFor="event-point-tag">Point Tag</Label>
+              <Label htmlFor="event-point-tag">Thẻ điểm</Label>
               <Select value={form.eventPointTagId} onValueChange={(value) => handleChange('eventPointTagId', value)}>
                 <SelectTrigger id="event-point-tag">
-                  <SelectValue placeholder="Select a tag" />
+                  <SelectValue placeholder="Chọn thẻ" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NO_TAG_VALUE}>No tag</SelectItem>
+                  <SelectItem value={NO_TAG_VALUE}>Không có thẻ</SelectItem>
                   {availableTags.map((tag) => (
                     <SelectItem key={tag.id} value={tag.id!}>
-                      {tag.name || 'Unnamed tag'}
+                      {tag.name || 'Thẻ chưa đặt tên'}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -230,18 +228,18 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
             </div>
 
             <div>
-              <Label htmlFor="event-point-address">Address</Label>
+              <Label htmlFor="event-point-address">Địa chỉ</Label>
               <Input
                 id="event-point-address"
                 value={form.address}
                 onChange={(e) => handleChange('address', e.target.value)}
-                placeholder="e.g. Ngu Hanh Son, Da Nang"
+                placeholder="vd: Ngũ Hành Sơn, Đà Nẵng"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="event-point-latitude">Latitude *</Label>
+                <Label htmlFor="event-point-latitude">Vĩ độ *</Label>
                 <Input
                   id="event-point-latitude"
                   value={form.latitude}
@@ -251,7 +249,7 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
                 {errors.latitude && <p className="text-xs text-destructive mt-1">{errors.latitude}</p>}
               </div>
               <div>
-                <Label htmlFor="event-point-longitude">Longitude *</Label>
+                <Label htmlFor="event-point-longitude">Kinh độ *</Label>
                 <Input
                   id="event-point-longitude"
                   value={form.longitude}
@@ -264,26 +262,26 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
 
             <div className="rounded-md border p-3 flex flex-wrap items-center justify-between gap-3">
               <div className="space-y-1">
-                <p className="text-sm font-medium">Pick coordinates on map</p>
-                <p className="text-xs text-muted-foreground">Use map picker for precise location selection.</p>
+                <p className="text-sm font-medium">Chọn tọa độ trên bản đồ</p>
+                <p className="text-xs text-muted-foreground">Dùng bản đồ để chọn vị trí chính xác.</p>
               </div>
               <Button type="button" variant="outline" onClick={() => setMapOpen(true)}>
                 <MapPin className="h-4 w-4 mr-1" />
-                Open Map Picker
+                Mở bản đồ chọn vị trí
               </Button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="font-mono text-xs">
-                Lat: {form.latitude || '—'}
+                Vĩ độ: {form.latitude || '—'}
               </Badge>
               <Badge variant="outline" className="font-mono text-xs">
-                Lng: {form.longitude || '—'}
+                Kinh độ: {form.longitude || '—'}
               </Badge>
             </div>
 
             <div>
-              <Label>Point Image</Label>
+              <Label>Ảnh điểm</Label>
               <div className="mt-1">
                 <DragImageUploader
                   value={form.imageUrl}
@@ -291,7 +289,7 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
                   onError={(errorMessage) => message.error(errorMessage)}
                   minHeight={140}
                   imageClassName="!w-auto max-w-[260px] mx-auto"
-                  placeholder="Upload event point image"
+                  placeholder="Tải ảnh điểm sự kiện"
                 />
               </div>
             </div>
@@ -299,11 +297,11 @@ export function EventPointFormDialog({ open, onOpenChange, point, tags, onSubmit
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button onClick={handleSubmit} disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Update' : 'Create'}
+              {isEdit ? 'Cập nhật' : 'Tạo mới'}
             </Button>
           </DialogFooter>
         </DialogContent>

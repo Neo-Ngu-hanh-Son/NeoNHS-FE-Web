@@ -4,9 +4,9 @@
  * Uses shadcn/ui AlertDialog + antd message for notifications.
  */
 
-import { useState } from "react";
-import { message } from "antd";
-import { TriangleAlert, Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { message } from 'antd';
+import { TriangleAlert, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,20 +16,20 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from "@/components/ui/alert-dialog";
-import { blogService } from "@/services/api/blogService";
-import { getApiErrorMessage } from "@/utils/getApiErrorMessage";
-import { truncateText } from "@/utils/helpers";
-import type { BlogResponse, BlogStatus } from "@/types/blog";
+} from '@/components/ui/alert-dialog';
+import { blogService } from '@/services/api/blogService';
+import { getApiErrorMessage } from '@/utils/getApiErrorMessage';
+import { truncateText } from '@/utils/helpers';
+import type { BlogResponse, BlogStatus } from '@/types/blog';
 
 function blogStatusLabelVi(status: BlogStatus | string): string {
   switch (status) {
-    case "DRAFT":
-      return "Bản nháp";
-    case "PUBLISHED":
-      return "Công khai";
-    case "ARCHIVED":
-      return "Lưu trữ";
+    case 'DRAFT':
+      return 'Bản nháp';
+    case 'PUBLISHED':
+      return 'Công khai';
+    case 'ARCHIVED':
+      return 'Lưu trữ';
     default:
       return status;
   }
@@ -51,13 +51,13 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
       setDeleting(true);
       const res = await blogService.deleteBlog(blog.id);
       if (res.success) {
-        message.success(res.message || "Đã lưu trữ bài viết thành công");
+        message.success(res.message || 'Đã lưu trữ bài viết thành công');
         onSuccess();
       } else {
-        message.error(res.message || "Không thể lưu trữ bài viết");
+        message.error(res.message || 'Không thể lưu trữ bài viết');
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, "Failed to archive blog"));
+      message.error(getApiErrorMessage(err, 'Không thể lưu trữ bài viết'));
     } finally {
       setDeleting(false);
     }
@@ -81,28 +81,20 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
         {blog && (
           <div className="w-full flex items-center gap-3 p-3 bg-destructive/5 rounded-lg border border-destructive/15">
             {blog.thumbnailUrl ? (
-              <img
-                src={blog.thumbnailUrl}
-                alt={blog.title}
-                className="h-10 w-14 rounded-md object-cover shrink-0"
-              />
+              <img src={blog.thumbnailUrl} alt={blog.title} className="h-10 w-14 rounded-md object-cover shrink-0" />
             ) : (
               <div className="h-10 w-14 rounded-md bg-destructive/10 shrink-0" />
             )}
             <div className="text-left min-w-0">
-              <p className="text-sm font-semibold text-foreground truncate">
-                {truncateText(blog.title, 40)}
-              </p>
+              <p className="text-sm font-semibold text-foreground truncate">{truncateText(blog.title, 40)}</p>
               <p className="text-xs text-muted-foreground">
-                {blog.blogCategory?.name ?? "Chưa có danh mục"} · {blogStatusLabelVi(blog.status)}
+                {blog.blogCategory?.name ?? 'Chưa có danh mục'} · {blogStatusLabelVi(blog.status)}
               </p>
             </div>
           </div>
         )}
 
-        <p className="text-xs text-destructive text-center">
-          Bạn có thể khôi phục bài đã lưu trữ từ trang quản trị.
-        </p>
+        <p className="text-xs text-destructive text-center">Bạn có thể khôi phục bài đã lưu trữ từ trang quản trị.</p>
 
         <AlertDialogFooter>
           <AlertDialogCancel disabled={deleting}>Hủy</AlertDialogCancel>
@@ -117,7 +109,7 @@ export function BlogDeleteDialog({ blog, onClose, onSuccess }: BlogDeleteDialogP
                 Đang lưu trữ...
               </>
             ) : (
-              "Lưu trữ"
+              'Lưu trữ'
             )}
           </AlertDialogAction>
         </AlertDialogFooter>

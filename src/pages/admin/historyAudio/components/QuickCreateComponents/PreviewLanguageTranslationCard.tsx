@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils';
 import QuickCreateLanguageSidebar from './QuickCreateLanguageSidebar';
 import QuickCreateVoiceAudioPanel from './QuickCreateVoiceAudioPanel';
 import QuickCreateBulkAudioProgress from './QuickCreateBulkAudioProgress';
-import { useQuickCreateAudioGeneration } from './hooks/useQuickCreateAudioGeneration';
+import { useQuickCreateAudioGeneration } from '../../hooks/useQuickCreateAudioGeneration';
 import { ELEVEN_LABS_VOICES } from '../../constants';
 import QuickCreateBulkGenerateConfirmDialog from './QuickCreateBulkGenerateConfirmDialog';
 

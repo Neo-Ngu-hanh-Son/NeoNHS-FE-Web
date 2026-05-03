@@ -96,7 +96,7 @@ export default function BlogCategorySection({ form }: { form: UseFormReturn<z.in
       messageApi.success('Đã tạo danh mục blog thành công!');
       onCategoryCreationSuccess();
     } catch (error: unknown) {
-      messageApi.error(getApiErrorMessage(error, 'Failed to create blog category. Please try again.'));
+      messageApi.error(getApiErrorMessage(error, 'Không thể tạo danh mục blog. Vui lòng thử lại.'));
     } finally {
       setSubmitting(false);
       setIsCreatingCategory(false);

@@ -1,4 +1,4 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $createParagraphNode,
   $getSelection,
@@ -9,29 +9,24 @@ import {
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
-} from "lexical";
-import { $isHeadingNode, $createHeadingNode } from "@lexical/rich-text";
-import {
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  $isListNode,
-  ListNode,
-} from "@lexical/list";
+} from 'lexical';
+import { $isHeadingNode, $createHeadingNode } from '@lexical/rich-text';
+import { INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, $isListNode, ListNode } from '@lexical/list';
 
-import { $isCodeNode } from "@lexical/code";
-import { $setBlocksType } from "@lexical/selection";
-import { $createQuoteNode, $isQuoteNode } from "@lexical/rich-text";
-import { $findMatchingParent, mergeRegister } from "@lexical/utils";
-import { useCallback, useEffect, useState } from "react";
+import { $isCodeNode } from '@lexical/code';
+import { $setBlocksType } from '@lexical/selection';
+import { $createQuoteNode, $isQuoteNode } from '@lexical/rich-text';
+import { $findMatchingParent, mergeRegister } from '@lexical/utils';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useImageInsert, type ImageUploadHandler } from "./ImagePlugin";
-import FloatingLinkEditor from "./FloatingLinkEditor";
-import { BlockType } from "../type";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import ToolbarButton from "./ToolbarElements/ToolbarButton";
-import ToolbarDivider from "./ToolbarElements/ToolbarDivider";
-import BlockTypeDropdown from "./ToolbarElements/ToolbarBlockTypeDropdown";
-import LinkInlineEditor from "./ToolbarElements/ToolbarLinkInlineButton";
+import { useImageInsert, type ImageUploadHandler } from './ImagePlugin';
+import FloatingLinkEditor from './FloatingLinkEditor';
+import { BlockType } from '../type';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import ToolbarButton from './ToolbarElements/ToolbarButton';
+import ToolbarDivider from './ToolbarElements/ToolbarDivider';
+import BlockTypeDropdown from './ToolbarElements/ToolbarBlockTypeDropdown';
+import LinkInlineEditor from './ToolbarElements/ToolbarLinkInlineButton';
 import {
   AlignCenter,
   AlignJustify,
@@ -44,7 +39,7 @@ import {
   Strikethrough,
   Table,
   Underline,
-} from "lucide-react";
+} from 'lucide-react';
 
 // --- Main Toolbar Plugin ---
 type ToolbarPluginProps = {
@@ -66,40 +61,33 @@ export default function ToolbarPlugin({
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [, setIsCode] = useState(false);
-  const [blockType, setBlockType] = useState<BlockType>("paragraph");
-  const [align, setAlign] = useState<"left" | "center" | "right" | "justify">("left");
+  const [blockType, setBlockType] = useState<BlockType>('paragraph');
+  const [align, setAlign] = useState<'left' | 'center' | 'right' | 'justify'>('left');
 
   // Image insert helper
   const { fileInputRef, handleFileChange, triggerFileInput } = useImageInsert(onImageUpload);
 
   // Link editor hook
-  const {
-    isLink,
-    isEditMode,
-    editUrl,
-    setEditUrl,
-    handleInsertLink,
-    handleConfirmLink,
-    handleCancelLink,
-  } = FloatingLinkEditor();
+  const { isLink, isEditMode, editUrl, setEditUrl, handleInsertLink, handleConfirmLink, handleCancelLink } =
+    FloatingLinkEditor();
 
   // --- Update toolbar state from selection ---
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
-      setIsBold(selection.hasFormat("bold"));
-      setIsItalic(selection.hasFormat("italic"));
-      setIsUnderline(selection.hasFormat("underline"));
-      setIsStrikethrough(selection.hasFormat("strikethrough"));
-      setIsCode(selection.hasFormat("code"));
+      setIsBold(selection.hasFormat('bold'));
+      setIsItalic(selection.hasFormat('italic'));
+      setIsUnderline(selection.hasFormat('underline'));
+      setIsStrikethrough(selection.hasFormat('strikethrough'));
+      setIsCode(selection.hasFormat('code'));
 
       const anchorNode = selection.anchor.getNode();
       let element =
-        anchorNode.getKey() === "root"
+        anchorNode.getKey() === 'root'
           ? anchorNode
           : $findMatchingParent(anchorNode, (e) => {
               const parent = e.getParent();
-              return parent !== null && parent.getKey() === "root";
+              return parent !== null && parent.getKey() === 'root';
             });
 
       if (element === null) {
@@ -108,7 +96,7 @@ export default function ToolbarPlugin({
 
       if ($isElementNode(element)) {
         const format = element.getFormatType();
-        setAlign(format as "left" | "center" | "right" | "justify");
+        setAlign(format as 'left' | 'center' | 'right' | 'justify');
       }
 
       if ($isHeadingNode(element)) {
@@ -116,13 +104,13 @@ export default function ToolbarPlugin({
         setBlockType(tag as BlockType);
       } else if ($isListNode(element)) {
         const listType = (element as ListNode).getListType();
-        setBlockType(listType === "bullet" ? "bullet" : "number");
+        setBlockType(listType === 'bullet' ? 'bullet' : 'number');
       } else if ($isQuoteNode(element)) {
-        setBlockType("quote");
+        setBlockType('quote');
       } else if ($isCodeNode(element)) {
-        setBlockType("paragraph");
+        setBlockType('paragraph');
       } else {
-        setBlockType("paragraph");
+        setBlockType('paragraph');
       }
     }
   }, []);
@@ -169,22 +157,22 @@ export default function ToolbarPlugin({
         if (!$isRangeSelection(selection)) return;
 
         switch (type) {
-          case "paragraph":
+          case 'paragraph':
             $setBlocksType(selection, () => $createParagraphNode());
             break;
-          case "h1":
-          case "h2":
-          case "h3":
-          case "h4":
+          case 'h1':
+          case 'h2':
+          case 'h3':
+          case 'h4':
             $setBlocksType(selection, () => $createHeadingNode(type));
             break;
-          case "quote":
+          case 'quote':
             $setBlocksType(selection, () => $createQuoteNode());
             break;
-          case "bullet":
+          case 'bullet':
             editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
             break;
-          case "number":
+          case 'number':
             editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
             break;
         }
@@ -225,28 +213,28 @@ export default function ToolbarPlugin({
 
         {/* Text formatting */}
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold")}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
           isActive={isBold}
           title="In đậm (Ctrl+B)"
         >
           <Bold className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic")}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
           isActive={isItalic}
           title="In nghiêng (Ctrl+I)"
         >
           <Italic className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline")}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
           isActive={isUnderline}
           title="Gạch chân (Ctrl+U)"
         >
           <Underline className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough")}
+          onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
           isActive={isStrikethrough}
           title="Gạch ngang"
         >
@@ -263,11 +251,7 @@ export default function ToolbarPlugin({
         <ToolbarDivider />
 
         {/* Link */}
-        <ToolbarButton
-          onClick={handleInsertLink}
-          isActive={isLink}
-          title={isLink ? "Bỏ liên kết" : "Chèn liên kết"}
-        >
+        <ToolbarButton onClick={handleInsertLink} isActive={isLink} title={isLink ? 'Bỏ liên kết' : 'Chèn liên kết'}>
           <Link className="size-4" />
         </ToolbarButton>
 
@@ -280,37 +264,37 @@ export default function ToolbarPlugin({
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
         />
 
         <ToolbarDivider />
 
         {/* Text alignment */}
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left")}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
           title="Căn trái"
-          isActive={align === "left"}
+          isActive={align === 'left'}
         >
           <AlignLeft className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center")}
-          title="Align Center"
-          isActive={align === "center"}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
+          title="Căn giữa"
+          isActive={align === 'center'}
         >
           <AlignCenter className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right")}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
           title="Căn phải"
-          isActive={align === "right"}
+          isActive={align === 'right'}
         >
           <AlignRight className="size-4" />
         </ToolbarButton>
         <ToolbarButton
-          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify")}
+          onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
           title="Căn đều"
-          isActive={align === "justify"}
+          isActive={align === 'justify'}
         >
           <AlignJustify className="size-4" />
         </ToolbarButton>

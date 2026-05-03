@@ -186,7 +186,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     }
     if (form.thumbnailUrl && form.thumbnailUrl.length > 255) e.thumbnailUrl = 'Tối đa 255 ký tự';
 
-    // Price validation removed as base price is no longer used
+    // Da bo kiem tra gia vi khong con dung gia co ban
     if (form.maxParticipants) {
       const mp = Number(form.maxParticipants);
       if (mp <= 0 || !Number.isInteger(mp)) e.maxParticipants = 'Phải là số nguyên dương';
@@ -235,7 +235,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
     if (editorRef.current) {
       editorRef.current.save();
     } else {
-      // Fallback if editor not ready (should not happen normally)
+      // Du phong khi trinh soan thao chua san sang (hiem khi xay ra)
       const data: CreateEventRequest | UpdateEventRequest = {
         name: form.name.trim(),
         shortDescription: form.shortDescription.trim() || undefined,
@@ -265,9 +265,9 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Left column */}
+      {/* Cot ben trai */}
       <div className="lg:col-span-2 space-y-6">
-        {/* Basic Information */}
+        {/* Thong tin co ban */}
         <Card>
           <CardHeader>
             <CardTitle>Thông tin cơ bản</CardTitle>
@@ -313,7 +313,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
           </CardContent>
         </Card>
 
-        {/* Time & Location */}
+        {/* Thoi gian va dia diem */}
         <Card>
           <CardHeader>
             <CardTitle>Thời gian & Địa điểm</CardTitle>
@@ -342,7 +342,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               </div>
             </div>
 
-            {/* Location */}
+            {/* Dia diem */}
             <div>
               <Label htmlFor="locationName">Tên địa điểm</Label>
               <Input
@@ -355,7 +355,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               {errors.locationName && <p className="text-xs text-destructive mt-1">{errors.locationName}</p>}
             </div>
 
-            {/* Map Picker */}
+            {/* Chon ban do */}
             <div>
               <Label>Tọa độ</Label>
               <div className="flex items-center gap-2 mt-1">
@@ -381,7 +381,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
                   </div>
                 )}
               </div>
-              {/* Hidden manual inputs, accessible via clicking coordinates */}
+              {/* Truong nhap tay an, co the dung khi can */}
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <div>
                   <Label htmlFor="latitude" className="text-xs text-muted-foreground">
@@ -416,7 +416,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
           </CardContent>
         </Card>
 
-        {/* Tickets & Pricing */}
+        {/* Ve va gia */}
         <Card>
           <CardHeader>
             <CardTitle>Vé & Giá</CardTitle>
@@ -446,9 +446,9 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         </Card>
       </div>
 
-      {/* Right column */}
+      {/* Cot ben phai */}
       <div className="space-y-6">
-        {/* Status (edit only) */}
+        {/* Trang thai (chi dung khi sua) */}
         {mode === 'edit' && (
           <Card>
             <CardHeader>
@@ -471,7 +471,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
           </Card>
         )}
 
-        {/* Thumbnail */}
+        {/* Anh dai dien */}
         <Card>
           <CardHeader>
             <CardTitle>Ảnh đại diện {mode === 'create' && '*'}</CardTitle>
@@ -484,7 +484,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               >
                 <img
                   src={thumbnailPreview || form.thumbnailUrl}
-                  alt="Thumbnail"
+                  alt="Anh dai dien"
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -530,7 +530,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               </div>
             )}
 
-            {/* Hidden file input */}
+            {/* Input file an */}
             <input
               ref={fileInputRef}
               type="file"
@@ -539,7 +539,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) handleFileUpload(file);
-                e.target.value = ''; // Reset so same file can be selected again
+                e.target.value = ''; // Dat lai de co the chon lai cung file
               }}
             />
 
@@ -547,7 +547,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
           </CardContent>
         </Card>
 
-        {/* Tags */}
+        {/* The */}
         <Card>
           <CardHeader>
             <CardTitle>Thẻ</CardTitle>
@@ -558,7 +558,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         </Card>
       </div>
 
-      {/* Footer */}
+      {/* Chan trang */}
       <div className="lg:col-span-3 flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={() => navigate(-1)}>
           Hủy
@@ -569,7 +569,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         </Button>
       </div>
 
-      {/* Map Picker Modal */}
+      {/* Hop thoai chon ban do */}
       <GoogleMapPickerModal
         open={mapPickerOpen}
         onOpenChange={setMapPickerOpen}
