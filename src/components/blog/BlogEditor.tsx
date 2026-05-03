@@ -1,35 +1,35 @@
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { LexicalComposer } from "@lexical/react/LexicalComposer";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import { TablePlugin } from "@lexical/react/LexicalTablePlugin";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { ListPlugin } from "@lexical/react/LexicalListPlugin";
-import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
-import { MarkdownShortcutPlugin } from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 
-import { TRANSFORMERS } from "@lexical/markdown";
+import { TRANSFORMERS } from '@lexical/markdown';
 
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { ListNode, ListItemNode } from "@lexical/list";
-import { CodeNode, CodeHighlightNode } from "@lexical/code";
-import { LinkNode, AutoLinkNode } from "@lexical/link";
-import { TableNode, TableCellNode, TableRowNode } from "@lexical/table";
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { ListNode, ListItemNode } from '@lexical/list';
+import { CodeNode, CodeHighlightNode } from '@lexical/code';
+import { LinkNode, AutoLinkNode } from '@lexical/link';
+import { TableNode, TableCellNode, TableRowNode } from '@lexical/table';
 
-import { editorTheme, ImageNode, ToolbarPlugin } from "./editor";
-import type { ImageUploadHandler } from "./editor";
+import { editorTheme, ImageNode, ToolbarPlugin } from './editor';
+import type { ImageUploadHandler } from './editor';
 
-import "./editor/styles/BlogEditor.css";
-import TableCellResizerPlugin from "./editor/TableCellResizerPlugin/TableCellResizerPlugin";
-import TableActionMenuPlugin from "./editor/TableActionMenuPlugin";
-import ToolbarModal from "./editor/ToolbarElements/ToolbarModal";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import ClickableLinkPlugin from "./editor/ClickableLinkPlugin";
-import { BlogEditorRef, EditorSaveResult } from "./type";
-import { $getRoot, $insertNodes, LexicalEditor } from "lexical";
-import { $generateHtmlFromNodes, $generateNodesFromDOM } from "@lexical/html";
-import EditorRefPlugin from "./editor/EditorRefPlugin";
+import './editor/styles/BlogEditor.css';
+import TableCellResizerPlugin from './editor/TableCellResizerPlugin/TableCellResizerPlugin';
+import TableActionMenuPlugin from './editor/TableActionMenuPlugin';
+import ToolbarModal from './editor/ToolbarElements/ToolbarModal';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import ClickableLinkPlugin from './editor/ClickableLinkPlugin';
+import { BlogEditorRef, EditorSaveResult } from './type';
+import { $getRoot, $insertNodes, LexicalEditor } from 'lexical';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
+import EditorRefPlugin from './editor/EditorRefPlugin';
 
 // --- Props ---
 type BlogEditorProps = {
@@ -65,26 +65,26 @@ const EDITOR_NODES = [
 
 // --- Link validation ---
 function validateUrl(url: string): boolean {
-  return /^https?:\/\//.test(url) || url.startsWith("/") || url.startsWith("mailto:");
+  return /^https?:\/\//.test(url) || url.startsWith('/') || url.startsWith('mailto:');
 }
 
 // --- Editor error handler ---
 function onError(error: Error) {
-  console.error("[BlogEditor] Lexical error:", error);
+  console.error('[BlogEditor] Lexical error:', error);
 }
 
 // --- Placeholder component ---
 function EditorPlaceholder({ text }: { text?: string }) {
-  return <div className="blog-editor-placeholder">{text || "Start writing..."}</div>;
+  return <div className="blog-editor-placeholder">{text || 'Bắt đầu viết...'}</div>;
 }
-import CharacterCountPlugin from "./editor/CharacterCountPlugin";
+import CharacterCountPlugin from './editor/CharacterCountPlugin';
 
 const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
   ({ onSave, onImageUpload, initialEditorState, initialHtml, placeholder }, ref) => {
     const editorRef = useRef<LexicalEditor | null>(null);
     const [open, setOpen] = useState(false);
     const initialConfig = {
-      namespace: "BlogEditor",
+      namespace: 'BlogEditor',
       theme: editorTheme,
       nodes: EDITOR_NODES,
       onError,
@@ -96,7 +96,7 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
 
         if (initialHtml) {
           const parser = new DOMParser();
-          const dom = parser.parseFromString(initialHtml, "text/html");
+          const dom = parser.parseFromString(initialHtml, 'text/html');
           const nodes = $generateNodesFromDOM(editor, dom);
           $getRoot().select();
           $insertNodes(nodes);
@@ -120,7 +120,7 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
       },
 
       getJSON() {
-        if (!editorRef.current) return "";
+        if (!editorRef.current) return '';
         return JSON.stringify(editorRef.current.getEditorState().toJSON());
       },
     }));
@@ -134,9 +134,7 @@ const BlogEditor = forwardRef<BlogEditorRef, BlogEditorProps>(
 
           <div className="blog-editor-content-wrapper">
             <RichTextPlugin
-              contentEditable={
-                <ContentEditable className="blog-editor-content" spellCheck={false} />
-              }
+              contentEditable={<ContentEditable className="blog-editor-content" spellCheck={false} />}
               placeholder={<EditorPlaceholder text={placeholder} />}
               ErrorBoundary={LexicalErrorBoundary}
             />

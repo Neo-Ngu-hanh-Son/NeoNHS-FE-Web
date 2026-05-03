@@ -351,7 +351,7 @@ export default function EventDetailPage() {
                   {/* Tags */}
                   {event.tags && event.tags.length > 0 && (
                     <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm font-medium mb-2">Tags</p>
+                      <p className="text-sm font-medium mb-2">Thẻ</p>
                       <div className="flex flex-wrap gap-2">
                         {event.tags.map((tag) => (
                           <Badge
@@ -412,14 +412,18 @@ export default function EventDetailPage() {
                   <CardTitle>Bản đồ khu vực tổ chức sự kiện</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div 
+                  <div
                     className="aspect-square sm:aspect-video lg:aspect-square rounded-lg overflow-hidden border relative z-0 group cursor-pointer bg-slate-50"
                     onClick={() => !updatingLocation && setMapPickerOpen(true)}
                   >
                     <div className="absolute inset-0 z-10 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
                       <div className="bg-white/95 text-sm font-semibold px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 shadow-lg text-slate-800 scale-95 group-hover:scale-100">
-                        {updatingLocation ? <Loader2 className="w-4 h-4 animate-spin text-indigo-600" /> : <MapPin className="w-4 h-4 text-indigo-600" />}
-                        {updatingLocation ? "Đang cập nhật..." : "Nhấn để chọn vị trí"}
+                        {updatingLocation ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
+                        ) : (
+                          <MapPin className="w-4 h-4 text-indigo-600" />
+                        )}
+                        {updatingLocation ? 'Đang cập nhật...' : 'Nhấn để chọn vị trí'}
                       </div>
                     </div>
                     {event.latitude && event.longitude ? (
@@ -483,7 +487,7 @@ export default function EventDetailPage() {
               <CardTitle>Các điểm sự kiện</CardTitle>
             </CardHeader>
             <CardContent>
-              <EventPointList />
+              <EventPointList eventId={id!} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -492,10 +496,10 @@ export default function EventDetailPage() {
         <TabsContent value="point-tags">
           <Card>
             <CardHeader>
-              <CardTitle>Thẻ đánh dấu hiển thị trên bản đồ điểm sư kiện</CardTitle>
+              <CardTitle>Thẻ đánh dấu hiển thị trên bản đồ điểm sự kiện</CardTitle>
             </CardHeader>
             <CardContent>
-              <EventPointTagList />
+              <EventPointTagList eventId={id!} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -517,13 +521,10 @@ export default function EventDetailPage() {
                 <Ticket className="h-12 w-12 mb-4 text-muted-foreground/30" />
                 <h3 className="text-lg font-semibold text-foreground">Không yêu cầu vé</h3>
                 <p className="mt-2 text-sm max-w-sm mb-6">
-                  Sự kiện này được cấu hình không yêu cầu vé. Bạn có thể bật tính năng vé tại đây để bắt đầu thêm các loại vé.
+                  Sự kiện này được cấu hình không yêu cầu vé. Bạn có thể bật tính năng vé tại đây để bắt đầu thêm các
+                  loại vé.
                 </p>
-                <Button 
-                  onClick={handleEnableTickets} 
-                  disabled={updatingTicketReq}
-                  className="gap-2"
-                >
+                <Button onClick={handleEnableTickets} disabled={updatingTicketReq} className="gap-2">
                   {updatingTicketReq ? <Loader2 className="h-4 w-4 animate-spin" /> : <Ticket className="h-4 w-4" />}
                   Bật yêu cầu vé
                 </Button>
@@ -539,7 +540,8 @@ export default function EventDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Ẩn sự kiện</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc chắn muốn ẩn "{event.name}"? Sự kiện sẽ không hiển thị trên trang chủ nhưng có thể khôi phục sau.
+              Bạn có chắc chắn muốn ẩn "{event.name}"? Sự kiện sẽ không hiển thị trên trang chủ nhưng có thể khôi phục
+              sau.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -584,6 +586,7 @@ export default function EventDetailPage() {
         open={mapPickerOpen}
         onOpenChange={setMapPickerOpen}
         initialCoord={event.latitude && event.longitude ? [Number(event.latitude), Number(event.longitude)] : undefined}
+        initialName={event.locationName || event.name}
         onSelect={handleUpdateLocation}
       />
     </div>

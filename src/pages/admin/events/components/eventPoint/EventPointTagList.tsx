@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, MoreHorizontal, Tags } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, MoreHorizontal, Tags, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,16 +21,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useEventPointTags } from '@/hooks/event';
+import { useEventPointTags, useEventTimelines } from '@/hooks/event';
 import type { EventPointTagRequest, EventPointTagResponse } from '@/types/eventTimeline';
 import { EventPointTagFormDialog } from './EventPointTagFormDialog';
 
-export function EventPointTagList() {
-  const { tags, loading, createTag, updateTag, deleteTag } = useEventPointTags();
+export function EventPointTagList({ eventId }: { eventId: string }) {
+  const { createTag, updateTag, deleteTag, restoreTag } = useEventPointTags({ autoFetch: false });
+  const { fetchEventPointTags } = useEventTimelines(eventId, true);
+  const [eventPointTags, setEventPointTags] = useState<EventPointTagResponse[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingTag, setEditingTag] = useState<EventPointTagResponse | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<EventPointTagResponse | null>(null);
+
+  useEffect(() => {
+    const loadEventPointTags = async () => {
+      try {
+        setLoading(true);
+        const nextTags = await fetchEventPointTags();
+        setEventPointTags(nextTags);
+      } catch (error) {
+        console.error('Không thể tải danh sách thẻ điểm:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEventPointTags();
+  }, [fetchEventPointTags]);
 
   const handleCreate = () => {
     setEditingTag(null);
@@ -44,16 +63,38 @@ export function EventPointTagList() {
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget?.id) return;
-    await deleteTag(deleteTarget.id);
+    const success = await deleteTag(deleteTarget.id);
     setDeleteTarget(null);
+    if (success) {
+      const nextTags = await fetchEventPointTags();
+      setEventPointTags(nextTags);
+    }
   };
 
   const handleSubmit = async (data: EventPointTagRequest): Promise<boolean> => {
+    let success = false;
     if (editingTag?.id) {
-      return updateTag(editingTag.id, data);
+      success = await updateTag(editingTag.id, data);
+    } else {
+      success = await createTag(data);
     }
 
-    return createTag(data);
+    if (success) {
+      const nextTags = await fetchEventPointTags();
+      setEventPointTags(nextTags);
+    }
+
+    return success;
+  };
+
+  const handleRestore = async (tagId: string) => {
+    try {
+      await restoreTag(tagId);
+      const nextTags = await fetchEventPointTags();
+      setEventPointTags(nextTags);
+    } catch (error) {
+      console.error('Không thể khôi phục thẻ điểm:', error);
+    }
   };
 
   if (loading) {
@@ -69,43 +110,48 @@ export function EventPointTagList() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm text-muted-foreground">
-          {tags.length} point tag{tags.length !== 1 ? 's' : ''}
-        </span>
+        <span className="text-sm text-muted-foreground">{eventPointTags.length} thẻ điểm</span>
         <Button size="sm" onClick={handleCreate}>
           <Plus className="h-4 w-4 mr-1" />
-          Add Point Tag
+          Thêm thẻ điểm
         </Button>
       </div>
 
-      {tags.length === 0 ? (
+      {eventPointTags.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
           <Tags className="h-10 w-10 mb-3 opacity-30" />
-          <p className="text-sm font-medium">No point tags yet</p>
-          <p className="text-xs mt-1">Create one to classify event points</p>
+          <p className="text-sm font-medium">Chưa có thẻ điểm</p>
+          <p className="text-xs mt-1">Tạo một thẻ để phân loại các điểm sự kiện</p>
         </div>
       ) : (
         <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[180px]">Name</TableHead>
-                <TableHead className="min-w-[220px]">Description</TableHead>
-                <TableHead className="min-w-[140px]">Color</TableHead>
-                <TableHead className="min-w-[120px]">Icon</TableHead>
+                <TableHead className="min-w-[180px]">Tên</TableHead>
+                <TableHead className="min-w-[220px]">Mô tả</TableHead>
+                <TableHead className="min-w-[140px]">Màu sắc</TableHead>
+                <TableHead className="min-w-[120px]">Biểu tượng</TableHead>
                 <TableHead className="w-[50px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tags.map((tag) => {
-                const resolvedName = tag.name || 'Unnamed';
+              {eventPointTags.map((tag) => {
+                const resolvedName = tag.name || 'Chưa đặt tên';
                 const resolvedDescription = tag.description || '—';
                 const resolvedColor = tag.tagColor || '#0f766e';
+                const isDeleted = !!tag.deletedAt;
 
                 return (
                   <TableRow key={tag.id || resolvedName}>
                     <TableCell>
-                      <span className="font-medium text-sm">{resolvedName}</span>
+                      <span
+                        className={
+                          isDeleted ? 'font-medium text-sm text-muted-foreground line-through' : 'font-medium text-sm'
+                        }
+                      >
+                        {resolvedName}
+                      </span>
                     </TableCell>
 
                     <TableCell>
@@ -124,7 +170,7 @@ export function EventPointTagList() {
                         <img src={tag.iconUrl} alt={resolvedName} className="h-8 w-8 rounded border object-cover" />
                       ) : (
                         <Badge variant="outline" className="text-xs text-muted-foreground">
-                          No icon
+                          Không có biểu tượng
                         </Badge>
                       )}
                     </TableCell>
@@ -139,17 +185,28 @@ export function EventPointTagList() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem onClick={() => handleEdit(tag)}>
                             <Pencil className="mr-2 h-4 w-4" />
-                            Edit
+                            Chỉnh sửa
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => setDeleteTarget(tag)}
-                            disabled={!tag.id}
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
+                          {tag.deletedAt ? (
+                            <DropdownMenuItem
+                              className="text-green-500 focus:text-green-500"
+                              onClick={() => tag.id && handleRestore(tag.id)}
+                              disabled={!tag.id}
+                            >
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                              Khôi phục thẻ điểm
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => setDeleteTarget(tag)}
+                              disabled={!tag.id}
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Ẩn thẻ điểm
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -166,19 +223,20 @@ export function EventPointTagList() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Point Tag</AlertDialogTitle>
+            <AlertDialogTitle>Ẩn thẻ điểm</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteTarget?.name || 'this tag'}"? This action cannot be undone.
+              Bạn có chắc chắn muốn ẩn "{deleteTarget?.name || 'thẻ này'}" không? Thẻ đã ẩn sẽ không còn hiển thị trong
+              các điểm sự kiện, nhưng bạn có thể khôi phục lại sau.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              Ẩn
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

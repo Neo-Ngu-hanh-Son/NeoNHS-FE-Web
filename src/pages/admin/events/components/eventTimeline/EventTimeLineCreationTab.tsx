@@ -30,7 +30,7 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
   return (
     <div className="space-y-4 py-2">
       <div className="border-b pb-2">
-        <h3 className="text-sm font-semibold">Chi tiết timeline sự kiện</h3>
+        <h3 className="text-sm font-semibold">Chi tiết dòng thời gian sự kiện</h3>
       </div>
       <div>
         <Label htmlFor="tl-name">Tên *</Label>
@@ -85,7 +85,7 @@ export default function EventTimeLineCreationTab({ form, errors, eventStartDate,
           id="tl-organizer"
           value={form.organizer}
           onChange={(e) => handleChange('organizer', e.target.value)}
-          placeholder="e.g. UBND TP Đà Nẵng"
+          placeholder="VD: UBND TP Đà Nẵng"
         />
         {errors.organizer && <p className="text-xs text-destructive mt-1">{errors.organizer}</p>}
       </div>

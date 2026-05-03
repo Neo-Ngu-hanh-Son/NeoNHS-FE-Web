@@ -1,12 +1,12 @@
-import { useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import dayjs from "dayjs";
-import { message } from "antd";
-import { ArrowLeft, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { message } from 'antd';
+import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,43 +16,41 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useEvent, useEventTimelines } from "@/hooks/event";
-import type { CreateEventTimelineRequest } from "@/types/eventTimeline";
-import type { EventPointTagTabHandle } from "../components/eventTimeline/EventPointTagTab";
-import EventTimeLineCreationTab from "../components/eventTimeline/EventTimeLineCreationTab";
-import EventTimeLinePointCreationTab from "../components/eventTimeline/EventTimeLinePointCreationTab";
-import EventPointTagTab from "../components/eventTimeline/EventPointTagTab";
-import { FormData } from "../type";
+} from '@/components/ui/alert-dialog';
+import { useEvent, useEventTimelines } from '@/hooks/event';
+import type { CreateEventTimelineRequest } from '@/types/eventTimeline';
+import type { EventPointTagTabHandle } from '../components/eventTimeline/EventPointTagTab';
+import EventTimeLineCreationTab from '../components/eventTimeline/EventTimeLineCreationTab';
+import EventTimeLinePointCreationTab from '../components/eventTimeline/EventTimeLinePointCreationTab';
+import EventPointTagTab from '../components/eventTimeline/EventPointTagTab';
+import { FormData } from '../type';
 
 const emptyForm: FormData = {
-  name: "",
-  description: "",
-  date: "",
-  startTime: "",
-  endTime: "",
-  organizer: "",
-  coOrganizer: "",
-  destinationName: "",
-  destinationAddress: "",
-  destinationLatitude: "",
-  destinationLongitude: "",
-  destinationImageUrl: "",
-  destinationMarkerIconUrl: "",
-  destinationTagColor: "#0f766e",
-  destinationTagName: "",
-  destinationTagDescription: "",
-  eventPointId: "",
-  eventPointTagId: "",
+  name: '',
+  description: '',
+  date: '',
+  startTime: '',
+  endTime: '',
+  organizer: '',
+  coOrganizer: '',
+  destinationName: '',
+  destinationAddress: '',
+  destinationLatitude: '',
+  destinationLongitude: '',
+  destinationImageUrl: '',
+  destinationMarkerIconUrl: '',
+  destinationTagColor: '#0f766e',
+  destinationTagName: '',
+  destinationTagDescription: '',
+  eventPointId: '',
+  eventPointTagId: '',
 };
 
 const toApiTime = (time: string): string => (time.length === 5 ? `${time}:00` : time);
 
-const summaryValue = (value: string): string => (value.trim() ? value.trim() : "Không có");
+const summaryValue = (value: string): string => (value.trim() ? value.trim() : 'Không có');
 
-const buildEventPointPayload = (
-  form: FormData,
-): CreateEventTimelineRequest["eventPoint"] | undefined => {
+const buildEventPointPayload = (form: FormData): CreateEventTimelineRequest['eventPoint'] | undefined => {
   const name = form.destinationName.trim();
   const latitudeRaw = form.destinationLatitude.trim();
   const longitudeRaw = form.destinationLongitude.trim();
@@ -68,7 +66,7 @@ const buildEventPointPayload = (
     return undefined;
   }
 
-  const payload: NonNullable<CreateEventTimelineRequest["eventPoint"]> = {
+  const payload: NonNullable<CreateEventTimelineRequest['eventPoint']> = {
     name,
     latitude,
     longitude,
@@ -105,13 +103,13 @@ export default function EventTimelineCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const eventId = id || "";
-  const defaultDate = searchParams.get("date") || "";
+  const eventId = id || '';
+  const defaultDate = searchParams.get('date') || '';
 
   const { event, loading: eventLoading } = useEvent(eventId);
   const { createTimeline } = useEventTimelines(eventId);
 
-  const [step, setStep] = useState<"timeline" | "point" | "visual">("timeline");
+  const [step, setStep] = useState<'timeline' | 'point' | 'visual'>('timeline');
   const [loading, setLoading] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isMarkerUploading, setIsMarkerUploading] = useState(false);
@@ -128,31 +126,31 @@ export default function EventTimelineCreatePage() {
     }
   };
 
-  const validate = (stage: "timeline" | "submit" = "submit"): boolean => {
+  const validate = (stage: 'timeline' | 'submit' = 'submit'): boolean => {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
 
-    if (!form.name.trim()) newErrors.name = "Vui lòng nhập tên";
-    if (!form.date) newErrors.date = "Vui lòng chọn ngày";
-    if (!form.startTime) newErrors.startTime = "Vui lòng chọn thời gian bắt đầu";
-    if (!form.endTime) newErrors.endTime = "Vui lòng chọn thời gian kết thúc";
+    if (!form.name.trim()) newErrors.name = 'Vui lòng nhập tên';
+    if (!form.date) newErrors.date = 'Vui lòng chọn ngày';
+    if (!form.startTime) newErrors.startTime = 'Vui lòng chọn thời gian bắt đầu';
+    if (!form.endTime) newErrors.endTime = 'Vui lòng chọn thời gian kết thúc';
     if (form.startTime && form.endTime && form.startTime >= form.endTime) {
-      newErrors.endTime = "Vui lòng chọn thời gian kết thúc sau thời gian bắt đầu";
+      newErrors.endTime = 'Vui lòng chọn thời gian kết thúc sau thời gian bắt đầu';
     }
 
     if (form.organizer && form.organizer.length > 255) {
-      newErrors.organizer = "Tên đơn vị tổ chức không được vượt quá 255 ký tự";
+      newErrors.organizer = 'Tên đơn vị tổ chức không được vượt quá 255 ký tự';
     }
     if (form.coOrganizer && form.coOrganizer.length > 255) {
-      newErrors.coOrganizer = "Tên đơn vị phối hợp không được vượt quá 255 ký tự";
+      newErrors.coOrganizer = 'Tên đơn vị phối hợp không được vượt quá 255 ký tự';
     }
 
     if (event?.startTime && form.date && form.startTime) {
       const eventStartDT = dayjs(event.startTime);
-      const minDate = eventStartDT.format("YYYY-MM-DD");
+      const minDate = eventStartDT.format('YYYY-MM-DD');
       if (form.date < minDate) {
         newErrors.date = `Ngày phải từ ngày ${minDate} trở đi`;
       } else if (form.date === minDate) {
-        const minTime = eventStartDT.format("HH:mm");
+        const minTime = eventStartDT.format('HH:mm');
         if (form.startTime < minTime) {
           newErrors.startTime = `Thời gian bắt đầu phải từ ${minTime} trở đi`;
         }
@@ -161,36 +159,36 @@ export default function EventTimelineCreatePage() {
 
     if (event?.endTime && form.date) {
       const eventEndDT = dayjs(event.endTime);
-      const maxDate = eventEndDT.format("YYYY-MM-DD");
+      const maxDate = eventEndDT.format('YYYY-MM-DD');
       if (form.date > maxDate) {
         newErrors.date = `Ngày phải từ ngày ${maxDate} trở về trước`;
       } else if (form.date === maxDate && form.endTime) {
-        const maxTime = eventEndDT.format("HH:mm");
+        const maxTime = eventEndDT.format('HH:mm');
         if (form.endTime > maxTime) {
           newErrors.endTime = `Thời gian bắt đầu phải từ ${maxTime} trở về trước`;
         }
       }
     }
 
-    if (stage === "submit") {
+    if (stage === 'submit') {
       if (!form.destinationName.trim()) {
-        newErrors.destinationName = "Tên điểm đến không được để trống";
+        newErrors.destinationName = 'Tên điểm đến không được để trống';
       }
 
       if (!form.destinationLatitude.trim()) {
-        newErrors.destinationLatitude = "Tọa độ vĩ độ không được để trống";
+        newErrors.destinationLatitude = 'Tọa độ vĩ độ không được để trống';
       } else if (!Number.isFinite(Number.parseFloat(form.destinationLatitude))) {
-        newErrors.destinationLatitude = "Tọa độ vĩ độ phải là một số hợp lệ";
+        newErrors.destinationLatitude = 'Tọa độ vĩ độ phải là một số hợp lệ';
       }
 
       if (!form.destinationLongitude.trim()) {
-        newErrors.destinationLongitude = "Tọa độ kinh độ không được để trống";
+        newErrors.destinationLongitude = 'Tọa độ kinh độ không được để trống';
       } else if (!Number.isFinite(Number.parseFloat(form.destinationLongitude))) {
-        newErrors.destinationLongitude = "Tọa độ kinh độ phải là một số hợp lệ";
+        newErrors.destinationLongitude = 'Tọa độ kinh độ phải là một số hợp lệ';
       }
 
       if (!form.destinationTagName.trim()) {
-        newErrors.destinationTagName = "Tên thẻ không được để trống";
+        newErrors.destinationTagName = 'Tên thẻ không được để trống';
       }
     }
 
@@ -199,13 +197,13 @@ export default function EventTimelineCreatePage() {
   };
 
   const handleNextStep = () => {
-    if (step === "timeline" && validate("timeline")) {
-      setStep("point");
+    if (step === 'timeline' && validate('timeline')) {
+      setStep('point');
       return;
     }
 
-    if (step === "point") {
-      setStep("visual");
+    if (step === 'point') {
+      setStep('visual');
     }
   };
 
@@ -241,7 +239,7 @@ export default function EventTimelineCreatePage() {
     }
 
     if (!markerUploaderRef.current) {
-      setMarkerUploadError("Không thể khởi tạo upload marker. Vui lòng thử lại.");
+      setMarkerUploadError('Không thể khởi tạo tải lên biểu tượng đánh dấu. Vui lòng thử lại.');
       return;
     }
 
@@ -251,24 +249,24 @@ export default function EventTimelineCreatePage() {
     const iconUrl = await markerUploaderRef.current.generateMarkerIcon();
 
     if (!iconUrl) {
-      setMarkerUploadError("Không thể tạo và upload marker icon. Vui lòng thử lại.");
+      setMarkerUploadError('Không thể tạo và tải lên biểu tượng đánh dấu. Vui lòng thử lại.');
       setErrors((prev) => ({
         ...prev,
-        destinationMarkerIconUrl: "Không thể tạo và upload marker icon. Vui lòng thử lại.",
+        destinationMarkerIconUrl: 'Không thể tạo và tải lên biểu tượng đánh dấu. Vui lòng thử lại.',
       }));
       setIsMarkerUploading(false);
       return;
     }
 
-    handleChange("destinationMarkerIconUrl", iconUrl);
+    handleChange('destinationMarkerIconUrl', iconUrl);
     setErrors((prev) => ({ ...prev, destinationMarkerIconUrl: undefined }));
     setIsMarkerUploading(false);
   };
 
   const handleSubmit = async () => {
-    if (!validate("submit")) {
+    if (!validate('submit')) {
       if (!form.destinationTagName.trim()) {
-        message.warning("Vui lòng nhập tên thẻ trước khi tạo.");
+        message.warning('Vui lòng nhập tên thẻ trước khi tạo.');
       }
       return;
     }
@@ -279,14 +277,12 @@ export default function EventTimelineCreatePage() {
 
   const handleFinalConfirm = async () => {
     if (isMarkerUploading) {
-      message.info("Đang tải ảnh đánh dấu lên. Vui lòng chờ.");
+      message.info('Đang tải ảnh đánh dấu lên. Vui lòng chờ.');
       return;
     }
 
     if (markerUploadError || !form.destinationMarkerIconUrl.trim()) {
-      message.warning(
-        "Ảnh đánh dấu chưa được tải lên xong. Vui lòng tải lại trước khi xác nhận.",
-      );
+      message.warning('Ảnh đánh dấu chưa được tải lên xong. Vui lòng tải lại trước khi xác nhận.');
       return;
     }
 
@@ -315,9 +311,9 @@ export default function EventTimelineCreatePage() {
     <div className="max-w-6xl mx-auto space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Thêm Timeline Entry</h1>
+          <h1 className="text-2xl font-bold">Thêm mục dòng thời gian</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {event ? `Sự kiện: ${event.name}` : "Tạo một timeline entry mới cho sự kiện."}
+            {event ? `Sự kiện: ${event.name}` : 'Tạo một mục dòng thời gian mới cho sự kiện.'}
           </p>
         </div>
         <Button variant="outline" onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}>
@@ -328,24 +324,24 @@ export default function EventTimelineCreatePage() {
 
       <Card>
         <CardContent className="p-4 sm:p-5">
-          <Tabs value={step} onValueChange={(v) => setStep(v as "timeline" | "point" | "visual")}>
+          <Tabs value={step} onValueChange={(v) => setStep(v as 'timeline' | 'point' | 'visual')}>
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger
                 value="timeline"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                1. Tạo timeline sự kiện
+                1. Tạo dòng thời gian sự kiện
               </TabsTrigger>
               <TabsTrigger
                 value="point"
-                disabled={step !== "point"}
+                disabled={step !== 'point'}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 2. Thêm địa điểm sự kiện
               </TabsTrigger>
               <TabsTrigger
                 value="visual"
-                disabled={step !== "visual"}
+                disabled={step !== 'visual'}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 3. Tạo thẻ địa điểm
@@ -383,10 +379,10 @@ export default function EventTimelineCreatePage() {
           </Tabs>
 
           <div className="mt-5 flex items-center justify-end gap-2 border-t pt-4">
-            {step === "point" || step === "visual" ? (
+            {step === 'point' || step === 'visual' ? (
               <Button
                 variant="outline"
-                onClick={() => setStep(step === "visual" ? "point" : "timeline")}
+                onClick={() => setStep(step === 'visual' ? 'point' : 'timeline')}
                 disabled={loading}
               >
                 Quay lại
@@ -401,7 +397,7 @@ export default function EventTimelineCreatePage() {
               </Button>
             )}
 
-            {step === "timeline" || step === "point" ? (
+            {step === 'timeline' || step === 'point' ? (
               <Button onClick={handleNextStep} disabled={loading}>
                 Tiếp tục
               </Button>
@@ -418,29 +414,27 @@ export default function EventTimelineCreatePage() {
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent className="max-w-3xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận tạo timeline</AlertDialogTitle>
-            <AlertDialogDescription>
-              Xem lại tất cả thông tin dưới đây trước khi tạo.
-            </AlertDialogDescription>
+            <AlertDialogTitle>Xác nhận tạo mục dòng thời gian</AlertDialogTitle>
+            <AlertDialogDescription>Xem lại tất cả thông tin dưới đây trước khi tạo.</AlertDialogDescription>
           </AlertDialogHeader>
 
           <div className="space-y-4">
-            <div className={`rounded-md border p-3 ${isMarkerUploading ? "opacity-60" : ""}`}>
-              <p className="text-sm font-medium">Trạng thái Tải lên Ảnh đánh dấu</p>
+            <div className={`rounded-md border p-3 ${isMarkerUploading ? 'opacity-60' : ''}`}>
+              <p className="text-sm font-medium">Trạng thái tải lên ảnh thẻ điểm sự kiện</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {isMarkerUploading
-                  ? "Đang tải ảnh đánh dấu lên hệ thống..."
+                  ? 'Đang tải ảnh ...'
                   : markerUploadError
                     ? markerUploadError
-                    : "Tải ảnh đánh dấu thành công và sẵn sàng tạo."}
+                    : 'Tải ảnh thẻ điểm sự kiện thành công và sẵn sàng tạo.'}
               </p>
             </div>
 
             <div className="max-h-[360px] overflow-auto rounded-md border bg-muted/20 p-4 space-y-4">
               <section className="space-y-2">
-                <p className="text-sm font-semibold">Chi tiết timeline</p>
+                <p className="text-sm font-semibold">Chi tiết dòng thời gian</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Tên timeline" value={summaryValue(form.name)} />
+                  <SummaryItem label="Tên mục dòng thời gian" value={summaryValue(form.name)} />
                   <SummaryItem label="Ngày" value={summaryValue(form.date)} />
                   <SummaryItem label="Giờ bắt đầu" value={summaryValue(form.startTime)} />
                   <SummaryItem label="Giờ kết thúc" value={summaryValue(form.endTime)} />
@@ -459,10 +453,7 @@ export default function EventTimelineCreatePage() {
               <section className="space-y-2">
                 <p className="text-sm font-semibold">Địa điểm sự kiện</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem
-                    label="Địa điểm tổ chức sự kiện"
-                    value={summaryValue(form.destinationName)}
-                  />
+                  <SummaryItem label="Địa điểm tổ chức sự kiện" value={summaryValue(form.destinationName)} />
                   <SummaryItem label="Địa chỉ" value={summaryValue(form.destinationAddress)} />
                   <SummaryItem label="Vĩ độ" value={summaryValue(form.destinationLatitude)} />
                   <SummaryItem label="Kinh độ" value={summaryValue(form.destinationLongitude)} />
@@ -472,14 +463,8 @@ export default function EventTimelineCreatePage() {
               <section className="space-y-2">
                 <p className="text-sm font-semibold">Thẻ địa điểm sự kiện</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem
-                    label="Tên thẻ địa điểm sự kiện"
-                    value={summaryValue(form.destinationTagName)}
-                  />
-                  <SummaryItem
-                    label="Màu thẻ địa điểm sự kiện"
-                    value={summaryValue(form.destinationTagColor)}
-                  />
+                  <SummaryItem label="Tên thẻ địa điểm sự kiện" value={summaryValue(form.destinationTagName)} />
+                  <SummaryItem label="Màu thẻ địa điểm sự kiện" value={summaryValue(form.destinationTagColor)} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -488,7 +473,7 @@ export default function EventTimelineCreatePage() {
                     {form.destinationImageUrl.trim() ? (
                       <img
                         src={form.destinationImageUrl}
-                        alt="Destination preview"
+                        alt="Xem trước ảnh điểm đến"
                         className="h-24 w-full object-cover rounded"
                       />
                     ) : (
@@ -502,14 +487,12 @@ export default function EventTimelineCreatePage() {
                       <div className="h-24 flex items-center justify-center">
                         <img
                           src={form.destinationMarkerIconUrl}
-                          alt="Marker preview"
+                          alt="Xem trước biểu tượng đánh dấu"
                           className="h-14 w-14 object-contain"
                         />
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Ảnh đánh dấu điểm đến sự kiện chưa được tải lên.
-                      </p>
+                      <p className="text-sm text-muted-foreground">Ảnh đánh dấu điểm đến sự kiện chưa được tải lên.</p>
                     )}
                   </div>
                 </div>
@@ -524,12 +507,7 @@ export default function EventTimelineCreatePage() {
                 event.preventDefault();
                 void handleFinalConfirm();
               }}
-              disabled={
-                loading ||
-                isMarkerUploading ||
-                !!markerUploadError ||
-                !form.destinationMarkerIconUrl.trim()
-              }
+              disabled={loading || isMarkerUploading || !!markerUploadError || !form.destinationMarkerIconUrl.trim()}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

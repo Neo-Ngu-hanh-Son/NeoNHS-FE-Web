@@ -83,25 +83,6 @@ export async function generateQuickCreateAudioAndTiming({
     throw new Error('Thiếu nội dung kịch bản để tạo audio');
   }
 
-  if (!useMock && !apiKey) {
-    throw new Error('Thiếu khóa API ElevenLabs');
-  }
-
-  const mockModeEnabled = useMock;
-  if (mockModeEnabled) {
-    await sleep(700);
-    const mockDuration = Math.max(2, Math.min(20, normalizedText.length / 8));
-    const audioBlob = createSilentWavBlob(mockDuration);
-
-    await sleep(450);
-    const words = buildMockAlignedWords(normalizedText);
-
-    return {
-      audioBlob,
-      words,
-    };
-  }
-
   try {
     const audio = await adminHistoryAudioService.textToSpeech({
       voiceId,
@@ -112,11 +93,6 @@ export async function generateQuickCreateAudioAndTiming({
     });
 
     const audioBlob = await new Response(audio).blob();
-
-    // const response = (await elevenlabs.forcedAlignment.create({
-    //   file: audioBlob,
-    //   text: normalizedText,
-    // })) as ForcedAlignmentResponse;
 
     const response = await adminHistoryAudioService.forcedAlignment({
       file: audioBlob,

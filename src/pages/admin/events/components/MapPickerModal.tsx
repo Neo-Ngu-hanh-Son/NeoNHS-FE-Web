@@ -1,19 +1,13 @@
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { MapContainer, Marker, TileLayer, Tooltip, useMapEvents } from "react-leaflet";
-import { MapPin } from "lucide-react";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { MapContainer, Marker, TileLayer, Tooltip, useMapEvents } from 'react-leaflet';
+import { MapPin } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // Fix leaflet default icon
 const DefaultIcon = L.icon({
@@ -26,14 +20,14 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const createPinIcon = (color: string) =>
   L.divIcon({
-    className: "custom-map-pin",
+    className: 'custom-map-pin',
     html: `<span style="display:block;width:14px;height:14px;border-radius:9999px;background:${color};border:2px solid #fff;box-shadow:0 0 0 2px rgba(15,23,42,0.25);"></span>`,
     iconSize: [14, 14],
     iconAnchor: [7, 7],
   });
 
-const ParentMarkerIcon = createPinIcon("#dc2626");
-const ChildMarkerIcon = createPinIcon("#2563eb");
+const ParentMarkerIcon = createPinIcon('#dc2626');
+const ChildMarkerIcon = createPinIcon('#2563eb');
 
 const DEFAULT_CENTER: [number, number] = [16.0028, 108.2638]; // Ngũ Hành Sơn
 
@@ -42,7 +36,7 @@ interface MapPickerModalOptions {
   showParentMarker?: boolean;
   showChildMarker?: boolean;
   useBlueChildMarker?: boolean;
-  childMarkerVisibility?: "always" | "after-select";
+  childMarkerVisibility?: 'always' | 'after-select';
   parentMarkerLabel?: string;
   defaultZoom?: number;
   zoomWhenParentPosition?: number;
@@ -77,11 +71,11 @@ export function MapPickerModal({
   onConfirm,
 }: MapPickerModalProps) {
   const {
-    helperText = "Nhấp vào bất kỳ đâu trên bản đồ để chọn tọa độ cho địa điểm tổ chức sự kiện.",
+    helperText = 'Nhấp vào bất kỳ đâu trên bản đồ để chọn tọa độ cho địa điểm tổ chức sự kiện.',
     showParentMarker = false,
     showChildMarker = true,
     useBlueChildMarker = false,
-    childMarkerVisibility = "always",
+    childMarkerVisibility = 'always',
     parentMarkerLabel,
     defaultZoom = 15,
     zoomWhenParentPosition = 18,
@@ -134,22 +128,13 @@ export function MapPickerModal({
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">{helperText}</p>
 
-          <div
-            style={{ height: "450px", width: "100%" }}
-            className="rounded-lg overflow-hidden border"
-          >
+          <div style={{ height: '450px', width: '100%' }} className="rounded-lg overflow-hidden border">
             {open && (
               <MapContainer
                 center={position}
-                zoom={
-                  initialPosition
-                    ? zoomWhenInitialPosition
-                    : parentPosition
-                      ? zoomWhenParentPosition
-                      : defaultZoom
-                }
+                zoom={initialPosition ? zoomWhenInitialPosition : parentPosition ? zoomWhenParentPosition : defaultZoom}
                 maxZoom={maxZoom}
-                style={{ height: "100%", width: "100%" }}
+                style={{ height: '100%', width: '100%' }}
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -157,10 +142,7 @@ export function MapPickerModal({
                 />
                 <MapClickHandler onMapClick={handleMapClick} />
                 {showParentMarker && parentPosition && (
-                  <Marker
-                    position={[parentPosition.lat, parentPosition.lng]}
-                    icon={ParentMarkerIcon}
-                  >
+                  <Marker position={[parentPosition.lat, parentPosition.lng]} icon={ParentMarkerIcon}>
                     {parentMarkerLabel && (
                       <Tooltip permanent direction="top" offset={[0, -10]}>
                         {parentMarkerLabel}
@@ -168,23 +150,19 @@ export function MapPickerModal({
                     )}
                   </Marker>
                 )}
-                {showChildMarker &&
-                  (childMarkerVisibility === "always" || hasUserSelectedPosition) && (
-                    <Marker
-                      position={position}
-                      {...(useBlueChildMarker ? { icon: ChildMarkerIcon } : {})}
-                    />
-                  )}
+                {showChildMarker && (childMarkerVisibility === 'always' || hasUserSelectedPosition) && (
+                  <Marker position={position} {...(useBlueChildMarker ? { icon: ChildMarkerIcon } : {})} />
+                )}
               </MapContainer>
             )}
           </div>
 
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs font-mono">
-              Lat: {position[0].toFixed(6)}
+              Vĩ độ: {position[0].toFixed(6)}
             </Badge>
             <Badge variant="outline" className="text-xs font-mono">
-              Lng: {position[1].toFixed(6)}
+              Kinh độ: {position[1].toFixed(6)}
             </Badge>
           </div>
         </div>

@@ -30,7 +30,7 @@ export default function DragImageUploader({
   onUpload,
   onError,
   maxSizeMB = 5,
-  placeholder = 'Drag & drop an image here, or click to browse',
+  placeholder = 'Kéo thả ảnh vào đây hoặc bấm để chọn',
   className,
   disabled = false,
   minHeight = 200,
@@ -56,10 +56,10 @@ export default function DragImageUploader({
 
       try {
         const url = await uploadImageToBackend(file);
-        if (!url) throw new Error('Upload failed — no URL returned');
+        if (!url) throw new Error('Upload thất bại. Vui lòng thử lại.');
         onUpload(url.mediaUrl);
       } catch (err: any) {
-        onError?.(err?.message || 'Failed to upload image. Please try again.');
+        onError?.(err?.message || 'Đã xảy ra lỗi khi tải lên. Vui lòng thử lại.');
       } finally {
         setUploading(false);
       }
@@ -118,7 +118,7 @@ export default function DragImageUploader({
           style={{ minHeight }}
         >
           <Spinner className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-primary font-medium">Uploading…</p>
+          <p className="text-sm text-primary font-medium">Đang tải lên</p>
           <p className="text-xs text-muted-foreground max-w-[80%] truncate text-center">{fileName}</p>
         </div>
         {fileInput}
@@ -143,7 +143,7 @@ export default function DragImageUploader({
             }}
             disabled={disabled}
             className="absolute top-2 right-2 rounded-full bg-black/60 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-black/80 disabled:cursor-not-allowed"
-            title="Remove image"
+            title="Xóa ảnh"
           >
             <X className="h-4 w-4" />
           </button>
@@ -155,7 +155,7 @@ export default function DragImageUploader({
           className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <RefreshCw className="h-3.5 w-3.5" />
-          Click to change image
+          Bấm để thay đổi ảnh
         </button>
         {fileInput}
       </div>

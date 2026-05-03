@@ -5,7 +5,7 @@ import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { ELEVEN_LABS_MODELS, ELEVEN_LABS_VOICES } from '@/pages/admin/historyAudio/constants';
 import type { ForcedAlignmentWord } from '@/pages/admin/historyAudio/types';
 import { useAudioWordTracking } from '@/pages/admin/historyAudio/hooks/useAudioWordTracking';
-import { useElevenLabsAudio } from '@/pages/admin/historyAudio/hooks/useElevenLabsAudio';
+import { useHistoryAudioGeneration } from '@/pages/admin/historyAudio/hooks/useHistoryAudioGeneration';
 import { useHistoryAudioUploadAndSave } from '@/pages/admin/historyAudio/hooks/useHistoryAudioUploadAndSave';
 import { useHistoryAudioMutations } from '@/hooks/historyAudio/useHistoryAudioMutations';
 import { useHistoryAudios } from '../../../../hooks/historyAudio/useHistoryAudios.ts';
@@ -34,7 +34,6 @@ export default function HistoryAudioPanel({
   variant = 'page',
   onBackToParent,
 }: HistoryAudioPanelProps) {
-  const elevenLabsKey = import.meta.env.VITE_ELEVENLABS_API_KEY;
   const navigate = useNavigate();
   const embedded = variant === 'embedded';
 
@@ -74,7 +73,7 @@ export default function HistoryAudioPanel({
     handleGenerateAudio,
     handleGenerateWordTiming,
     handleVoiceChange,
-  } = useElevenLabsAudio({ apiKey: elevenLabsKey, useMock: false });
+  } = useHistoryAudioGeneration();
 
   const {
     uploadingCoverImage,

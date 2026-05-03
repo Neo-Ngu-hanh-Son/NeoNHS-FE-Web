@@ -44,6 +44,10 @@ export const eventPointTagService = {
   delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiClient.delete<ApiResponse<void>>(`/admin/event-point-tags/${id}`);
   },
+
+  restore: async (id: string): Promise<ApiResponse<void>> => {
+    return apiClient.put<ApiResponse<void>>(`/admin/event-point-tags/${id}/restore`, {});
+  },
 };
 
 export default eventPointTagService;

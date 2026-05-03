@@ -82,12 +82,12 @@ function BlogEditPageInner() {
             bannerUrl: b.bannerUrl ?? '',
           });
         } else {
-          message.error(res.message || 'Blog not found, redirecting...', 5, () => {
+          message.error(res.message || 'Không tìm thấy bài viết, đang chuyển hướng...', 5, () => {
             navigate('/admin/blog');
           });
         }
       } catch (err: unknown) {
-        message.error(getApiErrorMessage(err, 'Failed to load blog, redirecting...'), 5, () => {
+        message.error(getApiErrorMessage(err, 'Không thể tải bài viết, đang chuyển hướng...'), 5, () => {
           navigate('/admin/blog');
         });
       } finally {
@@ -102,7 +102,7 @@ function BlogEditPageInner() {
     if (!id) return;
 
     if (content.charCount < 30) {
-      message.warning('Blog content must be at least 30 characters');
+      message.warning('Nội dung bài viết phải có ít nhất 30 ký tự');
       return;
     }
 
@@ -119,13 +119,13 @@ function BlogEditPageInner() {
     try {
       const res = await blogService.updateBlog(id, payload);
       if (res.success || res.data) {
-        message.success('Blog updated successfully!');
+        message.success('Cập nhật bài viết thành công!');
         navigate('/admin/blog');
       } else {
-        message.error(res.message || 'Failed to update blog');
+        message.error(res.message || 'Cập nhật bài viết thất bại');
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, 'An error occurred while updating the blog'));
+      message.error(getApiErrorMessage(err, 'Đã xảy ra lỗi khi cập nhật bài viết'));
     } finally {
       setSubmitting(false);
     }
@@ -135,7 +135,7 @@ function BlogEditPageInner() {
     if (editorRef.current) {
       editorRef.current.save();
     } else {
-      message.error('Editor not ready');
+      message.error('Trình soạn thảo chưa sẵn sàng');
     }
   }
 
@@ -181,8 +181,8 @@ function BlogEditPageInner() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Edit Blog</h1>
-            <p className="text-muted-foreground">Editing: {blog?.title}</p>
+            <h1 className="text-3xl font-bold tracking-tight">Chỉnh sửa bài viết</h1>
+            <p className="text-muted-foreground">Đang chỉnh sửa: {blog?.title}</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -190,12 +190,12 @@ function BlogEditPageInner() {
             {submitting ? (
               <>
                 <Spinner className="h-4 w-4 animate-spin mr-2" />
-                Saving...
+                Đang lưu...
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                {isPublished ? 'Publish' : 'Save Blog'}
+                {isPublished ? 'Xuất bản' : 'Lưu bài viết'}
               </>
             )}
           </Button>

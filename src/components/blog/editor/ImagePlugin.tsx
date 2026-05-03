@@ -1,7 +1,7 @@
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getNodeByKey, $insertNodes } from "lexical";
-import { useCallback, useRef } from "react";
-import { createImageNode, ImageNode } from "./ImageComponents/ImageNode";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $getNodeByKey, $insertNodes } from 'lexical';
+import { useCallback, useRef } from 'react';
+import { createImageNode, ImageNode } from './ImageComponents/ImageNode';
 
 export type ImageUploadHandler = (file: File) => Promise<string>;
 
@@ -23,9 +23,9 @@ export function useImageInsert(onUpload?: ImageUploadHandler) {
           altText,
           width: 400, // Smaller initial size for user to scale by themselves
           style: {
-            filter: "blur(10px)",
-            opacity: "0.6",
-            transition: "all 0.2s ease",
+            filter: 'blur(10px)',
+            opacity: '0.6',
+            transition: 'all 0.2s ease',
           },
         });
 
@@ -50,9 +50,9 @@ export function useImageInsert(onUpload?: ImageUploadHandler) {
           node.setSrc(newSrc);
           node.setAltText(newAltText);
           node.setStyle({
-            filter: "blur(0px)",
-            opacity: "1",
-            transition: "all 0.2s ease",
+            filter: 'blur(0px)',
+            opacity: '1',
+            transition: 'all 0.2s ease',
           });
         }
       });
@@ -68,7 +68,7 @@ export function useImageInsert(onUpload?: ImageUploadHandler) {
       const file = files[0];
 
       const previewSrc = await readFileAsDataURL(file);
-      const nodeKey = insertImagePlaceholder(previewSrc, "Uploading...");
+      const nodeKey = insertImagePlaceholder(previewSrc, 'Đang tải lên...');
 
       try {
         let finalSrc: string;
@@ -90,13 +90,12 @@ export function useImageInsert(onUpload?: ImageUploadHandler) {
             });
           }
         }
-
       } catch (error) {
-        console.error("Image upload failed:", error);
+        console.error('Image upload failed:', error);
       }
 
       if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+        fileInputRef.current.value = '';
       }
     },
     [editor, onUpload, insertImagePlaceholder, updateImageNodeSrc],

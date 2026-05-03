@@ -167,7 +167,7 @@ export default function EventTimelineUpdatePage() {
 
       if (!timeline) {
         setInitializing(false);
-        message.error('Không tìm thấy timeline.');
+        message.error('Không tìm thấy mục dòng thời gian.');
         navigate(`/admin/events/${eventId}?tab=timeline`, { replace: true });
         return;
       }
@@ -303,7 +303,7 @@ export default function EventTimelineUpdatePage() {
     }
 
     if (!markerUploaderRef.current) {
-      setMarkerUploadError('Không thể khởi tạo upload marker. Vui lòng thử lại.');
+      setMarkerUploadError('Không thể khởi tạo tải lên biểu tượng đánh dấu. Vui lòng thử lại.');
       return;
     }
 
@@ -313,10 +313,10 @@ export default function EventTimelineUpdatePage() {
     const iconUrl = await markerUploaderRef.current.generateMarkerIcon();
 
     if (!iconUrl) {
-      setMarkerUploadError('Không thể tạo và upload marker icon. Vui lòng thử lại.');
+      setMarkerUploadError('Không thể tạo và tải lên biểu tượng đánh dấu. Vui lòng thử lại.');
       setErrors((prev) => ({
         ...prev,
-        destinationMarkerIconUrl: 'Không thể tạo và upload marker icon. Vui lòng thử lại.',
+        destinationMarkerIconUrl: 'Không thể tạo và tải lên biểu tượng đánh dấu. Vui lòng thử lại.',
       }));
       setIsMarkerUploading(false);
       return;
@@ -356,7 +356,7 @@ export default function EventTimelineUpdatePage() {
   if (!eventId || !currentTimelineId) {
     return (
       <div className="max-w-6xl mx-auto">
-        <p className="text-sm text-muted-foreground">ID sự kiện hoặc timeline không hợp lệ.</p>
+        <p className="text-sm text-muted-foreground">ID sự kiện hoặc dòng thời gian không hợp lệ.</p>
       </div>
     );
   }
@@ -375,9 +375,9 @@ export default function EventTimelineUpdatePage() {
     <div className="max-w-6xl mx-auto space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Cập nhật Timeline Entry</h1>
+          <h1 className="text-2xl font-bold">Cập nhật mục dòng thời gian</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {event ? `Sự kiện: ${event.name}` : 'Cập nhật timeline entry này.'}
+            {event ? `Sự kiện: ${event.name}` : 'Cập nhật mục dòng thời gian này.'}
           </p>
         </div>
         <Button variant="outline" onClick={() => navigate(`/admin/events/${eventId}?tab=timeline`)}>
@@ -394,7 +394,7 @@ export default function EventTimelineUpdatePage() {
                 value="timeline"
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                1. Cập nhật timeline sự kiện
+                1. Cập nhật dòng thời gian sự kiện
               </TabsTrigger>
               <TabsTrigger
                 value="point"
@@ -408,7 +408,7 @@ export default function EventTimelineUpdatePage() {
                 disabled={step !== 'visual'}
                 className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
-                3. Tạo thẻ địa điểm
+                3. Cập nhật thẻ địa điểm
               </TabsTrigger>
             </TabsList>
 
@@ -484,7 +484,7 @@ export default function EventTimelineUpdatePage() {
 
           <div className="space-y-4">
             <div className={`rounded-md border p-3 ${isMarkerUploading ? 'opacity-60' : ''}`}>
-              <p className="text-sm font-medium">Trạng thái Tải lên Ảnh đánh dấu</p>
+              <p className="text-sm font-medium">Trạng thái tải lên ảnh đánh dấu</p>
               <p className="text-xs text-muted-foreground mt-1">
                 {isMarkerUploading
                   ? 'Đang tải ảnh đánh dấu lên hệ thống...'
@@ -496,9 +496,9 @@ export default function EventTimelineUpdatePage() {
 
             <div className="max-h-[360px] overflow-auto rounded-md border bg-muted/20 p-4 space-y-4">
               <section className="space-y-2">
-                <p className="text-sm font-semibold">Chi tiết timeline</p>
+                <p className="text-sm font-semibold">Chi tiết dòng thời gian</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <SummaryItem label="Tên timeline" value={summaryValue(form.name)} />
+                  <SummaryItem label="Tên mục dòng thời gian" value={summaryValue(form.name)} />
                   <SummaryItem label="Ngày" value={summaryValue(form.date)} />
                   <SummaryItem label="Giờ bắt đầu" value={summaryValue(form.startTime)} />
                   <SummaryItem label="Giờ kết thúc" value={summaryValue(form.endTime)} />
@@ -537,7 +537,7 @@ export default function EventTimelineUpdatePage() {
                     {form.destinationImageUrl.trim() ? (
                       <img
                         src={form.destinationImageUrl}
-                        alt="Destination preview"
+                        alt="Xem trước ảnh điểm đến"
                         className="h-24 w-full object-cover rounded"
                       />
                     ) : (
@@ -546,17 +546,17 @@ export default function EventTimelineUpdatePage() {
                   </div>
 
                   <div className="rounded-md border p-3">
-                    <p className="text-xs text-muted-foreground mb-2">Marker địa điểm sự kiện</p>
+                    <p className="text-xs text-muted-foreground mb-2">Biểu tượng đánh dấu địa điểm sự kiện</p>
                     {form.destinationMarkerIconUrl.trim() ? (
                       <div className="h-24 flex items-center justify-center">
                         <img
                           src={form.destinationMarkerIconUrl}
-                          alt="Marker preview"
+                          alt="Xem trước biểu tượng đánh dấu"
                           className="h-14 w-14 object-contain"
                         />
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">Marker sẽ hiển thị sau khi upload</p>
+                      <p className="text-sm text-muted-foreground">Biểu tượng đánh dấu sẽ hiển thị sau khi tải lên</p>
                     )}
                   </div>
                 </div>

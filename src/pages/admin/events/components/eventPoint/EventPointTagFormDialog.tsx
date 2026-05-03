@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -11,14 +11,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { message } from "antd";
-import type { EventPointTagRequest, EventPointTagResponse } from "@/types/eventTimeline";
-import { Icon } from "@iconify/react";
-import html2canvas from "html2canvas";
-import { uploadImageToBackend } from "@/utils/cloudinary";
+} from '@/components/ui/dialog';
+import { message } from 'antd';
+import type { EventPointTagRequest, EventPointTagResponse } from '@/types/eventTimeline';
+import { Icon } from '@iconify/react';
+import html2canvas from 'html2canvas';
+import { uploadImageToBackend } from '@/utils/cloudinary';
 
-const DEFAULT_TAG_COLOR = "#0f766e";
+const DEFAULT_TAG_COLOR = '#0f766e';
 
 type VisualIconOption = {
   key: string;
@@ -28,53 +28,53 @@ type VisualIconOption = {
 };
 
 const QUICK_SWATCHES = [
-  "#0f766e",
-  "#0d9488",
-  "#2563eb",
-  "#db2777",
-  "#ea580c",
-  "#7c3aed",
-  "#e11d48",
-  "#d97706",
-  "#65a30d",
-  "#0284c7",
-  "#9333ea",
-  "#a16207",
-  "#4f46e5",
+  '#0f766e',
+  '#0d9488',
+  '#2563eb',
+  '#db2777',
+  '#ea580c',
+  '#7c3aed',
+  '#e11d48',
+  '#d97706',
+  '#65a30d',
+  '#0284c7',
+  '#9333ea',
+  '#a16207',
+  '#4f46e5',
 ];
 
 const NHS_CULTURAL_ICONS: VisualIconOption[] = [
-  { key: "marker", label: "Location", iconName: "mdi:map-marker" },
-  { key: "navigation", label: "Navigation", iconName: "mdi:compass" },
-  { key: "viewpoint", label: "Viewpoint", iconName: "mdi:binoculars" },
-  { key: "trail", label: "Trail", iconName: "mdi:foot-print" },
-  { key: "info", label: "Information", iconName: "mdi:information" },
-  { key: "parking", label: "Parking", iconName: "mdi:parking" },
-  { key: "wc", label: "Restroom", iconName: "mdi:toilet" },
-  { key: "food", label: "Food", iconName: "mdi:food" },
-  { key: "drink", label: "Drink", iconName: "mdi:cup-water" },
-  { key: "ticket", label: "Ticket", iconName: "mdi:ticket" },
-  { key: "pagoda", label: "Pagoda", iconName: "mdi:temple-buddhist" },
-  { key: "shrine", label: "Shrine", iconName: "mdi:home-variant" },
-  { key: "incense", label: "Ritual", iconName: "mdi:fire" },
-  { key: "statue", label: "Statue", iconName: "mdi:human-male-height" },
-  { key: "history", label: "History", iconName: "mdi:scroll" },
-  { key: "mountain", label: "Mountain", iconName: "mdi:mountain" },
-  { key: "cave", label: "Cave", iconName: "roentgen:cave" },
-  { key: "water", label: "Water", iconName: "mdi:waves" },
-  { key: "tree", label: "Nature", iconName: "mdi:pine-tree" },
-  { key: "stone", label: "Marble", iconName: "mdi:diamond-stone" },
-  { key: "craft", label: "Craft", iconName: "mdi:brush" },
-  { key: "photo", label: "Photo Spot", iconName: "mdi:camera" },
-  { key: "guide", label: "Guide", iconName: "mdi:account-tie" },
-  { key: "shopping", label: "Souvenir", iconName: "mdi:shopping" },
-  { key: "festival", label: "Festival", iconName: "mdi:party-popper" },
-  { key: "music", label: "Music", iconName: "mdi:music" },
-  { key: "live-music", label: "Live Music", iconName: "mdi:microphone" },
-  { key: "dance", label: "Performance", iconName: "mdi:human-female-dance" },
-  { key: "fireworks", label: "Fireworks", iconName: "mdi:firework" },
-  { key: "stage", label: "Stage Event", iconName: "mdi:theater" },
-  { key: "lantern", label: "Lantern", iconName: "mingcute:lantern-fill" },
+  { key: 'marker', label: 'Vị trí', iconName: 'mdi:map-marker' },
+  { key: 'navigation', label: 'Điều hướng', iconName: 'mdi:compass' },
+  { key: 'viewpoint', label: 'Điểm ngắm', iconName: 'mdi:binoculars' },
+  { key: 'trail', label: 'Lối đi', iconName: 'mdi:foot-print' },
+  { key: 'info', label: 'Thông tin', iconName: 'mdi:information' },
+  { key: 'parking', label: 'Bãi đỗ xe', iconName: 'mdi:parking' },
+  { key: 'wc', label: 'Nhà vệ sinh', iconName: 'mdi:toilet' },
+  { key: 'food', label: 'Ẩm thực', iconName: 'mdi:food' },
+  { key: 'drink', label: 'Đồ uống', iconName: 'mdi:cup-water' },
+  { key: 'ticket', label: 'Vé', iconName: 'mdi:ticket' },
+  { key: 'pagoda', label: 'Chùa', iconName: 'mdi:temple-buddhist' },
+  { key: 'shrine', label: 'Đền', iconName: 'mdi:home-variant' },
+  { key: 'incense', label: 'Nghi lễ', iconName: 'mdi:fire' },
+  { key: 'statue', label: 'Tượng', iconName: 'mdi:human-male-height' },
+  { key: 'history', label: 'Lịch sử', iconName: 'mdi:scroll' },
+  { key: 'mountain', label: 'Núi', iconName: 'mdi:mountain' },
+  { key: 'cave', label: 'Hang động', iconName: 'roentgen:cave' },
+  { key: 'water', label: 'Nước', iconName: 'mdi:waves' },
+  { key: 'tree', label: 'Thiên nhiên', iconName: 'mdi:pine-tree' },
+  { key: 'stone', label: 'Đá cẩm thạch', iconName: 'mdi:diamond-stone' },
+  { key: 'craft', label: 'Thủ công', iconName: 'mdi:brush' },
+  { key: 'photo', label: 'Góc chụp ảnh', iconName: 'mdi:camera' },
+  { key: 'guide', label: 'Hướng dẫn', iconName: 'mdi:account-tie' },
+  { key: 'shopping', label: 'Lưu niệm', iconName: 'mdi:shopping' },
+  { key: 'festival', label: 'Lễ hội', iconName: 'mdi:party-popper' },
+  { key: 'music', label: 'Âm nhạc', iconName: 'mdi:music' },
+  { key: 'live-music', label: 'Nhạc sống', iconName: 'mdi:microphone' },
+  { key: 'dance', label: 'Biểu diễn', iconName: 'mdi:human-female-dance' },
+  { key: 'fireworks', label: 'Pháo hoa', iconName: 'mdi:firework' },
+  { key: 'stage', label: 'Sân khấu', iconName: 'mdi:theater' },
+  { key: 'lantern', label: 'Đèn lồng', iconName: 'mingcute:lantern-fill' },
 ];
 
 interface EventPointTagFormDialogProps {
@@ -90,16 +90,11 @@ interface FormData {
 }
 
 const emptyForm: FormData = {
-  name: "",
-  description: "",
+  name: '',
+  description: '',
 };
 
-export function EventPointTagFormDialog({
-  open,
-  onOpenChange,
-  tag,
-  onSubmit,
-}: EventPointTagFormDialogProps) {
+export function EventPointTagFormDialog({ open, onOpenChange, tag, onSubmit }: EventPointTagFormDialogProps) {
   const [form, setForm] = useState<FormData>(emptyForm);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [loading, setLoading] = useState(false);
@@ -119,15 +114,15 @@ export function EventPointTagFormDialog({
     if (open) {
       if (tag) {
         setForm({
-          name: tag.name || "",
-          description: tag.description || "",
+          name: tag.name || '',
+          description: tag.description || '',
         });
         setTagColor(tag.tagColor || DEFAULT_TAG_COLOR);
 
         if (tag.iconUrl) {
           setSelectedIcon({
-            key: "existing",
-            label: "Current icon",
+            key: 'existing',
+            label: 'Biểu tượng hiện tại',
             iconName: tag.iconUrl,
             isCustom: true,
           });
@@ -150,7 +145,7 @@ export function EventPointTagFormDialog({
 
   useEffect(() => {
     return () => {
-      if (customUploadUrl?.startsWith("blob:")) {
+      if (customUploadUrl?.startsWith('blob:')) {
         URL.revokeObjectURL(customUploadUrl);
       }
     };
@@ -160,7 +155,7 @@ export function EventPointTagFormDialog({
     if (selectedIcon.isCustom) {
       return <img src={selectedIcon.iconName} className="h-8 w-8 object-contain" />;
     }
-    return <Icon icon={selectedIcon.iconName} width={32} height={32} style={{ color: "white" }} />;
+    return <Icon icon={selectedIcon.iconName} width={32} height={32} style={{ color: 'white' }} />;
   }, [selectedIcon]);
 
   const handleChange = (field: keyof FormData, value: string) => {
@@ -187,23 +182,23 @@ export function EventPointTagFormDialog({
   const handleUploadIcon = (file: File | undefined) => {
     if (!file) return;
 
-    const isValidType = file.type === "image/svg+xml" || file.type === "image/png";
+    const isValidType = file.type === 'image/svg+xml' || file.type === 'image/png';
 
     if (!isValidType) {
-      message.error("Only .svg and .png files are supported.");
+      message.error('Chỉ hỗ trợ file .svg và .png.');
       return;
     }
 
     const objectUrl = URL.createObjectURL(file);
 
-    if (customUploadUrl?.startsWith("blob:")) {
+    if (customUploadUrl?.startsWith('blob:')) {
       URL.revokeObjectURL(customUploadUrl);
     }
 
     setCustomUploadUrl(objectUrl);
     setSelectedIcon({
-      key: "custom-upload",
-      label: "Custom Upload",
+      key: 'custom-upload',
+      label: 'Tải lên tùy chỉnh',
       iconName: objectUrl,
       isCustom: true,
     });
@@ -214,7 +209,7 @@ export function EventPointTagFormDialog({
     const nextErrors: Partial<Record<keyof FormData, string>> = {};
 
     if (!form.name.trim()) {
-      nextErrors.name = "Tag name is required";
+      nextErrors.name = 'Tên thẻ là bắt buộc';
     }
 
     setErrors(nextErrors);
@@ -233,14 +228,14 @@ export function EventPointTagFormDialog({
     });
 
     const blob = await new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((value) => resolve(value), "image/png");
+      canvas.toBlob((value) => resolve(value), 'image/png');
     });
 
     if (!blob) return null;
 
-    const file = new File([blob], `marker-${Date.now()}.png`, { type: "image/png" });
+    const file = new File([blob], `marker-${Date.now()}.png`, { type: 'image/png' });
     const url = await uploadImageToBackend(file);
-    return url?.mediaUrl ?? "";
+    return url?.mediaUrl ?? '';
   };
 
   const handleSubmit = async () => {
@@ -253,7 +248,7 @@ export function EventPointTagFormDialog({
     if (isMarkerDirty) {
       const url = await buildMarkerPng();
       if (!url) {
-        message.error("Error generating marker icon.");
+        message.error('Lỗi tạo biểu tượng điểm.');
         setLoading(false);
         return;
       }
@@ -280,11 +275,9 @@ export function EventPointTagFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Point Tag" : "Add Point Tag"}</DialogTitle>
+          <DialogTitle>{isEdit ? 'Chỉnh sửa thẻ điểm' : 'Thêm thẻ điểm'}</DialogTitle>
           <DialogDescription>
-            {isEdit
-              ? "Update visual and descriptive information for this tag."
-              : "Create a reusable tag for event points."}
+            {isEdit ? 'Cập nhật thông tin hiển thị và mô tả cho thẻ này.' : 'Tạo thẻ dùng chung cho các điểm sự kiện.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -293,29 +286,29 @@ export function EventPointTagFormDialog({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <div>
-                <Label htmlFor="event-point-tag-name">Tag Name *</Label>
+                <Label htmlFor="event-point-tag-name">Tên thẻ *</Label>
                 <Input
                   id="event-point-tag-name"
                   value={form.name}
-                  onChange={(e) => handleChange("name", e.target.value)}
-                  placeholder="e.g. Main Stage"
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  placeholder="vd: Sân khấu chính"
                 />
                 {errors.name && <p className="text-xs text-destructive mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <Label htmlFor="event-point-tag-description">Description</Label>
+                <Label htmlFor="event-point-tag-description">Mô tả</Label>
                 <Textarea
                   id="event-point-tag-description"
                   value={form.description}
-                  onChange={(e) => handleChange("description", e.target.value)}
-                  placeholder="Optional. If empty, it will default to tag name."
+                  onChange={(e) => handleChange('description', e.target.value)}
+                  placeholder="Không bắt buộc. Nếu để trống sẽ dùng tên thẻ."
                   rows={3}
                 />
               </div>
 
               <div>
-                <Label>Color</Label>
+                <Label>Màu sắc</Label>
                 <div className="mt-2 flex flex-wrap gap-2 items-center">
                   {QUICK_SWATCHES.map((swatch) => (
                     <button
@@ -323,9 +316,7 @@ export function EventPointTagFormDialog({
                       type="button"
                       onClick={() => handleTagColorChange(swatch)}
                       className={`h-6 w-6 rounded-full border-2 ${
-                        tagColor === swatch
-                          ? "border-primary ring-2 ring-primary ring-offset-1"
-                          : "border-transparent"
+                        tagColor === swatch ? 'border-primary ring-2 ring-primary ring-offset-1' : 'border-transparent'
                       }`}
                       style={{ backgroundColor: swatch }}
                     />
@@ -343,7 +334,7 @@ export function EventPointTagFormDialog({
             {/* Icon Selection */}
             <div className="space-y-4">
               <div>
-                <Label>Preview</Label>
+                <Label>Xem trước</Label>
                 <div className="flex items-center gap-4 mt-2">
                   <div
                     className="flex h-16 w-16 items-center justify-center rounded-full shadow-md transition-all duration-300 border-2 border-white"
@@ -351,17 +342,15 @@ export function EventPointTagFormDialog({
                   >
                     {markerIcon}
                   </div>
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {selectedIcon.label}
-                  </span>
+                  <span className="text-sm font-medium text-muted-foreground">{selectedIcon.label}</span>
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <Label>Icon</Label>
+                  <Label>Biểu tượng</Label>
                   <Button onClick={handleSelectCustomUpload} variant="outline" size="sm">
-                    Tải lên icon tùy chỉnh
+                    Tải lên biểu tượng tùy chỉnh
                   </Button>
                   <input
                     type="file"
@@ -373,16 +362,12 @@ export function EventPointTagFormDialog({
                 </div>
 
                 <div className="grid grid-cols-6 gap-2 max-h-48 overflow-y-auto p-1 border rounded-md">
-                  {customUploadUrl && selectedIcon.key === "custom-upload" && (
+                  {customUploadUrl && selectedIcon.key === 'custom-upload' && (
                     <button
                       type="button"
                       className="h-10 w-10 border rounded flex items-center justify-center border-primary ring-1 ring-primary"
                     >
-                      <img
-                        src={customUploadUrl}
-                        alt="Custom upload"
-                        className="max-h-6 max-w-6 object-contain"
-                      />
+                      <img src={customUploadUrl} alt="Tải lên tùy chỉnh" className="max-h-6 max-w-6 object-contain" />
                     </button>
                   )}
                   {NHS_CULTURAL_ICONS.map((item) => {
@@ -394,7 +379,7 @@ export function EventPointTagFormDialog({
                         title={item.label}
                         onClick={() => handleSelectIcon(item)}
                         className={`h-10 w-10 border rounded flex items-center justify-center ${
-                          isActive ? "border-primary ring-1 ring-primary" : ""
+                          isActive ? 'border-primary ring-1 ring-primary' : ''
                         }`}
                       >
                         <Icon icon={item.iconName} width={20} height={20} />
@@ -413,10 +398,10 @@ export function EventPointTagFormDialog({
             ref={markerPreviewRef}
             className="flex items-center justify-center rounded-full"
             style={{
-              width: "48px",
-              height: "48px",
+              width: '48px',
+              height: '48px',
               backgroundColor: tagColor,
-              padding: "8px",
+              padding: '8px',
             }}
           >
             {markerIcon}
@@ -425,11 +410,11 @@ export function EventPointTagFormDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Hủy
           </Button>
           <Button onClick={handleSubmit} disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isEdit ? "Update" : "Create"}
+            {isEdit ? 'Cập nhật' : 'Tạo mới'}
           </Button>
         </DialogFooter>
       </DialogContent>

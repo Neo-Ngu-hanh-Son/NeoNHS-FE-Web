@@ -24,15 +24,15 @@ export default function EventPointTagPicker({ tags, onTagSelect, selectedTagId }
           className={cn('w-full justify-between font-normal')}
           aria-expanded={openPopover}
         >
-          {tags.find((tag) => tag.id === selectedTagId)?.name || 'Select event point tag...'}
+          {tags.find((tag) => tag.id === selectedTagId)?.name || 'Chọn thẻ điểm sự kiện...'}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
-          <CommandInput placeholder="Search event point tags..." />
+          <CommandInput placeholder="Tìm thẻ điểm sự kiện..." />
           <CommandList>
-            <CommandEmpty>No event point tags found.</CommandEmpty>
+            <CommandEmpty>Không tìm thấy thẻ điểm sự kiện.</CommandEmpty>
             <CommandGroup>
               {tags.map((tag) => (
                 <CommandItem
@@ -46,7 +46,7 @@ export default function EventPointTagPicker({ tags, onTagSelect, selectedTagId }
                   className="cursor-pointer"
                 >
                   <Check className={cn('mr-2 h-4 w-4', tag.id === selectedTagId ? 'opacity-100' : 'opacity-0')} />
-                  {tag.name || 'Unnamed tag'}
+                  {tag.name || 'Thẻ chưa đặt tên'}
                 </CommandItem>
               ))}
             </CommandGroup>

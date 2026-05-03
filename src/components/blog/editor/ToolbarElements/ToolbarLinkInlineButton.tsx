@@ -1,5 +1,5 @@
-import { Button, Input } from "@/components/ui";
-import { Check, X } from "lucide-react";
+import { Button, Input } from '@/components/ui';
+import { Check, X } from 'lucide-react';
 
 type LinkInlineEditorProps = {
   isEditMode: boolean;
@@ -27,10 +27,10 @@ export default function LinkInlineEditor({
         placeholder="Nhập URL..."
         autoFocus
         onKeyDown={(e) => {
-          if (e.key === "Enter") onConfirm()
-          if (e.key === "Escape") onCancel()
+          if (e.key === 'Enter') onConfirm();
+          if (e.key === 'Escape') onCancel();
         }}
-        className='h-9'
+        className="h-9"
       />
 
       <Button
@@ -38,20 +38,13 @@ export default function LinkInlineEditor({
         size="icon"
         variant="default"
         onClick={onConfirm}
-        title="Apply link"
+        title="Áp dụng liên kết"
         className="h-9 w-9"
       >
         <Check className="h-4 w-4" />
       </Button>
 
-      <Button
-        type="button"
-        size="icon"
-        variant="outline"
-        onClick={onCancel}
-        title="Hủy"
-        className="h-9 w-9"
-      >
+      <Button type="button" size="icon" variant="outline" onClick={onCancel} title="Hủy" className="h-9 w-9">
         <X className="h-4 w-4" />
       </Button>
     </div>

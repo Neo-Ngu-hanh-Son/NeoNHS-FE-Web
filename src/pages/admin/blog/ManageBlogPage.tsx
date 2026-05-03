@@ -48,7 +48,7 @@ export default function ManageBlogPage() {
   } = useBlogs();
 
   const handleExport = () => {
-    const header = 'Title,Category,Status,Views,Created Date\n';
+    const header = 'Tiêu đề,Danh mục,Trạng thái,Lượt xem,Ngày tạo\n';
     const rows = blogs.map(
       (b) =>
         `"${b.title}","${b.blogCategory?.name ?? ''}","${b.status}",${b.viewCount},"${b.createdAt ? formatShortDate(b.createdAt) : ''}"`,
@@ -68,14 +68,14 @@ export default function ManageBlogPage() {
       setProcessing(true);
       const res = await blogService.deleteBlogHard(permanentDeleteTarget.id);
       if (res.success) {
-        message.success(res.message || 'Blog permanently deleted');
+        message.success(res.message || 'Đã xóa vĩnh viễn bài viết');
         setPermanentDeleteTarget(null);
         refetch();
       } else {
-        message.error(res.message || 'Failed to delete blog permanently');
+        message.error(res.message || 'Không thể xóa vĩnh viễn bài viết');
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, 'Failed to delete blog permanently'));
+      message.error(getApiErrorMessage(err, 'Không thể xóa vĩnh viễn bài viết'));
     } finally {
       setProcessing(false);
     }
@@ -86,14 +86,14 @@ export default function ManageBlogPage() {
       setProcessing(true);
       const res = await blogService.emptyAllDeletedBlogs();
       if (res.success) {
-        message.success(res.message || 'All archived blogs emptied');
+        message.success(res.message || 'Đã xóa vĩnh viễn tất cả bài viết đã lưu trữ');
         setShowEmptyArchivedDialog(false);
         refetch();
       } else {
-        message.error(res.message || 'Failed to empty archived blogs');
+        message.error(res.message || 'Không thể xóa vĩnh viễn các bài viết đã lưu trữ');
       }
     } catch (err: unknown) {
-      message.error(getApiErrorMessage(err, 'Failed to empty archived blogs'));
+      message.error(getApiErrorMessage(err, 'Không thể xóa vĩnh viễn các bài viết đã lưu trữ'));
     } finally {
       setProcessing(false);
     }
@@ -137,20 +137,20 @@ export default function ManageBlogPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Permanently Delete Blog</AlertDialogTitle>
+            <AlertDialogTitle>Xóa vĩnh viễn bài viết</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The blog "{permanentDeleteTarget?.title}" will be deleted permanently.
+              Hành động này không thể hoàn tác. Bài viết "{permanentDeleteTarget?.title}" sẽ bị xóa vĩnh viễn.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={processing}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handlePermanentDelete}
               disabled={processing}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {processing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-              Delete Permanently
+              Xóa vĩnh viễn
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -162,20 +162,20 @@ export default function ManageBlogPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Empty All Archived Blogs</AlertDialogTitle>
+            <AlertDialogTitle>Xóa vĩnh viễn tất cả bài viết đã lưu trữ</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete every archived blog. This action cannot be undone.
+              Thao tác này sẽ xóa vĩnh viễn mọi bài viết đã lưu trữ. Không thể hoàn tác.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={processing}>Hủy</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleEmptyArchived}
               disabled={processing}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {processing ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-              Empty Archived
+              Xóa hết bài đã lưu trữ
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
