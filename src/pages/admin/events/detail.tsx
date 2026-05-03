@@ -586,6 +586,7 @@ export default function EventDetailPage() {
         open={mapPickerOpen}
         onOpenChange={setMapPickerOpen}
         initialCoord={event.latitude && event.longitude ? [Number(event.latitude), Number(event.longitude)] : undefined}
+        initialName={event.locationName || event.name}
         onSelect={handleUpdateLocation}
       />
     </div>

@@ -245,6 +245,7 @@ export default function AdminDestinationsPage() {
           setIsDiscoveryModalVisible(open);
         }}
         initialCoord={isMapPickerVisible ? pickerCoord : undefined}
+        initialName={isMapPickerVisible ? editingPoint?.name : undefined}
         onSelect={(result) => {
           if (isMapPickerVisible) {
             onConfirmCoord({

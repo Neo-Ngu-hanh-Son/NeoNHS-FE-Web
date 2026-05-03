@@ -574,6 +574,7 @@ export function EventForm({ mode, initialData, onSubmit, loading }: EventFormPro
         open={mapPickerOpen}
         onOpenChange={setMapPickerOpen}
         initialCoord={mapInitialPos ? [mapInitialPos.lat, mapInitialPos.lng] : undefined}
+        initialName={form.locationName || form.name}
         onSelect={handleMapLocationSelect}
       />
     </div>
